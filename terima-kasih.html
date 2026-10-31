@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terima kasih · SureOwl</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0F1B33">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400&family=Manrope:wght@400;600;700&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0F1B33;color:#F4EEE1;font-family:Manrope,system-ui,sans-serif;font-size:17px;line-height:1.55;display:flex;align-items:center}
+main{max-width:720px;margin:0 auto;padding:64px 24px;display:flex;flex-direction:column;gap:24px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;letter-spacing:.2em;font-size:13px;color:#C9A55C}
+h1{margin:0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(44px,8vw,80px);line-height:.98;letter-spacing:-.03em}
+h1 em{font-weight:400;color:#C9A55C}
+p{margin:0;color:#C8C1B2}
+ol{margin:0;padding:0;list-style:none;border-top:1px solid #2E3E62}
+li{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #2E3E62}
+li span{font-family:'IBM Plex Mono',monospace;color:#C9A55C}
+.ref{font-family:'IBM Plex Mono',monospace;font-size:14px;color:#9AA6BF}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 26px;border-radius:999px;font-weight:700;text-decoration:none}
+.gold{background:#C9A55C;color:#0F1B33}.gold:hover{background:#E3C98E}
+.ghost{border:1.5px solid #3B4C72;color:#F4EEE1}.ghost:hover{border-color:#C9A55C}
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">SUREOWL</div>
+  <h1>Terima kasih. <em>Lagumu segera didengar.</em></h1>
+  <p>Kalau pembayaranmu sudah berhasil, bukti bayar dikirim ke email kamu. Tim SureOwl akan menghubungi kamu lewat WhatsApp maksimal 1×24 jam kerja.</p>
+  <p class="ref" data-ref></p>
+  <ol>
+    <li><span>01</span><div>Siapkan file lagu final dan bagian lagu (detik ke berapa) yang ingin dijadikan sound.</div></li>
+    <li><span>02</span><div>Kirim brief lewat WhatsApp supaya kampanye bisa langsung kami jalankan.</div></li>
+    <li><span>03</span><div>Laporan hasil kampanye dikirim sesuai paket yang kamu ambil.</div></li>
+  </ol>
+  <div class="row">
+    <a class="btn gold" data-wa href="https://wa.me/6281311995520" target="_blank" rel="noopener">Kirim brief lewat WhatsApp</a>
+    <a class="btn ghost" href="/">Kembali ke beranda</a>
+  </div>
+</main>
+<script>
+(function () {
+  var ref = new URLSearchParams(location.search).get('ref') || '';
+  ref = ref.replace(/[^A-Z0-9-]/gi, '').slice(0, 24);
+  if (ref) document.querySelector('[data-ref]').textContent = 'Nomor pesanan: ' + ref;
+  var msg = 'Halo SureOwl, saya sudah bayar' + (ref ? ' pesanan ' + ref : '') + '. Ini brief lagu saya:';
+  document.querySelector('[data-wa]').href = 'https://wa.me/6281311995520?text=' + encodeURIComponent(msg);
+})();
+</script>
+</body>
+</html>

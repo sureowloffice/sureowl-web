@@ -1,0 +1,21 @@
+{
+  "currency": "IDR",
+  "whatsapp": "6281311995520",
+  "items": [
+    { "id": "basic", "type": "paket", "name": "Paket Basic", "short": "BASIC", "price": 7000000, "normal": 7000000, "includes": ["1.000 UGC creator pakai sound"] },
+    { "id": "silver", "type": "paket", "name": "Paket Silver", "short": "SILVER", "price": 11000000, "normal": 11500000, "includes": ["1.000 UGC creator pakai sound", "FYP Booster"] },
+    { "id": "gold", "type": "paket", "name": "Paket Gold", "short": "GOLD", "price": 18000000, "normal": 19500000, "recommended": true, "includes": ["1.000 UGC creator pakai sound", "FYP Booster", "100 clipper musik"] },
+    { "id": "platinum", "type": "paket", "name": "Paket Platinum", "short": "PLATINUM", "price": 45000000, "normal": 49500000, "includes": ["1.000 UGC creator pakai sound", "FYP Booster", "100 clipper musik", "50 KOL"] },
+    { "id": "diamond", "type": "paket", "name": "Paket Diamond", "short": "DIAMOND", "price": 71000000, "normal": 79500000, "includes": ["1.000 UGC creator pakai sound", "FYP Booster", "100 clipper musik", "100 KOL"] },
+
+    { "id": "ac-sound", "type": "alacarte", "group": "Sound & UGC", "name": "1.000 buzzer pakai sound TikTok / Instagram", "price": 7000000 },
+    { "id": "ac-tt-cl", "type": "alacarte", "group": "TikTok pre-release", "name": "1–10 postingan TikTok: total 1.000 komentar + 1.000 like", "price": 2000000 },
+    { "id": "ac-tt-full", "type": "alacarte", "group": "TikTok pre-release", "name": "1–10 postingan TikTok: total 1.000 komentar + share + save + like", "price": 2500000 },
+    { "id": "ac-ig-cl", "type": "alacarte", "group": "Instagram", "name": "1–10 postingan Instagram: total 1.000 komentar + 1.000 like", "price": 1800000 },
+    { "id": "ac-ig-full", "type": "alacarte", "group": "Instagram", "name": "1–10 postingan Instagram: total 1.000 like + komentar + share story + save", "price": 2000000 },
+    { "id": "ac-yt-cl", "type": "alacarte", "group": "YouTube", "name": "1.000 komentar + like YouTube", "price": 2200000 },
+    { "id": "ac-yt-c", "type": "alacarte", "group": "YouTube", "name": "1.000 komentar YouTube", "price": 1600000 },
+    { "id": "ac-tt-fol", "type": "alacarte", "group": "Followers", "name": "1.000 followers TikTok", "price": 1500000 },
+    { "id": "ac-ig-fol", "type": "alacarte", "group": "Followers", "name": "1.000 followers Instagram", "price": 700000 }
+  ]
+}

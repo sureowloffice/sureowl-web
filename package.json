@@ -1,0 +1,7 @@
+{
+  "name": "sureowl-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Website SureOwl: paket promosi musik, keranjang, dan pembayaran online via Mayar.",
+  "engines": { "node": ">=18" }
+}
