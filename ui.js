@@ -131,7 +131,7 @@ const LADDER=[['🌱','Seniman Magang','Hari 0–6'],['🎒','Seniman Jalanan','
 R.kerja=()=>{const me=K.byName.get(store.get('me',''));const tp=topProf();const max=tp[0]?tp[0].c:1;
   $('kerjaBody').innerHTML=(me?`<ul class="list"><li class="item feat"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>@${esc(me.u)} · ${esc(me.p||'Belum pilih profesi')}</small></span></li></ul>`:'')+
   `<h3>Jenjang jabatan</h3><div class="ladder">`+
-  `<div class="item${me&&me.i>=1&&me.i<=10?' cur':''}"><span class="ic">👑</span><span><b>Pendiri Kota</b><small>Khusus 10 warga pertama, permanen</small></span></div>`+
+  `<div class="item${me&&me.i>=2&&me.i<=11&&!me.own?' cur':''}"><span class="ic">👑</span><span><b>Pendiri Kota</b><small>Khusus 10 warga pertama, permanen</small></span></div>`+
   LADDER.map(([ic,n,k])=>`<div class="item${me&&me.jab===n?' cur':''}"><span class="ic">${ic}</span><span><b>${n}</b><small>${k} tinggal di kota</small></span></div>`).join('')+
   `</div><h3>Bursa profesi warga</h3><div class="bars">`+(tp.slice(0,8).map(p=>`<div><span>${esc(p.n)}</span><span>${p.c} warga</span><i><em style="width:${p.c/max*100}%"></em></i></div>`).join('')||'<p class="muted">Belum ada data profesi.</p>')+
   `</div><p class="muted">Ganti profesi? Komen ulang <b>NADA + profesi baru</b> di postingan terbaru, nanti petugas kota yang update.</p>`};
