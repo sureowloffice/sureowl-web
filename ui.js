@@ -80,7 +80,7 @@ function eyesSVG(c){return `<svg width="64" height="64" viewBox="0 0 100 100" ar
 function balaiForm(){return `<form class="search" id="bf" autocomplete="off" style="margin-bottom:12px"><label for="bq"><span aria-hidden="true">@</span><input id="bq" placeholder="username-mu" aria-label="Username" autocapitalize="off" spellcheck="false"></label><button class="btn" type="submit">Ambil kartu</button></form>`}
 R.balai=()=>{const me=K.byName.get(store.get('me',''));
   if(me){$('balaiBody').innerHTML=idPreview(me)+cardHTML(me);bindCard();return}
-  $('balaiBody').innerHTML=idPreview(null)+`<div class="perks"><div><b>🏅 Gelar warga</b><small>Pendiri Kota sampai Bintang Festival</small></div><div><b>🪪 Kartu buat Story</b><small>Pamerin, tag @viralindongid</small></div><div><b>🗳️ Hak voting</b><small>Ikut pilih gedung berikutnya</small></div><div><b>💬 Pesan Warga</b><small>Segera dibuka</small></div></div>`+balaiForm()+`<h3>Belum jadi warga?</h3><ol class="steps"><li><span>Follow <b>@viralindongid</b> di Instagram atau TikTok.</span></li><li><span>Komen <span class="kw">NADA</span> + profesimu di postingan terbaru.</span></li><li><span>Balik ke sini maksimal 24 jam kemudian.</span></li></ol>`;
+  $('balaiBody').innerHTML=idPreview(null)+`<div class="perks"><div><b>🏅 Gelar warga</b><small>Pendiri Kota sampai Bintang Festival</small></div><div><b>🪪 Kartu buat Story</b><small>Pamerin, tag @viralindongid</small></div><div><b>🗳️ Hak voting</b><small>Ikut pilih gedung berikutnya</small></div><div><b>💬 Pesan Warga</b><small>Ngobrol bareng warga lain</small></div></div>`+balaiForm()+`<h3>Belum jadi warga?</h3><ol class="steps"><li><span>Follow <b>@viralindongid</b> di Instagram atau TikTok.</span></li><li><span>Komen <span class="kw">NADA</span> + profesimu di postingan terbaru.</span></li><li><span>Balik ke sini maksimal 24 jam kemudian.</span></li></ol>`;
   $('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)}};
 function find(raw){const q=String(raw||'').trim().replace(/^@/,'').toLowerCase();if(!q)return;const r=K.byName.get(q);
   if(r){store.set('me',r.u.toLowerCase());K.select(r);open('balai')}
@@ -145,6 +145,27 @@ R.info=()=>{const s=store.get('ann',0);$('infoList').innerHTML=ANN.map(a=>`<div 
 // ---------- voting ----------
 R.voting=()=>{const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);const ic=['🎙️','🎸','☕','🎓','🏗️'];
   $('vote').innerHTML=V.map((o,i)=>`<li class="item"><span class="ic">${ic[i%ic.length]}</span><span><b>${esc(o.n)}</b><small>${tot?Math.round(o.v/tot*100)+'% suara':'Voting dibuka setelah DAY 1 tayang'}</small></span><span class="r">${tot?o.v+' suara':''}</span></li>`).join('')||'<li class="item"><span><b>Voting belum dibuka</b></span></li>'};
+
+// ---------- chat / pesan warga ----------
+let chatMsgs=[],chatTimer=0,lastSeenChat=store.get('chatSeen',0),chatBusy=false;
+function chatKey(){let k=store.get('ck','');if(!k){const a=new Uint8Array(18);(crypto.getRandomValues?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*256|0));k=[...a].map(b=>b.toString(16).padStart(2,'0')).join('');store.set('ck',k)}return k}
+function ago(ts){const s=Math.max(0,(Date.now()-ts)/1000);if(s<60)return 'baru saja';if(s<3600)return Math.floor(s/60)+' mnt';if(s<86400)return Math.floor(s/3600)+' jam';return Math.floor(s/86400)+' hr'}
+async function loadChat(){if(chatBusy)return;chatBusy=true;try{const r=await fetch('/api/chat',{cache:'no-store'});const j=await r.json();if(r.ok){chatMsgs=j.msgs||[];window.KOTA_SAY=chatMsgs;const last=chatMsgs.length?chatMsgs[chatMsgs.length-1].ts:0;
+    if($('s-chat').hidden){if(last>lastSeenChat)$('chatDot').hidden=false}else{lastSeenChat=last;store.set('chatSeen',last);drawChat()}}
+  else if(!$('s-chat').hidden){$('msgs').innerHTML='<p class="muted">'+esc(j.error||'Chat belum aktif.')+'</p>'}}catch(e){}chatBusy=false}
+function drawChat(){const box=$('msgs');const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;const me=store.get('me','');
+  box.innerHTML=chatMsgs.length?chatMsgs.map(m=>{const r=K.byName.get(m.u);return `<div class="msg${m.u===me?' mine':''}"><div class="who">@${esc(m.u)}${r?` <i class="jb">${esc(r.i===0?'👑 Wali Kota':r.jab)}</i>`:''}<span>${ago(m.ts)}</span></div><p>${esc(m.t)}</p></div>`}).join(''):'<p class="muted">Belum ada obrolan. Jadi yang pertama nyapa warga lain! 👋</p>';
+  if(atBottom||!box.dataset.init){box.scrollTop=box.scrollHeight;box.dataset.init=1}}
+function chatFoot(){const me=K.byName.get(store.get('me',''));const f=$('chatFoot');
+  if(!me){f.innerHTML=`<p class="muted" style="margin:8px 0">Masuk pakai username warga buat ikut ngobrol.</p>`+balaiForm().replace('Ambil kartu','Masuk');$('bf').onsubmit=e=>{e.preventDefault();const q=$('bq').value.trim().replace(/^@/,'').toLowerCase();if(K.byName.get(q)){store.set('me',q);chatFoot()}else{toast('@'+q+' belum terdaftar. Komen NADA dulu ya')}};return}
+  f.innerHTML=`<form class="cform" id="cf" autocomplete="off"><input id="ct" maxlength="200" placeholder="Tulis pesan…" aria-label="Tulis pesan"><button class="btn" type="submit">Kirim</button></form><p class="cerr" id="cerr"></p><p class="chatme">Ngobrol sebagai <b>@${esc(me.u)}</b> · <button type="button" id="cme">ganti</button></p>`;
+  $('cme').onclick=()=>{store.set('me','');chatFoot()};
+  $('cf').onsubmit=async e=>{e.preventDefault();const t=$('ct').value.trim();if(!t)return;const b=$('cf').querySelector('button');b.disabled=true;$('cerr').textContent='';
+    try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({u:me.u.toLowerCase(),t,k:chatKey()})});const j=await r.json();
+      if(r.ok){$('ct').value='';chatMsgs.push(j.msg);window.KOTA_SAY=chatMsgs;$('msgs').dataset.init='';drawChat()}else $('cerr').textContent=j.error||'Gagal kirim.'}catch(err){$('cerr').textContent='Koneksi bermasalah, coba lagi.'}
+    b.disabled=false;$('ct').focus()}}
+R.chat=()=>{$('chatDot').hidden=true;$('msgs').dataset.init='';drawChat();chatFoot();loadChat();clearInterval(chatTimer);chatTimer=setInterval(()=>{if($('s-chat').hidden){clearInterval(chatTimer);chatTimer=setInterval(loadChat,30000)}else loadChat()},5000)};
+loadChat();chatTimer=setInterval(loadChat,30000);
 
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
