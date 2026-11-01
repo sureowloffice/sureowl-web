@@ -1,11 +1,11 @@
-// SureOwl — membuat invoice pembayaran Mayar dari isi keranjang.
+// Viralindong — membuat invoice pembayaran Mayar dari isi keranjang.
 // Harga SELALU diambil dari catalog.json di server, bukan dari browser,
 // jadi pembeli tidak bisa mengubah harga.
 //
 // Environment variables (diatur di Vercel > Settings > Environment Variables):
 //   MAYAR_API_KEY  : API key dari https://web.mayar.id/api-keys (Read & Write)
 //   MAYAR_ENV      : "production" (default) atau "sandbox" untuk uji coba
-//   SITE_URL       : opsional, mis. https://sureowl.vercel.app
+//   SITE_URL       : opsional, mis. https://viralindong.vercel.app
 
 const catalog = require('../catalog.json');
 
@@ -80,10 +80,10 @@ module.exports = async function handler(req, res) {
     : 'https://api.mayar.id/hl/v1';
   const host = req.headers['x-forwarded-host'] || req.headers.host || '';
   const siteUrl = (process.env.SITE_URL || ('https://' + host)).replace(/\/$/, '');
-  const ref = 'SO-' + Date.now().toString(36).toUpperCase();
+  const ref = 'VD-' + Date.now().toString(36).toUpperCase();
 
   const description = [
-    'SureOwl ' + ref,
+    'Viralindong ' + ref,
     'Lagu: ' + song,
     release ? 'Rilis: ' + release : '',
     link ? 'Link: ' + link : '',
