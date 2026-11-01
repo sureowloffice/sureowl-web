@@ -177,6 +177,24 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .ann p{margin:0;font-size:14.5px}
 .ann.new{border-color:var(--pink)}
 .vote{display:grid;gap:8px;margin-bottom:12px}
+/* chat */
+.chatcard{display:flex;flex-direction:column;height:min(640px,84vh)}
+.msgs{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px 10px;overscroll-behavior:contain}
+.msg{max-width:86%;align-self:flex-start;background:var(--ink2);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:8px 11px}
+.msg.mine{align-self:flex-end;background:var(--purple);border-color:var(--violet);border-radius:16px 4px 16px 16px}
+.msg .who{display:flex;gap:6px;align-items:baseline;font:800 12.5px var(--sans);color:var(--yellow);margin-bottom:2px}
+.msg.mine .who{color:#FFE6F4}
+.msg .who span{font:600 11px var(--sans);color:var(--muted)}
+.msg.mine .who span{color:#E3D6FF}
+.msg p{margin:0!important;font:500 15px/1.45 var(--sans)!important;color:var(--cream)!important;overflow-wrap:anywhere}
+.msg .jb{font:700 10.5px var(--sans);background:rgba(255,255,255,.12);border-radius:999px;padding:1px 6px;color:var(--cream)}
+.cform{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.cform input{flex:1;min-width:0;background:var(--ink2);border:1.5px solid var(--line);border-radius:14px;color:var(--cream);font:600 16px var(--sans);padding:12px;outline:0}
+.cform input:focus{border-color:var(--cyan)}
+.cerr{font:700 13px var(--sans);color:#FF9AC8;margin:6px 0 0;min-height:1em}
+.chatme{font:600 12px var(--sans);color:var(--muted);margin-top:6px}
+.chatme button{appearance:none;background:none;border:0;color:var(--cyan);font:700 12px var(--sans);cursor:pointer;padding:0}
+.tag.say{background:var(--cream);color:var(--ink);border-color:var(--ink);max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:12px;padding:6px 9px;z-index:3}
 @media (prefers-reduced-motion:reduce){.hint,.toast{transition:none}.on .eq i{animation:none;height:20px}}
 </style>
 </head>
@@ -222,6 +240,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
       <button class="btn" type="submit">Cari</button>
     </form>
     <nav class="nav" aria-label="Fasilitas kota">
+      <button class="nb" type="button" data-open="chat"><i>💬</i>Chat<span class="dot" id="chatDot" hidden></span></button>
       <button class="nb" type="button" data-open="radio"><i>📻</i>Radio</button>
       <button class="nb" type="button" data-open="koran"><i>📰</i>Koran<span class="dot" id="koranDot" hidden></span></button>
       <button class="nb" type="button" data-open="balai"><i>🏛️</i>Balai</button>
@@ -280,6 +299,15 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   <div id="balaiBody"></div>
 </div></div>
 
+<!-- Chat / Pesan Warga -->
+<div class="sheet" id="s-chat" hidden><div class="card chatcard" role="dialog" aria-modal="true" aria-labelledby="h-chat">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-chat">Pesan Warga</h2>
+  <p class="sub" id="chatSub">Ngobrol bareng warga Kota Seni</p>
+  <div class="msgs" id="msgs" role="log" aria-live="polite"></div>
+  <div id="chatFoot"></div>
+</div></div>
+
 <!-- Radio -->
 <div class="sheet" id="s-radio" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-radio">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
@@ -336,7 +364,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=2';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=3';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
