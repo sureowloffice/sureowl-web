@@ -15,8 +15,8 @@ const RES=K.RES;const ARR=window.KOTA_ARR||[];
 
 // ---------- sheets ----------
 let lastFocus=null;
-function open(id){closeAll(true);const s=$('s-'+id);if(!s)return;lastFocus=document.activeElement;if(R[id])R[id]();s.hidden=false;const b=s.querySelector('[data-close]');b&&b.focus()}
-function closeAll(keep){document.querySelectorAll('.sheet').forEach(s=>s.hidden=true);if(!keep&&lastFocus&&lastFocus.focus)lastFocus.focus()}
+function open(id){if(id==='chat'){openChat();return}closeAll(true);const s=$('s-'+id);if(!s)return;lastFocus=document.activeElement;if(R[id])R[id]();s.hidden=false;const b=s.querySelector('[data-close]');b&&b.focus()}
+function closeAll(keep){document.querySelectorAll('.sheet').forEach(s=>s.hidden=true);if(window.closeChat)closeChat();if(!keep&&lastFocus&&lastFocus.focus)lastFocus.focus()}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o){e.preventDefault();open(o.dataset.open);return}
   if(e.target.closest('[data-close]'))closeAll();else if(e.target.classList.contains('sheet'))closeAll()});
 addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
@@ -146,26 +146,50 @@ R.info=()=>{const s=store.get('ann',0);$('infoList').innerHTML=ANN.map(a=>`<div 
 R.voting=()=>{const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);const ic=['🎙️','🎸','☕','🎓','🏗️'];
   $('vote').innerHTML=V.map((o,i)=>`<li class="item"><span class="ic">${ic[i%ic.length]}</span><span><b>${esc(o.n)}</b><small>${tot?Math.round(o.v/tot*100)+'% suara':'Voting dibuka setelah DAY 1 tayang'}</small></span><span class="r">${tot?o.v+' suara':''}</span></li>`).join('')||'<li class="item"><span><b>Voting belum dibuka</b></span></li>'};
 
-// ---------- chat / pesan warga ----------
-let chatMsgs=[],chatTimer=0,lastSeenChat=store.get('chatSeen',0),chatBusy=false;
+// ---------- chat / pesan warga (panel live) ----------
+let chatMsgs=[],chatTimer=0,chatBusy=false,lastSeenChat=store.get('chatSeen',0),popT=0,firstLoad=true,interacted=false,ac2=null;
+addEventListener('pointerdown',()=>{interacted=true},{once:true});
+const QUICK=['👋 Halo warga!','🎵 Ada yang mau kolab?','🔥 Lagi garap lagu apa?','🎧 Rekomen lagu dong','🙌 Salam kenal!'];
 function chatKey(){let k=store.get('ck','');if(!k){const a=new Uint8Array(18);(crypto.getRandomValues?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*256|0));k=[...a].map(b=>b.toString(16).padStart(2,'0')).join('');store.set('ck',k)}return k}
-function ago(ts){const s=Math.max(0,(Date.now()-ts)/1000);if(s<60)return 'baru saja';if(s<3600)return Math.floor(s/60)+' mnt';if(s<86400)return Math.floor(s/3600)+' jam';return Math.floor(s/86400)+' hr'}
-async function loadChat(){if(chatBusy)return;chatBusy=true;try{const r=await fetch('/api/chat',{cache:'no-store'});const j=await r.json();if(r.ok){chatMsgs=j.msgs||[];window.KOTA_SAY=chatMsgs;const last=chatMsgs.length?chatMsgs[chatMsgs.length-1].ts:0;
-    if($('s-chat').hidden){if(last>lastSeenChat)$('chatDot').hidden=false}else{lastSeenChat=last;store.set('chatSeen',last);drawChat()}}
-  else if(!$('s-chat').hidden){$('msgs').innerHTML='<p class="muted">'+esc(j.error||'Chat belum aktif.')+'</p>'}}catch(e){}chatBusy=false}
-function drawChat(){const box=$('msgs');const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;const me=store.get('me','');
-  box.innerHTML=chatMsgs.length?chatMsgs.map(m=>{const r=K.byName.get(m.u);return `<div class="msg${m.u===me?' mine':''}"><div class="who">@${esc(m.u)}${r?` <i class="jb">${esc(r.i===0?'👑 Wali Kota':r.jab)}</i>`:''}<span>${ago(m.ts)}</span></div><p>${esc(m.t)}</p></div>`}).join(''):'<p class="muted">Belum ada obrolan. Jadi yang pertama nyapa warga lain! 👋</p>';
-  if(atBottom||!box.dataset.init){box.scrollTop=box.scrollHeight;box.dataset.init=1}}
+function jam(ts){const d=new Date(ts+7*36e5);return String(d.getUTCHours()).padStart(2,'0')+'.'+String(d.getUTCMinutes()).padStart(2,'0')}
+function hariOf(ts){return new Date(ts+7*36e5).toISOString().slice(0,10)}
+function avatar(u,s){const r=K.byName.get(u);const c=r?r.col:'#8A57FF';return `<svg class="av" width="${s||30}" height="${s||30}" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="${c}" stroke="#14102B" stroke-width="5"/><ellipse cx="35" cy="52" rx="14" ry="18" fill="#FFF7E8"/><ellipse cx="65" cy="52" rx="14" ry="18" fill="#FFF7E8"/><circle cx="40" cy="46" r="7" fill="#14102B"/><circle cx="70" cy="46" r="7" fill="#14102B"/></svg>`}
+function chatUnread(){return chatMsgs.filter(m=>m.ts>lastSeenChat&&m.u!==store.get('me','')).length}
+function setBadge(){const n=$('s-chat').hidden?chatUnread():0;const b=$('chatBadge');b.hidden=!n;b.textContent=n>9?'9+':n;document.querySelector('.chatbtn').classList.toggle('has',!!n);document.title=(n?'('+n+') ':'')+'Kota Seni · Kota Digital Para Seniman'}
+function ping(){if(!interacted)return;try{ac2=ac2||new (window.AudioContext||window.webkitAudioContext)();const t=ac2.currentTime;[880,1320].forEach((f,i)=>{const o=ac2.createOscillator(),g=ac2.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t+i*.09);g.gain.linearRampToValueAtTime(.06,t+i*.09+.01);g.gain.exponentialRampToValueAtTime(.0005,t+i*.09+.25);o.connect(g);g.connect(ac2.destination);o.start(t+i*.09);o.stop(t+i*.09+.3)})}catch(e){}}
+function showPop(m){const p=$('chatPop');p.innerHTML=avatar(m.u,26)+`<span><b>@${esc(m.u)}</b> ${esc(m.t)}</span>`;p.hidden=false;clearTimeout(popT);popT=setTimeout(()=>p.hidden=true,6500)}
+$('chatPop').onclick=()=>{$('chatPop').hidden=true;openChat()};
+async function loadChat(){if(chatBusy)return;chatBusy=true;try{const r=await fetch('/api/chat',{cache:'no-store'});const j=await r.json();
+  if(r.ok){const prevLast=chatMsgs.length?chatMsgs[chatMsgs.length-1].ts:0;chatMsgs=j.msgs||[];window.KOTA_SAY=chatMsgs;const last=chatMsgs.length?chatMsgs[chatMsgs.length-1].ts:0;
+    $('chatSub').textContent=chatMsgs.length?chatMsgs.length+' pesan · obrolan warga Kota Seni':'Obrolan warga Kota Seni';
+    if($('s-chat').hidden){const fresh=chatMsgs.filter(m=>m.ts>Math.max(prevLast,lastSeenChat)&&m.u!==store.get('me',''));if(fresh.length&&!firstLoad){showPop(fresh[fresh.length-1]);ping()}}
+    else{if(last>prevLast)drawChat(true);lastSeenChat=last;store.set('chatSeen',last)}
+    setBadge();firstLoad=false}
+  else if(!$('s-chat').hidden&&!chatMsgs.length){$('msgs').innerHTML='<div class="empty">'+esc(j.error||'Chat belum aktif.')+'</div>'}}catch(e){}chatBusy=false}
+function drawChat(incoming){const box=$('msgs');const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;const me=store.get('me','');let day='',h='';
+  for(const m of chatMsgs){const d=hariOf(m.ts);if(d!==day){day=d;h+=`<div class="sep">${d===TODAY?'HARI INI':tglPanjang(d).toUpperCase()}</div>`}
+    const r=K.byName.get(m.u);const mine=m.u===me;
+    h+=`<div class="msg${mine?' mine':''}">${avatar(m.u)}<div class="bub"><div class="who"><span style="color:${mine?'#fff':(r?r.col:'#B9AEDF')}">@${esc(m.u)}</span>${r?`<i class="jb">${esc(r.i===0?'👑 Wali Kota':r.jab)}</i>`:''}<time>${jam(m.ts)}</time></div><p>${esc(m.t)}</p></div></div>`}
+  box.innerHTML=h||'<div class="empty"><b>🎤</b>Belum ada obrolan.<br>Jadi yang pertama nyapa warga lain!</div>';
+  if(atBottom||!box.dataset.init){box.scrollTop=box.scrollHeight;box.dataset.init=1;$('newPill').hidden=true}else if(incoming){$('newPill').hidden=false}}
+$('msgs').addEventListener('scroll',()=>{const b=$('msgs');if(b.scrollHeight-b.scrollTop-b.clientHeight<80)$('newPill').hidden=true});
+$('newPill').onclick=()=>{const b=$('msgs');b.scrollTop=b.scrollHeight;$('newPill').hidden=true};
+async function sendMsg(t,me){const b=$('cf').querySelector('.send');b.disabled=true;$('cerr').textContent='';
+  try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({u:me.u.toLowerCase(),t,k:chatKey()})});const j=await r.json();
+    if(r.ok){$('ct').value='';chatMsgs.push(j.msg);window.KOTA_SAY=chatMsgs;lastSeenChat=j.msg.ts;store.set('chatSeen',j.msg.ts);$('msgs').dataset.init='';drawChat()}else $('cerr').textContent=j.error||'Gagal kirim.'}catch(err){$('cerr').textContent='Koneksi bermasalah, coba lagi.'}
+  b.disabled=false}
 function chatFoot(){const me=K.byName.get(store.get('me',''));const f=$('chatFoot');
-  if(!me){f.innerHTML=`<p class="muted" style="margin:8px 0">Masuk pakai username warga buat ikut ngobrol.</p>`+balaiForm().replace('Ambil kartu','Masuk');$('bf').onsubmit=e=>{e.preventDefault();const q=$('bq').value.trim().replace(/^@/,'').toLowerCase();if(K.byName.get(q)){store.set('me',q);chatFoot()}else{toast('@'+q+' belum terdaftar. Komen NADA dulu ya')}};return}
-  f.innerHTML=`<form class="cform" id="cf" autocomplete="off"><input id="ct" maxlength="200" placeholder="Tulis pesan…" aria-label="Tulis pesan"><button class="btn" type="submit">Kirim</button></form><p class="cerr" id="cerr"></p><p class="chatme">Ngobrol sebagai <b>@${esc(me.u)}</b> · <button type="button" id="cme">ganti</button></p>`;
+  if(!me){f.innerHTML=`<p class="muted" style="margin:0 0 8px">Masuk pakai username warga buat ikut ngobrol.</p>`+balaiForm().replace('Ambil kartu','Masuk');$('bf').onsubmit=e=>{e.preventDefault();const q=$('bq').value.trim().replace(/^@/,'').toLowerCase();if(K.byName.get(q)){store.set('me',q);chatFoot();drawChat()}else{$('bq').value='';$('bq').placeholder='@'+q+' belum terdaftar'}};return}
+  f.innerHTML=`<div class="quick">${QUICK.map(q=>`<button type="button">${esc(q)}</button>`).join('')}</div><form class="cform" id="cf" autocomplete="off"><input id="ct" maxlength="200" placeholder="Ngobrol sama warga…" aria-label="Tulis pesan"><button class="send" type="submit" aria-label="Kirim">➤</button></form><p class="cerr" id="cerr"></p><p class="chatme">Kamu: <b>@${esc(me.u)}</b> · <button type="button" id="cme">ganti</button></p>`;
+  f.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>sendMsg(b.textContent,me));
   $('cme').onclick=()=>{store.set('me','');chatFoot()};
-  $('cf').onsubmit=async e=>{e.preventDefault();const t=$('ct').value.trim();if(!t)return;const b=$('cf').querySelector('button');b.disabled=true;$('cerr').textContent='';
-    try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({u:me.u.toLowerCase(),t,k:chatKey()})});const j=await r.json();
-      if(r.ok){$('ct').value='';chatMsgs.push(j.msg);window.KOTA_SAY=chatMsgs;$('msgs').dataset.init='';drawChat()}else $('cerr').textContent=j.error||'Gagal kirim.'}catch(err){$('cerr').textContent='Koneksi bermasalah, coba lagi.'}
-    b.disabled=false;$('ct').focus()}}
-R.chat=()=>{$('chatDot').hidden=true;$('msgs').dataset.init='';drawChat();chatFoot();loadChat();clearInterval(chatTimer);chatTimer=setInterval(()=>{if($('s-chat').hidden){clearInterval(chatTimer);chatTimer=setInterval(loadChat,30000)}else loadChat()},5000)};
-loadChat();chatTimer=setInterval(loadChat,30000);
+  $('cf').onsubmit=e=>{e.preventDefault();const t=$('ct').value.trim();if(t)sendMsg(t,me).then(()=>$('ct').focus())}}
+function openChat(){if(!$('s-chat').hidden){closeChat();return}document.querySelectorAll('.sheet').forEach(s=>s.hidden=true);$('chatPop').hidden=true;$('s-chat').hidden=false;
+  const last=chatMsgs.length?chatMsgs[chatMsgs.length-1].ts:0;lastSeenChat=Math.max(lastSeenChat,last);store.set('chatSeen',lastSeenChat);setBadge();
+  $('msgs').dataset.init='';drawChat();chatFoot();loadChat();clearInterval(chatTimer);chatTimer=setInterval(loadChat,4000);const i=$('ct');if(i&&innerWidth>720)i.focus()}
+window.closeChat=function(){if($('s-chat').hidden)return;$('s-chat').hidden=true;clearInterval(chatTimer);chatTimer=setInterval(loadChat,15000);setBadge()};
+$('chatX').onclick=()=>closeChat();
+loadChat();chatTimer=setInterval(loadChat,15000);
 
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
