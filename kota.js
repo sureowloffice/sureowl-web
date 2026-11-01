@@ -75,15 +75,42 @@ function road(){for(let k=0;k<NSEG;k++){const a=k/NSEG*Math.PI*2;const x0=Math.c
   D(G.box,M.chain(M.T(x0,0,z0),M.RY(-a),M.S(1.8,.03,ROAD_R*2*Math.PI/NSEG+.05)),'#231A4D',{cast:false});
   if(k%2==0)D(G.box,M.chain(M.T(x0,.035,z0),M.RY(-a),M.S(.08,.02,.7)),'#38E1FF',{em:1,cast:false});
   for(const s of [-1,1])D(G.box,M.chain(M.T(Math.cos(a)*(ROAD_R+s*.95),.03,Math.sin(a)*(ROAD_R+s*.95)+.5),M.RY(-a),M.S(.06,.05,ROAD_R*2*Math.PI/NSEG)),s<0?'#FF4FA3':'#8A57FF',{em:1,cast:false})}}
-const CAR_COL=['#FFF7E8','#14102B','#FF4FA3','#38E1FF'];
-const NCAR=3,CAR_SP=.16;
-function carPos(k,t){const a=t*CAR_SP+k*Math.PI*2/NCAR;const lane=k%2?-.42:.42;const r=ROAD_R+lane;return {a,p:[Math.cos(a)*r,.42+Math.sin(t*2+k)*.05,Math.sin(a)*r+.5]}}
-function cars(t){for(let k=0;k<NCAR;k++){const {a,p}=carPos(k,t);const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(-a));const Wm=m=>M.mul(B,m);const col=CAR_COL[k%CAR_COL.length];
-  D(G.sphHi,Wm(M.S(.36,.17,.95)),col,{em:.15,cast:false});
-  D(G.sphHi,Wm(M.chain(M.T(0,.13,-.08),M.S(.27,.14,.5))),'#38E1FF',{em:.75,alpha:.85,cast:false});
-  D(G.box,Wm(M.chain(M.T(0,-.02,.9),M.S(.62,.05,.06))),'#FF3B5C',{em:1,cast:false});
-  D(G.box,Wm(M.chain(M.T(0,-.02,-.92),M.S(.5,.04,.05))),'#FFF7E8',{em:1,cast:false});
-  D(G.cyl16,Wm(M.chain(M.T(0,-.33,0),M.S(.5,.01,1))),k%2?'#FF4FA3':'#38E1FF',{em:1,alpha:.55,cast:false})}}
+const CAR_COL=[['#F2F0FF','#FF4FA3'],['#14102B','#38E1FF'],['#FF4FA3','#FFD23F']];
+const NCAR=3,CAR_SP=.1;
+const SKY_Z=4.2,SKY_Y=3.2,SKY_L=52,SKY_V=2.6;
+function carPos(k,t){const u=((t*SKY_V+k*SKY_L/NCAR)%SKY_L+SKY_L)%SKY_L;return {a:Math.PI/2,p:[-SKY_L/2+u,SKY_Y+Math.sin(t*2.2+k)*.08,SKY_Z+(k%2?-.35:.35)]}}
+const NAMES=ARR.length?ARR:RES.filter(r=>r.i>0).slice(-6).reverse();
+const signCache=new Map();
+function signTex(txt,today){const key=txt+(today?1:0);if(signCache.has(key))return signCache.get(key);
+  const tex=texFromCanvas(signCanvas(1024,256,(x,w,h)=>{x.fillStyle='#120C2A';x.fillRect(0,0,w,h);
+    x.strokeStyle='#38E1FF';x.lineWidth=12;x.shadowColor='#38E1FF';x.shadowBlur=24;x.strokeRect(14,14,w-28,h-28);x.shadowBlur=0;
+    x.fillStyle=today?'#FFD23F':'#FF4FA3';x.font='900 44px Inter';x.textAlign='center';x.fillText(today?'WARGA BARU TIBA':'SELAMAT DATANG',w/2,78);
+    x.fillStyle='#FFF7E8';let s=96;x.font='900 '+s+'px Inter';while(x.measureText(txt).width>w-80&&s>40){s-=4;x.font='900 '+s+'px Inter'}
+    x.shadowColor='#FF4FA3';x.shadowBlur=18;x.fillText(txt,w/2,186)}));signCache.set(key,tex);return tex}
+function cars(t){D(G.box,M.chain(M.T(0,SKY_Y-.55,SKY_Z),M.S(SKY_L,.02,1.6)),'#38E1FF',{em:1,alpha:.1,cast:false});for(const e of [-1,1])D(G.box,M.chain(M.T(0,SKY_Y-.54,SKY_Z+e*.8),M.S(SKY_L,.03,.04)),e<0?'#FF4FA3':'#8A57FF',{em:1,alpha:.7,cast:false});
+  for(let k=0;k<NCAR;k++){const {a,p}=carPos(k,t);const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(-a),M.S(1.15,1.15,1.15));const Wm=m=>M.mul(B,m);
+  const [body,neon]=CAR_COL[k%CAR_COL.length];
+  const Bc=(x,y,z,w,h,d)=>Wm(M.chain(M.T(x,y-h/2,z),M.S(w,h,d)));
+  // bodi ramping (lonjong) + kanopi kaca
+  D(G.sphHi,Wm(M.S(.46,.17,1.12)),body,{em:.15,cast:false});
+  D(G.sphHi,Wm(M.chain(M.T(0,.02,.25),M.S(.5,.12,.7))),body,{em:.1,cast:false});
+  D(G.sphHi,Wm(M.chain(M.T(0,.13,-.12),M.S(.27,.15,.55))),'#38E1FF',{em:.9,alpha:.85,cast:false});
+  // strip neon samping, lampu depan, lampu belakang
+  for(const s of [-1,1])D(G.box,Bc(s*.44,0,0,.03,.035,1.7),neon,{em:1,cast:false});
+  D(G.box,Bc(0,-.01,-1.08,.42,.04,.05),'#FFF7E8',{em:1,cast:false});
+  D(G.box,Bc(0,.04,.98,.62,.05,.05),'#FF3B5C',{em:1,cast:false});
+  // sayap belakang menyala
+  for(const s of [-1,1])D(G.box,Bc(s*.3,.2,.8,.04,.2,.08),body,{cast:false});
+  D(G.box,Bc(0,.32,.82,.95,.04,.24),neon,{em:.95,cast:false});
+  // pendorong hover (cincin menyala di bawah)
+  for(const sx of [-1,1])for(const sz of [-.55,.55]){D(G.cyl16,Wm(M.chain(M.T(sx*.36,-.2,sz),M.S(.13,.05,.13))),'#2A2058',{cast:false});D(G.cyl16,Wm(M.chain(M.T(sx*.36,-.21,sz),M.S(.1,.01,.1))),'#38E1FF',{em:1,cast:false})}
+  D(G.cyl16,M.chain(M.T(p[0],.02,p[2]),M.RY(-a),M.S(.75,.01,1.5)),neon,{em:1,alpha:.18,cast:false});
+  // jejak cahaya
+  for(let q=1;q<=5;q++){const tp=carPos(k,t-q*.12).p;D(G.box,M.chain(M.T(tp[0]-.9,tp[1]-.04,tp[2]),M.RY(-a),M.S(.34-q*.04,.03,.5)),neon,{em:1,alpha:.5-q*.08,cast:false})}
+  // papan nama melayang
+  if(NAMES.length){const r=NAMES[(k+NCAR*Math.floor(t/30))%NAMES.length];if(NAMES.length>k||NAMES.length>=1&&k===0){
+    D(G.box,M.chain(M.T(p[0],p[1]+.35,p[2]),M.S(.03,.55,.03)),'#38E1FF',{em:1,cast:false});
+    D(G.plane,M.chain(M.T(p[0],p[1]+1.3,p[2]),M.RY(cam.yaw),M.S(3.0,.75,1)),[1,1,1],{tex:signTex('@'+r.u,!!ARR.length),em:1,cast:false})}}}}
 // kenaikan jabatan: ambang 7, 14, 30 hari (bukan Wali/Pemilik/Pendiri)
 const STEP=[[7,'Seniman Jalanan'],[14,'Musisi Panggung'],[30,'Bintang Festival']];
 const dayIdx=s=>Math.floor(Date.parse(s+'T00:00:00Z')/864e5);
@@ -144,9 +171,6 @@ function frame(now){const t=now/1000;
   cand.sort((a,b)=>a[1][2]-b[1][2]);const keep=new Set();cand.slice(0,28).forEach(c=>keep.add(c[0]));if(selected)keep.add(selected);RES[0]&&keep.add(RES[0]);for(const r of RES)if(r.own)keep.add(r);
   for(const [r,s] of cand){const el=tagFor(r);if(!keep.has(r)){el.style.display='none';continue}el.style.display='';const sy=sayOf(r.u);el.className='tag'+(r.own?' own':'')+(r===selected?' me':'')+(sy?' say':'');el.textContent=(r.i===0?'👑 ':r.own?'💎 ':'')+'@'+r.u+(r.own&&!sy?' · PEMILIK KOTA':'')+(sy?': '+sy:'');el.style.left=s[0]+'px';el.style.top=s[1]+'px'}
   for(const [u,el] of tags){if(!cand.find(c=>c[0].u===u))el.style.display='none'}
-  for(let k=0;k<NCAR;k++){const el=carTag(k);if(!ARR.length||k>=ARR.length){el.style.display='none';continue}const r=ARR[(k+NCAR*Math.floor(t/40))%ARR.length];
-    const {p}=carPos(k,t);const s=project(VP,[p[0],p[1]+.75,p[2]]);if(!s||s[0]<-80||s[0]>innerWidth+80||s[1]<-20||s[1]>innerHeight+20){el.style.display='none';continue}
-    el.style.display='';el.textContent='🚘 @'+r.u+' tiba';el.style.left=s[0]+'px';el.style.top=s[1]+'px'}
   requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 
