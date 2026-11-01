@@ -44,13 +44,48 @@ const LB=document.getElementById('labels');const tags=new Map();
 function tagFor(r){let el=tags.get(r.u);if(!el){el=document.createElement('div');el.className='tag';el.textContent='@'+r.u;LB.appendChild(el);tags.set(r.u,el)}return el}
 function project(VP,p){const x=VP[0]*p[0]+VP[4]*p[1]+VP[8]*p[2]+VP[12],y=VP[1]*p[0]+VP[5]*p[1]+VP[9]*p[2]+VP[13],w=VP[3]*p[0]+VP[7]*p[1]+VP[11]*p[2]+VP[15];if(w<=0.1)return null;return [(x/w*.5+.5)*innerWidth,(1-(y/w*.5+.5))*innerHeight,w]}
 
+// ---------- day / night (jam WIB) ----------
+const KEYS={night:{top:'#0E0828',hor:'#FF5FA8',sunC:'#E6DBFF',sky:'#B9A8FF',gnd:'#5B3E86',fog:'#5A2A7A'},
+  dawn:{top:'#3A2A8C',hor:'#FFB38A',sunC:'#FFE2C8',sky:'#D9C8FF',gnd:'#6A4E8E',fog:'#9A6AA8'},
+  day:{top:'#4F6BFF',hor:'#FFC4E6',sunC:'#FFF6E8',sky:'#E4E4FF',gnd:'#7A68A8',fog:'#A898E0'},
+  dusk:{top:'#2A1460',hor:'#FF7A59',sunC:'#FFD0B8',sky:'#C8A8FF',gnd:'#62468E',fog:'#7A3A8A'}};
+const SCHED=[[0,'night'],[4.5,'night'],[6,'dawn'],[8,'day'],[16,'day'],[18,'dusk'],[19.5,'night'],[24,'night']];
+const forceH=parseFloat(new URLSearchParams(location.search).get('jam'));
+function hourWIB(){if(!isNaN(forceH))return forceH;const d=new Date(Date.now()+7*36e5);return d.getUTCHours()+d.getUTCMinutes()/60}
+window.hourWIB=hourWIB;
+let LCache=null,LAt=0;
+function light(){const now=performance.now();if(LCache&&now-LAt<10000)return LCache;LAt=now;const h=hourWIB();let i=0;while(i<SCHED.length-2&&h>=SCHED[i+1][0])i++;
+  const [h0,k0]=SCHED[i],[h1,k1]=SCHED[i+1];const f=h1>h0?Math.min(1,Math.max(0,(h-h0)/(h1-h0))):0;const ss=f*f*(3-2*f);const o={};
+  for(const key of ['top','hor','sunC','sky','gnd','fog'])o[key]=lerp3(hex(KEYS[k0][key]),hex(KEYS[k1][key]),ss);return LCache=o}
+let VPprev=null;
+// ---------- pesawat warga baru ----------
+const TODAY=new Date(Date.now()+7*36e5).toISOString().slice(0,10);
+const ARR=RES.filter(r=>r.i>0&&r.t===TODAY);window.KOTA_ARR=ARR;
+let bannerTex=null,bannerIdx=-1;const PERIOD=36,FLY=16;
+function bannerFor(k){const r=ARR.length?ARR[k%ARR.length]:null;const txt=r?('✈ @'+r.u+' tiba!'):'✈ Kota Seni';
+  return texFromCanvas(signCanvas(1024,192,(x,w,h)=>{x.fillStyle='#FFF7E8';x.fillRect(0,0,w,h);x.strokeStyle='#14102B';x.lineWidth=14;x.strokeRect(7,7,w-14,h-14);
+  x.fillStyle='#14102B';x.textAlign='center';x.textBaseline='middle';let s=96;x.font='900 '+s+'px Inter';while(x.measureText(txt).width>w-80&&s>40){s-=4;x.font='900 '+s+'px Inter'}x.fillText(txt,w/2,h/2+4)}))}
+function plane(t){const cyc=Math.floor(t/PERIOD),ph=t%PERIOD;if(ph>FLY)return;
+  if(cyc!==bannerIdx){bannerIdx=cyc;bannerTex=bannerFor(cyc);if(ARR.length&&window.toastArr)window.toastArr(ARR[cyc%ARR.length])}
+  const f=ph/FLY;const x=-40+80*f,y=8.5+Math.sin(f*Math.PI)*1.5,z=-5+Math.sin(f*Math.PI*2)*1.5;const bank=Math.cos(f*Math.PI*2)*.12;
+  const B=M.chain(M.T(x,y,z),M.RX(bank));const Wm=m=>M.mul(B,m);
+  D(G.sphHi,Wm(M.S(2.2,.5,.5)),'#FFF7E8',{em:.25,cast:false});
+  D(G.sph,Wm(M.chain(M.T(1.75,.12,0),M.S(.55,.3,.42))),'#38E1FF',{em:.6,cast:false});
+  D(G.box,Wm(M.chain(M.T(.1,-.06,0),M.S(1.0,.08,5.2))),'#6C2BFF',{em:.3,cast:false});
+  D(G.box,Wm(M.chain(M.T(-1.9,0,0),M.S(.55,.06,1.8))),'#6C2BFF',{em:.3,cast:false});
+  D(G.box,Wm(M.chain(M.T(-1.95,.1,0),M.S(.5,.85,.08))),'#FF4FA3',{em:.4,cast:false});
+  for(const s of [-1,1])D(G.sph,Wm(M.chain(M.T(.1,-.05,s*2.6),M.S(.12,.12,.12))),s<0?'#FF4F4F':'#4FFF8A',{em:1,cast:false});
+  // tali + spanduk
+  D(G.box,Wm(M.chain(M.T(-3.4,-.03,0),M.S(2.8,.03,.03))),'#14102B',{cast:false});
+  D(G.plane,M.chain(M.T(x-6.6,y-.1,z),M.RY(cam.yaw),M.S(5.4,1.0,1)),[1,1,1],{tex:bannerTex,em:1,cast:false})}
+
 // ---------- render ----------
 let selected=null;
 function frame(now){const t=now/1000;
   if(performance.now()-lastInput>5000&&!selected)cam.yaw+=0.0012;
   const tgt=selected?resPos(selected,t):[0,2,-0.5];const k=.06;cam.tx+=(tgt[0]-cam.tx)*k;cam.ty+=((selected?1.2:tgt[1])-cam.ty)*k;cam.tz+=(tgt[2]-cam.tz)*k;
   if(selected)cam.dist+=(11-cam.dist)*.04;
-  DL=[];world(t);stage(99);sign(99);chairs(99);notes(40+t%600);
+  DL=[];world(t);stage(99);sign(99);chairs(99);notes(40+t%600);plane(t,VPprev);
   const bob=Math.max(0,Math.sin(t*3))*.05;mascot([0,.9,-.9],Math.sin(t*.5)*.25,t,{squash:bob,look:[.05,.08],wave:(t%9<1.6)?Math.sin(Math.min(1,(t%9)/0.3)*Math.PI/2):0});
   const shown=RES.slice(1,260);for(const r of shown)resident(r,t,selected===r);if(selected&&selected.i>=260)resident(selected,t,true);
   const sun=norm([-0.55,0.9,0.75]);const lc=[0,0,0];const LV=M.look(add(lc,scl(sun,30)),lc,[0,1,0]);const LP=M.ortho(-26,26,-26,26,1,70);const LVP=M.mul(LP,LV);
@@ -58,12 +93,12 @@ function frame(now){const t=now/1000;
   gl.useProgram(P_DEPTH.p);gl.uniformMatrix4fv(P_DEPTH.u.uLVP,false,LVP);
   for(const d of DL){if(!d.cast||d.alpha<1||d.tex)continue;bindGeo(d.g);gl.uniformMatrix4fv(P_DEPTH.u.uM,false,d.m);gl.drawArrays(gl.TRIANGLES,0,d.g.n)}
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-  gl.disable(gl.DEPTH_TEST);gl.useProgram(P_SKY.p);gl.uniform3fv(P_SKY.u.uTop,hex('#0E0828'));gl.uniform3fv(P_SKY.u.uHor,hex('#FF5FA8'));bindGeo(skyQ);gl.drawArrays(gl.TRIANGLES,0,6);gl.enable(gl.DEPTH_TEST);
+  gl.disable(gl.DEPTH_TEST);gl.useProgram(P_SKY.p);const L=light();gl.uniform3fv(P_SKY.u.uTop,L.top);gl.uniform3fv(P_SKY.u.uHor,L.hor);bindGeo(skyQ);gl.drawArrays(gl.TRIANGLES,0,6);gl.enable(gl.DEPTH_TEST);
   const cp=[cam.tx+Math.sin(cam.yaw)*Math.cos(cam.pitch)*cam.dist,cam.ty+Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*Math.cos(cam.pitch)*cam.dist];
   const asp=W/H;const fov=asp<1?cam.fov*Math.PI/180:Math.min(cam.fov,42)*Math.PI/180;
-  const V=M.look(cp,[cam.tx,cam.ty,cam.tz],[0,1,0]);const VP=M.mul(M.persp(fov,asp,.1,200),V);
-  const u=P_MAIN.u;gl.useProgram(P_MAIN.p);gl.uniformMatrix4fv(u.uVP,false,VP);gl.uniformMatrix4fv(u.uLVP,false,LVP);gl.uniform3fv(u.uSun,sun);gl.uniform3fv(u.uSunC,hex('#E6DBFF'));
-  gl.uniform3fv(u.uSky,hex('#B9A8FF'));gl.uniform3fv(u.uGnd,hex('#5B3E86'));gl.uniform3fv(u.uFog,hex('#5A2A7A'));gl.uniform1f(u.uFogN,30);gl.uniform1f(u.uFogF,78);gl.uniform3fv(u.uCam,cp);gl.uniform1f(u.uShRes,SHS);
+  const V=M.look(cp,[cam.tx,cam.ty,cam.tz],[0,1,0]);const VP=M.mul(M.persp(fov,asp,.1,200),V);VPprev=VP;
+  const u=P_MAIN.u;gl.useProgram(P_MAIN.p);gl.uniformMatrix4fv(u.uVP,false,VP);gl.uniformMatrix4fv(u.uLVP,false,LVP);gl.uniform3fv(u.uSun,sun);gl.uniform3fv(u.uSunC,L.sunC);
+  gl.uniform3fv(u.uSky,L.sky);gl.uniform3fv(u.uGnd,L.gnd);gl.uniform3fv(u.uFog,L.fog);gl.uniform1f(u.uFogN,30);gl.uniform1f(u.uFogF,78);gl.uniform3fv(u.uCam,cp);gl.uniform1f(u.uShRes,SHS);
   gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,shTex);gl.uniform1i(u.uSh,0);gl.uniform1i(u.uTex,1);
   gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
   for(const d of [...DL.filter(d=>d.alpha>=1),...DL.filter(d=>d.alpha<1)]){bindGeo(d.g);gl.uniformMatrix4fv(u.uM,false,d.m);gl.uniformMatrix3fv(u.uNM,false,M.normal(d.m));gl.uniform3fv(u.uC,d.c);gl.uniform1f(u.uEm,d.em);gl.uniform1f(u.uAlpha,d.alpha);
@@ -102,23 +137,6 @@ function makeCard(r){const c=document.createElement('canvas');c.width=1080;c.hei
   x.font='700 34px Inter';x.fillStyle='#14102B';rrp(x,240,1520,600,84,42);x.fillStyle='#FFD23F';x.fill();x.fillStyle='#14102B';x.fillText('Komen NADA di @viralindongid',540,1575);
   x.fillStyle='#FFF7E8';x.font='600 30px Inter';x.fillText(location.host||'kota seni',540,1680);
   return c}
-const sheets=id=>document.getElementById('s-'+id);
-function open(id){sheets(id).hidden=false;const b=sheets(id).querySelector('[data-close]');b&&b.focus()}
-function closeAll(){document.querySelectorAll('.sheet').forEach(s=>s.hidden=true)}
-document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.open==='kartu'&&selected)showCard(selected);open(b.dataset.open)}));
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeAll));
-document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)closeAll()}));
-addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
-function showCard(r){const body=document.getElementById('kartu-body');const c=makeCard(r);const url=c.toDataURL('image/png');
-  body.innerHTML=`<p>Selamat, <b>@${r.u}</b> resmi warga Kota Seni! Simpan kartunya dan pamerin di Story, tag <b>@viralindongid</b>.</p><img id="ktw" alt="Kartu Warga @${r.u}" src="${url}"><div class="row"><a class="btn" id="dl" download="KartuWarga_KotaSeni_${r.u}.png" href="${url}">Simpan kartu</a><button class="btn ghost" type="button" id="see">Lihat aku di kota</button></div><p class="muted">Di HP: kalau tombol simpan tidak jalan, tahan gambar kartunya lalu pilih Simpan.</p>`;
-  document.getElementById('see').onclick=()=>{closeAll()}}
-function notFound(q){const body=document.getElementById('kartu-body');
-  body.innerHTML=`<p><b>@${q.replace(/[<>&"]/g,'')}</b> belum terdaftar di Kota Seni.</p><ol><li><span>Follow <b>@viralindongid</b>.</span></li><li><span>Komen <span class="kw">NADA</span> + profesimu di postingan terbaru.</span></li><li><span>Cek lagi di sini maksimal 24 jam kemudian.</span></li></ol><div class="row"><a class="btn dark" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">Buka Instagram</a></div>`}
-document.getElementById('sf').addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('q').value.trim().replace(/^@/,'').toLowerCase();if(!q)return;document.getElementById('q').blur();
-  const r=byName.get(q);if(r){selected=r;showCard(r);open('kartu')}else{selected=null;notFound(q);open('kartu')}});
-// voting list
-const vote=document.getElementById('vote');const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);
-vote.innerHTML=V.map(o=>`<div><span>${o.n}</span><span>${tot?o.v+' suara':'baru dibuka'}</span></div>`).join('')||'<div><span>Voting dibuka setelah DAY 1 tayang</span><span></span></div>';
-// deep link ?u=username
-const qp=new URLSearchParams(location.search).get('u');if(qp){document.getElementById('q').value=qp;document.getElementById('sf').requestSubmit()}
+// ---------- API for ui.js ----------
+window.KOTA={RES,byName,makeCard,jabatan,tgl,select(r){selected=r},get selected(){return selected}};
 })();
