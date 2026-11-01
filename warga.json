@@ -1,0 +1,34 @@
+{
+ "day": 1,
+ "update": "2026-11-01",
+ "warga": [
+  {
+   "u": "viralindongid",
+   "p": "Wali Kota",
+   "t": "2026-11-01"
+  },
+  {
+   "u": "immanuelragil",
+   "p": "Produser",
+   "t": "2026-11-01"
+  }
+ ],
+ "vote": [
+  {
+   "n": "Studio Rekaman",
+   "v": 0
+  },
+  {
+   "n": "Toko Alat Musik",
+   "v": 0
+  },
+  {
+   "n": "Kafe Akustik",
+   "v": 0
+  },
+  {
+   "n": "Sekolah Musik",
+   "v": 0
+  }
+ ]
+}
