@@ -241,6 +241,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .chatpop[hidden]{display:none}
 .chatpop span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chatpop b{color:var(--purple)}
+.tag.car{background:linear-gradient(90deg,#38E1FF,#8A57FF);color:#fff;border:1.5px solid #fff;font-size:11.5px;z-index:2;box-shadow:0 0 12px rgba(56,225,255,.6)}
 .tag.say{background:var(--cream);color:var(--ink);border-color:var(--ink);max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:12px;padding:6px 9px;z-index:3}
 @media (max-width:720px){.chatpanel{left:8px;right:8px;width:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);height:min(78vh,calc(100vh - 80px))}.newpill{bottom:128px}.chatpop{bottom:calc(env(safe-area-inset-bottom,0px) + 262px)}}
 @media (prefers-reduced-motion:reduce){.nb.chatbtn.has i,.badge.pulse,.live i,.chatpanel,.chatpop{animation:none}}
@@ -334,7 +335,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   <ol class="steps">
     <li><span>Follow <b>@viralindongid</b> di Instagram atau TikTok.</span></li>
     <li><span>Komen <span class="kw">NADA</span> + profesimu di postingan terbaru. Contoh: <b>NADA drummer</b>.</span></li>
-    <li><span>Pesawatmu mendarat paling lama 24 jam. Cari username-mu di sini dan ambil Kartu Warga.</span></li>
+    <li><span>Mobil jemputanmu tiba paling lama 24 jam. Cari username-mu di sini dan ambil Kartu Warga.</span></li>
   </ol>
   <p class="muted">Petugas kota tidak pernah minta password atau bayaran apa pun.</p>
   <div class="row"><a class="btn" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">Buka Instagram</a><a class="btn dark" href="https://www.tiktok.com/@viralindongid" target="_blank" rel="noopener">Buka TikTok</a></div>
@@ -413,7 +414,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=5';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=6';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
