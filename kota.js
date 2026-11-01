@@ -81,6 +81,7 @@ function plane(t){const cyc=Math.floor(t/PERIOD),ph=t%PERIOD;if(ph>FLY)return;
 
 // ---------- render ----------
 let selected=null;
+function sayOf(u){const L=window.KOTA_SAY;if(!L||!L.length)return '';for(let i=L.length-1;i>=0&&i>L.length-30;i--){const m=L[i];if(m.u===u.toLowerCase()&&Date.now()-m.ts<90000)return m.t.length>40?m.t.slice(0,40)+'…':m.t}return ''}
 function frame(now){const t=now/1000;
   if(performance.now()-lastInput>5000&&!selected)cam.yaw+=0.0012;
   const tgt=selected?resPos(selected,t):[0,2,-0.5];const k=.06;cam.tx+=(tgt[0]-cam.tx)*k;cam.ty+=((selected?1.2:tgt[1])-cam.ty)*k;cam.tz+=(tgt[2]-cam.tz)*k;
@@ -108,7 +109,7 @@ function frame(now){const t=now/1000;
   // labels: nearest ~28 + selected + wali kota
   const cand=[];for(const r of RES){if(r.i>=260&&r!==selected)continue;const p=resPos(r,t);const top=[p[0],p[1]+(r.i===0?2.4:(r===selected?1.4:1.1)),p[2]];const s=project(VP,top);if(!s)continue;if(s[0]<-60||s[0]>innerWidth+60||s[1]<-20||s[1]>innerHeight+20)continue;cand.push([r,s])}
   cand.sort((a,b)=>a[1][2]-b[1][2]);const keep=new Set();cand.slice(0,28).forEach(c=>keep.add(c[0]));if(selected)keep.add(selected);RES[0]&&keep.add(RES[0]);
-  for(const [r,s] of cand){const el=tagFor(r);if(!keep.has(r)){el.style.display='none';continue}el.style.display='';el.className='tag'+(r===selected?' me':'');el.textContent=(r.i===0?'👑 ':'')+'@'+r.u;el.style.left=s[0]+'px';el.style.top=s[1]+'px'}
+  for(const [r,s] of cand){const el=tagFor(r);if(!keep.has(r)){el.style.display='none';continue}el.style.display='';const sy=sayOf(r.u);el.className='tag'+(r===selected?' me':'')+(sy?' say':'');el.textContent=(r.i===0?'👑 ':'')+'@'+r.u+(sy?': '+sy:'');el.style.left=s[0]+'px';el.style.top=s[1]+'px'}
   for(const [u,el] of tags){if(!cand.find(c=>c[0].u===u))el.style.display='none'}
   requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
