@@ -24,7 +24,8 @@ const R={};
 
 // ---------- toast ----------
 let tT=0;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),3800)}
-window.toastArr=r=>{if(!document.querySelector('.sheet:not([hidden])'))toast('✈️ @'+r.u+' baru mendarat di Kota Seni')};
+window.toastArr=r=>{if(!document.querySelector('.sheet:not([hidden])'))toast('🚘 @'+r.u+' baru tiba di Kota Seni')};
+window.toastMsg=m=>{if(!document.querySelector('.sheet:not([hidden])'))toast(m)};
 
 // ---------- jam ----------
 function tick(){const h=window.hourWIB?window.hourWIB():nowWIB().getUTCHours();const d=nowWIB();
@@ -34,8 +35,8 @@ tick();setInterval(tick,15000);
 
 // ---------- warga tiba ----------
 const nArr=ARR.length;
-$('arr').innerHTML=nArr?'✈️ <b>'+nArr+'</b> tiba hari ini':'';
-$('arrM').innerHTML=nArr?'✈️ <b>'+nArr+' warga</b> tiba hari ini':'';if(!nArr)$('arrM').remove();
+$('arr').innerHTML=nArr?'🚘 <b>'+nArr+'</b> tiba hari ini':'';
+$('arrM').innerHTML=nArr?'🚘 <b>'+nArr+' warga</b> tiba hari ini':'';if(!nArr)$('arrM').remove();
 
 // ---------- mulai bar ----------
 if(store.get('hideStart',false))$('start').remove();else $('startX').onclick=()=>{store.set('hideStart',true);$('start').remove()};
