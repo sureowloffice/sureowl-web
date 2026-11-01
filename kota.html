@@ -177,6 +177,19 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .ann p{margin:0;font-size:14.5px}
 .ann.new{border-color:var(--pink)}
 .vote{display:grid;gap:8px;margin-bottom:12px}
+/* pemilik kota */
+@keyframes shine{to{background-position:200% 0}}
+@keyframes glow{50%{box-shadow:0 0 28px rgba(255,210,63,.8),0 0 4px #fff inset}}
+.tag.own{background:linear-gradient(90deg,#FFE680,#FFB800,#FFF3B0,#FFB800,#FFE680);background-size:200% 100%;color:#2A1A00;border:2px solid #fff;box-shadow:0 0 14px #FFD23F,0 0 34px rgba(255,210,63,.6);font:900 13px/1 var(--sans);padding:7px 12px;animation:shine 2.4s linear infinite;z-index:4}
+.msg.own .bub{background:linear-gradient(135deg,#3A2800,#8A6300 60%,#C99400);border:1.5px solid #FFD23F;box-shadow:0 0 16px rgba(255,210,63,.45);animation:glow 2.4s ease-in-out infinite}
+.msg.own .av{filter:drop-shadow(0 0 7px #FFD23F)}
+.msg.own .nm{background:linear-gradient(90deg,#FFF3B0,#FFD23F,#FFFFFF,#FFD23F);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:shine 2.4s linear infinite;font-size:13.5px}
+.msg.own .who time{color:#FFE9A8}
+.who .jb.own{background:linear-gradient(90deg,#FFE680,#FFB800,#FFF3B0,#FFB800);background-size:200% 100%;color:#2A1A00;animation:shine 2.4s linear infinite}
+.chatpop.own{background:linear-gradient(90deg,#FFE680,#FFB800,#FFE680);border-color:#fff;box-shadow:0 0 18px rgba(255,210,63,.7),0 6px 0 rgba(0,0,0,.28)}
+.idcard.own{background:linear-gradient(135deg,#2A1A00,#7A5A00 55%,#FFB800);border-color:#FFF3B0;box-shadow:0 0 26px rgba(255,210,63,.55);animation:glow 2.4s ease-in-out infinite}
+.idcard.own .hd span{background:#fff}
+@media (prefers-reduced-motion:reduce){.tag.own,.msg.own .bub,.msg.own .nm,.who .jb.own,.idcard.own{animation:none}}
 /* chat — Pesan Warga (panel live, beda dari menu lain) */
 .nb.chatbtn i{display:grid;place-items:center;width:30px;height:24px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--pink));font-size:15px}
 .nb.chatbtn.has i{animation:wob 1.6s ease-in-out infinite}
@@ -400,7 +413,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=4';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=5';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
