@@ -12,6 +12,12 @@ const RES=data.warga.map((w,i)=>{const h=hash(w.u.toLowerCase());const rr=x=>((h
   let a=rr(0)*Math.PI*2,r=4.8+rr(10)*6.5;let cx=Math.cos(a)*r,cz=Math.sin(a)*r+1.2;
   if(cx>-5&&cx<5&&cz>-5&&cz<1){cz=1.6+rr(5)*2}
   if(Math.hypot(cx-5.2,cz-3.4)<1.8)cx-=2.2;
+  {const P=String(w.p||'').toLowerCase();let spot=null;
+   if(/ilustr|illustr|pelukis|desain|gambar/.test(P))spot=[-5.6,2.6];
+   else if(/editor|film|video|produksi|kamera|foto/.test(P))spot=[6.2,.6];
+   else if(/tarot/.test(P))spot=[-8.3,3.2];
+   else if(/head creative|sastra|penulis|creative/.test(P))spot=[6.6,-3.2];
+   if(spot&&i>1){const q=rr(13)*Math.PI*2,d=.8+rr(15)*1.2;cx=spot[0]+Math.cos(q)*d;cz=spot[1]+Math.sin(q)*d}}
   return {...w,i,no:String(i+1).padStart(4,'0'),jab:jabatan(i,w),col:w.u.toLowerCase()===OWNER?'#FFD23F':PAL[h%PAL.length],own:w.u.toLowerCase()===OWNER,cx,cz,ph:rr(3)*6.28,sp:.25+rr(7)*.35,wr:.4+rr(9)*.8,hat:rr(11)>.5}});
 const byName=new Map(RES.map(r=>[r.u.toLowerCase(),r]));
 
@@ -141,6 +147,55 @@ function heli(t){const cyc=Math.floor(t/PERIOD),ph=t%PERIOD;if(ph>FLY)return;
   D(G.box,M.chain(M.T(x0-.2,y0-1.75,z0),M.S(.03,1.0,.03)),'#14102B',{cast:false});
   D(G.plane,M.chain(M.T(x0-.2,y0-2.95,z0),M.RY(cam.yaw),M.S(7.2,1.35,1)),[1,1,1],{tex:bannerTex,em:1,cast:false})}
 
+
+// ---------- tempat-tempat DAY 1 (dari video Panggung Festival) ----------
+const posterTex=texFromCanvas(signCanvas(512,700,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#FF4FA3');g.addColorStop(1,'#6C2BFF');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.fillStyle='#FFD23F';x.beginPath();x.arc(w/2,250,150,0,7);x.fill();x.fillStyle='#14102B';x.font='900 92px Inter';x.textAlign='center';x.fillText('FESTIVAL',w/2,500);
+  x.font='800 52px Inter';x.fillStyle='#FFF7E8';x.fillText('KOTA SENI',w/2,580);x.strokeStyle='#FFF7E8';x.lineWidth=14;x.strokeRect(10,10,w-20,h-20)}));
+const poster2Tex=texFromCanvas(signCanvas(512,700,(x,w,h)=>{x.fillStyle='#FFF7E8';x.fillRect(0,0,w,h);const c=['#38E1FF','#FF4FA3','#FFD23F','#6C2BFF'];for(let i=0;i<9;i++){x.fillStyle=c[i%4];x.globalAlpha=.85;x.beginPath();x.arc(80+(i*131)%380,90+(i*197)%520,60+(i%3)*30,0,7);x.fill()}x.globalAlpha=1;
+  x.fillStyle='#14102B';x.font='900 84px Inter';x.textAlign='center';x.fillText('ART!',w/2,640)}));
+const tarotTex=texFromCanvas(signCanvas(512,256,(x,w,h)=>{x.fillStyle='#2A0E5C';x.fillRect(0,0,w,h);x.fillStyle='#FFD23F';x.font='900 92px Inter';x.textAlign='center';x.textBaseline='middle';x.fillText('TAROT',w/2,h/2+6);
+  for(let i=0;i<14;i++){x.fillStyle='#FFF3B0';x.beginPath();x.arc((i*97)%w,(i*53)%h,3+(i%3),0,7);x.fill()}}));
+const backTex=texFromCanvas(signCanvas(512,160,(x,w,h)=>{x.fillStyle='#14102B';x.fillRect(0,0,w,h);x.strokeStyle='#38E1FF';x.lineWidth=10;x.strokeRect(5,5,w-10,h-10);x.fillStyle='#38E1FF';x.font='900 70px Inter';x.textAlign='center';x.textBaseline='middle';x.fillText('BACKSTAGE',w/2,h/2+4)}));
+const mixTex=texFromCanvas(signCanvas(512,256,(x,w,h)=>{x.fillStyle='#14102B';x.fillRect(0,0,w,h);for(let i=0;i<12;i++){x.fillStyle='#55515F';x.fillRect(24+i*40,30,8,150);x.fillStyle=['#FFD23F','#38E1FF','#FF4FA3'][i%3];x.fillRect(16+i*40,60+(i*37)%100,24,16)}
+  x.fillStyle='#FFD23F';x.font='900 40px Inter';x.textAlign='center';x.fillText('PEMILIK KOTA',w/2,236)}));
+const FOUND=RES.slice(2,12);
+const boardTex=texFromCanvas(signCanvas(1024,1400,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#3A2A00');g.addColorStop(1,'#1A1200');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.strokeStyle='#FFD23F';x.lineWidth=26;x.strokeRect(13,13,w-26,h-26);x.lineWidth=6;x.strokeRect(46,46,w-92,h-92);
+  x.fillStyle='#FFD23F';x.textAlign='center';x.font='900 112px Inter';x.fillText('PENDIRI KOTA',w/2,190);x.font='700 40px Inter';x.fillStyle='#FFF3B0';x.fillText('KOTA SENI · 1 NOVEMBER 2026',w/2,250);
+  FOUND.forEach((r,i)=>{const y=350+i*102;x.textAlign='left';x.fillStyle='#FFD23F';x.font='800 40px Inter';x.fillText('#'+r.no,90,y);
+    x.fillStyle='#FFF7E8';let fs=54;x.font=`900 ${fs}px Inter`;while(x.measureText('@'+r.u).width>520&&fs>30){fs-=2;x.font=`900 ${fs}px Inter`}x.fillText('@'+r.u,250,y);
+    x.textAlign='right';x.fillStyle='#FFD23F';x.font='700 34px Inter';x.fillText(String(r.p||'').slice(0,18),w-90,y);
+    x.strokeStyle='rgba(255,210,63,.25)';x.lineWidth=2;x.beginPath();x.moveTo(90,y+34);x.lineTo(w-90,y+34);x.stroke()})}));
+if(typeof HOLO!=='undefined'&&HOLO[0])HOLO[0][1]=7.6;
+const PLACES=[['👑 Papan Pendiri',[-6.3,4.6,-1.3]],['🎨 Sudut Ilustrator',[-5.6,2.6,2.9]],['🔮 Tenda Tarot',[-8.9,3.4,1.5]],['🎬 Booth Kamera',[6.6,2.0,1.4]],['📋 Backstage',[6.5,2.8,-4.6]],['🎛️ Meja Mixer',[0,1.7,8.4]]];
+function places(t){
+  // papan pendiri kota
+  {const B=M.chain(M.T(-6.3,0,-1.3),M.RY(.55));for(const dx of [-1.35,1.35])D(G.box,M.mul(B,M.chain(M.T(dx,0,0),M.S(.16,4.9,.16))),'#B8860B',{em:.4});
+   D(G.box,M.mul(B,M.chain(M.T(0,.6,0),M.S(3.1,4.25,.18))),'#FFD23F',{em:.5});D(G.plane,M.mul(B,M.chain(M.T(0,2.72,.1),M.S(2.92,4.0,1))),[1,1,1],{tex:boardTex,em:1});
+   D(G.box,M.mul(B,M.chain(M.T(0,4.85,0),M.S(3.3,.22,.3))),'#FFD23F',{em:.9});
+   for(let k=0;k<6;k++){const q=((t*.4+k/6)%1);const a=k*2.3;D(G.box,M.mul(B,M.chain(M.T(Math.cos(a)*1.9,.5+q*4.4,.3),M.RY(t*3+k),M.S(.09,.09,.09))),'#FFF3B0',{em:1,cast:false})}}
+  // easel ilustrator
+  [[-6.4,3.0,poster2Tex],[-5.1,4.3,posterTex]].forEach(([x,z,tx])=>{const B=M.chain(M.T(x,0,z),M.RY(.35));
+    for(const dx of [-.45,.45])D(G.box,M.mul(B,M.chain(M.T(dx,0,0),M.RZ(dx>0?-.12:.12),M.S(.07,2.1,.07))),'#C98B52');D(G.box,M.mul(B,M.chain(M.T(0,0,-.35),M.RX(.25),M.S(.07,2.0,.07))),'#C98B52');
+    D(G.box,M.mul(B,M.chain(M.T(0,.75,.06),M.S(1.1,.06,.12))),'#9E6838');D(G.plane,M.mul(B,M.chain(M.T(0,1.42,.1),M.RX(-.06),M.S(1.05,1.4,1))),[1,1,1],{tex:tx,em:.55})});
+  // tenda tarot
+  {const B=M.T(-8.9,0,1.5);D(G.cone8,M.mul(B,M.S(1.6,2.8,1.6)),'#6C2BFF',{em:.2});D(G.cone8,M.mul(B,M.chain(M.T(0,2.4,0),M.S(.26,.65,.26))),'#FFD23F',{em:.6});
+   D(G.plane,M.mul(B,M.chain(M.T(.45,1.0,1.05),M.RY(.35),M.RX(-.45),M.S(1.2,.6,1))),[1,1,1],{tex:tarotTex,em:.9});
+   D(G.cyl16,M.mul(B,M.chain(M.T(.7,0,1.6),M.S(.45,.7,.45))),'#2A0E5C');D(G.sphHi,M.mul(B,M.chain(M.T(.7,.92,1.6),M.S(.2,.2,.2))),'#B69CFF',{em:.9,alpha:.9})}
+  // booth kamera + editing
+  {const B=M.chain(M.T(7.0,0,1.8),M.RY(-.6));D(G.box,M.mul(B,M.S(2.6,.85,.9)),'#24212E');D(G.box,M.mul(B,M.chain(M.T(0,.85,0),M.S(2.7,.06,1.0))),'#38E1FF',{em:.8});
+   for(const dx of [-.65,.65]){D(G.box,M.mul(B,M.chain(M.T(dx,.88,-.15),M.S(.9,.6,.06))),'#14102B');D(G.plane,M.mul(B,M.chain(M.T(dx,1.18,-.11),M.RY(Math.PI),M.S(.82,.5,1))),[1,1,1],{tex:dx<0?scrEq:scrEyes,em:1})}
+   const C2=M.chain(M.T(5.7,0,.6),M.RY(Math.PI*.8));for(const a of [0,2.1,4.2])D(G.box,M.mul(C2,M.chain(M.RY(a),M.T(0,0,.2),M.RX(-.18),M.S(.05,1.45,.05))),'#3A3354');
+   D(G.box,M.mul(C2,M.chain(M.T(0,1.42,0),M.S(.4,.32,.62))),'#14102B');D(G.cyl16,M.mul(C2,M.chain(M.T(0,1.58,.32),M.RX(Math.PI/2),M.S(.13,.25,.13))),'#24212E');D(G.sph,M.mul(C2,M.chain(M.T(.12,1.72,-.2),M.S(.05,.05,.05))),'#FF3B5C',{em:(t%1.4<.7)?1:.2})}
+  // backstage
+  {const B=M.chain(M.T(6.5,0,-4.6),M.RY(-.6));for(const dx of [-.8,.8])D(G.cyl8,M.mul(B,M.chain(M.T(dx,0,0),M.S(.05,2.2,.05))),'#3A3354');
+   D(G.plane,M.mul(B,M.chain(M.T(0,2.2,.02),M.S(1.9,.6,1))),[1,1,1],{tex:backTex,em:1});D(G.box,M.mul(B,M.chain(M.T(-1.6,0,1.0),M.S(.9,.9,.9))),'#24212E');D(G.box,M.mul(B,M.chain(M.T(-1.3,.9,1.1),M.S(.6,.5,.6))),'#4A1BC2')}
+  // meja mixer pemilik kota
+  {const B=M.T(0,0,8.4);D(G.box,M.mul(B,M.S(2.4,1.0,.9)),'#14102B');D(G.box,M.mul(B,M.chain(M.T(0,1.0,0),M.S(2.5,.06,1.0))),'#FFD23F',{em:.9});
+   D(G.plane,M.mul(B,M.chain(M.T(0,.52,.46),M.S(2.2,.88,1))),[1,1,1],{tex:mixTex,em:.95});
+   for(let i=0;i<8;i++)D(G.box,M.mul(B,M.chain(M.T(-.95+i*.27,1.05,-.1+Math.sin(t*3+i)*.12),M.S(.12,.06,.12))),['#FFD23F','#38E1FF','#FF4FA3'][i%3],{em:1})}}
+const placeTags=[];function placeTag(k){if(!placeTags[k]){const el=document.createElement('div');el.className='tag place';LB.appendChild(el);placeTags[k]=el}return placeTags[k]}
 // apakah garis kamera->titik terhalang panggung / gedung kotak sederhana
 const OCC=[[-4.5,4.5,0,6.2,-4.9,.5]];
 function hidBy(o,p){for(const [x0,x1,y0,y1,z0,z1] of OCC){let a=0,b=1;const d=[p[0]-o[0],p[1]-o[1],p[2]-o[2]],lo=[x0,y0,z0],hi=[x1,y1,z1];let ok=true;
@@ -153,7 +208,7 @@ function frame(now){const t=now/1000;
   if(performance.now()-lastInput>5000&&!selected)cam.yaw+=0.0012;
   const tgt=selected?resPos(selected,t):[0,2,-0.5];const k=.06;cam.tx+=(tgt[0]-cam.tx)*k;cam.ty+=((selected?1.2:tgt[1])-cam.ty)*k;cam.tz+=(tgt[2]-cam.tz)*k;
   if(selected)cam.dist+=(11-cam.dist)*.04;
-  DL=[];world(t);stage(99);sign(99);chairs(99);notes(40+t%600);road();cars(t);heli(t);
+  DL=[];world(t);stage(99);sign(99);chairs(99);notes(40+t%600);road();places(t);cars(t);heli(t);
   const bob=Math.max(0,Math.sin(t*3))*.05;mascot([0,.9,-.9],Math.sin(t*.5)*.25,t,{squash:bob,look:[.05,.08],wave:(t%9<1.6)?Math.sin(Math.min(1,(t%9)/0.3)*Math.PI/2):0});
   const shown=RES.slice(1,260);for(const r of shown)resident(r,t,selected===r);if(selected&&selected.i>=260)resident(selected,t,true);
   const sun=norm([-0.55,0.9,0.75]);const lc=[0,0,0];const LV=M.look(add(lc,scl(sun,30)),lc,[0,1,0]);const LP=M.ortho(-26,26,-26,26,1,70);const LVP=M.mul(LP,LV);
@@ -184,6 +239,9 @@ function frame(now){const t=now/1000;
     if(!s||s[0]<-80||s[0]>innerWidth+80||s[1]<40||s[1]>innerHeight-150){el.style.display='none';continue}
     const txt=(ARR.length?'🚘 BARU TIBA · @':'🚘 @')+r.u;if(el.textContent!==txt)el.textContent=txt;
     el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px';el.style.zIndex=String(1000-Math.round(s[2]))}
+  // label tempat
+  PLACES.forEach(([nm,p],k)=>{const el=placeTag(k);const s=project(VP,p);if(!s||hidBy(cp,p)||s[0]<20||s[0]>innerWidth-20||s[1]<60||s[1]>innerHeight-160||s[2]>34){el.style.display='none';return}
+    if(el.textContent!==nm)el.textContent=nm;el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px'});
   for(const [u,el] of tags){if(!cand.find(c=>c[0].u===u))el.style.display='none'}
   requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
