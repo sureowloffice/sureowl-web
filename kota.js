@@ -81,14 +81,17 @@ function road(){ROADSEG.forEach((g,k)=>{
   if(k%2==0)D(G.box,M.chain(M.T(g.mx,.035,g.mz),M.RY(g.phi),M.S(.08,.02,.7)),'#38E1FF',{em:1,cast:false});
   for(const s of [-1,1])D(G.box,M.chain(M.T(g.mx+g.nx*s*.98,.03,g.mz+g.nz*s*.98),M.RY(g.phi),M.S(.07,.06,g.len+.02)),s<0?'#FF4FA3':'#8A57FF',{em:1,cast:false})})}
 const CAR_COL=[['#F2F0FF','#FF4FA3'],['#14102B','#38E1FF'],['#FF4FA3','#FFD23F']];
-const NCAR=4,CAR_V=3.1,CAR_Y=.55,CAR_S=1.45;
-// mobil melaju mengelilingi jalan oval, jalur dalam/luar bergantian
-function carPos(k,t){const lane=k%2?-.45:.45;const th=k/NCAR*Math.PI*2-t*CAR_V/11.7;const c=roadPt(th),tg=roadTan(th);
-  const nx=tg[1],nz=-tg[0];return {a:Math.atan2(tg[0],tg[1]),p:[c[0]+nx*lane,CAR_Y+Math.sin(t*2.2+k)*.06,c[1]+nz*lane]}}
+const NCAR=1,CAR_V=3.1,CAR_Y=.55,CAR_S=1.45,CAR_P=22,CAR_L=13;
+// satu mobil saja: muncul, melaju setengah putaran jalan oval (±13 detik), lalu jeda sebelum mobil berikutnya
+function carCyc(t){return Math.floor(t/CAR_P)}
+function carPos(k,t,cyc){if(cyc===undefined)cyc=carCyc(t);const u=t-cyc*CAR_P;const th=cyc*2.3-u*CAR_V/11.7;const c=roadPt(th),tg=roadTan(th);const lane=cyc%2?-.45:.45;
+  const nx=tg[1],nz=-tg[0];return {a:Math.atan2(tg[0],tg[1]),p:[c[0]+nx*lane,CAR_Y+Math.sin(t*2.2)*.06,c[1]+nz*lane]}}
+function carOn(t){const u=t-carCyc(t)*CAR_P;return u<=CAR_L?Math.min(1,u/.8,(CAR_L-u)/.8):0}
 const NAMES=ARR.length?ARR:RES.filter(r=>r.i>0).slice(-6).reverse();
 function cars(t){
-  for(let k=0;k<NCAR;k++){const {a,p}=carPos(k,t);const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(a),M.S(CAR_S,CAR_S,CAR_S));const Wm=m=>M.mul(B,m);
-  const [body,neon]=CAR_COL[k%CAR_COL.length];
+  const on=carOn(t);if(on<=0)return;const cyc=carCyc(t);
+  for(let k=0;k<NCAR;k++){const {a,p}=carPos(k,t);const sc=CAR_S*on;const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(a),M.S(sc,sc,sc));const Wm=m=>M.mul(B,m);
+  const [body,neon]=CAR_COL[cyc%CAR_COL.length];
   const Bc=(x,y,z,w,h,d)=>Wm(M.chain(M.T(x,y-h/2,z),M.S(w,h,d)));
   // bodi ramping (lonjong) + kanopi kaca
   D(G.sphHi,Wm(M.S(.46,.17,1.12)),body,{em:.15,cast:false});
@@ -109,7 +112,7 @@ function cars(t){
   const fx=p[0]-Math.sin(a)*1.9*CAR_S,fz=p[2]-Math.cos(a)*1.9*CAR_S;
   D(G.cyl16,M.chain(M.T(fx,.05,fz),M.RY(a),M.S(.45,.01,.8)),'#FFF7E8',{em:1,alpha:.18,cast:false});
   // jejak cahaya mengikuti lengkung jalan
-  for(let q=1;q<=7;q++){const tp=carPos(k,t-q*.09).p;D(G.box,M.chain(M.T(tp[0],tp[1]-.05,tp[2]),M.RY(a),M.S(.36-q*.035,.03,.45)),neon,{em:1,alpha:.55-q*.07,cast:false})}}}
+  for(let q=1;q<=7;q++){const tp=carPos(k,t-q*.09,cyc).p;D(G.box,M.chain(M.T(tp[0],tp[1]-.05,tp[2]),M.RY(a),M.S(.36-q*.035,.03,.45)),neon,{em:1,alpha:.55-q*.07,cast:false})}}}
 // kenaikan jabatan: ambang 7, 14, 30 hari (bukan Wali/Pemilik/Pendiri)
 const STEP=[[7,'Seniman Jalanan'],[14,'Musisi Panggung'],[30,'Bintang Festival']];
 const dayIdx=s=>Math.floor(Date.parse(s+'T00:00:00Z')/864e5);
@@ -175,8 +178,8 @@ function frame(now){const t=now/1000;
   cand.sort((a,b)=>a[1][2]-b[1][2]);const keep=new Set();cand.slice(0,28).forEach(c=>keep.add(c[0]));if(selected)keep.add(selected);RES[0]&&keep.add(RES[0]);for(const r of RES)if(r.own)keep.add(r);
   for(const [r,s] of cand){const el=tagFor(r);if(!keep.has(r)){el.style.display='none';continue}el.style.display='';const sy=sayOf(r.u);el.className='tag'+(r.own?' own':'')+(r===selected?' me':'')+(sy?' say':'');el.textContent=(r.i===0?'👑 ':r.own?'💎 ':'')+'@'+r.u+(r.own&&!sy?' · PEMILIK KOTA':'')+(sy?': '+sy:'');el.style.left=s[0]+'px';el.style.top=s[1]+'px'}
   // papan nama mobil (HTML, selalu tajam & terbaca)
-  for(let k=0;k<NCAR;k++){const el=carTag(k);const r=NAMES.length?NAMES[(k+NCAR*Math.floor(t/30))%NAMES.length]:null;
-    if(!r||(NAMES.length<=k&&k>0)){el.style.display='none';continue}
+  for(let k=0;k<NCAR;k++){const el=carTag(k);const r=NAMES.length?NAMES[carCyc(t)%NAMES.length]:null;
+    if(!r||carOn(t)<.6){el.style.display='none';continue}
     const {p}=carPos(k,t);const top=[p[0],p[1]+1.05*CAR_S,p[2]];if(hidBy(cp,top)){el.style.display='none';continue}const s=project(VP,top);
     if(!s||s[0]<-80||s[0]>innerWidth+80||s[1]<40||s[1]>innerHeight-150){el.style.display='none';continue}
     const txt=(ARR.length?'🚘 BARU TIBA · @':'🚘 @')+r.u;if(el.textContent!==txt)el.textContent=txt;
