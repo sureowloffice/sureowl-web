@@ -12,14 +12,36 @@ const RES=data.warga.map((w,i)=>{const h=hash(w.u.toLowerCase());const rr=x=>((h
   let a=rr(0)*Math.PI*2,r=4.8+rr(10)*6.5;let cx=Math.cos(a)*r,cz=Math.sin(a)*r+1.2;
   if(cx>-5&&cx<5&&cz>-5&&cz<1){cz=1.6+rr(5)*2}
   if(Math.hypot(cx-5.2,cz-3.4)<1.8)cx-=2.2;
-  {const P=String(w.p||'').toLowerCase();let spot=null;
-   if(/ilustr|illustr|pelukis|desain|gambar/.test(P))spot=[-5.6,2.6];
-   else if(/editor|film|video|produksi|kamera|foto/.test(P))spot=[6.2,.6];
-   else if(/tarot/.test(P))spot=[-8.3,3.2];
-   else if(/head creative|sastra|penulis|creative/.test(P))spot=[6.6,-3.2];
-   if(spot&&i>1){const q=rr(13)*Math.PI*2,d=.8+rr(15)*1.2;cx=spot[0]+Math.cos(q)*d;cz=spot[1]+Math.sin(q)*d}}
   return {...w,i,no:String(i+1).padStart(4,'0'),jab:jabatan(i,w),col:w.u.toLowerCase()===OWNER?'#FFD23F':PAL[h%PAL.length],own:w.u.toLowerCase()===OWNER,cx,cz,ph:rr(3)*6.28,sp:.25+rr(7)*.35,wr:.4+rr(9)*.8,hat:rr(11)>.5}});
 const byName=new Map(RES.map(r=>[r.u.toLowerCase(),r]));
+// ---------- peran & tempat tiap warga (sesuai video DAY 1) ----------
+{const STAGE_SLOTS=[[1.4,-2.05],[-3.1,-1.7],[3.1,-1.8],[-.9,-1.5],[.45,-3.7],[-2.2,-.45],[2.4,-.55],[-3.45,-.25],[-1.35,-.35],[1.2,-.3],[3.7,-1.1],[-2.4,-2.5],[2.3,-2.7],[.2,-2.3]];
+ const DRUM=[-1.6,-3.95];
+ const SPOT={ilus:{c:[-5.75,3.65],l:[[-6.95,3.55],[-5.35,4.85],[-7.6,2.4],[-4.6,3.0],[-6.6,4.9],[-4.4,5.3]],r:2.3},
+   edit:{c:[7.0,1.8],l:[[6.0,2.7],[7.0,3.0],[7.9,2.6],[5.3,1.3],[8.3,1.0],[6.2,3.6]],r:2.0},
+   head:{c:[6.2,-3.8],l:[[5.55,-4.0],[6.6,-3.2],[5.4,-3.0],[7.2,-4.2]],r:1.6},
+   tarot:{c:[-8.9,1.5],l:[[-8.2,3.6],[-9.6,3.3],[-7.5,2.4]],r:2.2}};
+ const MUS=/gitar|guitar|vokal|vocal|penyanyi|singer|drum|bass|terompet|trumpet|keyboard|piano|musisi|band|perkusi|biola|saxo/;
+ const cnt={ilus:0,edit:0,head:0,tarot:0};const mus=[];
+ for(const r of RES){if(r.i===0)continue;const P=String(r.p||'').toLowerCase();
+   if(r.own){r.slot=[0,.25,7.75];r.fy=0;r.grp='owner';continue}
+   if(MUS.test(P)){mus.push(r);continue}
+   const g=/tarot/.test(P)?'tarot':/ilustr|illustr|pelukis|gambar|desain|lukis/.test(P)?'ilus':/editor|film|video|produksi|kamera|foto|sinema/.test(P)?'edit':/creative|kreatif|sastra|penulis|writer|puisi/.test(P)?'head':null;
+   if(!g)continue;const S=SPOT[g],k=cnt[g]++;let q=S.l[k];if(!q){const a=k*2.4;q=[S.c[0]+Math.cos(a)*S.r,S.c[1]+Math.sin(a)*S.r*.8]}
+   r.slot=[q[0],0,q[1]];r.grp=g;r.fy=g==='tarot'?0:Math.atan2(S.c[0]-q[0],S.c[1]-q[1]);r.prop=g==='ilus'?'kuas':g==='head'?'clip':'none'}
+ const dr=mus.findIndex(r=>/drum/.test(String(r.p).toLowerCase()));let si=0,ov=0;
+ mus.forEach((r,k)=>{const P=String(r.p||'').toLowerCase();r.grp='musik';r.fy=0;
+   if(k===dr){r.slot=[DRUM[0],.9,DRUM[1]];r.prop='none';return}
+   if(si<STAGE_SLOTS.length){const q=STAGE_SLOTS[si++];r.slot=[q[0],.9,q[1]]}else{const x=-3.6+(ov%7)*1.2,z=2.1+Math.floor(ov/7)*1.0;ov++;r.slot=[x,0,z]}
+   r.prop=/drum|perkusi/.test(P)?'perkusi':/bass/.test(P)?'bass':/gitar|guitar/.test(P)?'gitar':/terompet|trumpet/.test(P)?'terompet':/vokal|vocal|penyanyi|singer/.test(P)?((si===1&&r.slot[1]>0)?'none':'mic2'):'gitar'})}
+function propOf(r,Wm,t){const k=r.prop;if(!k||k==='none')return;
+  if(k==='gitar'||k==='bass'){const L=k==='bass'?1.25:1;const P=M.chain(M.T(.1,.75,.62),M.RZ(.9+Math.sin(t*8+r.ph)*.06));
+    D(G.sphHi,Wm(M.chain(P,M.S(.36,.42,.12))),k==='bass'?'#2EC4B6':'#FF9F1C');D(G.sph,Wm(M.chain(P,M.T(0,0,.1),M.S(.1,.1,.04))),'#14102B');D(G.box,Wm(M.chain(P,M.T(0,.3,0),M.S(.08,.9*L,.06))),'#5A3A22')}
+  if(k==='terompet'){const P=M.chain(M.T(0,1.1,.75),M.RX(-Math.PI/2-.25));D(G.cyl16,Wm(M.chain(P,M.S(.05,.7,.05))),'#FFD23F',{em:.4});D(G.cone8,Wm(M.chain(P,M.T(0,.95,0),M.RX(Math.PI),M.S(.24,.3,.24))),'#FFD23F',{em:.5})}
+  if(k==='perkusi'){D(G.cyl16,Wm(M.chain(M.T(0,0,.75),M.S(.36,.75,.36))),'#FF4FA3');D(G.cyl16,Wm(M.chain(M.T(0,.75,.75),M.S(.34,.02,.34))),'#FFF7E8')}
+  if(k==='mic2'){const P=M.chain(M.T(.2,1.0,.72),M.RX(-.5));D(G.cyl16,Wm(M.chain(P,M.S(.05,.4,.05))),'#24212E');D(G.sph,Wm(M.chain(P,M.T(0,.45,0),M.S(.11,.12,.11))),'#9A97A6',{em:.3})}
+  if(k==='kuas'){const P=M.chain(M.T(.55,.9+Math.sin(t*5+r.ph)*.18,.5),M.RZ(-.6));D(G.box,Wm(M.chain(P,M.S(.06,.6,.06))),'#C98B52');D(G.box,Wm(M.chain(P,M.T(0,.6,0),M.S(.09,.14,.09))),PAL[r.i%5],{em:.6})}
+  if(k==='clip'){D(G.box,Wm(M.chain(M.T(.35,.55,.7),M.RX(-.5),M.S(.55,.7,.05))),'#C98B52');D(G.box,Wm(M.chain(M.T(.35,.6,.73),M.RX(-.5),M.S(.45,.55,.02))),'#FFF7E8',{em:.3})}}
 
 // ---------- canvas sizing ----------
 let W=0,H=0;function size(){const dpr=Math.min(window.devicePixelRatio||1,2);let w=innerWidth*dpr,h=innerHeight*dpr;const maxPix=2.4e6;if(w*h>maxPix){const k=Math.sqrt(maxPix/(w*h));w*=k;h*=k}
@@ -38,12 +60,13 @@ glc.addEventListener('wheel',e=>{e.preventDefault();cam.dist=clamp(cam.dist*(1+e
 let hintHidden=false;function hideHint(){if(hintHidden)return;hintHidden=true;const h=document.getElementById('hint');h.style.opacity=0;setTimeout(()=>h.remove(),700)}
 
 // ---------- residents ----------
-function resPos(r,t){if(r.i===0)return [0,.9,-.9];const a=t*r.sp+r.ph;return [r.cx+Math.cos(a)*r.wr,Math.abs(Math.sin(t*4+r.ph))*.12,r.cz+Math.sin(a)*r.wr*.7]}
-function resident(r,t,hi){const p=resPos(r,t);const a=t*r.sp+r.ph;const yaw=hi?cam.yaw:Math.atan2(-Math.sin(a),Math.cos(a)*.7)+Math.PI/2;
+function resPos(r,t){if(r.i===0)return [0,.9,-.9];if(r.slot){const b=r.grp==='musik'?Math.abs(Math.sin(t*6.2+r.ph))*.12:Math.abs(Math.sin(t*2.5+r.ph))*.04;return [r.slot[0],r.slot[1]+b,r.slot[2]]}const a=t*r.sp+r.ph;return [r.cx+Math.cos(a)*r.wr,Math.abs(Math.sin(t*4+r.ph))*.12,r.cz+Math.sin(a)*r.wr*.7]}
+function resident(r,t,hi){const p=resPos(r,t);const a=t*r.sp+r.ph;const yaw=hi?cam.yaw:(r.slot?r.fy+Math.sin(t*(r.grp==='musik'?2:.7)+r.ph)*(r.grp==='musik'?.15:.1):Math.atan2(-Math.sin(a),Math.cos(a)*.7)+Math.PI/2);
   const s=hi?.62:(r.own?.58:.48);const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(yaw),M.S(s,s,s));const Wm=m=>M.mul(B,m);
   D(G.sphHi,Wm(M.chain(M.T(0,.95,0),M.S(.82,.98,.78))),r.col);
   for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.3,1.22,.55),M.S(.3,.36,.24))),'#FFF7E8',{em:.2});D(G.sph,Wm(M.chain(M.T(sx*.3+.1,1.32,.74),M.S(.14,.14,.09))),'#14102B')}
   if(r.hat)D(G.sphHi,Wm(M.chain(M.T(.05,1.86,0),M.RZ(-.18),M.S(.6,.16,.56))),'#14102B');
+  propOf(r,Wm,t);
   if(hi)D(G.cyl16,M.chain(M.T(p[0],.03,p[2]),M.S(.75,.02,.75)),'#FFD23F',{em:1,cast:false});if(r.own)ownerFx(p,t)}
 function ownerFx(p,t){const B=M.chain(M.T(p[0],p[1],p[2]),M.S(.58,.58,.58));
   for(let k=0;k<5;k++){const a=k/5*Math.PI*2+t*.6;D(G.cone6,M.mul(B,M.chain(M.T(Math.cos(a)*.4,2.0,Math.sin(a)*.4),M.S(.14,.4,.14))),'#FFD23F',{em:.9,cast:false})}
