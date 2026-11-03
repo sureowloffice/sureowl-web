@@ -83,7 +83,8 @@ module.exports = async (req, res) => {
     if (!rlU || !rlIp) return send(res, 429, { error: 'Pelan-pelan, tunggu beberapa detik ya.' });
 
     const msg = { id: Date.now().toString(36) + crypto.randomBytes(3).toString('hex'), u, t: c.t, ts: Date.now() };
-    await redis([['LPUSH', 'chat', JSON.stringify(msg)], ['LTRIM', 'chat', '0', String(KEEP - 1)]]);
+    const hari = new Date(Date.now() + 7 * 36e5).toISOString().slice(0, 10);
+    await redis([['LPUSH', 'chat', JSON.stringify(msg)], ['LTRIM', 'chat', '0', String(KEEP - 1)], ['INCR', 'chatc:' + u + ':' + hari], ['EXPIRE', 'chatc:' + u + ':' + hari, '172800']]);
     return send(res, 200, { ok: true, msg });
   } catch (e) {
     return send(res, 500, { error: 'Server kota lagi sibuk, coba lagi sebentar.' });
