@@ -98,7 +98,12 @@ function light(){const now=performance.now();if(LCache&&now-LAt<10000)return LCa
 let VPprev=null;
 // ---------- mobil masa depan (warga baru) & helikopter (kenaikan jabatan) ----------
 const TODAY=new Date(Date.now()+7*36e5).toISOString().slice(0,10);
-const ARR=RES.filter(r=>r.i>0&&r.t===TODAY);window.KOTA_ARR=ARR;
+// jemputan terjadwal: warga yang didaftarkan hari ini dengan jam (j) menunggu mobil keberangkatan jam berikutnya (tiap jam tepat)
+const nowMin=()=>{const d=new Date(Date.now()+7*36e5);return d.getUTCHours()*60+d.getUTCMinutes()};
+const depMin=r=>{const m=/^(\d{1,2})[:.](\d{2})/.exec(r.j||'');return m?(+m[1]+1)*60:-1};
+for(const r of RES){if(r.i>0&&r.t===TODAY&&depMin(r)>nowMin())r.q=true}
+const ARR=RES.filter(r=>r.i>0&&r.t===TODAY&&!r.q);window.KOTA_ARR=ARR;
+const QUEUE=RES.filter(r=>r.q);window.KOTA_QUEUE=QUEUE;
 // jalan lingkar berbentuk oval mengelilingi plaza (di belakang kursi penonton, di samping & belakang panggung)
 const ROAD_R=13.2,RZ_A=10.25,RZ_B=.75,NSEG=72;
 function roadPt(th){const sn=Math.sin(th);return [Math.cos(th)*ROAD_R,.5+(RZ_A+RZ_B*sn)*sn]}
@@ -112,11 +117,15 @@ function road(){ROADSEG.forEach((g,k)=>{
 const CAR_COL=[['#F2F0FF','#FF4FA3'],['#14102B','#38E1FF'],['#FF4FA3','#FFD23F']];
 const NCAR=1,CAR_V=3.1,CAR_Y=.55,CAR_S=1.45,CAR_P=22,CAR_L=13;
 // satu mobil saja: muncul, melaju setengah putaran jalan oval (±13 detik), lalu jeda sebelum mobil berikutnya
-function carCyc(t){return Math.floor(t/CAR_P)}
-function carPos(k,t,cyc){if(cyc===undefined)cyc=carCyc(t);const u=t-cyc*CAR_P;const th=cyc*2.3-u*CAR_V/11.7;const c=roadPt(th),tg=roadTan(th);const lane=cyc%2?-.45:.45;
+let CAR_OFF=0;function carCyc(t){return Math.floor((t-CAR_OFF)/CAR_P)}
+function carPos(k,t,cyc){if(cyc===undefined)cyc=carCyc(t);const u=t-CAR_OFF-cyc*CAR_P;const th=cyc*2.3-u*CAR_V/11.7;const c=roadPt(th),tg=roadTan(th);const lane=cyc%2?-.45:.45;
   const nx=tg[1],nz=-tg[0];return {a:Math.atan2(tg[0],tg[1]),p:[c[0]+nx*lane,CAR_Y+Math.sin(t*2.2)*.06,c[1]+nz*lane]}}
-function carOn(t){const u=t-carCyc(t)*CAR_P;return u<=CAR_L?Math.min(1,u/.8,(CAR_L-u)/.8):0}
-const NAMES=ARR.length?ARR:RES.filter(r=>r.i>0).slice(-6).reverse();
+function carOn(t){const u=t-CAR_OFF-carCyc(t)*CAR_P;return u<=CAR_L?Math.min(1,u/.8,(CAR_L-u)/.8):0}
+const NAMES=ARR.length?ARR.slice():RES.filter(r=>r.i>0&&!r.q).slice(-6).reverse();
+// dipanggil UI saat jam keberangkatan tiba: warga antrean turun dari mobil satu per satu
+function arrive(){const now=QUEUE.filter(r=>r.q&&depMin(r)<=nowMin());if(!now.length)return [];
+  for(const r of now){r.q=false;ARR.push(r);QUEUE.splice(QUEUE.indexOf(r),1)}
+  const rest=NAMES.filter(r=>!now.includes(r));NAMES.length=0;NAMES.push(...now,...rest);CAR_OFF=performance.now()/1000;return now}
 function cars(t){
   const on=carOn(t);if(on<=0)return;const cyc=carCyc(t);
   for(let k=0;k<NCAR;k++){const {a,p}=carPos(k,t);const sc=CAR_S*on;const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(a),M.S(sc,sc,sc));const Wm=m=>M.mul(B,m);
@@ -233,7 +242,7 @@ function frame(now){const t=now/1000;
   if(selected)cam.dist+=(11-cam.dist)*.04;
   DL=[];world(t);stage(99);sign(99);chairs(99);notes(40+t%600);road();places(t);cars(t);heli(t);
   const bob=Math.max(0,Math.sin(t*3))*.05;mascot([0,.9,-.9],Math.sin(t*.5)*.25,t,{squash:bob,look:[.05,.08],wave:(t%9<1.6)?Math.sin(Math.min(1,(t%9)/0.3)*Math.PI/2):0});
-  const shown=RES.slice(1,260);for(const r of shown)resident(r,t,selected===r);if(selected&&selected.i>=260)resident(selected,t,true);
+  const shown=RES.slice(1,260);for(const r of shown)if(!r.q)resident(r,t,selected===r);if(selected&&selected.i>=260)resident(selected,t,true);
   const sun=norm([-0.55,0.9,0.75]);const lc=[0,0,0];const LV=M.look(add(lc,scl(sun,30)),lc,[0,1,0]);const LP=M.ortho(-26,26,-26,26,1,70);const LVP=M.mul(LP,LV);
   gl.bindFramebuffer(gl.FRAMEBUFFER,shFB);gl.viewport(0,0,SHS,SHS);gl.clearColor(1,1,1,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
   gl.useProgram(P_DEPTH.p);gl.uniformMatrix4fv(P_DEPTH.u.uLVP,false,LVP);
@@ -252,7 +261,7 @@ function frame(now){const t=now/1000;
     gl.depthMask(d.alpha>=1);gl.drawArrays(gl.TRIANGLES,0,d.g.n)}
   gl.depthMask(true);
   // labels: nearest ~28 + selected + wali kota
-  const cand=[];for(const r of RES){if(r.i>=260&&r!==selected)continue;const p=resPos(r,t);const top=[p[0],p[1]+(r.i===0?2.4:r.own?1.75:(r===selected?1.4:1.1)),p[2]];const s=project(VP,top);if(!s)continue;if(s[0]<-60||s[0]>innerWidth+60||s[1]<-20||s[1]>innerHeight+20)continue;cand.push([r,s])}
+  const cand=[];for(const r of RES){if((r.i>=260&&r!==selected)||r.q)continue;const p=resPos(r,t);const top=[p[0],p[1]+(r.i===0?2.4:r.own?1.75:(r===selected?1.4:1.1)),p[2]];const s=project(VP,top);if(!s)continue;if(s[0]<-60||s[0]>innerWidth+60||s[1]<-20||s[1]>innerHeight+20)continue;cand.push([r,s])}
   cand.sort((a,b)=>a[1][2]-b[1][2]);const keep=new Set();cand.slice(0,28).forEach(c=>keep.add(c[0]));if(selected)keep.add(selected);RES[0]&&keep.add(RES[0]);for(const r of RES)if(r.own)keep.add(r);
   for(const [r,s] of cand){const el=tagFor(r);if(!keep.has(r)){el.style.display='none';continue}el.style.display='';const sy=sayOf(r.u);el.className='tag'+(r.own?' own':'')+(r===selected?' me':'')+(sy?' say':'');el.textContent=(r.i===0?'👑 ':r.own?'💎 ':'')+'@'+r.u+(r.own&&!sy?' · PEMILIK KOTA':'')+(sy?': '+sy:'');el.style.left=s[0]+'px';el.style.top=s[1]+'px'}
   // papan nama mobil (HTML, selalu tajam & terbaca)
@@ -294,5 +303,5 @@ function makeCard(r){const c=document.createElement('canvas');c.width=1080;c.hei
   x.fillStyle='#FFF7E8';x.font='600 30px Inter';x.fillText(location.host||'kota seni',540,1680);
   return c}
 // ---------- API for ui.js ----------
-window.KOTA={RES,byName,makeCard,jabatan,tgl,select(r){selected=r},get selected(){return selected}};
+window.KOTA={RES,byName,makeCard,jabatan,tgl,arrive,QUEUE,select(r){selected=r},get selected(){return selected}};
 })();
