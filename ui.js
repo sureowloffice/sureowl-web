@@ -36,7 +36,7 @@ tick();setInterval(tick,15000);
 // ---------- warga tiba ----------
 const nArr=ARR.length;
 $('arr').innerHTML=nArr?'🚘 <b>'+nArr+'</b> tiba hari ini':'';
-$('arrM').innerHTML=nArr?'🚘 <b>'+nArr+' warga</b> tiba hari ini':'';if(!nArr)$('arrM').remove();
+$('arrM').innerHTML=nArr?'🚘 <b>'+nArr+' warga</b> tiba hari ini':'';
 
 // ---------- mulai bar ----------
 if(store.get('hideStart',false))$('start').remove();else $('startX').onclick=()=>{store.set('hideStart',true);$('start').remove()};
@@ -45,7 +45,7 @@ if(store.get('hideStart',false))$('start').remove();else $('startX').onclick=()=
 const MISI=info.misi||[];
 function misiState(){const s=store.get('misi',{});return s.d===TODAY?s:{d:TODAY,done:[]}}
 function setMisi(id,v){const s=misiState();s.done=s.done.filter(x=>x!==id);if(v)s.done.push(id);store.set('misi',s);misiCount()}
-function done(id){setMisi(id,true)}
+function done(id){setMisi(id,true);if(window.AKUN)window.AKUN.claim(id)}
 function misiCount(){const n=misiState().done.filter(id=>MISI.some(m=>m.id===id)).length;$('misiCt').textContent=n+'/'+MISI.length;return n}
 misiCount();
 R.misi=()=>{const s=misiState();const n=misiCount();$('misiSub').textContent=tglPanjang(TODAY)+' · berganti 00.00 WIB';$('misiProg').style.width=(MISI.length?n/MISI.length*100:0)+'%';
@@ -144,7 +144,7 @@ R.info=()=>{const s=store.get('ann',0);$('infoList').innerHTML=ANN.map(a=>`<div 
   store.set('ann',Math.max(0,...ANN.map(a=>a.id)));$('infoBadge').hidden=true};
 
 // ---------- voting ----------
-R.voting=()=>{const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);const ic=['🎙️','🎸','☕','🎓','🏗️'];
+R.voting=()=>{done('voting');const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);const ic=['🎙️','🎸','☕','🎓','🏗️'];
   $('vote').innerHTML=V.map((o,i)=>`<li class="item"><span class="ic">${ic[i%ic.length]}</span><span><b>${esc(o.n)}</b><small>${tot?Math.round(o.v/tot*100)+'% suara':'Voting dibuka setelah DAY 1 tayang'}</small></span><span class="r">${tot?o.v+' suara':''}</span></li>`).join('')||'<li class="item"><span><b>Voting belum dibuka</b></span></li>'};
 
 // ---------- chat / pesan warga (panel live) ----------
@@ -177,7 +177,7 @@ $('msgs').addEventListener('scroll',()=>{const b=$('msgs');if(b.scrollHeight-b.s
 $('newPill').onclick=()=>{const b=$('msgs');b.scrollTop=b.scrollHeight;$('newPill').hidden=true};
 async function sendMsg(t,me){const b=$('cf').querySelector('.send');b.disabled=true;$('cerr').textContent='';
   try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({u:me.u.toLowerCase(),t,k:chatKey()})});const j=await r.json();
-    if(r.ok){$('ct').value='';chatMsgs.push(j.msg);window.KOTA_SAY=chatMsgs;lastSeenChat=j.msg.ts;store.set('chatSeen',j.msg.ts);$('msgs').dataset.init='';drawChat()}else $('cerr').textContent=j.error||'Gagal kirim.'}catch(err){$('cerr').textContent='Koneksi bermasalah, coba lagi.'}
+    if(r.ok){$('ct').value='';if(window.AKUN)window.AKUN.claim('chat');chatMsgs.push(j.msg);window.KOTA_SAY=chatMsgs;lastSeenChat=j.msg.ts;store.set('chatSeen',j.msg.ts);$('msgs').dataset.init='';drawChat()}else $('cerr').textContent=j.error||'Gagal kirim.'}catch(err){$('cerr').textContent='Koneksi bermasalah, coba lagi.'}
   b.disabled=false}
 function chatFoot(){const me=K.byName.get(store.get('me',''));const f=$('chatFoot');
   if(!me){f.innerHTML=`<p class="muted" style="margin:0 0 8px">Masuk pakai username warga buat ikut ngobrol.</p>`+balaiForm().replace('Ambil kartu','Masuk');$('bf').onsubmit=e=>{e.preventDefault();const q=$('bq').value.trim().replace(/^@/,'').toLowerCase();if(K.byName.get(q)){store.set('me',q);chatFoot();drawChat()}else{$('bq').value='';$('bq').placeholder='@'+q+' belum terdaftar'}};return}
@@ -191,6 +191,64 @@ function openChat(){if(!$('s-chat').hidden){closeChat();return}document.querySel
 window.closeChat=function(){if($('s-chat').hidden)return;$('s-chat').hidden=true;clearInterval(chatTimer);chatTimer=setInterval(loadChat,15000);setBadge()};
 $('chatX').onclick=()=>closeChat();
 loadChat();chatTimer=setInterval(loadChat,15000);
+
+
+// ---------- AKUN WARGA: Koin Nada, level, misi berhadiah, absen, papan teraktif, KTW ----------
+const MISI2=[{id:'absen',ikon:'🗓️',judul:'Absen harian',ket:'+10 koin · bonus kalau beruntun'},{id:'chat',ikon:'💬',judul:'Ngobrol di Pesan Warga',ket:'Kirim 1 pesan · +5 koin',aksi:'chat'},
+ {id:'radio',ikon:'📻',judul:'Dengerin Radio Kota',ket:'Putar radio · +5 koin',aksi:'radio'},{id:'koran',ikon:'📰',judul:'Baca Harian Kota Seni',ket:'+3 koin',aksi:'koran'},
+ {id:'voting',ikon:'🗳️',judul:'Lihat voting gedung',ket:'+3 koin',aksi:'voting'},{id:'kartu',ikon:'🪪',judul:'Simpan Kartu Warga-mu',ket:'Download kartu di Balai · +3 koin',aksi:'balai'},
+ {id:'ajak',ikon:'🤝',judul:'Ajak 1 teman pindah',ket:'Bagikan link kota · +5 koin',aksi:'share'}];
+const AK={p:null,busy:false};
+async function api(a,extra){const me=store.get('me','');const r=await fetch('/api/akun',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({a,u:me,k:chatKey()},extra||{}))});
+  let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw Object.assign(new Error(j.error||'Gagal'),{j});return j}
+function pillUpdate(){const p=AK.p;$('koinCt').innerHTML=p?`<b>${p.koin}</b><small>Lv ${p.level}${p.verified?' ✓':''}</small>`:'Masuk';
+  $('misiCt').textContent=(p?p.misi.filter(id=>MISI2.some(m=>m.id===id)).length:0)+'/'+MISI2.length}
+async function refresh(){if(!store.get('me',''))return;try{const j=await api('profil');AK.p=j.profil;pillUpdate();if(!$('s-akun').hidden)R.akun();if(!$('s-misi').hidden)R.misi()}catch(e){if(e.j&&e.j.perluKTW){AK.p=null;AK.err=e.message;pillUpdate()}}}
+const pending=new Set();
+async function claim(id){if(!store.get('me','')||!AK.p||AK.p.misi.includes(id)||pending.has(id))return;pending.add(id);
+  try{const j=await api('misi',{id});AK.p=j.profil;pillUpdate();if(j.dapat){coinFx('+'+j.dapat);toast('🪙 +'+j.dapat+' Koin Nada · '+(MISI2.find(m=>m.id===id)||{}).judul+(j.bonus?' (bonus beruntun +'+j.bonus+')':''))}
+    if(!$('s-misi').hidden)R.misi();if(!$('s-akun').hidden)R.akun()}catch(e){if(id!=='absen'&&!$('s-misi').hidden)toast(e.message)}finally{pending.delete(id)}}
+window.AKUN={claim,refresh};
+function coinFx(t){const b=$('walletBtn');const f=document.createElement('span');f.className='coinfx';f.textContent=t;b.appendChild(f);setTimeout(()=>f.remove(),1300)}
+function lvBar(p){const span=p.nextExp-p.prevExp||1,pr=Math.max(0,Math.min(1,(p.exp-p.prevExp)/span));return `<div class="lvl"><b>Lv ${p.level}</b><div class="prog"><i style="width:${pr*100}%"></i></div><small>${p.exp}/${p.nextExp} EXP</small></div>`}
+async function topHTML(){try{const j=await (await fetch('/api/akun?a=top')).json();if(!j.top||!j.top.length)return '<p class="muted">Belum ada. Jadilah yang pertama absen!</p>';
+  return '<ol class="papan">'+j.top.map((t,i)=>`<li${t.u===store.get('me','')?' class="me"':''}><span class="rk">${['🥇','🥈','🥉'][i]||(i+1)}</span>${avatar(t.u,26)}<b>@${esc(t.u)}</b><small>Lv ${t.level} · ${t.exp} EXP</small></li>`).join('')+'</ol>'}catch(e){return ''}}
+R.akun=async()=>{const me=store.get('me',''),b=$('akunBody');
+  if(!me){b.innerHTML=`<p class="muted" style="margin:0 0 10px">Masuk pakai username Instagram yang udah jadi warga. Kumpulin <b>Koin Nada</b> dari misi harian, naik level, dan nanti belanja perabot rumah & kostum.</p>`+balaiForm().replace('Ambil kartu','Masuk')+`<h3 class="h3">🏆 Warga Teraktif</h3><div id="topBox"></div>`;
+    $('bf').onsubmit=async e=>{e.preventDefault();const q=$('bq').value.trim().replace(/^@/,'').toLowerCase();if(!K.byName.get(q)){$('bq').value='';$('bq').placeholder='@'+q+' belum terdaftar';return}
+      store.set('me',q);try{const j=await api('masuk');AK.p=j.profil;AK.err=null;pillUpdate();claim('absen');R.akun()}catch(err){AK.p=null;AK.err=err.message;R.akun()}};
+    $('topBox').innerHTML=await topHTML();return}
+  const r=K.byName.get(me),p=AK.p;
+  if(!p){b.innerHTML=`<div class="item"><span class="ic">⚠️</span><span><b>@${esc(me)}</b><small>${esc(AK.err||'Memuat akun…')}</small></span></div>`+(AK.err?ktwHTML():'')+`<p style="margin-top:10px"><button class="btn dark" type="button" id="akOut">Ganti akun</button></p>`;
+    $('akOut').onclick=()=>{store.set('me','');AK.p=null;AK.err=null;pillUpdate();R.akun()};bindKTW();if(!AK.err)refresh();return}
+  b.innerHTML=`<div class="wallet">${avatar(me,54)}<div><b>@${esc(me)}${p.verified?' <span class="ver" title="Terverifikasi KTW">✓</span>':''}</b><small>${esc(r?r.jab:'Warga')} · ${esc(r?r.p||'':'')}</small></div><div class="coin"><span>🪙</span><b>${p.koin}</b><small>Koin Nada</small></div></div>`+
+    lvBar(p)+`<div class="streak">🔥 Absen beruntun <b>${p.streak} hari</b>${p.absenHariIni?' · sudah absen hari ini':''}</div>`+
+    (p.verified?'':ktwHTML())+
+    `<div class="item soon"><span class="ic">🛋️</span><span><b>Toko Perabot & Kostum</b><small>Segera buka. Koin Nada-mu bisa dipakai beli perabot rumah, topi, alat musik, dan hewan peliharaan.</small></span></div>`+
+    `<h3 class="h3">🏆 Warga Teraktif</h3><div id="topBox"></div><p style="margin-top:12px"><button class="btn dark" type="button" id="akOut">Keluar</button></p>`;
+  $('akOut').onclick=()=>{store.set('me','');AK.p=null;pillUpdate();R.akun()};bindKTW();$('topBox').innerHTML=await topHTML()};
+function ktwHTML(){return `<div class="ktw"><b>✓ Ambil KTW (Kartu Tanda Warga)</b><small>Dapat centang terverifikasi + 50 Koin Nada, dan akunmu aman dipakai di HP mana pun.</small><div id="ktwBox"><button class="btn" type="button" id="ktwGo">Minta kode verifikasi</button></div></div>`}
+function bindKTW(){const g=$('ktwGo');if(!g)return;g.onclick=async()=>{g.disabled=true;try{const j=await api('kode');$('ktwBox').innerHTML=`<div class="kode">${esc(j.kode)}</div><small>1) Salin kode di atas  2) Kirim lewat <b>DM Instagram</b> dari akun @${esc(store.get('me',''))} ke <b>@viralindongid</b>  3) Diverifikasi otomatis maks. ±1 jam.</small><p style="display:flex;gap:8px;margin-top:8px"><button class="btn dark" type="button" id="ktwCp">Salin kode</button><a class="btn" href="https://ig.me/m/viralindongid" target="_blank" rel="noopener">Buka DM</a></p>`;
+  $('ktwCp').onclick=async()=>{try{await navigator.clipboard.writeText(j.kode);toast('Kode disalin')}catch(e){toast(j.kode)}}}catch(e){g.disabled=false;toast(e.message)}}}
+R.misi=()=>{const p=AK.p,me=store.get('me','');const n=p?p.misi.filter(id=>MISI2.some(m=>m.id===id)).length:0;
+  $('misiSub').textContent=tglPanjang(TODAY)+' · berganti 00.00 WIB';$('misiProg').style.width=(n/MISI2.length*100)+'%';
+  const ev=(info.events||[]).find(e=>e.mulai<=TODAY&&TODAY<=e.selesai);
+  $('misiList').innerHTML=(!me||!p?`<li class="item feat"><span class="ic">🪙</span><span><b>Masuk dulu biar dapat Koin Nada</b><small>Misi cuma dihitung buat warga yang masuk</small></span><button class="btn" type="button" data-go2="akun">Masuk</button></li>`:
+    `<li class="item feat"><span class="ic">🪙</span><span><b>${p.koin} Koin Nada · Lv ${p.level}</b><small>🔥 Absen beruntun ${p.streak} hari</small></span></li>`)+
+    (ev?`<li class="item"><span class="ic">${esc(ev.ikon)}</span><span><b>${esc(ev.judul)}</b><small>Event kota hari ini</small></span></li>`:'')+
+    MISI2.map(m=>{const on=p&&p.misi.includes(m.id);return `<li class="item${on?' done':''}"><span class="chk" aria-hidden="true">${on?'✓':''}</span><span class="ic">${m.ikon}</span><span style="min-width:0"><b>${esc(m.judul)}</b><small>${esc(m.ket)}</small></span>${on?'<span class="got">Selesai</span>':`<button class="btn dark" type="button" data-go2="${m.id}">${m.id==='absen'?'Absen':'Ayo'}</button>`}</li>`}).join('');
+  $('misiList').querySelectorAll('[data-go2]').forEach(b=>b.onclick=()=>{const id=b.dataset.go2;if(id==='akun'){open('akun');return}const m=MISI2.find(x=>x.id===id);
+    if(!me||!p){open('akun');return}if(m.id==='absen'){claim('absen');return}if(m.aksi==='share'){share();return}open(m.aksi)})};
+pillUpdate();if(store.get('me',''))refresh().then(()=>claim('absen'));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+
+// ---------- JEMPUTAN TERJADWAL (tiap jam tepat) ----------
+function jemput(){const d=nowWIB();const sisa=(59-d.getUTCMinutes())*60+(60-d.getUTCSeconds());const mm=Math.floor(sisa/60),ss=sisa%60;const cd=mm+':'+String(ss).padStart(2,'0');
+  const Q=(K.QUEUE||[]).filter(r=>r.q);const jamBer=String((d.getUTCHours()+1)%24).padStart(2,'0')+'.00';
+  const html=Q.length?`🚘 <b>${Q.length} warga</b> dijemput ${jamBer} · <b>${cd}</b>`:`🚘 Jemputan berikutnya ${jamBer} · <b>${cd}</b>`;
+  $('arr').innerHTML=html;const m=$('arrM');if(m){m.innerHTML=html+(Q.length?'':' · komen NADA biar ikut');m.style.display=''}
+  if(K.arrive){const got=K.arrive();if(got.length){toast('🚘 '+got.length+' warga baru tiba: '+got.slice(0,3).map(r=>'@'+r.u).join(', ')+(got.length>3?' …':''))}}}
+jemput();setInterval(jemput,1000);
 
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
