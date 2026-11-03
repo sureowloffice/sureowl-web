@@ -1,4 +1,4 @@
-  <!doctype html>
+<!doctype html>
 <html lang="id">
 <head>
 <meta charset="utf-8">
@@ -247,6 +247,22 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 @media (max-width:720px){.chatpanel{left:8px;right:8px;width:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);height:min(78vh,calc(100vh - 80px))}.newpill{bottom:128px}.chatpop{bottom:calc(env(safe-area-inset-bottom,0px) + 262px)}}
 @media (prefers-reduced-motion:reduce){.nb.chatbtn.has i,.badge.pulse,.live i,.chatpanel,.chatpop{animation:none}}
 @media (prefers-reduced-motion:reduce){.hint,.toast{transition:none}.on .eq i{animation:none;height:20px}}
+
+.wbtn #koinCt{display:flex;flex-direction:column;line-height:1.05}.wbtn #koinCt b{font:900 14px var(--sans);color:var(--yellow)}.wbtn #koinCt small{font:700 10px var(--sans);color:var(--muted)}
+.wbtn{position:relative}.coinfx{position:absolute;left:50%;top:-4px;transform:translateX(-50%);font:900 15px var(--sans);color:var(--yellow);text-shadow:0 2px 6px rgba(0,0,0,.6);animation:cfx 1.3s ease-out forwards;pointer-events:none}
+@keyframes cfx{0%{opacity:0;transform:translate(-50%,0)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-38px)}}
+.wallet{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2A1C66,#14102B);border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:10px}
+.wallet>div:nth-child(2){flex:1;min-width:0}.wallet b{display:block;font:800 16px var(--sans);color:var(--cream);overflow:hidden;text-overflow:ellipsis}.wallet small{color:var(--muted);font:600 12px var(--sans)}
+.wallet .coin{text-align:center;background:rgba(255,210,63,.12);border:1px solid rgba(255,210,63,.4);border-radius:14px;padding:6px 12px}.wallet .coin span{font-size:18px}.wallet .coin b{color:var(--yellow);font:900 20px var(--sans)}
+.ver{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--cyan);color:var(--ink);font:900 11px var(--sans);vertical-align:middle}
+.lvl{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;margin:6px 0 10px}.lvl b{font:900 14px var(--sans);color:var(--cream)}.lvl .prog{margin:0}.lvl small{color:var(--muted);font:700 11px var(--sans)}
+.streak{font:700 13px var(--sans);color:var(--cream);background:var(--ink2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-bottom:10px}.streak b{color:#FF9F1C}
+.ktw{display:grid;gap:6px;background:rgba(56,225,255,.08);border:1px solid rgba(56,225,255,.35);border-radius:14px;padding:12px;margin-bottom:10px}.ktw>b{color:var(--cyan);font:800 14px var(--sans)}.ktw small{color:var(--muted);font:600 12px/1.4 var(--sans)}
+.kode{font:900 28px/1 ui-monospace,monospace;letter-spacing:3px;color:var(--yellow);text-align:center;background:var(--ink);border:2px dashed var(--yellow);border-radius:12px;padding:12px}
+.item.soon{opacity:.85;margin-bottom:10px}.h3{font:800 15px var(--sans);color:var(--cream);margin:14px 0 8px}
+.papan{list-style:none;margin:0;padding:0;display:grid;gap:6px}.papan li{display:flex;align-items:center;gap:10px;background:var(--ink2);border:1px solid var(--line);border-radius:12px;padding:7px 10px}
+.papan li.me{border-color:var(--yellow)}.papan .rk{width:26px;text-align:center;font:900 14px var(--sans);color:var(--cream)}.papan b{flex:1;min-width:0;font:800 13px var(--sans);color:var(--cream);overflow:hidden;text-overflow:ellipsis}.papan small{color:var(--muted);font:700 11px var(--sans)}
+.got{font:800 12px var(--sans);color:#9BE15D}
 </style>
 </head>
 <body>
@@ -259,7 +275,8 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
       <svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#6C2BFF"/><ellipse cx="34" cy="52" rx="17" ry="21" fill="#FFF7E8"/><ellipse cx="67" cy="52" rx="17" ry="21" fill="#FFF7E8"/><circle cx="41" cy="42" r="8" fill="#14102B"/><circle cx="74" cy="42" r="8" fill="#14102B"/><circle cx="44" cy="39" r="2.4" fill="#fff"/><circle cx="77" cy="39" r="2.4" fill="#fff"/></svg>
       <div><b>Kota Seni</b><small>Populasi <strong id="pop">…</strong> warga</small></div>
     </a>
-    <button class="tbtn glass" type="button" data-open="misi" aria-label="Misi harian"><span class="ic">🎯</span>Misi <span class="ct" id="misiCt">0/6</span></button>
+    <button class="tbtn glass" type="button" data-open="misi" aria-label="Misi harian"><span class="ic">🎯</span>Misi <span class="ct" id="misiCt">0/7</span></button>
+    <button class="tbtn glass wbtn" type="button" id="walletBtn" data-open="akun" aria-label="Dompet dan akun warga"><span class="ic">🪙</span><span id="koinCt">Masuk</span></button>
   </div>
   <div>
     <button class="tbtn glass clock" type="button" data-open="kalender" aria-label="Jam kota, buka kalender"><span id="clkIc">🌙</span><span id="clk">--:--</span></button>
@@ -312,6 +329,13 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 </div></div>
 
 <!-- Kalender -->
+<div class="sheet" id="s-akun" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-akun">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-akun">Akun Warga</h2>
+  <p class="sub">Dompet Koin Nada, level, dan verifikasi KTW</p>
+  <div id="akunBody"></div>
+</div></div>
+
 <div class="sheet" id="s-kalender" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-kal">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
   <h2 id="h-kal">Kalender Kota Seni</h2>
@@ -415,7 +439,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=9';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=11';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
