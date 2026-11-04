@@ -282,7 +282,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()}
 function jemput(){const d=nowWIB();const sisa=(59-d.getUTCMinutes())*60+(60-d.getUTCSeconds());const mm=Math.floor(sisa/60),ss=sisa%60;const cd=mm+':'+String(ss).padStart(2,'0');
   const Q=(K.QUEUE||[]).filter(r=>r.q);const jamBer=String((d.getUTCHours()+1)%24).padStart(2,'0')+'.00';
   const html=Q.length?`🚘 <b>${Q.length} warga</b> dijemput ${jamBer} · <b>${cd}</b>`:`🚘 Jemputan berikutnya ${jamBer} · <b>${cd}</b>`;
-  $('arr').innerHTML=html;const m=$('arrM');if(m){m.innerHTML=html+(Q.length?'':' · komen NADA biar ikut');m.style.display=''}
+  $('arr').innerHTML=`🚘 ${jamBer} · <b>${cd}</b>`;const m=$('arrM');if(m){m.innerHTML=html+(Q.length?'':' · komen NADA biar ikut');m.style.display=''}
   if(K.arrive){const got=K.arrive();if(got.length){toast('🚘 '+got.length+' warga baru tiba: '+got.slice(0,3).map(r=>'@'+r.u).join(', ')+(got.length>3?' …':''))}}}
 jemput();setInterval(jemput,1000);
 
@@ -312,9 +312,9 @@ jemput();setInterval(jemput,1000);
  $('goRail').onclick=()=>{$('goMenu').hidden=!$('goMenu').hidden};
  $('goMenu').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{$('goMenu').hidden=true;const g=b.dataset.go;
    if(g==='rumahku'){const me=K.byName.get(store.get('me',''));if(me){K.focusHouse(me);toast('🏠 Ini rumahmu, @'+me.u+'!')}else open('rumah');return}
-   placeGo(g)});
+   window.KOTA_onPlace(g)});
  function placeGo(g){K.focusPlace(g);const T={home:'🗺️ Seluruh Kota Seni',plaza:'🎪 Panggung Festival · musisi tampil, ilustrator, booth kamera & tarot di sekitarnya',kampung:'🏘️ Kampung Warga · ketuk rumah buat lihat pemiliknya',studio:'🎙️ Studio Rekaman lagi ON AIR · coba game rekam lagu!',isr:'🏢 Indo Semar Records · '+K.isrMsg()};if(T[g])toast(T[g]);if(g==='studio')setTimeout(()=>open('studio'),900)}
- window.KOTA_onPlace=placeGo;
+ window.KOTA_onPlace=placeGo;/* diganti kartu info di bawah */
  $('zIn').onclick=()=>K.zoomStep(.6);$('zOut').onclick=()=>K.zoomStep(1.65);
  window.KOTA_onCluster=C=>toast(C.nm+' · '+C.n+' rumah · ketuk rumah buat lihat pemiliknya');
  let pickR=null;window.KOTA_onPick=r=>{pickR=r;const p=$('pick');if(!r){p.hidden=true;return}$('pkName').textContent=r.i===0?'🦉 Vilindo':r.own?'👑 President':'@'+r.u;$('pkSub').textContent=(r.i===0?'Wali Kota · lagi keliling mantau kota':r.own?'President Kota Seni · lagi di istana':(r.p||'Warga'))+(r.net?' · 🟢 online':'');$('pkHome').hidden=r.i===0;$('pkHome').textContent=r.own?'🚪 Masuk istana':'🚪 Masuk rumahnya';p.hidden=false};
@@ -402,6 +402,39 @@ jemput();setInterval(jemput,1000);
    open('room');sfx('door');RM.d=store.get('deco_'+r.u.toLowerCase(),null)||defDeco(r);tools();draw();
    try{const j=await (await fetch('/api/akun?a=rumah&u='+encodeURIComponent(r.u.toLowerCase()))).json();if(j&&j.deco&&RM.r===r&&!RM.dirty){RM.d=j.deco;tools();draw()}}catch(e){}}
  window.KOTA_ROOM=enterRoom}
+
+// ---------- KARTU INFO GEDUNG (ketuk gedung di peta) ----------
+{const PL={
+  plaza:{cat:'Hiburan',ic:'🎪',bg:'#FF4FA3',nm:'Panggung Festival',al:'Jl. Nada No. 1 · Pusat Kota',ds:'Panggung utama Kota Seni. Band warga tampil bergantian tiap 2,5 menit.',sec:'LAGI TAMPIL',act:[['💬 Ngobrol sama warga','chat'],['🎮 Main ke panggung','play']]},
+  studio:{cat:'Musik',ic:'🎙️',bg:'#38E1FF',nm:'Studio Rekaman',al:'Jl. Nada No. 7 · Distrik Timur',ds:'Gedung pemenang voting DAY 2. Lagi ON AIR, mampir dan rekam lagu bareng band kota.',sec:'GAME',act:[['▶ Main Rekam Lagu','studio']]},
+  isr:{cat:'Perkantoran',ic:'🏢',bg:'#B69CFF',nm:'Indo Semar Records',al:'Jl. Label No. 9 · Distrik Barat',ds:'Kantor label musik Kota Seni.',sec:'KEGIATAN SEKARANG',act:[['📻 Dengerin lagu kota','radio']]},
+  mansion:{cat:'Pemerintahan',ic:'👑',bg:'#FFD23F',nm:'Istana President',al:'Jl. Utama No. 1 · Belakang Panggung',ds:'Rumah President Kota Seni. President lagi ada di dalam.',sec:'ISTANA',act:[['🚪 Masuk istana','mansion']]},
+  halte:{cat:'Transportasi',ic:'🚘',bg:'#9BE15D',nm:'Halte Jemputan',al:'Jl. Raya Kota Seni',ds:'Warga baru dijemput mobil tiap jam tepat, lalu turun di sini.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
+  papan:{cat:'Sejarah',ic:'🏛️',bg:'#FFD23F',nm:'Papan Pendiri Kota',al:'Plaza Panggung Festival',ds:'10 warga pertama yang ikut membangun Kota Seni.',sec:'PENDIRI',act:[['🪪 Lihat kartu warga','balai']]},
+  lot:{cat:'Lahan',ic:'🗳️',bg:'#B69CFF',nm:'Lahan Kosong',al:'Jl. Nada No. 9 · Distrik Timur',ds:'Gedung berikutnya di sini kalian yang pilih lewat voting.',sec:'VOTING',act:[['🗳️ Lihat voting','voting']]}};
+ function chips(list){return '<div class="pchips">'+list.map(r=>`<button type="button" class="pchip" data-u="${esc(r.u)}">${r.own?'👑 President':'@'+esc(r.u)}</button>`).join('')+'</div>'}
+ function extra(k){if(k==='plaza'){const b=K.band();return b.length?chips(b):'<p class="muted">Panggung lagi istirahat.</p>'}
+   if(k==='isr')return `<p class="pnow">🎧 ${esc(K.isrMsg())}</p>`;
+   if(k==='studio'){const b=store.get('sgBest',0);return `<p class="pnow">${b?'🏆 Skor terbaikmu: '+b:'Belum pernah rekam. Coba 30 detik aja!'}</p>`}
+   if(k==='halte'){const d=nowWIB();return `<p class="pnow">Jemputan berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00 · ${(K.QUEUE||[]).filter(r=>r.q).length} warga antre</p>`}
+   if(k==='papan')return chips(K.FOUND||[]);
+   if(k==='mansion')return '<p class="pnow">👑 President lagi di rumah</p>';
+   if(k==='lot'){const V=(data.vote||[]).slice().sort((a,b)=>(b.v||0)-(a.v||0));return `<p class="pnow">${V.length?'Terdepan: '+esc(V[0].n)+' ('+(V[0].v||0)+' suara)':'Voting segera dibuka'}</p>`}return ''}
+ function show(k){let P=PL[k];let body='';
+   if(String(k).startsWith('cluster:')){const C=(K.CLUSTERS||[]).find(c=>'cluster:'+c.k===k);if(!C)return;const L=K.HOUSES.filter(h=>h.seg===C).map(h=>h.r);
+     P={cat:'Hunian',ic:C.nm.split(' ')[0],bg:C.col,nm:C.nm.replace(/^\S+\s/,''),al:'Kampung Warga · '+C.n+' rumah',ds:'Ketuk nama warga buat mampir ke rumahnya.',sec:'WARGA',act:[]};body=chips(L)}else if(P)body=extra(k);if(!P)return;
+   $('plCat').textContent=P.cat;$('plIll').style.setProperty('--c',P.bg);$('plIc').textContent=P.ic;$('plNm').textContent=P.nm;$('plAl').textContent=P.al;$('plDs').textContent=P.ds;$('plSec').textContent=P.sec;$('plX').innerHTML=body;
+   $('plAct').innerHTML=P.act.map(([t,a],i)=>`<button class="btn${i?' ghost':''}" type="button" data-a="${a}">${t}</button>`).join('');
+   $('plAct').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='play'){closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()}else if(a==='mansion'){const o=K.RES.find(r=>r.own);if(o)window.KOTA_ROOM(o)}else open(a)});
+   $('plX').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const r=K.byName.get(b.dataset.u.toLowerCase());if(r){closeAll();if(r.house){K.focusHouse(r);window.KOTA_onPick(r)}else{K.select(r);window.KOTA_onPick(r)}}});
+   K.focusPlace(k);open('place')}
+ window.KOTA_onPlaceInfo=show;window.KOTA_onPlace=g=>{if(g==='home'||g==='kampung'){K.focusPlace(g);toast(g==='home'?'🗺️ Seluruh Kota Seni':'🏘️ Kampung Warga');return}show(g)};
+ $('cta').onclick=()=>open('balai');$('ctaN').textContent=(RES.length||0).toLocaleString('id-ID')+' Warga Kota Seni';
+ $('q').placeholder=(RES.length||0).toLocaleString('id-ID')+' Warga · Cari @username';
+ // menu samping bisa diciutkan
+ $('railT').onclick=()=>{const m=document.querySelector('.rail').classList.toggle('min');$('railT').textContent=m?'⌄':'⌃';store.set('railMin',m?1:0)};
+ if(store.get('railMin',0)){document.querySelector('.rail').classList.add('min');$('railT').textContent='⌄'}
+ setInterval(()=>{const r=document.querySelector('[data-open="radio"]');if(r)r.classList.toggle('playing',!!AU.on)},800)}
 
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
