@@ -92,7 +92,8 @@ $('sf').addEventListener('submit',e=>{e.preventDefault();const v=$('q').value;$(
 R.rumah=()=>{const me=K.byName.get(store.get('me',''));
   if(!me){$('rumahBody').innerHTML=`<p>Kamu belum masuk sebagai warga. Ketik username-mu, nanti kota ingat rumahmu di perangkat ini.</p>`+balaiForm();$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)};return}
   K.select(me);const days=Math.max(0,Math.floor((Date.parse(TODAY)-Date.parse(me.t))/864e5));
-  $('rumahBody').innerHTML=idPreview(me)+`<ul class="list"><li class="item"><span class="ic">🏠</span><span><b>Rumah No. ${me.no}</b><small>Distrik ${['Neon','Beat','Mural','Synth','Groove'][me.i%5]}, Kota Seni</small></span></li><li class="item"><span class="ic">📆</span><span><b>Tinggal ${days?days+' hari':'sejak hari ini'}</b><small>Warga sejak ${tglPendek(me.t)}</small></span></li><li class="item"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>${esc(me.p||'Belum pilih profesi')}</small></span></li></ul><div class="row"><button class="btn" type="button" data-open="balai">Kartu Warga</button><button class="btn ghost" type="button" data-close>Lihat rumahku</button><button class="btn ghost" type="button" id="logout">Bukan aku</button></div>`;
+  $('rumahBody').innerHTML=idPreview(me)+`<ul class="list"><li class="item"><span class="ic">🏠</span><span><b>Rumah No. ${me.no}</b><small>Kampung Warga, Kota Seni · isi perabot segera dengan Koin Nada</small></span></li><li class="item"><span class="ic">📆</span><span><b>Tinggal ${days?days+' hari':'sejak hari ini'}</b><small>Warga sejak ${tglPendek(me.t)}</small></span></li><li class="item"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>${esc(me.p||'Belum pilih profesi')}</small></span></li></ul><div class="row"><button class="btn" type="button" data-open="balai">Kartu Warga</button><button class="btn ghost" type="button" id="seeHome">🏠 Lihat rumahku</button><button class="btn" type="button" id="playHome">🎮 Main dari rumah</button><button class="btn ghost" type="button" id="logout">Bukan aku</button></div>`;
+  $('seeHome').onclick=()=>{closeAll();K.focusHouse(me)};$('playHome').onclick=()=>{closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()};
   $('logout').onclick=()=>{store.set('me','');K.select(null);R.rumah()}};
 
 // ---------- radio ----------
@@ -144,8 +145,8 @@ R.info=()=>{const s=store.get('ann',0);$('infoList').innerHTML=ANN.map(a=>`<div 
   store.set('ann',Math.max(0,...ANN.map(a=>a.id)));$('infoBadge').hidden=true};
 
 // ---------- voting ----------
-R.voting=()=>{done('voting');const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);const ic=['🎙️','🎸','☕','🎓','🏗️'];
-  $('vote').innerHTML=V.map((o,i)=>`<li class="item"><span class="ic">${ic[i%ic.length]}</span><span><b>${esc(o.n)}</b><small>${tot?Math.round(o.v/tot*100)+'% suara':'Voting dibuka setelah DAY 1 tayang'}</small></span><span class="r">${tot?o.v+' suara':''}</span></li>`).join('')||'<li class="item"><span><b>Voting belum dibuka</b></span></li>'};
+R.voting=()=>{done('voting');const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);const icOf=n=>/studio/i.test(n)?'🎙️':/galeri/i.test(n)?'🎨':/bioskop/i.test(n)?'🎬':/kafe/i.test(n)?'☕':'🏗️';
+  $('vote').innerHTML=V.map((o,i)=>`<li class="item"><span class="ic">${icOf(o.n||"")}</span><span><b>${esc(o.n)}</b><small>${tot?Math.round(o.v/tot*100)+'% suara':'Voting dibuka setelah DAY 1 tayang'}</small></span><span class="r">${tot?o.v+' suara':''}</span></li>`).join('')||'<li class="item"><span><b>Voting belum dibuka</b></span></li>'};
 
 // ---------- chat / pesan warga (panel live) ----------
 let chatMsgs=[],chatTimer=0,chatBusy=false,lastSeenChat=store.get('chatSeen',0),popT=0,firstLoad=true,interacted=false,ac2=null;
@@ -249,6 +250,35 @@ function jemput(){const d=nowWIB();const sisa=(59-d.getUTCMinutes())*60+(60-d.ge
   $('arr').innerHTML=html;const m=$('arrM');if(m){m.innerHTML=html+(Q.length?'':' · komen NADA biar ikut');m.style.display=''}
   if(K.arrive){const got=K.arrive();if(got.length){toast('🚘 '+got.length+' warga baru tiba: '+got.slice(0,3).map(r=>'@'+r.u).join(', ')+(got.length>3?' …':''))}}}
 jemput();setInterval(jemput,1000);
+
+
+// ---------- MAIN KARAKTER, JELAJAH KOTA & WARGA ONLINE ----------
+{const hud=$('playHud'),joy=$('joy'),knob=$('knob');let netT=0,pollT=0,lastEmo='',online=[];
+ function setJoy(x,y){knob.style.transform=`translate(${x}px,${y}px)`;K.joy(x/48,y/48)}
+ let jid=null;joy.addEventListener('pointerdown',e=>{jid=e.pointerId;joy.setPointerCapture(e.pointerId);move(e)});
+ function move(e){if(e.pointerId!==jid)return;const r=joy.getBoundingClientRect();let x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);const d=Math.hypot(x,y),m=48;if(d>m){x*=m/d;y*=m/d}setJoy(x,y)}
+ joy.addEventListener('pointermove',move);const end=e=>{if(e.pointerId!==jid)return;jid=null;setJoy(0,0)};joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end);
+ hud.querySelectorAll('[data-emo]').forEach(b=>b.onclick=()=>{K.emote(b.dataset.emo);sendPos(true)});
+ function enter(){const me=store.get('me','');if(!me||!K.byName.get(me)){toast('🎮 Masuk dulu pakai username warga-mu, baru bisa main');open('akun');return}if(!AK.p)refresh();
+   if(!K.startPlay(me)){toast('Username ini belum jadi warga');return}
+   closeAll(true);$('goMenu').hidden=true;document.body.classList.add('playing');hud.hidden=false;toast('🎮 Kamu keluar dari rumah! Geser joystick (atau WASD) buat jalan-jalan.');sendPos(true);poll()}
+ function exit(){K.stopPlay();document.body.classList.remove('playing');hud.hidden=true;$('homeIn').hidden=true;setJoy(0,0);api('keluar').catch(()=>{})}
+ window.KOTA_PLAY={enter,exit};
+ $('playRail').onclick=()=>K.playing?exit():enter();$('playX').onclick=exit;
+ addEventListener('kota-home',e=>{$('homeIn').hidden=!e.detail});$('homeIn').onclick=()=>open('rumah');
+ async function sendPos(force){const p=K.pos();if(!p)return;const now=Date.now();if(!force&&now-netT<2500)return;if(!force&&p.moved<.3&&p.emo===lastEmo&&now-netT<12000)return;
+   netT=now;lastEmo=p.emo;K.resetMoved();try{await api('pos',p)}catch(e){}}
+ async function poll(){pollT=Date.now();try{const j=await (await fetch('/api/akun?a=online')).json();online=j.online||[];K.setOnline(online,K.playing?store.get('me','').toLowerCase():null);
+   const n=online.filter(o=>o.u!==store.get('me','').toLowerCase()).length;$('onlineCt').textContent=n?`🟢 ${n} warga lain lagi main`:'🟢 kamu lagi main';
+   $('playRail').dataset.tip=n?`Main karaktermu · ${n} online`:'Main karaktermu'}catch(e){}}
+ setInterval(()=>{if(document.hidden)return;if(K.playing)sendPos(false);const gap=K.playing?5000:20000;if(Date.now()-pollT>gap)poll()},1000);
+ setTimeout(poll,2500);
+ // jelajah kota
+ $('goRail').onclick=()=>{$('goMenu').hidden=!$('goMenu').hidden};
+ $('goMenu').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{$('goMenu').hidden=true;const g=b.dataset.go;
+   if(g==='rumahku'){const me=K.byName.get(store.get('me',''));if(me){K.focusHouse(me);toast('🏠 Ini rumahmu, @'+me.u+'!')}else open('rumah');return}
+   K.focusPlace(g);toast({plaza:'🎪 Plaza & Panggung Festival',kampung:'🏘️ Kampung Warga: satu rumah untuk tiap warga',studio:'🏗️ Studio Rekaman sedang dibangun!'}[g])});
+ window.KOTA_onHouse=r=>{const me=store.get('me','');if(r.u.toLowerCase()===me){open('rumah');return}K.focusHouse(r);toast('🏠 Rumah @'+r.u+' · '+(r.p||'Warga'))}}
 
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
