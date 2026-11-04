@@ -12,7 +12,7 @@ const RES=data.warga.map((w,i)=>{const h=hash(w.u.toLowerCase());const rr=x=>((h
   let a=rr(0)*Math.PI*2,r=4.8+rr(10)*6.5;let cx=Math.cos(a)*r,cz=Math.sin(a)*r+1.2;
   if(cx>-5&&cx<5&&cz>-5&&cz<1){cz=1.6+rr(5)*2}
   if(Math.hypot(cx-5.2,cz-3.4)<1.8)cx-=2.2;
-  return {...w,i,no:String(i+1).padStart(4,'0'),jab:jabatan(i,w),col:w.u.toLowerCase()===OWNER?'#FFD23F':PAL[h%PAL.length],own:w.u.toLowerCase()===OWNER,cx,cz,ph:rr(3)*6.28,sp:.25+rr(7)*.35,wr:.4+rr(9)*.8,hat:rr(11)>.5}});
+  return {...w,i,no:String(i+1).padStart(4,'0'),jab:jabatan(i,w),col:w.u.toLowerCase()===OWNER?'#FFD23F':PAL[h%PAL.length],own:w.u.toLowerCase()===OWNER,cx,cz,ph:rr(3)*6.28,sp:.25+rr(7)*.35,wr:.4+rr(9)*.8,hat:rr(11)>.5,nohouse:!!w.f&&i>0&&w.u.toLowerCase()!==OWNER}});
 const byName=new Map(RES.map(r=>[r.u.toLowerCase(),r]));
 // ---------- peran warga: band tampil bergiliran di panggung, sisanya jalan-jalan keliling kota ----------
 const MUS=/gitar|guitar|vokal|vocal|penyanyi|singer|drum|bass|terompet|trumpet|keyboard|piano|musisi|band|perkusi|biola|saxo/;
@@ -69,7 +69,7 @@ function onTap(x,y){const now=performance.now();
       const lim=Math.max(22,Math.min(60,900/cam.dist));if(hb&&hd<lim){lastTap=0;if(window.KOTA_onHouse)window.KOTA_onHouse(hb.r);return}}}
   if(now-lastTap<380){lastTap=0;zoomTo(x,y,.42);return}lastTap=now;
   if(selected&&!PLAY.on){selected=null;if(window.KOTA_onPick)window.KOTA_onPick(null)}}
-function picks(){const P=[['plaza',0,2.2,-1.5,5.2],['studio',24,2.4,-.4,5],['isr',-24,6,-24,5],['mansion',0,2.6,-24.4,7],['halte',0,1.2,26,7],['taman',-24,1,24,8],['warung',-6,1.6,19.5,3.2],['papan',-6.3,2.6,-1.3,1.8]];for(const C of CLUSTERS)if(C.x0!==undefined)P.push(['cluster:'+C.k,C.cx,1.2,C.cz,Math.max(8,C.rows*2.6)]);for(const K of KAV)P.push(['kav:'+K.n,K.x,.5,K.z,8]);return P}
+function picks(){const P=[['plaza',0,2.2,-1.5,5.2],['studio',24,2.4,-.4,5],['isr',-24,6,-24,5],['mansion',0,2.6,-24.4,7],['halte',0,1.2,26,7],['taman',-24,1,24,8],['warung',-6,1.6,19.5,3.2],['papan',-6.3,2.6,-1.3,1.8]];for(const B of CBLK)if(B.n)P.push(['cluster:'+B.C.k,B.bx,1.2,B.bz,Math.max(8,B.rows*2.6)]);for(const K of KAV)P.push(['kav:'+K.n,K.x,.5,K.z,8]);return P}
 function zoomTo(x,y,k){if(PLAY.on){cam.dist=clamp(cam.dist*k,6,30);return}const g=x==null?null:groundAt(x,y);ensureFocus();if(g){focus.x=clamp(g[0],-62,62);focus.z=clamp(g[1],-96,50)}focus.d=clamp(cam.dist*k,7,130);lastInput=performance.now()}
 glc.addEventListener('contextmenu',e=>e.preventDefault());
 glc.addEventListener('pointerdown',e=>{glc.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);lastInput=performance.now();hideHint();rotDrag=e.button===2||e.shiftKey||e.ctrlKey;if(ptrs.size===1)tapS={x:e.clientX,y:e.clientY,t:performance.now(),ok:true};else tapS=null;if(ptrs.size===2)two=twoState()});
@@ -209,6 +209,41 @@ function heli(t){const cyc=Math.floor(t/PERIOD),ph=t%PERIOD;if(ph>FLY)return;
   D(G.plane,M.chain(M.T(x0-.2,y0-2.95,z0),M.RY(cam.yaw),M.S(7.2,1.35,1)),[1,1,1],{tex:bannerTex,em:1,cast:false})}
 
 
+// ---------- pesawat spanduk: terbang lewat depan kamera, buat pengumuman besar (warga baru, donatur) ----------
+const PLANE={q:[],cur:null,t0:0,next:8,k:0,strips:null};const PL_DUR=13,PL_K=10;
+function planeSay(txt,kind,top,now){PLANE.q.unshift({txt:String(txt),kind:kind||'info',top:top||''});if(now){PLANE.cur=null;PLANE.next=0}}
+const PL_TOP={donatur:'💛 TERIMA KASIH DONATUR',warga:'🎉 SELAMAT DATANG WARGA BARU',info:'📢 PENGUMUMAN KOTA SENI'};
+function planeTex(o){return texFromCanvas(signCanvas(2048,512,(x,w,h)=>{const don=o.kind==='donatur';x.fillStyle=don?'#FFD23F':'#FFF7E8';x.fillRect(0,0,w,h);
+  const ac=don?'#FF4B4B':o.kind==='warga'?'#2FB86A':'#FF4FA3';x.fillStyle=ac;x.fillRect(0,0,w,34);x.fillRect(0,h-34,w,34);
+  const F=v=>x.font='900 '+v+'px "Plus Jakarta Sans",Inter,sans-serif';x.textAlign='center';x.textBaseline='middle';
+  const top=o.top||PL_TOP[o.kind]||PL_TOP.info;let s=104;F(s);while(x.measureText(top).width>w-120&&s>50){s-=4;F(s)}x.fillStyle=ac;x.fillText(top,w/2,128);
+  s=250;F(s);while(x.measureText(o.txt).width>w-110&&s>90){s-=6;F(s)}x.fillStyle='#14102B';x.fillText(o.txt,w/2,322)}))}
+function planeMsgs(){const L=[];const I=(typeof info!=='undefined'&&info)||{};
+  for(const d of (I.donatur||[]).slice(-4)){const n=String(d.u||d.n||'').replace(/^@/,'');if(n)L.push({txt:'@'+n,kind:'donatur'})}
+  for(const r of ARR.slice(-4))L.push({txt:'@'+r.u,kind:'warga'});
+  L.push({txt:'FOLLOW @viralindongid',kind:'info',top:'✈️ MAU JADI WARGA KOTA SENI?'},{txt:'KOMEN = DAPAT RUMAH',kind:'info',top:'🏠 KOMEN DI POSTINGAN @viralindongid'});return L}
+function planeDraw(t){
+  if(!PLANE.cur){if(t<PLANE.next)return;let o=PLANE.q.shift();if(!o){const L=planeMsgs();o=L[PLANE.k++%L.length]}PLANE.cur={...o,tex:planeTex(o)};PLANE.t0=t;if(window.KOTA_SFX)try{window.KOTA_SFX('plane')}catch(e){}}
+  const P=PLANE.cur,u=(t-PLANE.t0)/PL_DUR;if(u>=1){PLANE.cur=null;PLANE.next=t+(PLANE.q.length?2:55);return}
+  if(!PLANE.strips){PLANE.strips=[];for(let i=0;i<PL_K;i++){const g=new Geo(),u0=i/PL_K,u1=(i+1)/PL_K,w=1/PL_K;g.tri([0,-.5,0],[w,-.5,0],[w,.5,0],[u0,0],[u1,0],[u1,1],null,[0,0,1]);g.tri([0,-.5,0],[w,.5,0],[0,.5,0],[u0,0],[u1,1],[u0,1],null,[0,0,1]);PLANE.strips.push(upload(g))}}
+  const asp=W/H,hh=HALF(cam.dist),wW=2*hh*asp;const sz2=.86+.28*Math.sin(Math.PI*u);const BW=(asp<1?wW*.6:Math.min(wW*.5,hh*1.45))*sz2,BH=BW*512/2048,gap=hh*.04*sz2,sc=hh*(asp<1?.034:.04)*sz2,Lp=sc*2.4;
+  const c=(gap+BW+sc*1.7-sc*2.1)/2-(asp<1?wW*.05:0),R=wW/2+(BW+gap+sc*3.8)/2+sc;const f=u+.86*Math.sin(2*Math.PI*u)/(2*Math.PI);const px=c-R+2*R*f;const py=hh*(.1+.12*Math.sin(Math.PI*u))+Math.sin(t*1.3)*hh*.012;
+  const tg=[cam.tx,cam.ty,cam.tz];const bz=[Math.sin(cam.yaw)*Math.cos(cam.pitch),Math.sin(cam.pitch),Math.cos(cam.yaw)*Math.cos(cam.pitch)];const bx=norm(cross([0,1,0],bz)),by=cross(bz,bx);
+  const o=add(tg,scl(bz,60));const Bs=[bx[0],bx[1],bx[2],0,by[0],by[1],by[2],0,bz[0],bz[1],bz[2],0,o[0],o[1],o[2],1];const S=M.mul(Bs,M.T(px,py,0));
+  // pesawat (hidung ke kanan, sedikit miring biar sayapnya kelihatan)
+  const A=M.chain(S,M.RZ(Math.sin(t*1.7)*.04),M.RX(.55),M.S(sc,sc,sc));const Wm=m=>M.mul(A,m);const O={cast:false,nofog:1};
+  D(G.sphHi,Wm(M.S(1.9,.42,.42)),'#FFF7E8',{...O,em:.35});D(G.sph,Wm(M.chain(M.T(1.72,0,0),M.S(.32,.3,.3))),'#FF4B4B',{...O,em:.5});
+  D(G.sphHi,Wm(M.chain(M.T(.95,.24,0),M.S(.55,.22,.3))),'#38E1FF',{...O,em:.8});
+  D(G.box,Wm(M.chain(M.T(.15,-.05,0),M.S(.85,.08,4.4))),'#FF4FA3',{...O,em:.45});D(G.box,Wm(M.chain(M.T(.15,-.02,0),M.S(.86,.02,4.42))),'#FFD23F',{...O,em:.8});
+  D(G.box,Wm(M.chain(M.T(-1.65,.25,0),M.S(.5,.8,.08))),'#FF4B4B',{...O,em:.5});D(G.box,Wm(M.chain(M.T(-1.65,0,0),M.S(.42,.06,1.5))),'#FF4FA3',{...O,em:.45});
+  D(G.box,Wm(M.chain(M.T(2.05,0,0),M.RX(t*32),M.T(0,-.6,0),M.S(.04,1.2,.13))),'#14102B',{...O});
+  for(const s of [-1,1])D(G.sph,Wm(M.chain(M.T(.15,-.05,s*2.2),M.S(.1,.1,.1))),s<0?'#FF3B5C':'#9BE15D',{...O,em:1});
+  // tali + spanduk berkibar di belakang
+  D(G.box,M.mul(S,M.chain(M.T(-gap/2-sc*1.6,0,-.1),M.S(gap,hh*.004,hh*.004))),'#14102B',{...O});
+  const x0=-sc*1.7-gap-BW;for(let i=0;i<PL_K;i++){const a=1-i/PL_K;const wy=Math.sin(t*7-i*.8)*BH*.07*(.35+a);D(PLANE.strips[i],M.mul(S,M.chain(M.T(x0+i*BW/PL_K,wy,0),M.S(BW*1.004,BH,1))),[1,1,1],{tex:P.tex,em:1,cast:false,nofog:1})}
+  for(const yy of [BH/2,-BH/2])D(G.box,M.mul(S,M.chain(M.T(-sc*1.7-gap/2,yy*.6,-.1),M.RZ(-yy/Math.abs(yy)*.25),M.S(gap*1.05,hh*.003,hh*.003))),'#14102B',{...O})}
+window.KOTA_PLANE=planeSay;
+
 // ---------- tempat-tempat DAY 1 (dari video Panggung Festival) ----------
 const posterTex=texFromCanvas(signCanvas(512,700,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#FF4FA3');g.addColorStop(1,'#6C2BFF');x.fillStyle=g;x.fillRect(0,0,w,h);
   x.fillStyle='#FFD23F';x.beginPath();x.arc(w/2,250,150,0,7);x.fill();x.fillStyle='#14102B';x.font='900 92px Inter';x.textAlign='center';x.fillText('FESTIVAL',w/2,500);
@@ -277,81 +312,180 @@ const TREES=[];{let sd=11;const rn=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2
   for(let x=-58;x<=58;x+=4.6)for(let z=-94;z<=46;z+=4.6){const px=x+(rn()-.5)*3,pz=z+(rn()-.5)*3;if(rn()<.5)continue;if(Math.abs(px)<38&&pz>-86&&pz<34)continue;
     if(Math.abs(px)<14.5&&pz>-10&&pz<11.5)continue;if(Math.abs(pz-ROAD_Z)<3.4)continue;if(px>11&&px<24.5&&pz>-8.5&&pz<11)continue;
     if(BUILDINGS.some(B=>Math.hypot(B.x-px,B.z-pz)<Math.max(B.w,B.d)*.8+1.2))continue;if([-10,10,-30,30].some(v=>Math.abs(px-v)<2.4)&&pz<10)continue;if([-24,-9.5].some(v=>Math.abs(pz-v)<2.4))continue;TREES.push([px,pz,.8+rn()*.7,['#7B4DFF','#2EC4B6','#FF4FA3','#38E1FF'][Math.floor(rn()*4)]])}}
+// ---------- bake: geometri statis digabung jadi sedikit draw call (lebih ringan di HP) ----------
+const G4=upload(cyl(0,1,1,4));
+const SRCG=new Map();function srcOf(g){if(!SRCG.size){SRCG.set(G.box,box(1,1,1));SRCG.set(G.cyl8,cyl(1,1,1,8));SRCG.set(G.cyl16,cyl(1,1,1,16));SRCG.set(G.cone6,cyl(0,1,1,6));SRCG.set(G.cone8,cyl(0,1,1,8));SRCG.set(G.sph,sphere(1,6,10));SRCG.set(G.sphHi,sphere(1,12,20));SRCG.set(G4,cyl(0,1,1,4))}return SRCG.get(g)}
+function bake(fn){const keep=DL;DL=[];fn();const items=DL;DL=keep;const grp=new Map(),rest=[];
+  for(const d of items){const s=d.tex?null:srcOf(d.g);if(!s){rest.push(d);continue}const k=d.c.map(v=>v.toFixed(3)).join(',')+'|'+d.em+'|'+d.alpha+'|'+d.cast;let g=grp.get(k);if(!g){g={c:d.c,em:d.em,alpha:d.alpha,cast:d.cast,v:[]};grp.set(k,g)}
+    const m=d.m,N=M.normal(m),v=s.v,o=g.v;for(let i=0;i<v.length;i+=8){const x=v[i],y=v[i+1],z=v[i+2],nx=v[i+3],ny=v[i+4],nz=v[i+5];
+      o.push(m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]);
+      const a=N[0]*nx+N[3]*ny+N[6]*nz,b=N[1]*nx+N[4]*ny+N[7]*nz,c=N[2]*nx+N[5]*ny+N[8]*nz,l=Math.hypot(a,b,c)||1;o.push(a/l,b/l,c/l,v[i+6],v[i+7])}}
+  const out=[];for(const g of grp.values()){const gg=new Geo();gg.v=g.v;out.push({g:upload(gg),m:M.id(),c:g.c,tex:null,em:g.em,alpha:g.alpha,cast:g.cast,nofog:0})}
+  return out.concat(rest)}
+function drawBaked(L){for(const d of L)DL.push(d)}
+const BK={};
+const hx2=c=>'#'+c.map(v=>Math.round(clamp(v)*255).toString(16).padStart(2,'0')).join('');
+const mixC=(a,b,t)=>hx2(lerp3(hex(a),hex(b),t));
 function streets(){const C='#130F26',W='#CFC8E8';
   for(const x of [-36,-12,12,36]){D(G.box,M.chain(M.T(x,.008,-25),M.S(3.4,.016,122)),C,{cast:false});for(let z=34;z>-86;z-=4)D(G.box,M.chain(M.T(x,.02,z),M.S(.12,.01,1.6)),W,{em:.25,cast:false})}
   for(const z of [12,-12,-36,-60,-84]){D(G.box,M.chain(M.T(0,.008,z),M.S(75.4,.016,3.4)),C,{cast:false});for(let x=-34;x<=34;x+=4)D(G.box,M.chain(M.T(x,.02,z),M.S(1.6,.01,.12)),W,{em:.25,cast:false})}
   // trotoar tiap blok
   for(const x of GX)for(const z of GZ){D(G.box,M.chain(M.T(x,.012,z),M.S(BLK+1.2,.02,BLK+1.2)),'#3A3360',{cast:false});
     for(const [a,b] of [[x-12,z-12],[x+12,z-12],[x-12,z+12],[x+12,z+12]])for(let k=-2;k<=2;k++)D(G.box,M.chain(M.T(a+k*.55,.026,b+1.9),M.S(.3,.01,.8)),'#E8E1FF',{em:.3,cast:false})}}
+// ---------- potongan dekor kecil yang dipakai di banyak blok ----------
+function bush(x,z,s,c){D(G.sph,M.chain(M.T(x,.32*s,z),M.S(.55*s,.45*s,.55*s)),c||'#3E9E6A',{em:.12})}
+function treeR(x,z,s,c){D(G.cyl8,M.chain(M.T(x,0,z),M.S(.13*s,1.2*s,.13*s)),'#5A3A22',{});D(G.sph,M.chain(M.T(x,1.65*s,z),M.S(1*s,.92*s,1*s)),c||'#4FAF7A',{em:.15})}
+function lamp(x,z,c){D(G.cyl8,M.chain(M.T(x,0,z),M.S(.06,2.3,.06)),'#3A3354',{cast:false});D(G.sph,M.chain(M.T(x,2.35,z),M.S(.2,.2,.2)),c||'#FFE9A8',{em:1,cast:false});D(G.cyl16,M.chain(M.T(x,.02,z),M.S(.8,.01,.8)),c||'#FFE9A8',{em:.8,alpha:.28,cast:false})}
+function bench(x,z,r,c){const B=M.chain(M.T(x,0,z),M.RY(r||0));D(G.box,M.mul(B,M.chain(M.T(0,.38,0),M.S(1.8,.1,.5))),c||'#C98B52',{});D(G.box,M.mul(B,M.chain(M.T(0,.62,-.22),M.S(1.8,.4,.08))),c||'#C98B52',{});for(const s of [-1,1])D(G.box,M.mul(B,M.chain(M.T(s*.75,0,0),M.S(.1,.38,.45))),'#3A3354',{})}
+function umbrella(x,z,c){D(G.cyl16,M.chain(M.T(x,0,z),M.S(.55,.7,.55)),'#FFF7E8',{});D(G.cyl8,M.chain(M.T(x,.7,z),M.S(.04,1.4,.04)),'#3A3354',{cast:false});D(G.cone8,M.chain(M.T(x,1.85,z),M.S(1.25,.5,1.25)),c,{em:.3});
+  for(const [a,b] of [[-.9,0],[.9,0],[0,-.9],[0,.9]])D(G.cyl16,M.chain(M.T(x+a,0,z+b),M.S(.22,.45,.22)),'#C98B52',{})}
+function car(x,z,r,c){const B=M.chain(M.T(x,0,z),M.RY(r||0));D(G.box,M.mul(B,M.chain(M.T(0,.25,0),M.S(1.5,.55,2.8))),c,{em:.12});D(G.box,M.mul(B,M.chain(M.T(0,.8,-.1),M.S(1.3,.45,1.5))),'#1B3A6B',{em:.35});
+  for(const [a,b] of [[-.72,-.9],[.72,-.9],[-.72,.9],[.72,.9]])D(G.cyl16,M.mul(B,M.chain(M.T(a,.25,b),M.RZ(Math.PI/2),M.S(.28,.14,.28))),'#14102B',{cast:false})}
+function parking(x,z,w,d,n,dir){D(G.box,M.chain(M.T(x,.04,z),M.S(w,.02,d)),'#231D40',{cast:false});for(let i=0;i<=n;i++){const q=-d/2+i*d/n;D(G.box,M.chain(M.T(x+(dir>0?-w/2+1.2:w/2-1.2),.06,z+q),M.S(2.4,.01,.08)),'#E8E1FF',{em:.3,cast:false})}}
+function flower(x,z,r,cols){D(G.cyl16,M.chain(M.T(x,0,z),M.S(r,.22,r)),'#5A3A22',{});D(G.cyl16,M.chain(M.T(x,.22,z),M.S(r*.92,.03,r*.92)),'#2E6B4A',{cast:false});
+  const n=Math.round(r*7);for(let i=0;i<n;i++){const a=i*2.399,q=Math.sqrt((i+.5)/n)*r*.8;D(G.sph,M.chain(M.T(x+Math.cos(a)*q,.36,z+Math.sin(a)*q),M.S(.16,.14,.16)),cols[i%cols.length],{em:.45,cast:false})}}
+function hedge(x,z,w,d,c){D(G.box,M.chain(M.T(x,0,z),M.S(w,.55,d)),c||'#2F7A55',{em:.1})}
+function flag(x,z,c){D(G.cyl8,M.chain(M.T(x,0,z),M.S(.05,3.4,.05)),'#C9C4D6',{cast:false});D(G.box,M.chain(M.T(x+.5,2.95,z),M.S(1,.6,.03)),c,{em:.5,cast:false})}
+// ---------- Kampung Warga: cluster rumah per segmen seni, tiap warna beda ----------
+const CLUSTERS=[{k:'musik',nm:'🎸 Cluster Musisi',col:'#FF4B4B'},{k:'visual',nm:'🎨 Cluster Visual',col:'#FFC233'},{k:'film',nm:'🎬 Cluster Film & Konten',col:'#3FA9FF'},
+  {k:'kreatif',nm:'✍️ Cluster Kreatif & Sastra',col:'#3FD37A'},{k:'umum',nm:'🌱 Cluster Warga Baru',col:'#B69CFF'}];
+const segOf=r=>r.grp==='musik'?'musik':r.grp==='ilus'?'visual':r.grp==='edit'?'film':(r.grp==='head'||r.grp==='tarot')?'kreatif':'umum';
+const HX=3.7,HZ=4.2,HCOLS=5,PERB=20;const CPOS={musik:[-24,-72],visual:[0,-72],film:[24,-72],kreatif:[-24,-48],umum:[0,-48]};const MZ=-24;
+// kalau satu cluster penuh (20 rumah), rumah berikutnya pindah ke kavling kosong terdekat
+const SPILL=[[24,-48],[-24,0],[24,24]];const SPILLUSED=[];
+const HOUSES=[];const CBLK=[];{const by={};for(const C of CLUSTERS)by[C.k]=[];for(const r of RES){if(r.i===0||r.own||r.nohouse)continue;by[segOf(r)].push(r)}
+  for(const C of CLUSTERS){const L=by[C.k];const [bx,bz]=CPOS[C.k];C.bx=bx;C.bz=bz;C.cx=bx;C.cz=bz;C.n=L.length;C.blocks=[];C.gz=bz+BLK/2-.9;C.rows=0;
+    const roofs=[C.col,mixC(C.col,'#000000',.2),mixC(C.col,'#FFFFFF',.22),mixC(C.col,'#14102B',.38)],walls=[mixC(C.col,'#FFF7E8',.86),mixC(C.col,'#FFF7E8',.74),mixC(C.col,'#FFFFFF',.9)];
+    let s=0,i0=0;do{let px=bx,pz=bz;if(s>0){const free=SPILL.filter(p=>!SPILLUSED.includes(p));free.sort((a,b)=>Math.hypot(a[0]-bx,a[1]-bz)-Math.hypot(b[0]-bx,b[1]-bz));[px,pz]=free[0];SPILLUSED.push(free[0])}
+      const more=SPILL.some(p=>!SPILLUSED.includes(p));const take=(L.length-i0>PERB&&!more)?L.length-i0:PERB;const P2=L.slice(i0,i0+take);
+      const rows=Math.ceil(P2.length/HCOLS);const x0=px-(HCOLS-1)*HX/2,z0=pz+BLK/2-4.2;const B={C,bx:px,bz:pz,x0,zTop:z0,rows,n:P2.length,gz:pz+BLK/2-.9,part:s};C.blocks.push(B);CBLK.push(B);
+      if(s===0){C.x0=x0;C.zTop=z0;C.rows=rows}
+      P2.forEach((r,i)=>{const x=x0+(i%HCOLS)*HX,z=z0-Math.floor(i/HCOLS)*HZ;const h=hash(r.u+'rumah');
+        const H={r,x,z,big:false,seg:C,blk:B,roof:roofs[h%roofs.length],wall:walls[(h>>>4)%walls.length],chim:(h>>>8)%3===0,door:[x,0,z+1.35]};r.house=H;HOUSES.push(H)});
+      i0+=take;s++}while(i0<L.length);
+    if(!C.n)C.x0=undefined}
+  for(const r of RES)if(r.own)r.house={r,x:0,z:MZ,big:true,mansion:true,door:[0,0,MZ+5.6]}}
+window.KOTA_HOUSES=HOUSES;
+const clusterSign={};function cSign(C){return clusterSign[C.k]||(clusterSign[C.k]=texFromCanvas(signCanvas(1024,200,(x,w,h)=>{x.fillStyle='#14102B';x.fillRect(0,0,w,h);x.strokeStyle=C.col;x.lineWidth=14;x.strokeRect(7,7,w-14,h-14);
+  x.fillStyle=C.col;let s=78;x.font='900 '+s+'px Inter';const T=C.nm.toUpperCase();while(x.measureText(T).width>w-60&&s>40){s-=4;x.font='900 '+s+'px Inter'}x.textAlign='center';x.textBaseline='middle';x.fillText(T,w/2,h/2+4)})))}
+// patung tema di gerbang tiap cluster
+function themeStatue(k,x,z,side,col){D(G.cyl16,M.chain(M.T(x,0,z),M.S(.9,.45,.9)),'#2A2448',{});D(G.cyl16,M.chain(M.T(x,.45,z),M.S(.95,.06,.95)),col,{em:.7,cast:false});const y=.5;
+  if(k==='musik'){if(side<0){D(G.cyl8,M.chain(M.T(x+.25,y,z),M.S(.09,2.2,.09)),'#14102B',{});D(G.sph,M.chain(M.T(x-.05,y+.25,z),M.RZ(.4),M.S(.45,.32,.32)),'#14102B',{});D(G.box,M.chain(M.T(x+.55,y+1.9,z),M.RZ(-.5),M.S(.7,.16,.1)),'#14102B',{})}
+    else{D(G.sph,M.chain(M.T(x,y+.55,z),M.S(.62,.55,.22)),col,{em:.3});D(G.sph,M.chain(M.T(x,y+1.15,z),M.S(.48,.42,.2)),col,{em:.3});D(G.cyl16,M.chain(M.T(x,y+.7,z+.18),M.RX(Math.PI/2),M.S(.18,.05,.18)),'#14102B',{});D(G.box,M.chain(M.T(x,y+1.4,z),M.S(.14,1.5,.1)),'#5A3A22',{});D(G.box,M.chain(M.T(x,y+2.25,z),M.S(.24,.34,.12)),'#14102B',{})}}
+  else if(k==='visual'){if(side<0){D(G.cyl16,M.chain(M.T(x,y+1.1,z),M.RX(Math.PI/2),M.S(.95,.08,.7)),'#F4E3C3',{em:.2});for(const [a,b,c] of [[-.45,.2,'#FF4B4B'],[0,.45,'#3FA9FF'],[.45,.15,'#3FD37A'],[.1,-.2,'#B69CFF']])D(G.sph,M.chain(M.T(x+a,y+1.1+b,z+.06),M.S(.15,.15,.06)),c,{em:.6,cast:false})}
+    else{D(G.cyl8,M.chain(M.T(x,y,z),M.RZ(.25),M.S(.09,2.1,.09)),'#C98B52',{});D(G.cone8,M.chain(M.T(x-.52,y+2.05,z),M.RZ(.25),M.S(.2,.6,.2)),col,{em:.5})}}
+  else if(k==='film'){if(side<0){D(G.box,M.chain(M.T(x,y+.4,z),M.S(1.4,1.0,.16)),'#14102B',{});for(let i=0;i<4;i++)D(G.box,M.chain(M.T(x-.52+i*.35,y+1.08,z),M.RZ(.25),M.S(.18,.26,.18)),i%2?'#FFFFFF':'#14102B',{em:.3})}
+    else{D(G.box,M.chain(M.T(x,y+.3,z),M.S(1.2,.8,.7)),'#2A2448',{});for(const a of [-.32,.32])D(G.cyl16,M.chain(M.T(x+a,y+1.45,z),M.RX(Math.PI/2),M.S(.42,.12,.42)),col,{em:.4});D(G.cyl8,M.chain(M.T(x+.75,y+.7,z),M.RZ(Math.PI/2),M.S(.2,.4,.2)),'#14102B',{})}}
+  else if(k==='kreatif'){if(side<0){for(const s of [-1,1])D(G.box,M.chain(M.T(x+s*.42,y+.55,z),M.RZ(s*.35),M.S(.85,.08,1.0)),'#FFF7E8',{em:.25});D(G.box,M.chain(M.T(x,y+.4,z),M.S(.1,.3,1.0)),col,{em:.5})}
+    else{D(G.cyl8,M.chain(M.T(x,y,z),M.S(.2,1.9,.2)),'#FFC233',{em:.3});D(G.cone8,M.chain(M.T(x,y+1.9,z),M.S(.2,.5,.2)),'#F4E3C3',{});D(G.cyl8,M.chain(M.T(x,y-.0,z),M.S(.21,.2,.21)),'#FF8FB1',{})}}
+  else{if(side<0){D(G.cyl8,M.chain(M.T(x,y,z),M.S(.07,1.3,.07)),'#2E8B57',{});for(const s of [-1,1])D(G.sph,M.chain(M.T(x+s*.38,y+1.3,z),M.RZ(s*.5),M.S(.42,.16,.24)),col,{em:.35})}
+    else{D(G.cyl8,M.chain(M.T(x,y,z),M.S(.06,1.5,.06)),'#2E8B57',{});for(let i=0;i<6;i++){const a=i/6*Math.PI*2;D(G.sph,M.chain(M.T(x+Math.cos(a)*.3,y+1.6+Math.sin(a)*.3,z),M.S(.2,.2,.08)),col,{em:.4})}D(G.sph,M.chain(M.T(x,y+1.6,z+.04),M.S(.16,.16,.1)),'#FFC233',{em:.6})}}}
+// fasilitas tengah cluster (kalau masih ada lahan di belakang rumah)
+function themeCenter(k,x,z,col){D(G.cyl16,M.chain(M.T(x,.03,z),M.S(2.9,.04,2.9)),mixC(col,'#14102B',.55),{cast:false});D(G.cyl16,M.chain(M.T(x,.05,z),M.S(2.6,.02,2.6)),col,{em:.4,alpha:.45,cast:false});
+  if(k==='musik'){for(let i=0;i<6;i++){const a=i/6*Math.PI*2;D(G.cyl8,M.chain(M.T(x+Math.cos(a)*1.9,0,z+Math.sin(a)*1.9),M.S(.08,2.2,.08)),'#FFF7E8',{})}D(G.cone6,M.chain(M.T(x,2.2,z),M.S(2.5,1.2,2.5)),col,{em:.3});D(G.cyl16,M.chain(M.T(x,0,z),M.S(1.5,.35,1.5)),'#2A2448',{});
+    D(G.cyl16,M.chain(M.T(x-.4,.35,z),M.S(.35,.4,.35)),'#FFF7E8',{});D(G.cyl16,M.chain(M.T(x+.45,.35,z+.2),M.S(.28,.3,.28)),'#FFC233',{em:.4})}
+  else if(k==='visual'){const c3=['#FF4B4B','#3FA9FF','#3FD37A','#FFC233','#B69CFF'];for(let i=0;i<5;i++)D(G.box,M.chain(M.T(x+Math.sin(i)*.3,.4+i*.75,z),M.RY(i*.7),M.RZ(.3),M.S(.9-i*.1,.6,.9-i*.1)),c3[i],{em:.35});bench(x-2,z+1.8,.5);bench(x+2,z+1.8,-.5)}
+  else if(k==='film'){D(G.box,M.chain(M.T(x,0,z-.6),M.S(4,3.2,.25)),'#14102B',{});D(G.box,M.chain(M.T(x,1.0,z-.45),M.S(3.6,2.0,.05)),'#7FD3FF',{em:.85,cast:false});for(const a of [-1.2,0,1.2])D(G.box,M.chain(M.T(x+a,.3,z+1.4),M.S(.9,.5,.9)),col,{em:.25})}
+  else if(k==='kreatif'){for(let i=0;i<6;i++){const a=i/6*Math.PI*2;D(G.cyl8,M.chain(M.T(x+Math.cos(a)*1.8,0,z+Math.sin(a)*1.8),M.S(.08,2,.08)),'#FFF7E8',{})}D(G.cone6,M.chain(M.T(x,2,z),M.S(2.3,1,2.3)),col,{em:.3});
+    D(G.box,M.chain(M.T(x,0,z),M.S(1.6,1.1,.5)),'#5A3A22',{});for(let i=0;i<5;i++)D(G.box,M.chain(M.T(x-.6+i*.3,.65,z+.2),M.S(.2,.36,.1)),['#FF4B4B','#3FA9FF','#FFC233','#B69CFF','#3FD37A'][i],{em:.3})}
+  else{D(G.box,M.chain(M.T(x-.8,.9,z),M.RZ(.55),M.S(2.6,.12,.8)),'#FF8FB1',{em:.3});D(G.box,M.chain(M.T(x+.3,0,z),M.S(.8,1.6,.8)),col,{em:.25});
+    for(const s of [-1,1])D(G.box,M.chain(M.T(x+1.4,1.1,z+s*.9),M.RX(s*.3),M.S(.07,2.2,.07)),'#3A3354',{});D(G.box,M.chain(M.T(x+1.4,2.15,z),M.S(.08,.08,2)),'#3A3354',{});D(G.box,M.chain(M.T(x+1.4,.6,z),M.S(.5,.06,.3)),'#FFC233',{em:.4})}}
+// lantai, jalan setapak, pagar, semak, lampu & gerbang tiap blok cluster
+function clusterBlock(B){const {C,bx,bz}=B;const col=C.col;
+  D(G.box,M.chain(M.T(bx,.03,bz),M.S(BLK-.6,.03,BLK-.6)),mixC(col,'#14102B',.8),{cast:false});
+  D(G.box,M.chain(M.T(bx,.034,bz),M.S(BLK-.2,.008,BLK-.2)),col,{em:.6,alpha:.16,cast:false});
+  const w=HCOLS*HX+1.2;for(let k=0;k<B.rows;k++){const lz=B.zTop-k*HZ+1.95;D(G.box,M.chain(M.T(bx,.05,lz),M.S(w-.6,.02,1.15)),mixC(col,'#3B3466',.72),{cast:false});
+    for(let i=0;i<10;i++)D(G.box,M.chain(M.T(bx-w/2+1+i*(w-2)/9,.065,lz),M.S(.5,.01,.12)),col,{em:.6,cast:false});lamp(bx-w/2+.4,lz,col);lamp(bx+w/2-.4,lz,col)}
+  // pagar & semak di sisi blok
+  hedge(bx-BLK/2+.7,bz-1.2,.6,BLK-4);hedge(bx+BLK/2-.7,bz-1.2,.6,BLK-4);hedge(bx,bz-BLK/2+.6,BLK-2,.6);
+  // gerbang cluster + patung tema
+  for(const s of [-1,1])D(G.box,M.chain(M.T(bx+s*2.6,1.3,B.gz),M.S(.35,2.6,.35)),col,{em:.6,cast:false});
+  D(G.box,M.chain(M.T(bx,2.75,B.gz),M.S(5.6,.7,.3)),'#14102B',{cast:false});D(G.plane,M.chain(M.T(bx,2.75,B.gz+.18),M.S(5.4,1.05,1)),[1,1,1],{tex:cSign(C),em:1,cast:false});
+  themeStatue(C.k,bx-6,B.gz-.1,-1,col);themeStatue(C.k,bx+6,B.gz-.1,1,col);
+  if(B.rows<=3)themeCenter(C.k,bx,bz-6.8,col)}
+function houseStatic(H){const {x,z,r}=H;const B=M.chain(M.T(x,0,z),M.RY(-Math.PI/2));const Wm=m=>M.mul(B,m);const col=H.seg.col;
+  D(G.box,Wm(M.chain(M.T(0,.06,0),M.S(2.5,.12,2.3))),mixC(col,'#2A1C4F',.7),{cast:false});
+  D(G.box,Wm(M.chain(M.T(0,.12,0),M.S(2.1,1.45,1.9))),H.wall,{em:.1,cast:false});
+  D(G.box,Wm(M.chain(M.T(0,1.5,0),M.S(2.14,.1,1.94))),col,{em:.5,cast:false});
+  D(G4,Wm(M.chain(M.T(0,1.57,0),M.RY(Math.PI/4),M.S(1.75,1.05,1.65))),H.roof,{em:.22,cast:false});
+  if(H.chim)D(G.box,Wm(M.chain(M.T(-.45,1.9,.45),M.S(.26,.7,.26))),mixC(col,'#14102B',.5),{cast:false});
+  D(G.box,Wm(M.chain(M.T(1.06,.12,0),M.S(.05,.95,.55))),mixC(col,'#14102B',.62),{cast:false});D(G.box,Wm(M.chain(M.T(1.09,1.12,0),M.S(.04,.08,.7))),col,{em:.6,cast:false});
+  D(G.box,Wm(M.chain(M.T(1.7,.04,0),M.S(1.0,.05,.5))),'#C9C4D6',{cast:false});
+  // pagar halaman depan warna cluster + semak
+  for(const s of [-1,1]){D(G.box,M.chain(M.T(x+s*.78,.18,z+1.62),M.S(.85,.36,.06)),col,{em:.35,cast:false});D(G.box,M.chain(M.T(x+s*1.2,.0,z+1.62),M.S(.08,.46,.08)),'#FFF7E8',{cast:false})}
+  bush(x-1.55,z+.85,.7,(hash(r.u)%2)?'#2EC4B6':'#4FAF7A');
+  D(G.cyl8,Wm(M.chain(M.T(1.95,.0,.62),M.S(.04,.62,.04))),'#3A3354',{cast:false});D(G.box,Wm(M.chain(M.T(1.95,.66,.62),M.S(.24,.17,.15))),r.col,{em:.7,cast:false})}
+function houseWin(H,night){const B=M.chain(M.T(H.x,0,H.z),M.RY(-Math.PI/2));for(const s of [-1,1])D(G.box,M.mul(B,M.chain(M.T(1.07,.82,s*.64),M.S(.03,.42,.42))),night?'#FFD23F':'#8FD8FF',{em:night?1:.45,cast:false})}
+function houses(t,cp){const night=(()=>{const h=hourWIB();return h>=18||h<6})();
+  if(!BK.hs){BK.hs=bake(()=>{for(const B of CBLK)clusterBlock(B);for(const H of HOUSES)houseStatic(H)});BK.wd=bake(()=>{for(const H of HOUSES)houseWin(H,false)});BK.wn=bake(()=>{for(const H of HOUSES)houseWin(H,true)})}
+  drawBaked(BK.hs);drawBaked(night?BK.wn:BK.wd);
+  if(PLAY.on&&PLAY.r&&PLAY.r.house&&!PLAY.r.house.big){const H=PLAY.r.house;D(G.cyl16,M.chain(M.T(H.door[0],.03,H.door[2]+.3),M.S(.6,.02,.6)),'#FFD23F',{em:1,alpha:.7+.3*Math.sin(t*5),cast:false})}
+  mansion(t)}
 // kavling kosong: petak siap bangun di seluruh peta, biar kelihatan kota masih bisa diisi
 const KAV=[];function initKav(){if(initKav.done)return;initKav.done=1;const used=(x,z,m)=>(window.KOTA_RS||[]).some(([a,b,c,d])=>x>a-m&&x<b+m&&z>c-m&&z<d+m)||BUILDINGS.some(B=>Math.hypot(B.x-x,B.z-z)<Math.max(B.w,B.d)*.7+3)||OBST.some(o=>o.c?Math.hypot(x-o.c[0],z-o.c[1])<o.c[2]+3:(x>o.b[0]-3&&x<o.b[1]+3&&z>o.b[2]-3&&z<o.b[3]+3));
-  let n=1;for(const [x,z] of [[-24,0],[24,-24],[24,-48],[24,24]])KAV.push({x,z,n:n++});
+  let n=1;for(const [x,z] of [[-24,0],[24,-24],[24,-48],[24,24]])if(!SPILLUSED.some(p=>p[0]===x&&p[1]===z))KAV.push({x,z,n:n++});
   for(const [x,z] of [[-48,24],[48,24],[-48,-6],[48,-6]])if(!used(x,z,1))KAV.push({x,z,n:n++})}
 let kavTex=null;function kavSign(){return kavTex||(kavTex=texFromCanvas(signCanvas(512,192,(x,w,h)=>{x.fillStyle='#F4EFE6';x.fillRect(0,0,w,h);x.strokeStyle='#14102B';x.lineWidth=10;x.strokeRect(5,5,w-10,h-10);x.textAlign='center';x.textBaseline='middle';
   x.fillStyle='#14102B';x.font='900 58px Inter';x.fillText('KAVLING',w/2,h/2-22);x.fillStyle='#8A6A2E';x.font='800 34px Inter';x.fillText('siap dibangun',w/2,h/2+34)})))}
-function kavling(t){initKav();for(const K of KAV){const {x,z}=K;const E=K.x*K.x>2000?5.5:9;D(G.box,M.chain(M.T(x,.03,z),M.S(E*2,.04,E*2)),'#2C264E',{cast:false});
+function kavStatic(){initKav();for(const K of KAV){const {x,z}=K;const E=K.x*K.x>2000?5.5:9;D(G.box,M.chain(M.T(x,.03,z),M.S(E*2,.04,E*2)),'#2C264E',{cast:false});
+    // rumput, tanah urug, semak sudut & kerucut proyek
+    D(G.box,M.chain(M.T(x,.05,z),M.S(E*2-1,.02,E*2-1)),'#27443A',{cast:false});D(G.box,M.chain(M.T(x,.07,z-.6),M.S(E*.85,.03,E*.85)),'#6A5340',{cast:false});
+    D(G.box,M.chain(M.T(x,.06,z+E*.5),M.S(1.4,.02,E)),'#B9AE95',{cast:false});
+    for(const [a,b] of [[-1,-1],[1,-1],[-1,1],[1,1]])bush(x+a*(E-1.3),z+b*(E-1.3),E>6?1.1:.8,'#3E9E6A');
+    for(const [a,b] of [[-1,-1],[1,-1],[1,1]]){const cx=x+a*E*.42,cz=z-.6+b*E*.42;D(G.cone8,M.chain(M.T(cx,0,cz),M.S(.22,.6,.22)),'#FF7A1A',{em:.3});D(G.cyl8,M.chain(M.T(cx,.25,cz),M.S(.16,.1,.16)),'#FFF7E8',{em:.4,cast:false})}
     const nq=Math.round(E*1.4);for(let i=0;i<nq;i++){const q=-E+i*(2*E/(nq-1));D(G.box,M.chain(M.T(x+q,.07,z-E),M.S(.9,.03,.14)),'#E8C27A',{em:.4,cast:false});D(G.box,M.chain(M.T(x+q,.07,z+E),M.S(.9,.03,.14)),'#E8C27A',{em:.4,cast:false});D(G.box,M.chain(M.T(x-E,.07,z+q),M.S(.14,.03,.9)),'#E8C27A',{em:.4,cast:false});D(G.box,M.chain(M.T(x+E,.07,z+q),M.S(.14,.03,.9)),'#E8C27A',{em:.4,cast:false})}
-    D(G.cyl8,M.chain(M.T(x,0,z+E-1.5),M.S(.08,2.2,.08)),'#3A3354',{cast:false});D(G.plane,M.chain(M.T(x,2.3,z+E-1.45),M.S(3.4,1.27,1)),[1,1,1],{tex:kavSign(),em:.85,cast:false})}
-  taman(t);halteBlok();warung(t)}
+    D(G.cyl8,M.chain(M.T(x,0,z+E-1.5),M.S(.08,2.2,.08)),'#3A3354',{cast:false});D(G.plane,M.chain(M.T(x,2.3,z+E-1.45),M.S(3.4,1.27,1)),[1,1,1],{tex:kavSign(),em:.85,cast:false})}}
 const TAMAN=[-24,24];
-function taman(t){const [x,z]=TAMAN;D(G.box,M.chain(M.T(x,.03,z),M.S(19,.05,19)),'#1F4A3A',{cast:false});
+function tamanStatic(){const [x,z]=TAMAN;D(G.box,M.chain(M.T(x,.03,z),M.S(19,.05,19)),'#1F4A3A',{cast:false});
   D(G.box,M.chain(M.T(x,.06,z),M.S(2,.02,19)),'#C9B98E',{cast:false});D(G.box,M.chain(M.T(x,.06,z),M.S(19,.02,2)),'#C9B98E',{cast:false});
-  D(G.cyl16,M.chain(M.T(x,.05,z),M.S(2.6,.4,2.6)),'#5A6A8A',{});D(G.cyl16,M.chain(M.T(x,.45,z),M.S(2.2,.05,2.2)),'#38E1FF',{em:.6,alpha:.8,cast:false});D(G.sph,M.chain(M.T(x,1+Math.abs(Math.sin(t*3))*.3,z),M.S(.3,.5,.3)),'#BDF4FF',{em:.8,alpha:.7,cast:false});
+  D(G.cyl16,M.chain(M.T(x,.05,z),M.S(2.6,.4,2.6)),'#5A6A8A',{});D(G.cyl16,M.chain(M.T(x,.45,z),M.S(2.2,.05,2.2)),'#38E1FF',{em:.6,alpha:.8,cast:false});
   for(const [a,b] of [[-6,-6],[6,-6],[-6,6],[6,6],[-6.5,0],[6.5,0],[0,-6.5],[0,6.5]]){const s2=1.1;D(G.cyl8,M.chain(M.T(x+a,0,z+b),M.S(.14*s2,1.2*s2,.14*s2)),'#5A3A22',{});D(G.sphHi,M.chain(M.T(x+a,1.6*s2,z+b),M.S(1.1*s2,1*s2,1.1*s2)),(a*b)%2?'#3E9E6A':'#5FBF8A',{em:.15})}
   for(const [a,b,r] of [[-3,-8.6,0],[3,8.6,0],[-8.6,3,1],[8.6,-3,1]]){D(G.box,M.chain(M.T(x+a,.35,z+b),M.RY(r*Math.PI/2),M.S(1.8,.12,.5)),'#C98B52',{})}
+  for(const [a,b] of [[-3.3,-3.3],[3.3,-3.3],[-3.3,3.3],[3.3,3.3]])flower(x+a,z+b,1.1,['#FF4B4B','#FFC233','#FF8FB1','#FFF7E8']);
   for(const [a,b] of [[-9,-9],[9,-9],[-9,9],[9,9]]){D(G.cyl8,M.chain(M.T(x+a,0,z+b),M.S(.06,2.2,.06)),'#3A3354',{cast:false});D(G.sph,M.chain(M.T(x+a,2.25,z+b),M.S(.2,.2,.2)),'#FFE9A8',{em:1,cast:false})}}
+function tamanDyn(t){const [x,z]=TAMAN;D(G.sph,M.chain(M.T(x,1+Math.abs(Math.sin(t*3))*.3,z),M.S(.3,.5,.3)),'#BDF4FF',{em:.8,alpha:.7,cast:false})}
 let warTex=null;function warSign(){return warTex||(warTex=texFromCanvas(signCanvas(512,160,(x,w,h)=>{x.fillStyle='#2A1408';x.fillRect(0,0,w,h);x.strokeStyle='#F2994A';x.lineWidth=10;x.strokeRect(5,5,w-10,h-10);x.textAlign='center';x.textBaseline='middle';x.fillStyle='#FFE9C7';x.font='900 72px Inter';x.fillText('🍜 WARUNG',w/2,h/2+4)})))}
-function warung(t){const x=-6,z=19;D(G.box,M.chain(M.T(x,0,z),M.S(5,1.2,2.6)),'#8A5A3B',{});D(G.box,M.chain(M.T(x,1.2,z),M.S(5.2,.12,2.8)),'#C98B52',{});
+function warungStatic(){const x=-6,z=19;D(G.box,M.chain(M.T(x,0,z),M.S(5,1.2,2.6)),'#8A5A3B',{});D(G.box,M.chain(M.T(x,1.2,z),M.S(5.2,.12,2.8)),'#C98B52',{});
   for(let i=0;i<6;i++)D(G.box,M.chain(M.T(x-2.2+i*.88,2.55,z+.6),M.RX(-.35),M.S(.88,.08,2.2)),i%2?'#FFF7E8':'#F2994A',{em:.25});
   for(const s2 of [-1,1])D(G.cyl8,M.chain(M.T(x+s2*2.4,0,z+1.5),M.S(.07,2.4,.07)),'#3A3354',{cast:false});
   D(G.plane,M.chain(M.T(x,3.15,z+1.65),M.S(3.6,1.12,1)),[1,1,1],{tex:warSign(),em:.9,cast:false});
   for(let i=0;i<3;i++)D(G.sph,M.chain(M.T(x-1.4+i*1.4,1.45,z+.6),M.S(.28,.2,.28)),['#F2C94C','#FFF7E8','#F2994A'][i],{em:.3});
-  for(let k=0;k<3;k++){const q=((t*.5+k/3)%1);D(G.sph,M.chain(M.T(x-1.4+Math.sin(t+k)*.2,1.7+q*1.6,z+.6),M.S(.12,.12,.12)),'#FFFFFF',{em:.6,alpha:(1-q)*.5,cast:false})}
   for(const a of [-1.6,0,1.6])D(G.cyl16,M.chain(M.T(x+a,0,z+2.6),M.S(.35,.55,.35)),'#C98B52',{})}
+function warungDyn(t){const x=-6,z=19;for(let k=0;k<3;k++){const q=((t*.5+k/3)%1);D(G.sph,M.chain(M.T(x-1.4+Math.sin(t+k)*.2,1.7+q*1.6,z+.6),M.S(.12,.12,.12)),'#FFFFFF',{em:.6,alpha:(1-q)*.5,cast:false})}}
 function halteBlok(){const x=0,z=24;D(G.box,M.chain(M.T(x,.03,z),M.S(19,.05,19)),'#2A2448',{cast:false});
   for(let i=0;i<5;i++)D(G.box,M.chain(M.T(x,.06,z-8+i*4),M.S(5,.02,1.4)),'#E8E1FF',{em:.15,cast:false});
   for(const s2 of [-1,1]){D(G.box,M.chain(M.T(x+s2*6,0,z+5),M.S(4,.5,1)),'#38E1FF',{em:.3});D(G.box,M.chain(M.T(x+s2*6,.5,z+4.6),M.S(4,.8,.15)),'#2E2A55',{})}
-  for(const [a,b] of [[-8,-8],[8,-8],[-8,8],[8,8]]){D(G.cyl8,M.chain(M.T(x+a,0,z+b),M.S(.06,2.2,.06)),'#3A3354',{cast:false});D(G.sph,M.chain(M.T(x+a,2.25,z+b),M.S(.2,.2,.2)),'#BDF4FF',{em:1,cast:false})}}
-function decor(t,cp){streets();kavling(t);for(const [x,z,s,c] of TREES){D(G.cyl8,M.chain(M.T(x,0,z),M.S(.12*s,1.1*s,.12*s)),'#3A2A5E',{cast:false});
-    D(G.cone8,M.chain(M.T(x,.8*s,z),M.S(.9*s,1.3*s,.9*s)),c,{em:.35,cast:false});D(G.cone8,M.chain(M.T(x,1.6*s,z),M.S(.6*s,1.0*s,.6*s)),c,{em:.5,cast:false})}
-  for(let x=-60;x<=60;x+=7.5){if(Math.abs(x)<4)continue;for(const zz of [ROAD_Z-1.6,ROAD_Z+1.6]){D(G.cyl8,M.chain(M.T(x,0,zz),M.S(.07,2.6,.07)),'#3A3354',{cast:false});
-    D(G.sph,M.chain(M.T(x,2.65,zz),M.S(.18,.18,.18)),(Math.round(x/7.5)%2)?'#38E1FF':'#FF4FA3',{em:1,cast:false})}}}
-// Kampung Warga: cluster rumah per segmen seni (barat plaza), tiap warga punya rumah
-const G4=upload(cyl(0,1,1,4));
-const CLUSTERS=[{k:'musik',nm:'🎸 Cluster Musisi',col:'#FF4FA3'},{k:'visual',nm:'🎨 Cluster Visual',col:'#FFD23F'},{k:'film',nm:'🎬 Cluster Film & Konten',col:'#38E1FF'},
-  {k:'kreatif',nm:'✍️ Cluster Kreatif & Sastra',col:'#B69CFF'},{k:'umum',nm:'🌱 Cluster Warga Baru',col:'#9BE15D'}];
-const segOf=r=>r.grp==='musik'?'musik':r.grp==='ilus'?'visual':r.grp==='edit'?'film':(r.grp==='head'||r.grp==='tarot')?'kreatif':'umum';
-const HX=3.7,HZ=4.2,HCOLS=5;const CPOS={musik:[-24,-72],visual:[0,-72],film:[24,-72],kreatif:[-24,-48],umum:[0,-48]};const MZ=-24;
-const HOUSES=[];{const by={};for(const C of CLUSTERS)by[C.k]=[];for(const r of RES){if(r.i===0||r.own)continue;by[segOf(r)].push(r)}
-  // tiap cluster menempati satu blok kota (5 rumah per baris, gapura di depan blok)
-  for(const C of CLUSTERS){const L=by[C.k];const [bx,bz]=CPOS[C.k];C.bx=bx;C.bz=bz;if(!L.length)continue;const rows=Math.ceil(L.length/HCOLS);
-    const x0=bx-(HCOLS-1)*HX/2,z0=bz+BLK/2-4.2;C.x0=x0;C.zTop=z0;C.rows=rows;C.cx=bx;C.cz=bz;C.n=L.length;C.gz=bz+BLK/2-.9;
-    L.forEach((r,i)=>{const x=x0+(i%HCOLS)*HX,z=z0-Math.floor(i/HCOLS)*HZ;const h=hash(r.u+'rumah');
-      const H={r,x,z,big:false,seg:C,roof:['#FF4FA3','#38E1FF','#FFD23F','#9BE15D','#FF9F1C','#B69CFF'][h%6],wall:['#FFF7E8','#E8E1FF','#FFE6F2','#E1FFF6','#FFF1D6'][(h>>>4)%5],chim:(h>>>8)%3===0,door:[x,0,z+1.35]};r.house=H;HOUSES.push(H)})}
-  for(const r of RES)if(r.own)r.house={r,x:0,z:MZ,big:true,mansion:true,door:[0,0,MZ+5.6]}}
-window.KOTA_HOUSES=HOUSES;
-const clusterSign={};function cSign(C){return clusterSign[C.k]||(clusterSign[C.k]=texFromCanvas(signCanvas(1024,200,(x,w,h)=>{x.fillStyle='#14102B';x.fillRect(0,0,w,h);x.strokeStyle=C.col;x.lineWidth=14;x.strokeRect(7,7,w-14,h-14);
-  x.fillStyle=C.col;x.font='900 78px Inter';x.textAlign='center';x.textBaseline='middle';x.fillText(C.nm.toUpperCase(),w/2,h/2+4)})))}
-function houses(t,cp){const night=(()=>{const h=hourWIB();return h>=18||h<6})();
-  for(const C of CLUSTERS){if(C.x0===undefined)continue;const w=HCOLS*HX+1.6,gz=C.gz;
-    D(G.box,M.chain(M.T(C.bx,.03,C.bz),M.S(BLK-.6,.03,BLK-.6)),'#2A1C4F',{cast:false});
-    D(G.box,M.chain(M.T(C.bx,.032,C.bz),M.S(BLK-.2,.012,BLK-.2)),C.col,{em:.5,alpha:.35,cast:false});
-    // jalan kecil depan tiap baris + gapura cluster (menghadap panggung)
-    for(let k=0;k<C.rows;k++)D(G.box,M.chain(M.T(C.cx,.05,C.zTop-k*HZ+1.95),M.S(w-.6,.02,1.1)),'#3B2A6E',{cast:false});
-    if(true){for(const s of [-1,1])D(G.box,M.chain(M.T(C.cx+s*2.6,1.3,gz),M.S(.35,2.6,.35)),C.col,{em:.6,cast:false});
-      D(G.box,M.chain(M.T(C.cx,2.75,gz),M.S(5.6,.7,.3)),'#14102B',{cast:false});D(G.plane,M.chain(M.T(C.cx,2.75,gz+.18),M.S(5.4,1.05,1)),[1,1,1],{tex:cSign(C),em:1,cast:false})}}
-  for(const H of HOUSES){const {x,z,r}=H;const B=M.chain(M.T(x,0,z),M.RY(-Math.PI/2));const Wm=m=>M.mul(B,m);
-    D(G.box,Wm(M.chain(M.T(0,.06,0),M.S(2.5,.12,2.3))),'#3A2C5E',{cast:false});
-    D(G.box,Wm(M.chain(M.T(0,.12,0),M.S(2.1,1.45,1.9))),H.wall,{em:.1,cast:false});
-    D(G4,Wm(M.chain(M.T(0,1.57,0),M.RY(Math.PI/4),M.S(1.75,1.05,1.65))),H.roof,{em:.22,cast:false});
-    if(H.chim)D(G.box,Wm(M.chain(M.T(-.45,1.9,.45),M.S(.26,.7,.26))),'#6B4A8A',{cast:false});
-    D(G.box,Wm(M.chain(M.T(1.06,.12,0),M.S(.05,.95,.55))),'#14102B',{cast:false});D(G.box,Wm(M.chain(M.T(1.09,1.12,0),M.S(.04,.08,.7))),H.roof,{em:.6,cast:false});
-    for(const s of [-1,1])D(G.box,Wm(M.chain(M.T(1.07,.82,s*.64),M.S(.03,.42,.42))),night?'#FFD23F':'#8FD8FF',{em:night?1:.45,cast:false});
-    D(G.box,Wm(M.chain(M.T(1.7,.04,0),M.S(1.0,.05,.5))),'#C9C4D6',{cast:false});
-    D(G.sph,Wm(M.chain(M.T(1.55,.25,.85),M.S(.32,.3,.32))),'#2EC4B6',{em:.25,cast:false});D(G.sph,Wm(M.chain(M.T(1.55,.25,-.85),M.S(.28,.26,.28))),'#9BE15D',{em:.25,cast:false});
-    D(G.cyl8,Wm(M.chain(M.T(1.95,.0,.62),M.S(.04,.62,.04))),'#3A3354',{cast:false});D(G.box,Wm(M.chain(M.T(1.95,.66,.62),M.S(.24,.17,.15))),r.col,{em:.7,cast:false});
-    if(PLAY.on&&PLAY.r===r)D(G.cyl16,M.chain(M.T(H.door[0],.03,H.door[2]+.3),M.S(.6,.02,.6)),'#FFD23F',{em:1,alpha:.7+.3*Math.sin(t*5),cast:false})}
-  mansion(t)}
+  for(const [a,b] of [[-8,-8],[8,-8],[-8,8],[8,8]]){D(G.cyl8,M.chain(M.T(x+a,0,z+b),M.S(.06,2.2,.06)),'#3A3354',{cast:false});D(G.sph,M.chain(M.T(x+a,2.25,z+b),M.S(.2,.2,.2)),'#BDF4FF',{em:1,cast:false})}
+  // area makan warung, papan info jemputan, taman kecil
+  D(G.box,M.chain(M.T(-6.2,.065,z+1.6),M.S(7,.02,4.2)),'#4A3A5E',{cast:false});umbrella(-8,z+1.4,'#F2994A');umbrella(-4.3,z+1.9,'#FFF7E8');
+  {const B=M.chain(M.T(5.8,0,z-4.6));D(G.box,M.mul(B,M.chain(M.T(0,0,0),M.S(2.4,.3,.7))),'#2A2448',{});D(G.box,M.mul(B,M.chain(M.T(0,.3,0),M.S(2.2,2.1,.25))),'#14102B',{});D(G.box,M.mul(B,M.chain(M.T(0,.55,.14),M.S(1.9,1.6,.03))),'#38E1FF',{em:.85,cast:false});
+   for(let i=0;i<4;i++)D(G.box,M.mul(B,M.chain(M.T(-.45,1.8-i*.36,.16),M.S(.8,.12,.02))),'#FFF7E8',{em:1,cast:false})}
+  flower(8,z-7.6,1.1,['#FF4FA3','#FFC233','#FFF7E8']);flower(-8.8,z-8.2,1,['#3FA9FF','#FFF7E8','#FF8FB1']);bush(3.6,z-8.4,.8);bush(-3.6,z-8.4,.8);bush(8.6,z+.5,.9)}
+// layout khusus blok Panggung, Studio dan kantor ISR (lantai, taman, parkir, patung)
+function blockLayouts(){
+  // Panggung: bingkai lantai emas, pot tanaman sudut, bendera festival di belakang panggung
+  for(const [a,b,w,d] of [[0,9.7,19.6,.18],[0,-9.7,19.6,.18],[9.7,0,.18,19.6],[-9.7,0,.18,19.6]])D(G.box,M.chain(M.T(a,.04,b),M.S(w,.02,d)),'#FFD23F',{em:.7,cast:false});
+  for(const [a,b] of [[-8.5,8.5],[8.5,8.5],[-8.5,-8.5],[8.5,-8.5]]){D(G.cyl16,M.chain(M.T(a,0,b),M.S(.85,.5,.85)),'#2A2448',{});treeR(a,b+0,.9,'#2EC4B6')}
+  ['#FF4B4B','#FFC233','#3FA9FF','#3FD37A','#B69CFF','#FF4FA3'].forEach((c,i)=>flag(-7.5+i*3,-8.8,c));
+  // Studio: jalan masuk, parkir + mobil, lounge payung, deret pohon belakang
+  {const [sx,,sz]=SITE;D(G.box,M.chain(M.T(sx,.025,sz),M.S(19,.03,19)),'#252046',{cast:false});
+   D(G.box,M.chain(M.T(sx-2.2,.05,sz+7.1),M.S(1.6,.02,6)),'#C9C4D6',{cast:false});for(let i=0;i<5;i++)D(G.box,M.chain(M.T(sx-2.2,.065,sz+4.8+i*1.2),M.S(1.2,.01,.12)),'#38E1FF',{em:.8,cast:false});
+   parking(sx+7.4,sz,4,15,5,1);car(sx+7.6,sz-6,Math.PI/2,'#FF4FA3');car(sx+7.6,sz,Math.PI/2,'#FFF7E8');car(sx+7.6,sz+3,Math.PI/2,'#3FA9FF');
+   umbrella(sx-6.8,sz+6.2,'#38E1FF');bench(sx-7.4,sz+1.8,Math.PI/2,'#6C2BFF');flower(sx-7.2,sz-6.5,1.2,['#38E1FF','#FF4FA3','#FFF7E8']);
+   for(const a of [-6,-2,2])treeR(sx+a,sz-8.2,1,'#3E9E6A');lamp(sx-3.6,sz+8.6,'#38E1FF');lamp(sx-.8,sz+8.6,'#38E1FF')}
+  // Kantor ISR: halaman rumput, jalan masuk, patung equalizer, bendera label, taman samping, pohon belakang
+  {const [ox,,oz]=ISR;D(G.box,M.chain(M.T(ox,.025,oz),M.S(19,.03,19)),'#1F3F38',{cast:false});
+   D(G.box,M.chain(M.T(ox,.05,oz+7.4),M.S(2,.02,5.2)),'#E8E1FF',{em:.15,cast:false});for(const s of [-1,1])for(let i=0;i<4;i++)lamp(ox+s*1.5,oz+5.6+i*1.4,'#FF4FA3');
+   D(G.box,M.chain(M.T(ox-5.5,0,oz+6.4),M.S(4.4,.3,1.4)),'#14102B',{});[1.2,2.2,3.1,1.8,2.7,1.4,2.4].forEach((h,i)=>D(G.box,M.chain(M.T(ox-7.3+i*.6,.3,oz+6.4),M.S(.4,h,.5)),i%2?'#38E1FF':'#FF4FA3',{em:.75}));
+   for(const [i,c] of [[0,'#FF4FA3'],[1,'#FFF7E8'],[2,'#38E1FF']])flag(ox+6.8+i*1.2,oz+8.4,c);
+   flower(ox-7.4,oz,1.3,['#FF4FA3','#FFF7E8','#B69CFF']);flower(ox+7.4,oz-.5,1.3,['#38E1FF','#FFF7E8','#FF4FA3']);
+   for(const a of [-7,-2.5,2.5,7])treeR(ox+a,oz-7.6,1.05,a<0?'#3E9E6A':'#2EC4B6');hedge(ox,oz-9.1,17,.6)}}
+function decor(t,cp){if(!BK.st)BK.st=bake(()=>{streets();kavStatic();tamanStatic();halteBlok();warungStatic();blockLayouts();
+    for(const [x,z,s,c] of TREES){D(G.cyl8,M.chain(M.T(x,0,z),M.S(.12*s,1.1*s,.12*s)),'#3A2A5E',{cast:false});
+      D(G.cone8,M.chain(M.T(x,.8*s,z),M.S(.9*s,1.3*s,.9*s)),c,{em:.35,cast:false});D(G.cone8,M.chain(M.T(x,1.6*s,z),M.S(.6*s,1.0*s,.6*s)),c,{em:.5,cast:false})}
+    for(let x=-60;x<=60;x+=7.5){if(Math.abs(x)<4)continue;for(const zz of [ROAD_Z-1.6,ROAD_Z+1.6]){D(G.cyl8,M.chain(M.T(x,0,zz),M.S(.07,2.6,.07)),'#3A3354',{cast:false});
+      D(G.sph,M.chain(M.T(x,2.65,zz),M.S(.18,.18,.18)),(Math.round(x/7.5)%2)?'#38E1FF':'#FF4FA3',{em:1,cast:false})}}});
+  drawBaked(BK.st);tamanDyn(t);warungDyn(t)}
 // Istana Seni President: blok tengah, di belakang panggung
 const manTex=texFromCanvas(signCanvas(1024,160,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,'#FFB800');g.addColorStop(1,'#FFE36B');x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle='#14102B';x.font='900 62px Inter';x.textAlign='center';x.textBaseline='middle';x.fillText('👑 ISTANA SENI PRESIDENT',w/2,h/2+4)}));
 function mansion(t){const B=M.T(0,0,MZ);
@@ -456,6 +590,9 @@ const OBST=[];{const box=(x0,x1,z0,z1)=>OBST.push({b:[x0,x1,z0,z1]}),circ=(x,z,r
   box(-4.2,4.2,-4.6,1.0);box(-1.4,1.4,7.85,8.95);circ(7.0,1.8,1.5);circ(-8.9,1.5,1.7);circ(-6.3,-1.3,1.6);circ(6.5,-4.6,1.1);circ(0,-.9,1.1);
   box(SITE[0]-3.7,SITE[0]+3.7,SITE[2]-3.1,SITE[2]+3.1);box(-6.6,6.6,MZ-4.75,MZ+4.75);box(-8.6,-3.4,17.6,20.4);box(ISR[0]-3.75,ISR[0]+3.75,ISR[2]-3.25,ISR[2]+3.25);circ(ISR[0]+3.4,ISR[2]+5.2,1.6);
   for(const H of HOUSES){box(H.x-1.15,H.x+1.1,H.z-1.05,H.z+1.05)}
+  for(const B of CBLK){box(B.bx-9.7,B.bx-8.9,B.bz-9.4,B.bz+7);box(B.bx+8.9,B.bx+9.7,B.bz-9.4,B.bz+7);box(B.bx-9,B.bx+9,B.bz-9.7,B.bz-8.9);circ(B.bx-6,B.gz-.1,1.1);circ(B.bx+6,B.gz-.1,1.1);if(B.rows<=3)circ(B.bx,B.bz-6.8,2.9)}
+  box(SITE[0]+5.4,SITE[0]+9.4,SITE[2]-7.5,SITE[2]+4.5);circ(SITE[0]-6.8,SITE[2]+6.2,1.5);box(ISR[0]-7.7,ISR[0]-3.3,ISR[2]+5.7,ISR[2]+7.1);circ(5.8,19.4,1.4);circ(-8,25.4,1.4);circ(-4.3,25.9,1.4);
+  for(const [a,b2] of [[-8.5,8.5],[8.5,8.5],[-8.5,-8.5],[8.5,-8.5]])circ(a,b2,1)
   for(const B of BUILDINGS)circ(B.x,B.z,Math.max(B.w,B.d)*.62)}
 function collide(p){p[0]=clamp(p[0],-60,60);p[1]=clamp(p[1],-92,46);
   for(const o of OBST){if(o.c){const [x,z,r]=o.c;const dx=p[0]-x,dz=p[1]-z,d=Math.hypot(dx,dz);if(d<r+.35){const k=(r+.35)/(d||1);p[0]=x+dx*k;p[1]=z+dz*k}}
@@ -552,7 +689,7 @@ function frame(now){const t=now/1000;
   const tgt=PLAY.on?[PLAY.x,1.1,PLAY.z]:selected?resPos(selected,t):focus?[focus.x,1.5,focus.z]:[HOME.x,1.5,HOME.z];const k=1-Math.exp(-dtn*(PLAY.on?7:3.6));cam.tx+=(tgt[0]-cam.tx)*k;cam.ty+=((selected?1.2:tgt[1])-cam.ty)*k;cam.tz+=(tgt[2]-cam.tz)*k;
   const kd=1-Math.exp(-dtn*3);if(PLAY.on&&ptrs.size===0&&performance.now()-lastInput>4000)cam.dist+=(16-cam.dist)*kd;else if(selected)cam.dist+=(17-cam.dist)*kd;else if(focus&&ptrs.size===0)cam.dist+=(focus.d-cam.dist)*kd;else if(!focus&&!selected&&!PLAY.on)cam.dist+=(HOME.d-cam.dist)*kd;
   const cp=[cam.tx+Math.sin(cam.yaw)*Math.cos(cam.pitch)*cam.dist,cam.ty+Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*Math.cos(cam.pitch)*cam.dist];
-  DL=[];world(t);stage(99);sign(99);notes(40+t%600);road();places(t);houses(t,cp);office(t,cp);staff(t);site(t,cp);decor(t,cp);cars(t);heli(t);sparks(t);
+  DL=[];world(t);stage(99);sign(99);notes(40+t%600);road();places(t);houses(t,cp);office(t,cp);staff(t);site(t,cp);decor(t,cp);cars(t);heli(t);sparks(t);planeDraw(t);
   vilDraw(t);
   const shown=RES.slice(1,260);for(const r of shown)if(!r.q)resident(r,t,selected===r);if(selected&&selected.i>=260)resident(selected,t,true);
   const sun=norm([-0.55,0.9,0.75]);const lc=[0,0,0];const LV=M.look(add(lc,scl(sun,30)),lc,[0,1,0]);const LP=M.ortho(-26,26,-26,26,1,70);const LVP=M.mul(LP,LV);
@@ -582,7 +719,7 @@ function frame(now){const t=now/1000;
     if(!s||s[0]<-80||s[0]>innerWidth+80||s[1]<40||s[1]>innerHeight-150){el.style.display='none';continue}
     const txt=(ARR.length?'🚘 BARU TIBA · @':'🚘 @')+r.u;if(el.textContent!==txt)el.textContent=txt;
     el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px';el.style.zIndex=String(1000-Math.round(s[2]))}
-  {const el=document.getElementById('cta');if(el){const s=project(VP,[0,7.6,-1]);const ok=s&&!PLAY.on&&!selected&&cam.dist>34&&cam.dist<100&&s[0]>60&&s[0]<innerWidth-60&&s[1]>110&&s[1]<innerHeight-220;el.style.display=ok?'':'none';if(ok){el.style.left=s[0]+'px';el.style.top=s[1]+'px'}}}
+  {const el=document.getElementById('cta');if(el){const s=project(VP,[0,7.6,-1]);const ok=s&&!PLANE.cur&&!PLAY.on&&!selected&&cam.dist>34&&cam.dist<100&&s[0]>60&&s[0]<innerWidth-60&&s[1]>110&&s[1]<innerHeight-220;el.style.display=ok?'':'none';if(ok){el.style.left=s[0]+'px';el.style.top=s[1]+'px'}}}
   // label tempat
   PLACES.forEach(([nm,p],k)=>{const el=placeTag(k);const s=project(VP,p);if(!s||cam.dist>15||PLAY.on||hidBy(cp,p)||s[0]<20||s[0]>innerWidth-20||s[1]<60||s[1]>innerHeight-160||s[2]>(k<2?70:34)){el.style.display='none';return}
     if(el.textContent!==nm)el.textContent=nm;el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px'});
@@ -622,7 +759,7 @@ function makeCard(r){const c=document.createElement('canvas');c.width=1080;c.hei
   x.fillStyle='#FFF7E8';x.font='600 30px Inter';x.fillText(location.host||'kota seni',540,1680);
   return c}
 // ---------- API for ui.js ----------
-window.KOTA={setLemas(v){LEMAS.on=!!v},KAV,RES,byName,makeCard,jabatan,tgl,arrive,QUEUE,HOUSES,CLUSTERS,band(){return [...BAND.keys()]},FOUND,isrMsg(){return ISR_MSG[Math.floor(performance.now()/5000)%ISR_MSG.length].replace(/^\S+\s/,'').toLowerCase()},select(r){selected=r;if(r)focus=null},zoomStep(k){zoomTo(null,null,k)},get selected(){return selected},
+window.KOTA={plane:planeSay,get planeU(){return PLANE.cur?(performance.now()/1000-PLANE.t0)/PL_DUR:-1},setLemas(v){LEMAS.on=!!v},KAV,RES,byName,makeCard,jabatan,tgl,arrive,QUEUE,HOUSES,CLUSTERS,band(){return [...BAND.keys()]},FOUND,isrMsg(){return ISR_MSG[Math.floor(performance.now()/5000)%ISR_MSG.length].replace(/^\S+\s/,'').toLowerCase()},select(r){selected=r;if(r)focus=null},zoomStep(k){zoomTo(null,null,k)},get selected(){return selected},
   startPlay,stopPlay,get playing(){return PLAY.on},get me(){return PLAY.r},joy(x,z){PLAY.joy=[x,z]},emote(e){PLAY.emo=e;PLAY.emoT=performance.now()/1000+(e==='dance'?3:e==='music'?3:1.4)},
   pos(){return PLAY.on?{x:+PLAY.x.toFixed(2),z:+PLAY.z.toFixed(2),yaw:+PLAY.yaw.toFixed(2),emo:PLAY.emoT>performance.now()/1000?PLAY.emo:'',moved:PLAY.moved}:null},resetMoved(){PLAY.moved=0},
   setOnline,focusAt,focusHouse(r){if(r&&r.house){const mn=r.house.mansion;focusAt(r.house.x,r.house.z+(mn?1:0),mn?34:18);cam.yaw=mn?.15:.3;cam.pitch=mn?.68:.55}},focusPlace(k){if(String(k).startsWith('kav:')){const K=KAV.find(q=>'kav:'+q.n===k);if(K)focusAt(K.x,K.z,32);return}if(String(k).startsWith('cluster:')){const C=CLUSTERS.find(c=>'cluster:'+c.k===k);if(C){focusAt(C.cx,C.cz,Math.max(30,C.rows*6+16))}return}const P={plaza:[0,0,30,.3,.55],kampung:[KAMP_C[0],KAMP_C[1],60,0,.88],studio:[23,0,28,.45,.5],isr:[-23,-22,34,-.3,.5],mansion:[0,-23,32,0,.6],halte:[0,26,28,0,.6],taman:[-24,24,28,0,.6],warung:[-5,20,20,0,.6],papan:[-6,-1,22,0,.6]}[k];if(k==='home'){focus=null;selected=null;cam.yaw=HOME.yaw;cam.pitch=HOME.pitch;return}if(P){focusAt(P[0],P[1],P[2]);cam.yaw=P[3];cam.pitch=P[4]}},clearFocus(){focus=null}};
