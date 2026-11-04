@@ -354,8 +354,8 @@ jemput();setInterval(jemput,1000);
    const T=now();let best=null,bd=1;for(const n of G.notes)if(!n.done&&n.l===l){const d=Math.abs(n.t-T);if(d<bd){bd=d;best=n}}
    if(best&&bd<.16){best.done=true;const pf=bd<.07;G.combo++;G.hit++;if(pf)G.perf++;G.score+=(pf?100:60)*(1+Math.min(4,Math.floor(G.combo/8)));sfx('lane',l);G.fx.push({txt:pf?'PERFECT':'GOOD',c:pf?'#9BE15D':'#FFD23F',l,at:performance.now()})}
    else{sfx('miss');G.combo=0}}
- function start(){auInit();AU.ac.resume();duck(.12);G.notes=chart();G.score=0;G.combo=0;G.hit=0;G.perf=0;G.fx=[];G.done='';G.t0=AU.ac.currentTime+.6;G.beatT=0;G.beat=0;G.run=true;$('sgStart').textContent='⏹ Berhenti';cancelAnimationFrame(G.raf);loop()}
- function finish(){G.run=false;duck(1);const n=G.notes.length,acc=n?G.hit/n:0;const st=acc>.85?3:acc>.6?2:acc>.3?1:0;const best=store.get('sgBest',0);
+ function start(){$('sgPay').innerHTML='';auInit();AU.ac.resume();duck(.12);G.notes=chart();G.score=0;G.combo=0;G.hit=0;G.perf=0;G.fx=[];G.done='';G.t0=AU.ac.currentTime+.6;G.beatT=0;G.beat=0;G.run=true;$('sgStart').textContent='⏹ Berhenti';cancelAnimationFrame(G.raf);loop()}
+ function finish(){G.run=false;duck(1);const n=G.notes.length,acc=n?G.hit/n:0;if(window.KOTA_KERJA)window.KOTA_KERJA(acc).then(h=>{$('sgPay').innerHTML=h});const st=acc>.85?3:acc>.6?2:acc>.3?1:0;const best=store.get('sgBest',0);
    if(G.score>best)store.set('sgBest',G.score);G.done=(st?'⭐'.repeat(st)+' ':'')+(st>=2?'Rekaman jadi! Mantap':'Rekaman selesai')+' · '+G.score;$('sgStart').textContent='▶ Rekam lagi';
    $('sgBest').textContent='Akurasi '+Math.round(acc*100)+'% · skor terbaikmu '+Math.max(best,G.score);if(G.score>best&&best)toast('🏆 Rekor baru di Studio Rekaman: '+G.score);draw()}
  function stop(){if(G.run){G.run=false;duck(1);G.done='Rekaman dihentikan';$('sgStart').textContent='▶ Mulai rekam';cancelAnimationFrame(G.raf);draw()}}
@@ -400,10 +400,12 @@ jemput();setInterval(jemput,1000);
    t.innerHTML=`<div class="rpal">${['🧽',...ITEMS].map(e=>`<button type="button" data-it="${e}" class="${e===RM.sel?'on':''}" aria-label="${e==='🧽'?'Hapus perabot':'Pilih '+e}">${e}</button>`).join('')}</div>
    <div class="rrow"><span>Lantai</span>${FLOOR.map((c,i)=>`<button type="button" data-f="${i}" style="background:${c}" class="sw${RM.d.f===i?' on':''}" aria-label="Warna lantai ${i+1}"></button>`).join('')}</div>
    <div class="rrow"><span>Dinding</span>${WALL.map((c,i)=>`<button type="button" data-w="${i}" style="background:${c}" class="sw${RM.d.w===i?' on':''}" aria-label="Warna dinding ${i+1}"></button>`).join('')}</div>
+   <div class="row"><button class="btn ghost" type="button" id="roomSleep">🛏️ Tidur</button><button class="btn ghost" type="button" id="roomBath">🚿 Mandi</button></div>
    <div class="row"><button class="btn" type="button" id="roomSave">💾 Simpan dekorasi</button><button class="btn ghost" type="button" id="roomReset">↺ Atur ulang</button></div>`;
    t.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{RM.sel=b.dataset.it;tools()});
    t.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{RM.d.f=+b.dataset.f;RM.dirty=true;tools();draw()});
    t.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{RM.d.w=+b.dataset.w;RM.dirty=true;tools();draw()});
+   $('roomSleep').onclick=()=>window.KOTA_AKSI('tidur','🛏️ Tidur nyenyak, energi +40');$('roomBath').onclick=()=>window.KOTA_AKSI('mandi','🚿 Segar! Kebersihan +50');
    $('roomReset').onclick=()=>{RM.d=defDeco(RM.r);RM.dirty=true;tools();draw()};
    $('roomSave').onclick=async()=>{store.set('deco_'+RM.r.u.toLowerCase(),RM.d);try{await api('rumah',{deco:RM.d});RM.dirty=false;sfx('coin');toast('🏠 Dekorasi rumahmu tersimpan! Warga lain bisa lihat waktu mampir')}catch(e){toast('🏠 Tersimpan di HP ini. '+(e.message||'Sambungan ke server lagi gangguan'))}}}
  async function enterRoom(r){if(!r)return;const me=store.get('me','');RM.r=r;RM.edit=!!me&&me===r.u.toLowerCase();RM.d=null;RM.dirty=false;RM.sel='🪴';
@@ -420,6 +422,8 @@ jemput();setInterval(jemput,1000);
   mansion:{cat:'Pemerintahan',ic:'👑',bg:'#FFD23F',nm:'Istana Seni President',al:'Jl. Utama No. 1 · Belakang Panggung',ds:'Istana Seni, rumah President Kota Seni. President lagi ada di dalam.',sec:'ISTANA',act:[['🚪 Masuk istana','mansion']]},
   halte:{cat:'Transportasi',ic:'🚘',bg:'#9BE15D',nm:'Halte Jemputan',al:'Jl. Raya Kota Seni',ds:'Warga baru dijemput mobil tiap jam tepat, lalu turun di sini.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
   papan:{cat:'Sejarah',ic:'🏛️',bg:'#FFD23F',nm:'Papan Pendiri Kota',al:'Plaza Panggung Festival',ds:'10 warga pertama yang ikut membangun Kota Seni.',sec:'PENDIRI',act:[['🪪 Lihat kartu warga','balai']]},
+  warung:{cat:'Kuliner',ic:'🍜',bg:'#F2994A',nm:'Warung Kota',al:'Blok Halte · Jl. Raya Kota Seni',ds:'Tempat warga beli makan biar avatar nggak lemas. Bayar pakai Koin Nada hasil kerja.',sec:'MENU',act:[['🍞 Roti · 15 koin','roti'],['🍚 Nasi · 30 koin','nasi']]},
+  taman:{cat:'Ruang publik',ic:'🌳',bg:'#5FBF8A',nm:'Taman Kota',al:'Blok depan kiri · dekat Jl. Raya',ds:'Taman dengan air mancur, pohon, dan bangku. Nanti jadi Taman Donatur berisi nama-nama donatur kota.',sec:'SEGERA',act:[['😊 Cek kondisi avatar','avatar']]},
   lot:{cat:'Lahan',ic:'🗳️',bg:'#B69CFF',nm:'Lahan Kosong',al:'Jl. Nada No. 9 · Distrik Timur',ds:'Gedung berikutnya di sini kalian yang pilih lewat voting.',sec:'VOTING',act:[['🗳️ Lihat voting','voting']]}};
  function chips(list){return '<div class="pchips">'+list.map(r=>`<button type="button" class="pchip" data-u="${esc(r.u)}">${r.own?'👑 President':'@'+esc(r.u)}</button>`).join('')+'</div>'}
  function extra(k){if(k==='plaza'){const b=K.band();return b.length?chips(b):'<p class="muted">Panggung lagi istirahat.</p>'}
@@ -435,7 +439,7 @@ jemput();setInterval(jemput,1000);
      P={cat:'Hunian',ic:C.nm.split(' ')[0],bg:C.col,nm:C.nm.replace(/^\S+\s/,''),al:'Kampung Warga · '+C.n+' rumah',ds:'Ketuk nama warga buat mampir ke rumahnya.',sec:'WARGA',act:[]};body=chips(L)}else if(P)body=extra(k);if(!P)return;
    $('plCat').textContent=P.cat;$('plIll').style.setProperty('--c',P.bg);$('plIc').textContent=P.ic;$('plNm').textContent=P.nm;$('plAl').textContent=P.al;$('plDs').textContent=P.ds;$('plSec').textContent=P.sec;$('plX').innerHTML=body;
    $('plAct').innerHTML=P.act.map(([t,a],i)=>`<button class="btn${i?' ghost':''}" type="button" data-a="${a}">${t}</button>`).join('');
-   $('plAct').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='play'){closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()}else if(a==='mansion'){const o=K.RES.find(r=>r.own);if(o)window.KOTA_ROOM(o)}else open(a)});
+   $('plAct').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='play'){closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()}else if(a==='roti'||a==='nasi'){window.KOTA_AKSI(a,a==='roti'?'🍞 Nyam! Lapar +25':'🍚 Kenyang! Lapar +50')}else if(a==='mansion'){const o=K.RES.find(r=>r.own);if(o)window.KOTA_ROOM(o)}else open(a)});
    $('plX').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const r=K.byName.get(b.dataset.u.toLowerCase());if(r){closeAll();if(r.house){K.focusHouse(r);window.KOTA_onPick(r)}else{K.select(r);window.KOTA_onPick(r)}}});
    K.focusPlace(k);open('place')}
  window.KOTA_onPlaceInfo=show;window.KOTA_onPlace=g=>{if(g==='home'||g==='kampung'){K.focusPlace(g);toast(g==='home'?'🗺️ Seluruh Kota Seni':'🏘️ Kampung Warga');return}show(g)};
@@ -457,6 +461,40 @@ jemput();setInterval(jemput,1000);
  let last='\u0000',lp=null;function upd(){const me=store.get('me','');if(me===last&&lp===K.playing)return;last=me;lp=K.playing;const r=K.byName.get(me);const b=$('playRail');if(!b)return;b.querySelector('.pe').innerHTML=avSvg(r);
    b.querySelector('b').textContent='AVATAR';if(!K.playing)$('playSub').textContent=r?(r.own?'President':'@'+r.u).slice(0,12):'ketuk main';b.classList.toggle('has',!!r);b.setAttribute('aria-label',r?'Mainkan avatarmu':'Masuk lalu mainkan avatarmu')}
  upd();setInterval(upd,1000)}
+// ---------- KEBUTUHAN AVATAR: lapar, energi, kebersihan, mood, inspirasi (dari server, turun pelan walau offline) ----------
+{const NB=[['lapar','🍞','Lapar','#F2C94C'],['energi','⚡','Energi','#7CF2FF'],['bersih','🫧','Kebersihan','#9BD8FF'],['mood','😊','Mood','#FF7AC8'],['inspirasi','✨','Inspirasi','#C9B8FF']];
+ const KAR=['Pemula','Asisten','Kru','Profesional','Senior','Maestro'];
+ const NS={n:null,at:0};window.KOTA_NEED=NS;
+ function now(){if(!NS.n)return null;const h=(Date.now()-NS.at)/36e5;const D={lapar:5,energi:2,bersih:4,mood:3,inspirasi:2};const o={...NS.n};for(const k in D)o[k]=Math.max(0,o[k]-D[k]*h);o.lemas=NB.some(([k])=>o[k]<=0);return o}
+ function setN(n){if(!n)return;window.KOTA_ME=store.get('me','');NS.n=n;NS.at=Date.now();if(AK.p&&n.koin!=null){AK.p.koin=n.koin;pillUpdate()}draw();if(window.KOTA&&K.setLemas)K.setLemas(!!n.lemas)}
+ function draw(){const n=now();const hud=$('needHud');if(!hud)return;hud.hidden=!n;if(!n)return;
+   hud.innerHTML=NB.map(([k,ic,nm,c])=>`<span class="nb2${n[k]<20?' low':''}" title="${nm} ${Math.round(n[k])}"><i>${ic}</i><b style="--v:${Math.round(n[k])}%;--c:${c}"></b></span>`).join('');
+   hud.classList.toggle('lemas',n.lemas);if(!$('s-avatar').hidden)R.avatar()}
+ async function load(){if(!store.get('me',''))return;try{const j=await api('status');setN(j.need)}catch(e){}}
+ async function aksi(j,label){try{const r=await api('aksi',{j});setN(r.need);sfx(j==='roti'||j==='nasi'?'coin':'place');toast(label)}catch(e){if(e.j&&e.j.need)setN(e.j.need);toast('⚠️ '+e.message)}}
+ window.KOTA_AKSI=aksi;
+ // dipanggil Studio Rekaman setelah selesai rekam
+ window.KOTA_KERJA=async acc=>{if(!store.get('me',''))return '<span>Masuk pakai username warga biar rekaman dibayar Koin Nada.</span>';
+   try{const j=await api('kerja',{acc});setN(j.need);coinFx('+'+j.gaji);sfx('coin');if(j.naik)toast('🎖️ Naik jabatan jadi '+KAR[j.need.karier]+'! Gaji naik 10%');return `<b>💰 Gaji +${j.gaji} Koin Nada</b> · energi −20, lapar −10`}
+   catch(e){if(e.j&&e.j.need)setN(e.j.need);return '<span>'+esc(e.message)+'</span>'}};
+ const cdTxt=(n,j)=>{const t=n.cd&&n.cd[j];if(!t)return '';const m=Math.ceil((t-(n.now||Date.now())-(Date.now()-NS.at))/60000);return m>0?` · ${m} mnt lagi`:''};
+ R.avatar=()=>{const me=K.byName.get(store.get('me',''));const n=now();const b=$('avBody');
+   if(!me){b.innerHTML='<p>Masuk dulu pakai username warga-mu biar avatarmu punya kebutuhan, bisa kerja dan dapat Koin Nada.</p>'+balaiForm();$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)};return}
+   if(!n){b.innerHTML='<p class="muted">Memuat kondisi avatar…</p>';load();return}
+   const st=n.lemas?'<span class="avst bad">😵 Lemas · rawat dulu biar bisa kerja</span>':n.energi<20?'<span class="avst warn">🥱 Capek · tidur dulu</span>':'<span class="avst ok">🙂 Segar · siap kerja</span>';
+   b.innerHTML=`<div class="avtop">${document.querySelector('.playbig .pe').innerHTML}<div><b>${me.own?'👑 President':'@'+esc(me.u)}</b><small>${esc(me.p||'Warga')} · ${KAR[n.karier||0]} (${n.kerja||0}× kerja)</small>${st}</div><div class="avkoin"><small>Koin Nada</small><b>${(AK.p&&AK.p.koin)||n.koin||0}</b></div></div>
+   <div class="avbars">${NB.map(([k,ic,nm,c])=>`<div class="avb"><span>${ic} ${nm}</span><i><b style="width:${Math.round(n[k])}%;background:${c}"></b></i><em>${Math.round(n[k])}</em></div>`).join('')}</div>
+   <h3>Kerja</h3><div class="avact"><button class="btn" type="button" data-av="kerja">🎙️ Sesi Rekaman<small>+20–60 koin · −20 energi</small></button></div>
+   <h3>Warung Kota</h3><div class="avact"><button class="btn ghost" type="button" data-av="roti">🍞 Roti<small>−15 koin · +25 lapar</small></button><button class="btn ghost" type="button" data-av="nasi">🍚 Nasi<small>−30 koin · +50 lapar</small></button></div>
+   <h3>Di rumah</h3><div class="avact"><button class="btn ghost" type="button" data-av="tidur">🛏️ Tidur<small>+40 energi${cdTxt(n,'tidur')}</small></button><button class="btn ghost" type="button" data-av="mandi">🚿 Mandi<small>+50 kebersihan${cdTxt(n,'mandi')}</small></button></div>
+   <h3>Main & cari inspirasi</h3><div class="avact"><button class="btn ghost" type="button" data-av="nongkrong">🎪 Nongkrong di panggung<small>+12 mood${cdTxt(n,'nongkrong')}</small></button><button class="btn ghost" type="button" data-av="dengar">🎧 Dengar sesi di studio<small>+18 inspirasi${cdTxt(n,'dengar')}</small></button></div>
+   <p class="muted">Semua bar turun pelan, juga waktu kamu offline. Kalau ada yang habis, avatarmu lemas dan belum bisa kerja. Inspirasi di atas 70 = gaji +20%.</p>`;
+   b.querySelectorAll('[data-av]').forEach(x=>x.onclick=()=>{const j=x.dataset.av;if(j==='kerja'){open('studio');return}
+     const L={roti:'🍞 Nyam! Lapar +25',nasi:'🍚 Kenyang! Lapar +50',tidur:'🛏️ Tidur nyenyak, energi +40',mandi:'🚿 Segar! Kebersihan +50',nongkrong:'🎪 Seru nongkrong, mood +12',dengar:'🎧 Dapat inspirasi baru, +18'};aksi(j,L[j])})};
+ $('needHud').onclick=()=>open('avatar');
+ let lastMe=null;setInterval(()=>{const me=store.get('me','');if(me!==lastMe){lastMe=me;NS.n=null;draw();load()}else draw()},5000);
+ setInterval(load,90000);setTimeout(load,1500)}
+
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
 else if(qp.get('buka'))open(qp.get('buka'));
