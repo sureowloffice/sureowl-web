@@ -43,7 +43,7 @@ const hashKey = k => crypto.createHash('sha256').update(k).digest('hex').slice(0
 
 // kebutuhan avatar: turun pelan tiap jam (juga saat offline)
 const NEED_DECAY = { l: 5, e: 2, b: 4, m: 3, i: 2 };
-const AKSI = { roti: { koin: 15, l: 25 }, nasi: { koin: 30, l: 50 }, tidur: { e: 40, cd: 20 }, mandi: { b: 50, cd: 10 }, nongkrong: { m: 12, cd: 10 }, dengar: { i: 18, m: 4, cd: 15 } };
+const AKSI = { roti: { koin: 15, l: 25 }, nasi: { koin: 30, l: 50 }, kopi: { koin: 12, e: 15 }, esteh: { koin: 8, l: 8, m: 5 }, tidur: { e: 40, cd: 20 }, mandi: { b: 50, cd: 10 }, nongkrong: { m: 12, cd: 10 }, dengar: { i: 18, m: 4, cd: 15 } };
 function needNow(raw) {
   let n = null; try { n = raw ? JSON.parse(raw) : null } catch (e) { n = null }
   const now = Date.now(); if (!n) n = { l: 80, e: 80, b: 80, m: 70, i: 50, t: now, kc: 0, cd: {} };
@@ -212,7 +212,7 @@ module.exports = async (req, res) => {
         const [rl] = await redis([['SET', 'rln:' + u, '1', 'NX', 'PX', '1200']]);
         if (!rl) return send(res, 429, { error: 'Pelan-pelan ya.', need: needOut(n, koin) });
         if (A.cd && n.cd[j] && now < n.cd[j]) return send(res, 429, { error: 'Bisa lagi ' + Math.ceil((n.cd[j] - now) / 60000) + ' menit lagi.', need: needOut(n, koin) });
-        if (A.koin && koin < A.koin) return send(res, 400, { error: 'Koin Nada kurang. Kerja dulu di Studio Rekaman.', need: needOut(n, koin) });
+        if (A.koin && koin < A.koin) return send(res, 400, { error: 'Koin Nada kurang. Kerja dulu di Gedung Musik atau Kantor ISR.', need: needOut(n, koin) });
         for (const k of ['l', 'e', 'b', 'm', 'i']) if (A[k]) n[k] = Math.min(100, n[k] + A[k]);
         if (A.cd) n.cd[j] = now + A.cd * 60000;
         const cmds = [['SET', 'need:' + u, JSON.stringify(n)]]; if (A.koin) cmds.push(['DECRBY', 'koin:' + u, String(A.koin)]);
