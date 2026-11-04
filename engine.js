@@ -149,7 +149,7 @@ function world(t){
   for(const [x,y,z,s,c,ph] of CUBES){D(G.box,M.chain(M.T(x,y+Math.sin(t*1.3+ph)*.4,z),M.RY(t*.8+ph),M.RX(t*.5+ph),M.S(s,s,s)),c,{em:1,cast:false})}
   HOLO.forEach(([x,y,z,yaw],i)=>{D(G.plane,M.chain(M.T(x,y+Math.sin(t*1.1+i)*.25,z),M.RY(yaw),M.S(3.2,1.8,1)),[1,1,1],{tex:SCR[i%3],em:1,alpha:.82,cast:false})});
   // mural wall left
-  D(G.box,M.chain(M.T(-46,0,-3),M.RY(Math.PI/2),M.S(16,5.5,.4)),'#231848');D(G.plane,M.chain(M.T(-45.78,2.75,-3),M.RY(Math.PI/2),M.S(15.6,5.3,1)),[1,1,1],{tex:muralTex,em:.7,cast:false});
+  D(G.box,M.chain(M.T(-58,0,-10),M.RY(Math.PI/2),M.S(16,5.5,.4)),'#231848');D(G.plane,M.chain(M.T(-57.78,2.75,-10),M.RY(Math.PI/2),M.S(15.6,5.3,1)),[1,1,1],{tex:muralTex,em:.7,cast:false});
   // plaza ring light
   D(G.cyl16,M.chain(M.T(0,.015,0.5),M.S(9.5,.01,9.5)),'#38E1FF',{em:.9,alpha:.18,cast:false});
 }
