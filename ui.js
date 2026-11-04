@@ -432,6 +432,8 @@ jemput();setInterval(jemput,1000);
   mansion:{cat:'Pemerintahan',ic:'👑',bg:'#FFD23F',nm:'Istana Seni President',al:'Jl. Utama No. 1 · Belakang Panggung',ds:'Istana Seni, rumah President Kota Seni. President lagi ada di dalam.',sec:'ISTANA',act:[['🚪 Masuk istana','mansion']]},
   halte:{cat:'Transportasi',ic:'🚘',bg:'#9BE15D',nm:'Halte Jemputan',al:'Jl. Raya Kota Seni',ds:'Warga baru dijemput mobil tiap jam tepat, lalu turun di sini.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
   papan:{cat:'Sejarah',ic:'🏛️',bg:'#FFD23F',nm:'Papan Pendiri Kota',al:'Plaza Panggung Festival',ds:'10 warga pertama yang ikut membangun Kota Seni.',sec:'PENDIRI',act:[['🪪 Lihat kartu warga','balai']]},
+  bandara:{cat:'Transportasi',ic:'✈️',bg:'#38E1FF',nm:'Bandara Kota Seni',al:'Seberang Jl. Raya Kota Seni',ds:'Warga baru mendarat di sini, lalu mobil jemputan mengantar mereka sampai rumah di cluster masing-masing. Pesawat lepas landas dan mendarat bergantian.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
+  billboard:{cat:'Iklan',ic:'📣',bg:'#FF4FA3',nm:'Billboard Kota',al:'Jl. Raya, bandara & pinggir kota',ds:'Layar digital yang gantian menampilkan kabar kota: warga baru, donatur, Seni Mart, Indo Semar Records. Nanti bisa dipasangi iklan brand.',sec:'TAMPIL SEKARANG',act:[['🎵 Cara jadi warga','jadi']]},
   mart:{cat:'Belanja',ic:'🛒',bg:'#8A57FF',nm:'Seni Mart',al:'Minimarket warga · buka 24 jam',ds:'Belanja makan & minum biar avatar tetap segar. Bayar pakai Koin Nada hasil kerja. Ada di dekat Halte, di Alun-alun dan di gerbang barat kota.',sec:'BELANJA',act:[['🍞 Roti · 15','roti'],['🍚 Nasi · 30','nasi'],['☕ Kopi · 12','kopi'],['🧋 Es Teh · 8','esteh']]},
   taman:{cat:'Ruang publik',ic:'🌳',bg:'#5FBF8A',nm:'Taman Kota',al:'Blok depan kiri · dekat Jl. Raya',ds:'Taman dengan air mancur, pohon, dan bangku. Nanti jadi Taman Donatur berisi nama-nama donatur kota.',sec:'SEGERA',act:[['😊 Cek kondisi avatar','avatar']]},
   lot:{cat:'Lahan',ic:'🗳️',bg:'#B69CFF',nm:'Lahan Kosong',al:'Jl. Nada No. 9 · Distrik Timur',ds:'Gedung berikutnya di sini kalian yang pilih lewat voting.',sec:'VOTING',act:[['🗳️ Lihat voting','voting']]}};
@@ -439,6 +441,7 @@ jemput();setInterval(jemput,1000);
  function extra(k){if(k==='plaza'){const b=K.band();return b.length?chips(b):'<p class="muted">Panggung lagi istirahat.</p>'}
    if(k==='isr')return `<p class="pnow">🎧 ${esc(K.isrMsg())}</p>`;if(String(k).startsWith('mart')){const n=window.KOTA_NEED&&window.KOTA_NEED.n;return `<p class="pnow">${n?'🍞 Lapar '+Math.round(n.lapar)+' · ⚡ Energi '+Math.round(n.energi):'Masuk dulu biar bisa belanja'}</p>`}
    if(k==='studio'){const b=store.get('sgBest',0);return `<p class="pnow">${b?'🏆 Skor terbaikmu: '+b:'Belum pernah rekam. Coba 30 detik aja!'}</p>`}
+   if(k==='bandara'){const d=nowWIB();return `<p class="pnow">✈️ Penerbangan warga baru berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00</p>`}
    if(k==='halte'){const d=nowWIB();return `<p class="pnow">Jemputan berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00 · ${(K.QUEUE||[]).filter(r=>r.q).length} warga antre</p>`}
    if(k==='papan')return chips(K.FOUND||[]);
    if(k==='mansion')return '<p class="pnow">👑 President lagi di rumah</p>';
