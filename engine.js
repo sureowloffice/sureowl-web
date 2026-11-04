@@ -140,7 +140,7 @@ const CUBES=[];for(let i=0;i<34;i++){const a=r2()*Math.PI*2,r=6+r2()*14;CUBES.pu
 const HOLO=[[-6.8,5.2,-1.5,.45],[6.8,5.6,-1.0,-.45],[-9,3.6,4,.8]];
 function world(t){
   D(G.gnd,M.id(),[1,1,1],{tex:gridTex,em:.5,cast:false});
-  D(G.plane,M.chain(M.T(0,9,-75),M.S(40,40,1)),[1,1,1],{tex:sunTex,em:1,cast:false,nofog:1});
+  D(G.plane,M.chain(M.T(0,26,-150),M.S(60,60,1)),[1,1,1],{tex:sunTex,em:1,cast:false,nofog:1});
   for(const B of BUILDINGS){const m=M.chain(M.T(B.x,0,B.z),M.RY(B.yaw),M.S(B.w,B.h,B.d));D(G.box,m,[1,1,1],{tex:B.tex,em:.55});
     D(G.box,M.chain(M.T(B.x,B.h,B.z),M.RY(B.yaw),M.S(B.w+.15,.18,B.d+.15)),B.rim,{em:1,cast:false});
     if(B.scr){D(G.plane,M.chain(M.T(B.x,B.h*.62,B.z),M.RY(B.yaw),M.T(0,0,B.d/2+.08),M.S(B.w*.9,B.w*.9*.5625,1)),[1,1,1],{tex:B.scr,em:1,cast:false})}}
