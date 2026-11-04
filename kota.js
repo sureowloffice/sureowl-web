@@ -54,7 +54,7 @@ function groundAt(sx,sy){const cp=camPos();const f=norm(sub([cam.tx,cam.ty,cam.t
   const fov=(asp<1?cam.fov:Math.min(cam.fov,42))*Math.PI/180,th=Math.tan(fov/2);const nx=sx/innerWidth*2-1,ny=1-sy/innerHeight*2;
   const d=norm(add(add(f,scl(r,nx*th*asp)),scl(u,ny*th)));if(d[1]>-.02)return null;const t=-cp[1]/d[1];return [cp[0]+d[0]*t,cp[2]+d[2]*t]}
 function ensureFocus(){if(!focus)focus={x:cam.tx,z:cam.tz,d:cam.dist};selected=null}
-function panBy(dx,dz){ensureFocus();const nx=clamp(focus.x+dx,-62,62),nz=clamp(focus.z+dz,-96,50);cam.tx+=nx-focus.x;cam.tz+=nz-focus.z;focus.x=nx;focus.z=nz}
+function panBy(dx,dz){ensureFocus();const nx=clamp(focus.x+dx,-62,62),nz=clamp(focus.z+dz,-96,84);cam.tx+=nx-focus.x;cam.tz+=nz-focus.z;focus.x=nx;focus.z=nz}
 function zoomAt(sx,sy,k){ensureFocus();const nd=clamp(cam.dist*k,6,130);const g=sx==null?null:groundAt(sx,sy);if(g){const fr=1-nd/cam.dist;panBy((g[0]-focus.x)*fr,(g[1]-focus.z)*fr)}cam.dist=nd;focus.d=nd}
 function twoState(){const p=[...ptrs.values()];return {d:Math.hypot(p[0][0]-p[1][0],p[0][1]-p[1][1]),a:Math.atan2(p[1][1]-p[0][1],p[1][0]-p[0][0]),mx:(p[0][0]+p[1][0])/2,my:(p[0][1]+p[1][1])/2}}
 let rotDrag=false,tapS=null,lastTap=0;
@@ -70,7 +70,7 @@ function onTap(x,y){const now=performance.now();
       const lim=Math.max(22,Math.min(60,900/cam.dist));if(hb&&hd<lim){lastTap=0;if(window.KOTA_onHouse)window.KOTA_onHouse(hb.r);return}}}
   if(now-lastTap<380){lastTap=0;zoomTo(x,y,.42);return}lastTap=now;
   if(selected&&!PLAY.on){selected=null;if(window.KOTA_onPick)window.KOTA_onPick(null)}}
-function picks(){const P=[['plaza',0,3.2,-3.2,7.5],['plaza',-24,1,0,8],['plaza',19,1,-3,6],['studio',24,3,24,6.5],['isr',-24,6,-24,5],['mansion',0,2.6,-24.4,7],['halte',0,1.2,26,7],['taman',-24,1,24,8],['papan',-9.1,3.8,-3.1,2.6]];MARTS.forEach(([x,z],i)=>P.push(['mart:'+i,x,1.6,z,4.2]));for(const B of CBLK)if(B.n)P.push(['cluster:'+B.C.k,B.bx,1.2,B.bz,Math.max(8,B.rows*2.6)]);for(const K of KAV)P.push(['kav:'+K.n,K.x,.5,K.z,8]);return P}
+function picks(){const P=[['plaza',0,3.2,-3.2,7.5],['plaza',-24,1,0,8],['plaza',19,1,-3,6],['studio',24,3,24,6.5],['bandara',38,3,47,7],['bandara',-28,.5,64,12],['bandara',54,7,46,3],['isr',-24,6,-24,5],['mansion',0,2.6,-24.4,7],['halte',0,1.2,26,7],['taman',-24,1,24,8],['papan',-9.1,3.8,-3.1,2.6]];MARTS.forEach(([x,z],i)=>P.push(['mart:'+i,x,1.6,z,4.2]));BB.forEach(([x,z,y,w,h,el])=>P.push(['billboard',x,el+h/2,z,w*.5]));for(const B of CBLK)if(B.n)P.push(['cluster:'+B.C.k,B.bx,1.2,B.bz,Math.max(8,B.rows*2.6)]);for(const K of KAV)P.push(['kav:'+K.n,K.x,.5,K.z,8]);return P}
 function zoomTo(x,y,k){if(PLAY.on){cam.dist=clamp(cam.dist*k,6,30);return}const g=x==null?null:groundAt(x,y);ensureFocus();if(g){focus.x=clamp(g[0],-62,62);focus.z=clamp(g[1],-96,50)}focus.d=clamp(cam.dist*k,7,130);lastInput=performance.now()}
 glc.addEventListener('contextmenu',e=>e.preventDefault());
 glc.addEventListener('pointerdown',e=>{glc.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);lastInput=performance.now();hideHint();rotDrag=e.button===2||e.shiftKey||e.ctrlKey;if(ptrs.size===1)tapS={x:e.clientX,y:e.clientY,t:performance.now(),ok:true};else tapS=null;if(ptrs.size===2)two=twoState()});
@@ -149,8 +149,8 @@ const NCAR=1,CAR_V=8,CAR_Y=.55,CAR_S=1.45;
 // satu mobil: jemput di jalan raya, berhenti di halte, lalu antar warga baru sampai gerbang cluster rumahnya
 const CAR={cyc:-1,t0:0,R:null};const CAR_OFF=0;
 function carBuild(r){const W=ROAD_Z;const B=r&&r.house&&!r.house.big?r.house.blk:null;const legs=[],stops=[];
-  if(!B){const s=CAR.cyc%2?-1:1;legs.push([[-s*ROAD_X,W],[0,W]],[[0,W],[s*ROAD_X,W]]);stops.push(2.4)}
-  else{const s=B.bx>=0?1:-1,fz=B.bz+12;legs.push([[-s*ROAD_X,W],[0,W]],[[0,W],[s*36,W],[s*36,fz],[B.bx,fz]],[[B.bx,fz],[-s*36,fz],[-s*36,W],[-s*ROAD_X,W]]);stops.push(2.0,3.0)}
+  const A0=[[38,45.5],[38,W],[0,W]];if(!B){legs.push(A0,[[0,W],[-ROAD_X,W]]);stops.push(2.4)}
+  else{const s=B.bx>=0?1:-1,fz=B.bz+12;legs.push(A0,[[0,W],[s*36,W],[s*36,fz],[B.bx,fz]],[[B.bx,fz],[-s*36,fz],[-s*36,W],[-s*ROAD_X,W]]);stops.push(2.0,3.0)}
   const L=legs.map(P=>{const seg=[];let len=0;for(let i=1;i<P.length;i++){const d=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);seg.push(d);len+=d}return {P,seg,len,T:len/CAR_V*1.3}});
   let T=0;L.forEach((l,i)=>{T+=l.T+(stops[i]||0)});return {r,B,L,stops,T,drop:false,halt:false}}
 function polyAt(l,s){let k=0;while(k<l.seg.length-1&&s>l.seg[k]){s-=l.seg[k];k++}const a=l.P[k],b=l.P[k+1],f=l.seg[k]?Math.min(1,s/l.seg[k]):0;const dx=b[0]-a[0],dz=b[1]-a[1],d=Math.hypot(dx,dz)||1;return {x:a[0]+dx*f,z:a[1]+dz*f,dx:dx/d,dz:dz/d,k}}
@@ -657,6 +657,105 @@ function site(t,cp){const [sx,,sz]=SITE;const F=sz+2.2;const beat=Math.pow(Math.
   for(let i=0;i<8;i++){const on=(Math.floor(t*4)+i)%2;D(G.sph,M.chain(M.T(sx+.6+i*.34,2.55,F+1.82),M.S(.07,.07,.07)),on?'#FFE9A8':'#5A4A20',{em:on?1:.2,cast:false})}
   // not musik melayang dari atap
   for(let k=0;k<5;k++){const q=((t*.3+k/5)%1);D(G.box,M.chain(M.T(sx-2.6+k*1.3+Math.sin(t+k)*.4,7.4+q*5,sz-.6),M.RY(t*2+k),M.S(.22,.22,.05)),['#FFD23F','#FF4FA3','#38E1FF','#9BE15D','#FFF7E8'][k],{em:1,alpha:1-q,cast:false})}}
+// ---------- Panggung Festival bersinar: truss, moving head, layar LED, laser, kembang api, confetti ----------
+// semua koordinat di sini lokal alun-alun (ikut diperbesar PXF)
+const FCOL=['#FF4FA3','#38E1FF','#FFD23F','#9BE15D','#B69CFF','#FF7A1A'];
+function festStatic(){const ST='#C9C4D6';
+  for(const sx of [-5.4,5.4]){for(const [a,b] of [[-.35,-.35],[.35,-.35],[-.35,.35],[.35,.35]])D(G.box,M.chain(M.T(sx+a,0,-1.2+b),M.S(.08,8.4,.08)),ST,{em:.25});
+    for(let y=.6;y<8.4;y+=.8){D(G.box,M.chain(M.T(sx,y,-1.55),M.S(.75,.05,.05)),ST,{em:.2,cast:false});D(G.box,M.chain(M.T(sx,y,-.85),M.S(.75,.05,.05)),ST,{em:.2,cast:false});D(G.box,M.chain(M.T(sx-.35,y,-1.2),M.S(.05,.05,.75)),ST,{em:.2,cast:false})}
+    D(G.box,M.chain(M.T(sx,0,-1.2),M.S(1.1,.15,1.1)),'#3A3354',{})}
+  for(const z of [-1.55,-.85])for(const y of [8.25,8.85])D(G.box,M.chain(M.T(0,y,z),M.S(11.6,.08,.08)),ST,{em:.25,cast:false});
+  for(let x=-5;x<=5;x+=.8)D(G.box,M.chain(M.T(x,8.25,-1.2),M.S(.05,.65,.05)),ST,{em:.2,cast:false});
+  // rangka layar LED samping
+  for(const sx of [-7.3,7.3]){D(G.box,M.chain(M.T(sx,5.3,-1.3),M.S(3.1,3.5,.25)),'#0B0918',{});D(G.box,M.chain(M.T((sx+Math.sign(sx)*5.4)/2,8.4,-1.2),M.S(Math.abs(sx)-5.2,.12,.12)),'#C9C4D6',{em:.25,cast:false});D(G.box,M.chain(M.T(sx,8.4,-1.2),M.S(.1,.1,.1)),'#C9C4D6',{});D(G.box,M.chain(M.T(sx,8.8,-1.3),M.S(3.1,.06,.25)),'#38E1FF',{em:1,cast:false})}}
+function festDyn(t){const beat=t*2.1,bi=Math.floor(beat),pulse=Math.pow(Math.max(0,Math.cos((beat%1)*Math.PI*2)),6),col=FCOL[bi%FCOL.length],col2=FCOL[(bi+3)%FCOL.length];
+  // lampu moving head di truss atas + sorotan ke penonton
+  for(let i=0;i<7;i++){const x=-4.5+i*1.5;const sw=Math.sin(t*1.2+i*.9)*.55,tl=-.55-Math.sin(t*.8+i)*.25;const c=i%2?col:col2;
+    D(G.sph,M.chain(M.T(x,7.9,-1.2),M.S(.22,.26,.22)),'#14102B',{cast:false});D(G.sph,M.chain(M.T(x,7.75,-1.05),M.S(.14,.14,.14)),c,{em:1,cast:false});
+    D(G.cone8,M.chain(M.T(x,7.75,-1.1),M.RZ(sw),M.RX(tl),M.T(0,-11,0),M.S(1.25,11,1.25)),c,{em:1,alpha:.13+pulse*.06,cast:false});
+    const ct=Math.cos(tl),st=Math.sin(tl),L=7.7/Math.max(.2,ct*Math.cos(sw));D(G.cyl16,M.chain(M.T(x+ct*Math.sin(sw)*L,.05,Math.min(9,-1.1-st*L)),M.S(1.1,.01,1.1)),c,{em:1,alpha:.22,cast:false})}
+  // sorot langit di belakang panggung
+  for(let i=0;i<4;i++){const s=i<2?-1:1,a=Math.sin(t*.5+i*1.7)*.45;D(G.cone8,M.chain(M.T(s*(3+i%2*1.6),.5,-4.8),M.RZ(s*.15+a),M.RX(-.12),M.S(.9,38,.9)),i%2?'#B69CFF':'#FFF3B0',{em:1,alpha:.1,cast:false,nofog:1})}
+  // layar LED samping: piksel berubah warna mengikuti beat
+  for(const sx of [-7.3,7.3])for(let r=0;r<4;r++)for(let c=0;c<4;c++){const v=Math.sin(t*3+r*.8+c*1.1+(sx>0?2:0))*.5+.5;const cc=FCOL[(bi+r+c)%FCOL.length];D(G.box,M.chain(M.T(sx-1.08+c*.72,5.45+r*.8,-1.16),M.S(.66,.74,.03)),v>.35?cc:'#1B1638',{em:v>.35?.95:.2,cast:false})}
+  // strip lampu di muka & belakang panggung
+  D(G.box,M.chain(M.T(0,.9,.12),M.S(8.2,.1,.1)),col,{em:1,cast:false});D(G.box,M.chain(M.T(0,0,.14),M.S(8.2,.85,.04)),col2,{em:.4+pulse*.6,alpha:.85,cast:false});
+  for(let k=0;k<5;k++)D(G.box,M.chain(M.T(0,1.3+k*.75,-4.32),M.S(7.4,.08,.04)),FCOL[(bi+k)%FCOL.length],{em:1,cast:false});
+  // sorotan di lantai panggung
+  for(let i=0;i<3;i++){const x=Math.sin(t*.7+i*2.1)*3,z=-2.2+Math.cos(t*.9+i)*1.4;D(G.cyl16,M.chain(M.T(x,.93,z),M.S(.9,.01,.9)),FCOL[(bi+i)%6],{em:1,alpha:.35,cast:false})}
+  // laser hijau/pink menyapu penonton (bergantian 8 detik)
+  if(Math.floor(t/8)%2===0){const lc=Math.floor(t/16)%2?'#9BE15D':'#FF4FA3';for(let i=0;i<9;i++){const a=(i-4)*.16+Math.sin(t*1.7)*.35;D(G.box,M.chain(M.T(0,6.3,-1),M.RY(a),M.RX(-.18-Math.sin(t*2.3+i)*.05),M.T(0,0,9),M.S(.035,.035,18)),lc,{em:1,alpha:.8,cast:false})}}
+  // kembang api / pyro di sudut depan panggung tiap 12 detik
+  {const q=(t%12)/1.6;if(q<1)for(const sx of [-3.7,3.7])for(let k=0;k<14;k++){const a=k*2.4,r=.15+q*.5*(k%3);D(G.box,M.chain(M.T(sx+Math.cos(a)*r,1+q*7*(.6+(k%5)*.1),.3+Math.sin(a)*r),M.RY(k),M.S(.12,.12,.12)),k%2?'#FFD23F':'#FF7A1A',{em:1,alpha:1-q*.8,cast:false})}}
+  // confetti di atas penonton
+  for(let i=0;i<36;i++){const h=(i*97)%100/100;const y=8-((t*.9+h*8)%8);const x=-7+((i*53)%140)/10,z=.8+((i*37)%90)/10;D(G.box,M.chain(M.T(x+Math.sin(t+i)*.3,y,z),M.RY(t*3+i),M.RX(t*2+i),M.S(.14,.02,.09)),FCOL[i%6],{em:.9,cast:false})}}
+// ---------- Bandara Kota Seni (depan kota, seberang jalan raya) ----------
+const RWZ=64,RW0=-74,RW1=18;
+for(let i=BUILDINGS.length-1;i>=0;i--){const B=BUILDINGS[i];if(B.x>-86&&B.x<66&&B.z>40&&B.z<90)BUILDINGS.splice(i,1)}
+let bdrTex=null;function bdrSign(){return bdrTex||(bdrTex=texFromCanvas(signCanvas(1024,160,(x,w,h)=>{x.fillStyle='#14102B';x.fillRect(0,0,w,h);x.fillStyle='#38E1FF';x.fillRect(0,h-12,w,12);x.textAlign='center';x.textBaseline='middle';x.fillStyle='#FFF7E8';x.font='900 82px Inter';x.fillText('✈ BANDARA KOTA SENI',w/2,h/2-4)})))}
+function jet(B,t,on){const Wm=m=>M.mul(B,m);
+  D(G.sphHi,Wm(M.S(.8,.8,4.2)),'#FFF7E8',{em:.25});D(G.sph,Wm(M.chain(M.T(0,0,-4.0),M.S(.55,.55,.6))),'#FFF7E8',{em:.25});
+  D(G.box,Wm(M.chain(M.T(0,.05,-3.3),M.S(.95,.25,.7))),'#1B3A6B',{em:.5,cast:false});
+  D(G.box,Wm(M.chain(M.T(0,-.25,-.2),M.S(9.5,.14,1.8))),'#E9E3F7',{em:.2});D(G.box,Wm(M.chain(M.T(0,-.2,-.6),M.S(9.6,.06,.4))),'#FF4FA3',{em:.6,cast:false});
+  for(const s of [-2.2,2.2])D(G.cyl16,Wm(M.chain(M.T(s,-.7,-.9),M.RX(Math.PI/2),M.T(0,-.7,0),M.S(.38,1.4,.38))),'#9A97A6',{});
+  D(G.box,Wm(M.chain(M.T(0,.3,3.6),M.S(.14,2.0,1.2))),'#6C2BFF',{em:.5});D(G.box,Wm(M.chain(M.T(0,.2,3.7),M.S(3.4,.1,.9))),'#E9E3F7',{em:.2});
+  for(const s of [-1,1])D(G.sph,Wm(M.chain(M.T(s*.09,1.6,3.6),M.S(.04,.22,.18))),'#FFF7E8',{em:1,cast:false});
+  D(G.box,Wm(M.chain(M.T(0,0,0),M.S(1.62,.12,7))),'#FF4FA3',{em:.6,cast:false});
+  if(on){D(G.sph,Wm(M.chain(M.T(-4.8,-.25,-.2),M.S(.12,.12,.12))),'#FF3B5C',{em:1,cast:false});D(G.sph,Wm(M.chain(M.T(4.8,-.25,-.2),M.S(.12,.12,.12))),'#9BE15D',{em:1,cast:false})}}
+function airportStatic(){
+  D(G.box,M.chain(M.T(-10,.015,62),M.S(140,.02,40)),'#1C2E33',{cast:false});
+  // landasan pacu + marka + lampu tepi
+  D(G.box,M.chain(M.T((RW0+RW1)/2,.03,RWZ),M.S(RW1-RW0,.02,8)),'#201C2E',{cast:false});
+  for(let x=RW0+6;x<RW1-6;x+=6)D(G.box,M.chain(M.T(x,.045,RWZ),M.S(3,.01,.3)),'#FFF7E8',{em:.35,cast:false});
+  for(const x0 of [RW0+1.5,RW1-1.5])for(let k=-3;k<=3;k++)D(G.box,M.chain(M.T(x0,.045,RWZ+k*1.05),M.S(2.2,.01,.5)),'#FFF7E8',{em:.35,cast:false});
+  for(let x=RW0;x<=RW1;x+=4)for(const s of [-1,1])D(G.sph,M.chain(M.T(x,.12,RWZ+s*4.2),M.S(.12,.12,.12)),'#FFE9A8',{em:1,cast:false});
+  // taxiway, apron, jalan akses & parkir
+  D(G.box,M.chain(M.T(RW1+5,.03,58),M.S(10,.02,4)),'#2A2640',{cast:false});D(G.box,M.chain(M.T(38,.03,55.5),M.S(30,.02,11)),'#3A3654',{cast:false});
+  for(let x=26;x<=50;x+=8)D(G.box,M.chain(M.T(x,.045,55.5),M.S(.12,.01,10)),'#FFD23F',{em:.5,cast:false});
+  D(G.box,M.chain(M.T(38,.012,40.7),M.S(4.4,.02,7.4)),'#231A4D',{cast:false});
+  parking(18,45,6,8,4,1);car(19,43,Math.PI/2,'#FF4FA3');car(19,47,Math.PI/2,'#3FA9FF');
+  // terminal kaca dengan atap lengkung
+  D(G.box,M.chain(M.T(38,0,46.2),M.S(24,.4,6.4)),'#2A2448',{});D(G.box,M.chain(M.T(38,.4,46.2),M.S(22,4.6,5)),'#E9E3F7',{em:.1});
+  D(G.box,M.chain(M.T(38,.7,48.73),M.S(20,3.2,.06)),'#7FD3FF',{em:.7,alpha:.75,cast:false});for(let x=28.5;x<=47.5;x+=2.4)D(G.box,M.chain(M.T(x,.7,48.78),M.S(.12,3.2,.06)),'#C9C4D6',{em:.3,cast:false});
+  D(G.sphHi,M.chain(M.T(38,5,46.2),M.S(11.2,1.0,2.55)),'#EDE7FF',{em:.15});D(G.box,M.chain(M.T(38,4.95,46.2),M.S(23,.12,5.4)),'#38E1FF',{em:.8,cast:false});
+  D(G.plane,M.chain(M.T(38,4.2,48.82),M.S(11,1.72,1)),[1,1,1],{tex:bdrSign(),em:1,cast:false});
+  for(const x of [32,44])D(G.box,M.chain(M.T(x,1.6,50.6),M.S(1.3,1.3,3.8)),'#C9C4D6',{em:.15});
+  // menara ATC
+  D(G.cyl8,M.chain(M.T(54,0,46),M.S(1.1,12,1.1)),'#C9C4D6',{em:.15});D(G.cyl16,M.chain(M.T(54,12,46),M.S(2.3,.3,2.3)),'#3A3354',{});
+  D(G.cyl16,M.chain(M.T(54,12.3,46),M.S(2.1,1.6,2.1)),'#7FD3FF',{em:.75,alpha:.85,cast:false});D(G.cone8,M.chain(M.T(54,13.9,46),M.S(2.4,1,2.4)),'#3A3354',{});
+  // hangar
+  D(G.box,M.chain(M.T(4,0,75),M.S(14,3.2,8)),'#B9B0D6',{em:.1});D(G.sphHi,M.chain(M.T(4,3.2,75),M.S(7,3,4)),'#D6D0EA',{em:.15});D(G.box,M.chain(M.T(4,.02,79.05),M.S(10,3,.06)),'#3A3354',{cast:false});
+  // kantong angin & pesawat parkir
+  D(G.cyl8,M.chain(M.T(RW1+2,0,69.5),M.S(.06,3.2,.06)),'#C9C4D6',{cast:false});D(G.cone8,M.chain(M.T(RW1+2.9,3,69.5),M.RZ(Math.PI/2),M.S(.35,1.8,.35)),'#FF7A1A',{em:.5,cast:false});
+  jet(M.chain(M.T(31,1.25,55.5),M.S(.8,.8,.8)),0,false);jet(M.chain(M.T(45,1.25,55.5),M.S(.8,.8,.8)),0,false);
+  for(let x=-14;x<=-2;x+=4)treeR(x,46,.9,'#2EC4B6')}
+function airport(t){if(!BK.air)BK.air=bake(airportStatic);drawBaked(BK.air);
+  // lampu pendekatan berkedip berurutan, suar menara
+  const q=Math.floor(t*8)%8;for(let i=0;i<8;i++)D(G.sph,M.chain(M.T(RW0-2-i*1.6,.2,RWZ),M.S(.18,.18,.18)),i===q?'#FFFFFF':'#5A5A8A',{em:i===q?1:.3,cast:false});
+  D(G.sph,M.chain(M.T(54,14.9,46),M.S(.3,.3,.3)),(t%1.5)<.7?'#FF3B5C':'#3A0010',{em:1,cast:false});
+  // pesawat lepas landas & mendarat bergantian (siklus 40 detik)
+  const cyc=Math.floor(t/40),u=(t%40)/24;if(u>1)return;let x,y;
+  if(cyc%2===0){x=RW1-4-(RW1-RW0+60)*u*u;y=x<RW0+40?Math.pow((RW0+40-x)/30,1.6)*4:0}else{const v=1-Math.pow(1-u,2);x=RW0-80+(RW1-RW0+70)*v;y=x<RW0+20?Math.pow((RW0+20-x)/30,1.4)*4:0}
+  if(y>45)return;const yaw=cyc%2===0?Math.PI/2:-Math.PI/2;const pitch=y>0?(cyc%2===0?.18:.06):0;
+  jet(M.chain(M.T(x,1.2+y,RWZ),M.RY(yaw),M.RX(pitch)),t,true)}
+// ---------- Billboard digital (ide kota awal) ----------
+const BB=[[-40,42,0,10,5,6.2],[-16,42,0,10,5,6.2],[56,40.5,-.4,8,4,5.5],[-46,8,0,6.4,3.2,10.2,1],[46,8,0,6.4,3.2,11.2,1],[-44,-42,Math.PI/2,9,4.5,6],[44,-30,-Math.PI/2+.2,9,4.5,6]];
+const BBT=[];function bbSlides(){if(BBT.length)return BBT;const mk=(bg,a,b,c,ic)=>texFromCanvas(signCanvas(1024,512,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,bg[0]);g.addColorStop(1,bg[1]);x.fillStyle=g;x.fillRect(0,0,w,h);
+    x.fillStyle='rgba(255,255,255,.08)';for(let i=0;i<14;i++){x.beginPath();x.arc((i*173)%w,(i*97)%h,40+(i%4)*30,0,7);x.fill()}x.textAlign='center';x.textBaseline='middle';
+    if(ic){x.font='150px Inter';x.fillText(ic,w/2,130)}let s=96;const F=v=>x.font='900 '+v+'px Inter';F(s);while(x.measureText(a).width>w-80&&s>40){s-=4;F(s)}x.fillStyle='#FFF7E8';x.fillText(a,w/2,ic?290:200);
+    x.fillStyle='#FFE36B';s=52;x.font='800 '+s+'px Inter';while(x.measureText(b).width>w-80&&s>26){s-=2;x.font='800 '+s+'px Inter'}x.fillText(b,w/2,ic?380:310);if(c){x.fillStyle='rgba(255,255,255,.8)';x.font='700 34px Inter';x.fillText(c,w/2,ic?450:400)}}));
+  const I=window.KOTA_INFO||{};const don=(I.donatur||[]).slice(-1)[0];const nw=RES.filter(r=>r.i>0&&!r.q).slice(-1)[0];
+  BBT.push(mk(['#6C2BFF','#FF4FA3'],'KOTA SENI','kota digital para seniman','kotaseni.vercel.app','🦉'),mk(['#0E0828','#FF4FA3'],'INDO SEMAR RECORDS','rilis baru · dengerin di Radio Kota','kantor label di Distrik Barat','🎧'),
+    mk(['#14102B','#38E1FF'],'FOLLOW @viralindongid','langsung jadi warga Kota Seni','komen = dapat rumah','✈️'),mk(['#5B21E0','#FFD23F'],'SENI MART','roti 15 · nasi 30 · kopi 12','buka 24 jam','🛒'),
+    mk(['#2FB86A','#14102B'],nw?'@'+nw.u:'WARGA BARU','selamat datang di Kota Seni!','dijemput dari bandara','🎉'),mk(['#FFB800','#FF4B4B'],don?'@'+String(don.u||don.n).replace(/^@/,''):'JADI DONATUR KOTA',don?'terima kasih donaturnya!':'namamu tampil di billboard & pesawat','','💛'),
+    mk(['#14102B','#6C2BFF'],'PASANG IKLAN DI SINI','billboard brand Kota Seni','DM @viralindongid','📣'));return BBT}
+function bbStatic(){for(const [x,z,yaw,w,h,el,roof] of BB){const B=M.chain(M.T(x,0,z),M.RY(yaw));const Wm=m=>M.mul(B,m);
+    if(!roof){for(const s of [-1,1])D(G.box,Wm(M.chain(M.T(s*w*.3,0,-.3),M.S(.35,el,.35))),'#3A3354',{});D(G.box,Wm(M.chain(M.T(0,el-.4,-.1),M.S(w+.6,.2,1.2))),'#2A2448',{})}
+    D(G.box,Wm(M.chain(M.T(0,el-.1,-.25),M.S(w+.5,h+.5,.3))),'#14102B',{});D(G.box,Wm(M.chain(M.T(0,el+h+.35,-.25),M.S(w+.6,.12,.34))),'#38E1FF',{em:1,cast:false});
+    for(let i=0;i<4;i++){const lx=-w/2+w*(i+.5)/4;D(G.box,Wm(M.chain(M.T(lx,el-.35,.5),M.S(.1,.1,.5))),'#C9C4D6',{cast:false});D(G.sph,Wm(M.chain(M.T(lx,el-.25,.75),M.S(.13,.13,.13))),'#FFF3B0',{em:1,cast:false})}}}
+function billboards(t){if(!BK.bb)BK.bb=bake(bbStatic);drawBaked(BK.bb);const S=bbSlides();
+  BB.forEach(([x,z,yaw,w,h,el],i)=>{const k=Math.floor(t/7+i*1.7);const f=(t/7+i*1.7)%1;const sq=f>.94?Math.max(.05,1-(f-.94)/.03):f<.03?f/.03:1;
+    D(G.plane,M.chain(M.T(x,0,z),M.RY(yaw),M.T(0,el+.15+h/2,-.08),M.S(w,h*Math.min(1,Math.max(.05,sq)),1)),[1,1,1],{tex:S[k%S.length],em:1,cast:false})})}
 // ---------- main karakter (mode main) ----------
 const PLAY={on:false,r:null,x:0,y:0,z:9,yaw:Math.PI,vx:0,vz:0,emo:'',emoT:0,joy:[0,0],keys:new Set(),moved:0,lastSent:0,nearHome:false};
 addEventListener('keydown',e=>{if(!PLAY.on||/input|textarea/i.test((e.target.tagName||'')))return;const k=e.key.toLowerCase();if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k)){PLAY.keys.add(k);e.preventDefault()}});
@@ -778,7 +877,7 @@ function frame(now){const t=now/1000;
   const tgt=PLAY.on?[PLAY.x,1.1,PLAY.z]:selected?resPos(selected,t):focus?[focus.x,1.5,focus.z]:[HOME.x,1.5,HOME.z];const k=1-Math.exp(-dtn*(PLAY.on?7:3.6));cam.tx+=(tgt[0]-cam.tx)*k;cam.ty+=((selected?1.2:tgt[1])-cam.ty)*k;cam.tz+=(tgt[2]-cam.tz)*k;
   const kd=1-Math.exp(-dtn*3);if(PLAY.on&&ptrs.size===0&&performance.now()-lastInput>4000)cam.dist+=(16-cam.dist)*kd;else if(selected)cam.dist+=(17-cam.dist)*kd;else if(focus&&ptrs.size===0)cam.dist+=(focus.d-cam.dist)*kd;else if(!focus&&!selected&&!PLAY.on)cam.dist+=(HOME.d-cam.dist)*kd;
   const cp=[cam.tx+Math.sin(cam.yaw)*Math.cos(cam.pitch)*cam.dist,cam.ty+Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*Math.cos(cam.pitch)*cam.dist];
-  DL=[];world(t);XF=PXF;stage(99);sign(99);notes(40+t%600);places(t);XF=null;road();houses(t,cp);office(t,cp);staff(t);site(t,cp);decor(t,cp);cars(t);heli(t);sparks(t);planeDraw(t);
+  DL=[];world(t);XF=PXF;stage(99);sign(99);notes(40+t%600);places(t);if(!BK.fest)BK.fest=bake(festStatic);drawBaked(BK.fest);festDyn(t);XF=null;road();houses(t,cp);office(t,cp);staff(t);site(t,cp);decor(t,cp);cars(t);heli(t);sparks(t);airport(t);billboards(t);planeDraw(t);
   vilDraw(t);
   const shown=RES.slice(1,260);for(const r of shown)if(!r.q)resident(r,t,selected===r);if(selected&&selected.i>=260)resident(selected,t,true);
   const sun=norm([-0.55,0.9,0.75]);const lc=[0,0,0];const LV=M.look(add(lc,scl(sun,30)),lc,[0,1,0]);const LP=M.ortho(-26,26,-26,26,1,70);const LVP=M.mul(LP,LV);
@@ -854,5 +953,5 @@ function makeCard(r){const c=document.createElement('canvas');c.width=1080;c.hei
 window.KOTA={get car(){return CAR},intro(){cam.dist=150;focus=null;selected=null},vilSay,fx(u,e,food,msg){FXM.set(String(u).toLowerCase(),{e,food,msg,t0:performance.now()/1000});const r=byName.get(String(u).toLowerCase());if(r){for(let i=0;i<8;i++){const p=resPos(r,performance.now()/1000);SPARK.push([p[0]+(i-4)*.2,1.4,p[2],performance.now()/1000+i*.05])}}},vilTos(){const t=performance.now()/1000;VIL.hopT=t+1.2;VIL.waveT=t+2;VIL.wait=Math.max(VIL.wait,4);for(let i=0;i<10;i++)SPARK.push([VIL.x+(i-5)*.25,1.8,VIL.z,t+i*.04])},get VIL(){return VIL},MARTS,plane:planeSay,get planeU(){return PLANE.cur?(performance.now()/1000-PLANE.t0)/PL_DUR:-1},setLemas(v){LEMAS.on=!!v},KAV,RES,byName,makeCard,jabatan,tgl,arrive,QUEUE,HOUSES,CLUSTERS,band(){return [...BAND.keys()]},FOUND,isrMsg(){return ISR_MSG[Math.floor(performance.now()/5000)%ISR_MSG.length].replace(/^\S+\s/,'').toLowerCase()},select(r){selected=r;if(r)focus=null},zoomStep(k){zoomTo(null,null,k)},get selected(){return selected},
   startPlay,stopPlay,get playing(){return PLAY.on},get me(){return PLAY.r},joy(x,z){PLAY.joy=[x,z]},emote(e){PLAY.emo=e;PLAY.emoT=performance.now()/1000+(e==='dance'?3:e==='music'?3:1.4)},
   pos(){return PLAY.on?{x:+PLAY.x.toFixed(2),z:+PLAY.z.toFixed(2),yaw:+PLAY.yaw.toFixed(2),emo:PLAY.emoT>performance.now()/1000?PLAY.emo:'',moved:PLAY.moved}:null},resetMoved(){PLAY.moved=0},
-  setOnline,focusAt,focusHouse(r){if(r&&r.house){const mn=r.house.mansion;focusAt(r.house.x,r.house.z+(mn?1:0),mn?34:18);cam.yaw=mn?.15:.3;cam.pitch=mn?.68:.55}},focusPlace(k){if(String(k).startsWith('mart')){const m=MARTS[+String(k).split(':')[1]||0];focusAt(m[0],m[1]+1,22);cam.yaw=0;cam.pitch=.6;return}if(String(k).startsWith('kav:')){const K=KAV.find(q=>'kav:'+q.n===k);if(K)focusAt(K.x,K.z,32);return}if(String(k).startsWith('cluster:')){const C=CLUSTERS.find(c=>'cluster:'+c.k===k);if(C){focusAt(C.cx,C.cz,Math.max(30,C.rows*6+16))}return}const P={plaza:[0,-1,44,.3,.55],kampung:[KAMP_C[0],KAMP_C[1],60,0,.88],studio:[24,24,30,.45,.5],isr:[-23,-22,34,-.3,.5],mansion:[0,-23,32,0,.6],halte:[0,26,28,0,.6],taman:[-24,24,28,0,.6],papan:[-6,-1,22,0,.6]}[k];if(k==='home'){focus=null;selected=null;cam.yaw=HOME.yaw;cam.pitch=HOME.pitch;return}if(P){focusAt(P[0],P[1],P[2]);cam.yaw=P[3];cam.pitch=P[4]}},clearFocus(){focus=null}};
+  setOnline,focusAt,focusHouse(r){if(r&&r.house){const mn=r.house.mansion;focusAt(r.house.x,r.house.z+(mn?1:0),mn?34:18);cam.yaw=mn?.15:.3;cam.pitch=mn?.68:.55}},focusPlace(k){if(String(k).startsWith('mart')){const m=MARTS[+String(k).split(':')[1]||0];focusAt(m[0],m[1]+1,22);cam.yaw=0;cam.pitch=.6;return}if(String(k).startsWith('kav:')){const K=KAV.find(q=>'kav:'+q.n===k);if(K)focusAt(K.x,K.z,32);return}if(String(k).startsWith('cluster:')){const C=CLUSTERS.find(c=>'cluster:'+c.k===k);if(C){focusAt(C.cx,C.cz,Math.max(30,C.rows*6+16))}return}const P={plaza:[0,-1,44,.3,.55],kampung:[KAMP_C[0],KAMP_C[1],60,0,.88],studio:[24,24,30,.45,.5],bandara:[20,58,56,.5,.62],billboard:[-28,40,34,0,.5],isr:[-23,-22,34,-.3,.5],mansion:[0,-23,32,0,.6],halte:[0,26,28,0,.6],taman:[-24,24,28,0,.6],papan:[-6,-1,22,0,.6]}[k];if(k==='home'){focus=null;selected=null;cam.yaw=HOME.yaw;cam.pitch=HOME.pitch;return}if(P){focusAt(P[0],P[1],P[2]);cam.yaw=P[3];cam.pitch=P[4]}},clearFocus(){focus=null}};
 })();
