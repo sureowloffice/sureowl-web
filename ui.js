@@ -314,7 +314,7 @@ jemput();setInterval(jemput,1000);
    netT=now;lastEmo=p.emo;K.resetMoved();try{await api('pos',p)}catch(e){}}
  async function poll(){pollT=Date.now();try{const j=await (await fetch('/api/akun?a=online')).json();online=j.online||[];K.setOnline(online,K.playing?store.get('me','').toLowerCase():null);
    const n=online.filter(o=>o.u!==store.get('me','').toLowerCase()).length;$('onlineCt').textContent=n?`🟢 ${n} warga lain lagi main`:'🟢 kamu lagi main';
-   $('playSub').textContent=n?`${n} online`:'jalan-jalan'}catch(e){}}
+   if(K.playing)$('playSub').textContent=n?`${n} online`:'lagi main'}catch(e){}}
  setInterval(()=>{if(document.hidden)return;if(K.playing)sendPos(false);const gap=K.playing?5000:20000;if(Date.now()-pollT>gap)poll()},1000);
  setTimeout(poll,2500);
  // jelajah kota
@@ -446,6 +446,17 @@ jemput();setInterval(jemput,1000);
  if(store.get('railMin',0)){document.querySelector('.rail').classList.add('min');$('railT').textContent='⌄'}
  setInterval(()=>{const r=document.querySelector('[data-open="radio"]');if(r)r.classList.toggle('playing',!!AU.on)},800)}
 
+
+// ---------- tombol AVATAR menampilkan karakter milik warga ----------
+{function avSvg(r){if(!r)return '<svg class="av me" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="15" fill="#2A2452" stroke="#7CF2FF" stroke-width="1.6" stroke-dasharray="3 3"/><text x="24" y="31.5" text-anchor="middle" font-size="15" font-weight="700" fill="#7CF2FF" font-family="Space Grotesk,sans-serif">?</text></svg>';
+   const c=r.col||'#B69CFF';const hat=r.hat&&!r.own?'<ellipse cx="25" cy="10.5" rx="10.5" ry="3" fill="#14102B" transform="rotate(-8 25 10.5)"/>':'';
+   const crown=r.own?'<path d="M15 12l3.5 4 5.5-6 5.5 6 3.5-4v5H15z" fill="#E8C27A" stroke="#7A5A1E" stroke-width=".8"/>':'';
+   return `<svg class="av me" viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="avb" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".45" stop-color="${c}"/><stop offset="1" stop-color="${c}" stop-opacity=".85"/></radialGradient></defs>`+
+     `<ellipse cx="24" cy="44" rx="11" ry="2.2" fill="#000" opacity=".35"/><ellipse cx="24" cy="27" rx="15" ry="16.5" fill="url(#avb)" stroke="rgba(0,0,0,.25)" stroke-width=".8"/>`+
+     `<ellipse cx="18.5" cy="23" rx="5" ry="6" fill="#FFF7E8"/><ellipse cx="29.5" cy="23" rx="5" ry="6" fill="#FFF7E8"/><circle cx="20.2" cy="24.4" r="2.5" fill="#14102B"/><circle cx="31.2" cy="24.4" r="2.5" fill="#14102B"/><circle cx="21" cy="23.4" r=".9" fill="#fff"/><circle cx="32" cy="23.4" r=".9" fill="#fff"/>`+hat+crown+'</svg>'}
+ let last='\u0000',lp=null;function upd(){const me=store.get('me','');if(me===last&&lp===K.playing)return;last=me;lp=K.playing;const r=K.byName.get(me);const b=$('playRail');if(!b)return;b.querySelector('.pe').innerHTML=avSvg(r);
+   b.querySelector('b').textContent='AVATAR';if(!K.playing)$('playSub').textContent=r?(r.own?'President':'@'+r.u).slice(0,12):'ketuk main';b.classList.toggle('has',!!r);b.setAttribute('aria-label',r?'Mainkan avatarmu':'Masuk lalu mainkan avatarmu')}
+ upd();setInterval(upd,1000)}
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
 else if(qp.get('buka'))open(qp.get('buka'));
