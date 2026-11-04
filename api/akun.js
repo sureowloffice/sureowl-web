@@ -27,6 +27,7 @@ async function redis(cmds) {
 }
 
 let wargaCache = { at: 0, set: null };
+let onlineCache = { at: 0, body: null };
 async function warga(host) {
   if (wargaCache.set && Date.now() - wargaCache.at < 60000) return wargaCache.set;
   const r = await fetch('https://' + host + '/warga.json?nc=' + Date.now());
@@ -72,6 +73,19 @@ module.exports = async (req, res) => {
         for (let i = 0; i < (rows || []).length; i += 2) top.push({ u: rows[i], exp: +rows[i + 1], level: level(+rows[i + 1]) });
         res.setHeader('Cache-Control', 'public, max-age=30');
         return send(res, 200, { top });
+      }
+      if (q.get('a') === 'online') { // warga yang sedang main (posisi terakhir < 30 detik)
+        if (onlineCache.at && Date.now() - onlineCache.at < 3000) return send(res, 200, onlineCache.body);
+        const now = Date.now();
+        const [, us] = await redis([['ZREMRANGEBYSCORE', 'online', '-inf', String(now - 60000)], ['ZRANGEBYSCORE', 'online', String(now - 30000), '+inf']]);
+        let list = [];
+        if (us && us.length) {
+          const [vals] = await redis([['MGET', ...us.slice(0, 60).map(u => 'pos:' + u)]]);
+          list = (vals || []).map((v, i) => { try { return v ? Object.assign({ u: us[i] }, JSON.parse(v)) : null } catch (e) { return null } }).filter(Boolean);
+        }
+        const body = { online: list, n: list.length };
+        onlineCache = { at: Date.now(), body };
+        return send(res, 200, body);
       }
       return send(res, 400, { error: 'Permintaan tidak dikenal.' });
     }
@@ -119,6 +133,16 @@ module.exports = async (req, res) => {
     if (!mine) return send(res, 403, { error: 'Username ini sudah dipakai di perangkat lain. Kalau ini akunmu, ambil KTW: kirim kode verifikasi lewat DM ke @viralindongid.', perluKTW: true });
 
     if (a === 'masuk' || a === 'profil') return send(res, 200, { ok: true, profil: await profil(u) });
+
+    if (a === 'pos') { // posisi karakter saat mode main
+      const num = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round((+v || 0) * 100) / 100));
+      const p = { x: num(body.x, -60, 60), z: num(body.z, -40, 34), yaw: num(body.yaw, -50, 50), emo: ['wave', 'dance', 'music'].includes(body.emo) ? body.emo : '' };
+      const [ok] = await redis([['SET', 'rlp:' + u, '1', 'NX', 'PX', '1800']]);
+      if (!ok) return send(res, 200, { ok: true, skip: true });
+      await redis([['SET', 'pos:' + u, JSON.stringify(p), 'EX', '40'], ['ZADD', 'online', String(Date.now()), u]]);
+      return send(res, 200, { ok: true });
+    }
+    if (a === 'keluar') { await redis([['ZREM', 'online', u], ['DEL', 'pos:' + u]]); return send(res, 200, { ok: true }) }
 
     if (a === 'misi') {
       const id = String(body.id || '');
