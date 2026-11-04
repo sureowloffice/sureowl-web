@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%236C2BFF'/%3E%3Cellipse cx='34' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Cellipse cx='67' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Ccircle cx='41' cy='42' r='8' fill='%2314102B'/%3E%3Ccircle cx='74' cy='42' r='8' fill='%2314102B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800&family=DM+Serif+Display&display=swap">
 <style>
 :root{--ink:#14102B;--ink2:#1E1645;--ink3:#2A2058;--purple:#6C2BFF;--violet:#8A57FF;--cream:#FFF7E8;--yellow:#FFD23F;--pink:#FF4FA3;--cyan:#38E1FF;--muted:#B9AEDF;--line:rgba(255,255,255,.12);
 --sans:Inter,system-ui,sans-serif;--brand:Poppins,Inter,system-ui,sans-serif}
@@ -277,6 +277,30 @@ body.playing .mpill{top:calc(env(safe-area-inset-top,0px) + 160px)}
 .rrow{display:flex;align-items:center;gap:6px;margin:6px 0;flex-wrap:wrap}.rrow span{font:800 12px var(--sans);color:#B9AEDF;min-width:56px}
 .rrow .sw{appearance:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer}.rrow .sw.on{box-shadow:0 0 0 3px var(--yellow)}
 #studioIn{bottom:calc(env(safe-area-inset-bottom,0px) + 240px)}
+/* gaya peta kota yang tenang */
+.hint,.start,.arr-m,#mPill{display:none!important}
+.glass{background:rgba(26,21,44,.9)}
+@media (max-width:720px){.bar{flex-direction:column-reverse}.nav{border-top:0;border-bottom:1px solid var(--line);padding:0 0 6px}.arr{display:inline!important;font-size:11px}}
+.rail .rt{background:rgba(255,247,232,.12)!important;color:var(--cream);height:30px;font-size:16px}
+.rail.min button:not(.rt){display:none}
+.nb.playing::before{content:'♪';position:absolute;top:0;right:12px;font:900 12px var(--sans);color:#9BE15D;animation:eqb .7s ease-in-out infinite alternate}
+@keyframes eqb{from{transform:translateY(1px);opacity:.6}to{transform:translateY(-3px);opacity:1}}
+.cta{position:fixed;z-index:4;transform:translate(-50%,-100%);appearance:none;cursor:pointer;display:grid;justify-items:center;gap:2px;background:linear-gradient(180deg,#3B2A6E,#2A1C55);color:var(--cream);border:3px solid #E9B949;border-radius:16px;padding:12px 22px 10px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.cta small{position:absolute;top:-14px;background:#E9B949;color:#2A1C10;font:900 11.5px var(--sans);padding:3px 10px;border-radius:999px;white-space:nowrap}
+.cta b{font:900 17px var(--sans);letter-spacing:.03em;white-space:nowrap}.cta span{font:800 12px var(--sans);color:#E9B949;white-space:nowrap}
+.pcard{padding:0;overflow:auto}.pcard>*:not(.pill-ill):not(.xbtn):not(.pill2){margin-left:20px;margin-right:20px}
+.pcard .xbtn{z-index:3}
+.pill2{position:absolute;top:14px;left:16px;z-index:2;background:rgba(56,225,255,.2);color:#BDF4FF;border:1px solid rgba(56,225,255,.4);font:800 12px var(--sans);padding:5px 12px;border-radius:999px}
+.pill-ill{height:170px;display:grid;place-items:center;background:radial-gradient(circle at 50% 70%,color-mix(in srgb,var(--c,#6C2BFF) 55%,transparent),transparent 65%),linear-gradient(180deg,#221A47,#15102E);border-bottom:1px solid var(--line)}
+.pill-ill span{font-size:86px;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5))}
+.pname{font:400 30px 'DM Serif Display',Georgia,serif;margin-top:16px;letter-spacing:.01em}
+.paddr{margin:4px 0 2px;color:var(--muted);font:600 13px var(--sans)}.pdesc{margin:8px 0 10px;font:600 14px/1.45 var(--sans);color:#E9E3FF}
+.psec{display:flex;gap:8px;align-items:center;margin:6px 0}.psec b{font:900 11.5px var(--sans);letter-spacing:.12em;color:var(--muted)}
+.pnow{font:700 14px var(--sans);margin:4px 0 8px}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px;max-height:150px;overflow:auto}
+.pchip{appearance:none;border:1px solid var(--line);background:var(--ink3);color:var(--cream);font:700 12.5px var(--sans);padding:6px 10px;border-radius:999px;cursor:pointer}
+#plAct{margin-bottom:20px}#plAct .btn{flex:1}
+.playbig{width:72px;height:78px;border-radius:20px;animation:none;box-shadow:0 5px 0 rgba(0,0,0,.4)}.playbig .pe{font-size:30px}.playbig b{font-size:14px}
 .pick{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 250px);transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:18px;max-width:calc(100vw - 24px);animation:pop .25s ease-out}
 .pick[hidden]{display:none}.pk-t{display:grid;min-width:0}.pk-t b{font:900 15px var(--sans);color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pk-t small{font:800 11.5px var(--sans);color:var(--yellow);white-space:nowrap}
 .pick button{appearance:none;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);font:900 13px var(--sans);padding:9px 12px;border-radius:12px;cursor:pointer;white-space:nowrap}
@@ -341,6 +365,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 </header>
 
 <nav class="rail glass" aria-label="Menu warga">
+  <button type="button" id="railT" class="rt" aria-label="Ciutkan menu">⌃</button>
   <button type="button" data-open="rumah" data-tip="Rumahku" style="background:#38E1FF" aria-label="Rumahku">🏠</button>
   <button type="button" data-open="kalender" data-tip="Kalender kota" style="background:#FFD23F" aria-label="Kalender kota">📅</button>
   <button type="button" data-open="voting" data-tip="Voting gedung" style="background:#FF4FA3" aria-label="Voting gedung">🗳️</button>
@@ -350,6 +375,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <button type="button" id="playRail" class="playbig" aria-label="Main karaktermu"><span class="pe">🎮</span><b>MAIN</b><small id="playSub">jalan-jalan</small></button>
   <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk">＋</button><button type="button" id="zOut" aria-label="Zoom keluar">－</button></div>
 </div>
+<button type="button" class="cta" id="cta" style="display:none"><small id="ctaN">Warga Kota Seni</small><b>🪪 AMBIL KARTU WARGA</b><span>Cek namamu di Balai Warga ›</span></button>
 <div class="mpill glass" id="mPill"><button type="button" id="mTitle" class="mt" aria-label="Buka daftar lagu">🎵 <span id="mTitleTx"></span></button><button type="button" id="mBtn" aria-label="Putar atau jeda musik">▶</button><button type="button" id="mNext" aria-label="Lagu berikutnya">⏭</button></div>
 <div class="pick glass" id="pick" hidden><div class="pk-t"><b id="pkName">@warga</b><small id="pkSub">Warga</small></div><button type="button" id="pkHome">🏠 Rumahnya</button><button type="button" id="pkX" aria-label="Tutup">✕</button></div>
 <div class="gomenu glass" id="goMenu" hidden>
@@ -461,6 +487,18 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 </section>
 <button class="chatpop" id="chatPop" type="button" hidden></button>
 
+<!-- Kartu info gedung -->
+<div class="sheet" id="s-place" hidden><div class="card pcard" role="dialog" aria-modal="true" aria-labelledby="plNm">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <div class="pill2" id="plCat">Tempat</div>
+  <div class="pill-ill" id="plIll"><span id="plIc">🏙️</span></div>
+  <h2 class="pname" id="plNm">Tempat</h2>
+  <p class="paddr">📍 <span id="plAl"></span></p>
+  <p class="pdesc" id="plDs"></p>
+  <div class="psec"><b id="plSec"></b></div>
+  <div id="plX"></div>
+  <div class="row" id="plAct"></div>
+</div></div>
 <!-- Studio Rekaman -->
 <div class="sheet" id="s-studio" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-studio">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
@@ -535,7 +573,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=15';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=16';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
