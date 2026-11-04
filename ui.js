@@ -30,7 +30,7 @@ window.toastMsg=m=>{if(!document.querySelector('.sheet:not([hidden])'))toast(m)}
 // ---------- jam ----------
 function tick(){const h=window.hourWIB?window.hourWIB():nowWIB().getUTCHours();const d=nowWIB();
   $('clk').textContent=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
-  $('clkIc').textContent=h>=19.5||h<5?'🌙':h<8?'🌅':h<16?'☀️':'🌇'}
+  $('clkIc').innerHTML=(h>=19.5||h<5)?'<svg class="i" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>':'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'}
 tick();setInterval(tick,15000);
 
 // ---------- warga tiba ----------
@@ -99,10 +99,15 @@ R.rumah=()=>{const me=K.byName.get(store.get('me',''));
 // ---------- AUDIO: musik kota (lagu latar), radio & efek suara ----------
 const SONGS=info.radio||[];
 const AU={ac:null,mus:null,sfx:null,on:false,ti:0,timer:0,nextT:0,step:0,duck:1};
-const TRACKS=[{nm:'Lo-fi Malam Kota',bpm:78,st:'lofi',ch:[[65,69,72,76],[64,67,71,74],[62,65,69,72],[60,64,67,71]],mel:[0,2,1,3,2,1,0,2]},
-  {nm:'Festival Neon',bpm:112,st:'pop',ch:[[60,64,67,72],[67,71,74,79],[69,72,76,81],[65,69,72,77]],mel:[2,3,1,2,0,1,3,2]},
-  {nm:'Studio Session',bpm:90,st:'boom',ch:[[57,60,64,67],[62,65,69,72],[64,67,71,74],[57,60,64,69]],mel:[3,2,0,1,2,3,1,0]},
-  {nm:'Jalan-jalan Sore',bpm:100,st:'pop',ch:[[62,66,69,74],[59,62,66,71],[67,71,74,79],[64,67,71,76]],mel:[1,2,3,2,0,3,1,2]}];
+// lagu kota: lo-fi suasana Natal (lagu-lagu Natal klasik yang sudah domain publik) + lo-fi kota
+const NN={C:0,'C#':1,D:2,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,A:9,'A#':10,B:11};
+function mel(str){const out=[];let st=0;for(const tk of str.replace(/\|/g,' ').trim().split(/\s+/)){const [n,d]=tk.split(':');const L=+d;if(n!=='R'){const m=n.match(/^([A-G]#?)(\d)?$/);out.push([12*((m[2]?+m[2]:5)+1)+NN[m[1]],st,L])}st+=L}return out}
+const CH={C:[48,55,64,67,71],Cm:[48,55,63,67],F:[41,53,57,60,64],G:[43,53,59,62,65],D:[38,54,57,60],Am:[45,55,60,64,67],Dm:[38,53,57,60,65],E:[40,56,59,62]};
+const TRACKS=[
+ {nm:'Jingle Bells · Lo-fi Natal',bpm:74,st:'xmas',ch:'C C C C F C D G C C C C F C G C'.split(' '),mel:mel('E:4 E:4 E:8 | E:4 E:4 E:8 | E:4 G:4 C:6 D:2 | E:16 | F:4 F:4 F:6 F:2 | F:4 E:4 E:4 E:2 E:2 | E:4 D:4 D:4 E:4 | D:8 G:8 | E:4 E:4 E:8 | E:4 E:4 E:8 | E:4 G:4 C:6 D:2 | E:16 | F:4 F:4 F:6 F:2 | F:4 E:4 E:4 E:2 E:2 | G:4 G:4 F:4 D:4 | C:16')},
+ {nm:'Deck the Halls · Lo-fi',bpm:70,st:'xmas',ch:'C C G C C C G C G C D G C C G C'.split(' '),mel:mel('G:6 F:2 E:4 D:4 | C:4 D:4 E:4 C:4 | D:2 E:2 F:2 D:2 E:6 D:2 | C:4 B4:4 C:8 | G:6 F:2 E:4 D:4 | C:4 D:4 E:4 C:4 | D:2 E:2 F:2 D:2 E:6 D:2 | C:4 B4:4 C:8 | D:6 E:2 F:4 D:4 | E:6 F:2 G:4 D:4 | E:2 F#:2 G:4 A:2 B:2 C6:4 | B:4 A:4 G:8 | G:6 F:2 E:4 D:4 | C:4 D:4 E:4 C:4 | A:2 A:2 A:2 A:2 G:6 F:2 | E:4 D:4 C:8')},
+ {nm:'Joy to the World · Lo-fi',bpm:66,st:'xmas',ch:'C G C G F G C C'.split(' '),mel:mel('C6:8 B:6 A:2 | G:12 F:4 | E:8 D:8 | C:12 G:4 | A:12 A:4 | B:12 B:4 | C6:16 | R:16')},
+ {nm:'Malam Natal di Kota Seni',bpm:72,st:'lofi',ch:'F Am Dm C F Am G C'.split(' '),mel:mel('A:4 C6:4 A:4 G:4 | E:8 R:8 | F:4 A:4 D6:6 C6:2 | C6:8 R:8 | A:4 C6:4 F6:4 E6:4 | E6:8 C6:8 | D6:4 C6:4 A:4 G:4 | C6:12 R:4')}];
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 function auInit(){if(AU.ac)return AU.ac;const ac=AU.ac=new (window.AudioContext||window.webkitAudioContext)();
   AU.mus=ac.createGain();AU.mus.gain.value=.34;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3200;AU.mus.connect(lp);lp.connect(ac.destination);
@@ -113,18 +118,22 @@ function voice(f,t,dur,g,type,out){const ac=AU.ac,o=ac.createOscillator(),e=ac.c
 function kick(t,g,out){const ac=AU.ac,o=ac.createOscillator(),e=ac.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(42,t+.14);e.gain.setValueAtTime(g||.55,t);e.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(e);e.connect(out||AU.mus);o.start(t);o.stop(t+.32)}
 function noise(t,dur,g,f,type,out){const ac=AU.ac,b=ac.createBuffer(1,Math.max(1,ac.sampleRate*dur|0),ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const s=ac.createBufferSource();s.buffer=b;const fl=ac.createBiquadFilter();fl.type=type||'highpass';fl.frequency.value=f||7000;const e=ac.createGain();e.gain.value=g;s.connect(fl);fl.connect(e);e.connect(out||AU.mus);s.start(t)}
 const hat=(t,g,o)=>noise(t,.05,g,7000,'highpass',o),snare=(t,g,o)=>{noise(t,.18,g,1800,'bandpass',o);voice(190,t,.1,g*.6,'triangle',o)};
-function sched(){const ac=AU.ac;let T=TRACKS[AU.ti];const SPB=60/T.bpm;
-  while(AU.nextT<ac.currentTime+.3){const st=AU.step,beat=st%16,bar=Math.floor(st/16)%4,t=AU.nextT;const c=T.ch[bar];const m8=T.mel[(Math.floor(st/2)+bar*3)%8];
-    if(T.st==='lofi'){if(beat===0)c.forEach((m,i)=>voice(mtof(m),t+i*.02,SPB*3.6,.06));if(beat===0||beat===10)voice(mtof(c[0]-24),t,SPB*1.8,.2,'sine');
-      if(beat===0||beat===7||beat===10)kick(t,.45);if(beat%4===2)hat(t,.08);if(beat===4||beat===12)snare(t,.07);if(beat===6||beat===13||beat===3)voice(mtof(c[m8]+12),t,SPB*1.1,.05,'sine')}
-    else if(T.st==='pop'){if(beat%4===0)kick(t,.5);if(beat===4||beat===12)snare(t,.12);if(beat%2===0)hat(t,beat%4===2?.09:.04);if(beat%4===2)voice(mtof(c[0]-24),t,SPB*.45,.2,'sawtooth');
-      if(beat===0||beat===6||beat===10)c.forEach(m=>voice(mtof(m),t,SPB*.7,.035,'square'));if(beat%2===1&&bar%2===0||beat%4===3)voice(mtof(c[m8]+12),t,SPB*.5,.05,'triangle')}
-    else{if(beat===0||beat===7||beat===10)kick(t,.55);if(beat===4||beat===12)snare(t,.12);if(beat%2===0)hat(t+(beat%4===2?SPB*.06:0),.06);if(beat===0)voice(mtof(c[0]-24),t,SPB*3,.22,'sine');
-      if(beat===0||beat===8)c.forEach((m,i)=>voice(mtof(m),t+i*.015,SPB*1.6,.05,'triangle'));if(beat===3||beat===11||beat===14)voice(mtof(c[m8]+12),t,SPB*.8,.05,'sine')}
-    AU.nextT+=SPB/4;AU.step++;if(AU.step>=16*4*6){AU.step=0;AU.ti=(AU.ti+1)%TRACKS.length;T=TRACKS[AU.ti];musUI()}}}
+function sched(){const ac=AU.ac;let T=TRACKS[AU.ti];
+  while(AU.nextT<ac.currentTime+.3){const SPB=60/T.bpm;const bars=T.ch.length,LOOP=bars*16;const st=AU.step%LOOP,beat=st%16,bar=Math.floor(st/16);
+    const sw=(beat%2===1)?SPB/4*.18:0;const t=AU.nextT+sw;const c=CH[T.ch[bar]]||CH.C;
+    // akord lembut (seperti electric piano) + bass
+    if(beat===0)c.forEach((m,i)=>voice(mtof(m+12*(i===0?0:0)),t+i*.025,SPB*3.8,i===0?.16:.045,i===0?'sine':'triangle'));
+    if(beat===8)c.slice(1).forEach((m,i)=>voice(mtof(m),t+i*.02,SPB*1.6,.03,'triangle'));
+    if(beat===10)voice(mtof(c[0]),t,SPB*1.4,.12,'sine');
+    // drum lo-fi pelan
+    if(beat===0||beat===7||beat===10)kick(t,.36);if(beat===4||beat===12)snare(t,.05);if(beat%2===0)hat(t,beat%4===2?.05:.025);
+    if(T.st==='xmas'&&beat%4===2)noise(t,.09,.03,9000,'highpass');
+    // melodi
+    for(const [m,s0,L] of T.mel)if(s0===st){voice(mtof(m),t,Math.max(.25,L*SPB/4*1.15),.075,'sine');voice(mtof(m+12),t+.01,Math.max(.2,L*SPB/4*.6),.012,'triangle')}
+    AU.nextT+=SPB/4;AU.step++;if(AU.step>=LOOP*3){AU.step=0;AU.ti=(AU.ti+1)%TRACKS.length;T=TRACKS[AU.ti];musUI()}}}
 function musUI(){const T=TRACKS[AU.ti];const p=$('mPill');if(p){p.classList.toggle('on',AU.on);$('mTitleTx').textContent=T.nm;$('mBtn').textContent=AU.on?'⏸':'▶'}
   const rb=$('radioBox');if(rb){rb.classList.toggle('on',AU.on);$('radioPlay').textContent=AU.on?'❚❚':'▶';$('radioPlay').setAttribute('aria-label',AU.on?'Jeda musik':'Putar musik');$('radioNow').textContent=(AU.on?'Lagi diputar: ':'Siap diputar: ')+T.nm}}
-function music(play,auto){AU.on=play;store.set('bgm',play?1:0);const ac=auInit();if(play){ac.resume();AU.crk.gain.value=TRACKS[AU.ti].st==='lofi'?.5:0;AU.nextT=ac.currentTime+.05;sched();clearInterval(AU.timer);AU.timer=setInterval(sched,100);if(!auto)done('radio')}else{clearInterval(AU.timer)}musUI()}
+function music(play,auto){AU.on=play;store.set('bgm',play?1:0);const ac=auInit();if(play){ac.resume();AU.crk.gain.value=.45;AU.nextT=ac.currentTime+.05;sched();clearInterval(AU.timer);AU.timer=setInterval(sched,100);if(!auto)done('radio')}else{clearInterval(AU.timer)}musUI()}
 function nextSong(){AU.ti=(AU.ti+1)%TRACKS.length;AU.step=0;if(AU.on){AU.nextT=AU.ac.currentTime+.08}musUI();toast('🎵 '+TRACKS[AU.ti].nm)}
 function duck(v){if(AU.mus)AU.mus.gain.setTargetAtTime(.34*v,AU.ac.currentTime,.2)}
 // efek suara
@@ -143,7 +152,7 @@ function sfx(k,o){if(!AU.ac)return;const ac=AU.ac;if(ac.state!=='running')ac.res
 window.KOTA_SFX=sfx;musUI();
 $('radioPlay').onclick=()=>music(!AU.on);
 R.radio=()=>{musUI();
-  $('radioList').innerHTML=TRACKS.map((T,i)=>`<li class="item"><span class="ic">${i===AU.ti&&AU.on?'🔊':'🎵'}</span><span style="min-width:0"><b>${esc(T.nm)}</b><small>Lagu kota · ${T.bpm} BPM</small></span><button class="btn dark" type="button" data-song="${i}" style="margin-left:auto;min-height:36px;padding:0 12px;font-size:13px">Putar</button></li>`).join('')+
+  $('radioList').innerHTML=TRACKS.map((T,i)=>`<li class="item"><span class="ic">${i===AU.ti&&AU.on?'🔊':'🎵'}</span><span style="min-width:0"><b>${esc(T.nm)}</b><small>${T.st==='xmas'?'Lo-fi Natal':'Lo-fi kota'} · ${T.bpm} BPM</small></span><button class="btn dark" type="button" data-song="${i}" style="margin-left:auto;min-height:36px;padding:0 12px;font-size:13px">Putar</button></li>`).join('')+
   (SONGS.length?SONGS.map(s=>`<li class="item"><span class="ic">🎧</span><span style="min-width:0"><b>${esc(s.j)}</b><small>@${esc(s.u)}${s.p?' · '+esc(s.p):''}</small></span>${s.l?`<a class="btn dark" href="${esc(s.l)}" target="_blank" rel="noopener" style="margin-left:auto;min-height:36px;padding:0 12px;font-size:13px">Dengar</a>`:''}</li>`).join(''):
   `<li class="item"><span class="ic">🎙️</span><span><b>Lagu warga segera diputar di sini</b><small>Warga yang punya lagu bisa DM <b>@viralindongid</b>: judul + link Spotify/YouTube.</small></span></li>`);
   $('radioList').querySelectorAll('[data-song]').forEach(b=>b.onclick=()=>{AU.ti=+b.dataset.song;AU.step=0;if(!AU.on)music(true);else AU.nextT=AU.ac.currentTime+.08;musUI();R.radio()})};
@@ -317,7 +326,7 @@ jemput();setInterval(jemput,1000);
  window.KOTA_onPlace=placeGo;/* diganti kartu info di bawah */
  $('zIn').onclick=()=>K.zoomStep(.6);$('zOut').onclick=()=>K.zoomStep(1.65);
  window.KOTA_onCluster=C=>toast(C.nm+' · '+C.n+' rumah · ketuk rumah buat lihat pemiliknya');
- let pickR=null;window.KOTA_onPick=r=>{pickR=r;const p=$('pick');if(!r){p.hidden=true;return}$('pkName').textContent=r.i===0?'🦉 Vilindo':r.own?'👑 President':'@'+r.u;$('pkSub').textContent=(r.i===0?'Wali Kota · lagi keliling mantau kota':r.own?'President Kota Seni · lagi di istana':(r.p||'Warga'))+(r.net?' · 🟢 online':'');$('pkHome').hidden=r.i===0;$('pkHome').textContent=r.own?'🚪 Masuk istana':'🚪 Masuk rumahnya';p.hidden=false};
+ let pickR=null;window.KOTA_onPick=r=>{pickR=r;const p=$('pick');if(!r){p.hidden=true;return}$('pkName').textContent=r.i===0?'🦉 Vilindo':r.own?'👑 President':'@'+r.u;$('pkSub').textContent=(r.i===0?'Wali Kota · lagi keliling mantau kota':r.own?'President Kota Seni · di Istana Seni':(r.p||'Warga'))+(r.net?' · 🟢 online':'');$('pkHome').hidden=r.i===0;$('pkHome').textContent=r.own?'🚪 Masuk istana':'🚪 Masuk rumahnya';p.hidden=false};
  $('pkX').onclick=()=>{K.select(null);$('pick').hidden=true};$('pkHome').onclick=()=>{if(pickR)window.KOTA_ROOM(pickR);$('pick').hidden=true};
  window.KOTA_onHouse=r=>{K.focusHouse(r);window.KOTA_onPick(r)}}
 
@@ -387,7 +396,7 @@ jemput();setInterval(jemput,1000);
  cv.addEventListener('pointermove',e=>{if(RM.edit)draw(tileAt(e))});
  cv.addEventListener('click',e=>{if(!RM.edit)return;const p=tileAt(e);if(!p)return;const d=RM.d;const k=d.it.findIndex(a=>a[0]===p[0]&&a[1]===p[1]);
    if(RM.sel==='🧽'){if(k>=0){d.it.splice(k,1);sfx('erase')}}else{if(k>=0)d.it.splice(k,1);if(d.it.length<40){d.it.push([p[0],p[1],RM.sel]);sfx('place')}}RM.dirty=true;draw(p)});
- function tools(){const t=$('roomTools');if(!RM.edit){t.innerHTML=`<p class="muted">${RM.r.own?'Istana President':'Rumah @'+esc(RM.r.u)} · hanya pemilik rumah yang bisa dekor.</p>`;return}
+ function tools(){const t=$('roomTools');if(!RM.edit){t.innerHTML=`<p class="muted">${RM.r.own?'Istana Seni President':'Rumah @'+esc(RM.r.u)} · hanya pemilik rumah yang bisa dekor.</p>`;return}
    t.innerHTML=`<div class="rpal">${['🧽',...ITEMS].map(e=>`<button type="button" data-it="${e}" class="${e===RM.sel?'on':''}" aria-label="${e==='🧽'?'Hapus perabot':'Pilih '+e}">${e}</button>`).join('')}</div>
    <div class="rrow"><span>Lantai</span>${FLOOR.map((c,i)=>`<button type="button" data-f="${i}" style="background:${c}" class="sw${RM.d.f===i?' on':''}" aria-label="Warna lantai ${i+1}"></button>`).join('')}</div>
    <div class="rrow"><span>Dinding</span>${WALL.map((c,i)=>`<button type="button" data-w="${i}" style="background:${c}" class="sw${RM.d.w===i?' on':''}" aria-label="Warna dinding ${i+1}"></button>`).join('')}</div>
@@ -398,7 +407,7 @@ jemput();setInterval(jemput,1000);
    $('roomReset').onclick=()=>{RM.d=defDeco(RM.r);RM.dirty=true;tools();draw()};
    $('roomSave').onclick=async()=>{store.set('deco_'+RM.r.u.toLowerCase(),RM.d);try{await api('rumah',{deco:RM.d});RM.dirty=false;sfx('coin');toast('🏠 Dekorasi rumahmu tersimpan! Warga lain bisa lihat waktu mampir')}catch(e){toast('🏠 Tersimpan di HP ini. '+(e.message||'Sambungan ke server lagi gangguan'))}}}
  async function enterRoom(r){if(!r)return;const me=store.get('me','');RM.r=r;RM.edit=!!me&&me===r.u.toLowerCase();RM.d=null;RM.dirty=false;RM.sel='🪴';
-   $('roomT').textContent=r.own?'👑 Istana President':'🏠 Rumah @'+r.u;$('roomSub').textContent=RM.edit?'Pilih perabot di bawah, lalu ketuk lantai buat menaruh. 🧽 buat menghapus.':(r.own?'President lagi di rumah':(r.p||'Warga Kota Seni'));
+   $('roomT').textContent=r.own?'👑 Istana Seni President':'🏠 Rumah @'+r.u;$('roomSub').textContent=RM.edit?'Pilih perabot di bawah, lalu ketuk lantai buat menaruh. 🧽 buat menghapus.':(r.own?'President lagi di rumah':(r.p||'Warga Kota Seni'));
    open('room');sfx('door');RM.d=store.get('deco_'+r.u.toLowerCase(),null)||defDeco(r);tools();draw();
    try{const j=await (await fetch('/api/akun?a=rumah&u='+encodeURIComponent(r.u.toLowerCase()))).json();if(j&&j.deco&&RM.r===r&&!RM.dirty){RM.d=j.deco;tools();draw()}}catch(e){}}
  window.KOTA_ROOM=enterRoom}
@@ -408,7 +417,7 @@ jemput();setInterval(jemput,1000);
   plaza:{cat:'Hiburan',ic:'🎪',bg:'#FF4FA3',nm:'Panggung Festival',al:'Jl. Nada No. 1 · Pusat Kota',ds:'Panggung utama Kota Seni. Band warga tampil bergantian tiap 2,5 menit.',sec:'LAGI TAMPIL',act:[['💬 Ngobrol sama warga','chat'],['🎮 Main ke panggung','play']]},
   studio:{cat:'Musik',ic:'🎙️',bg:'#38E1FF',nm:'Studio Rekaman',al:'Jl. Nada No. 7 · Distrik Timur',ds:'Gedung pemenang voting DAY 2. Lagi ON AIR, mampir dan rekam lagu bareng band kota.',sec:'GAME',act:[['▶ Main Rekam Lagu','studio']]},
   isr:{cat:'Perkantoran',ic:'🏢',bg:'#B69CFF',nm:'Indo Semar Records',al:'Jl. Label No. 9 · Distrik Barat',ds:'Kantor label musik Kota Seni.',sec:'KEGIATAN SEKARANG',act:[['📻 Dengerin lagu kota','radio']]},
-  mansion:{cat:'Pemerintahan',ic:'👑',bg:'#FFD23F',nm:'Istana President',al:'Jl. Utama No. 1 · Belakang Panggung',ds:'Rumah President Kota Seni. President lagi ada di dalam.',sec:'ISTANA',act:[['🚪 Masuk istana','mansion']]},
+  mansion:{cat:'Pemerintahan',ic:'👑',bg:'#FFD23F',nm:'Istana Seni President',al:'Jl. Utama No. 1 · Belakang Panggung',ds:'Istana Seni, rumah President Kota Seni. President lagi ada di dalam.',sec:'ISTANA',act:[['🚪 Masuk istana','mansion']]},
   halte:{cat:'Transportasi',ic:'🚘',bg:'#9BE15D',nm:'Halte Jemputan',al:'Jl. Raya Kota Seni',ds:'Warga baru dijemput mobil tiap jam tepat, lalu turun di sini.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
   papan:{cat:'Sejarah',ic:'🏛️',bg:'#FFD23F',nm:'Papan Pendiri Kota',al:'Plaza Panggung Festival',ds:'10 warga pertama yang ikut membangun Kota Seni.',sec:'PENDIRI',act:[['🪪 Lihat kartu warga','balai']]},
   lot:{cat:'Lahan',ic:'🗳️',bg:'#B69CFF',nm:'Lahan Kosong',al:'Jl. Nada No. 9 · Distrik Timur',ds:'Gedung berikutnya di sini kalian yang pilih lewat voting.',sec:'VOTING',act:[['🗳️ Lihat voting','voting']]}};
@@ -421,7 +430,8 @@ jemput();setInterval(jemput,1000);
    if(k==='mansion')return '<p class="pnow">👑 President lagi di rumah</p>';
    if(k==='lot'){const V=(data.vote||[]).slice().sort((a,b)=>(b.v||0)-(a.v||0));return `<p class="pnow">${V.length?'Terdepan: '+esc(V[0].n)+' ('+(V[0].v||0)+' suara)':'Voting segera dibuka'}</p>`}return ''}
  function show(k){let P=PL[k];let body='';
-   if(String(k).startsWith('cluster:')){const C=(K.CLUSTERS||[]).find(c=>'cluster:'+c.k===k);if(!C)return;const L=K.HOUSES.filter(h=>h.seg===C).map(h=>h.r);
+   if(String(k).startsWith('kav:')){const n=k.slice(4);P={cat:'Lahan',ic:'📐',bg:'#E8C27A',nm:'Kavling Kosong No. '+n,al:'Kota Seni · siap dibangun',ds:'Petak ini masih kosong. Gedung baru di Kota Seni dipilih lewat voting warga, ikut voting biar kotamu makin ramai.',sec:'STATUS',act:[['🗳️ Ikut voting','voting'],['🎵 Ajak teman jadi warga','jadi']]};body='<p class="pnow">🟡 Tersedia</p>'}
+   else if(String(k).startsWith('cluster:')){const C=(K.CLUSTERS||[]).find(c=>'cluster:'+c.k===k);if(!C)return;const L=K.HOUSES.filter(h=>h.seg===C).map(h=>h.r);
      P={cat:'Hunian',ic:C.nm.split(' ')[0],bg:C.col,nm:C.nm.replace(/^\S+\s/,''),al:'Kampung Warga · '+C.n+' rumah',ds:'Ketuk nama warga buat mampir ke rumahnya.',sec:'WARGA',act:[]};body=chips(L)}else if(P)body=extra(k);if(!P)return;
    $('plCat').textContent=P.cat;$('plIll').style.setProperty('--c',P.bg);$('plIc').textContent=P.ic;$('plNm').textContent=P.nm;$('plAl').textContent=P.al;$('plDs').textContent=P.ds;$('plSec').textContent=P.sec;$('plX').innerHTML=body;
    $('plAct').innerHTML=P.act.map(([t,a],i)=>`<button class="btn${i?' ghost':''}" type="button" data-a="${a}">${t}</button>`).join('');
