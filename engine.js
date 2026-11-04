@@ -107,7 +107,7 @@ const wallTex=texFromCanvas(signCanvas(1024,512,(x,w,h)=>{const g=x.createLinear
 
 // ================== draw helpers ==================
 let DL=[];// display list per frame: {g,m,c,tex,em,alpha,cast}
-function D(g,m,c,o={}){DL.push({g,m,c:typeof c=='string'?hex(c):c,tex:o.tex||null,em:o.em||0,alpha:o.alpha==null?1:o.alpha,cast:o.cast!==false,nofog:o.nofog||0})}
+let XF=null;function D(g,m,c,o={}){DL.push({g,m:XF?M.mul(XF,m):m,c:typeof c=='string'?hex(c):c,tex:o.tex||null,em:o.em||0,alpha:o.alpha==null?1:o.alpha,cast:o.cast!==false,nofog:o.nofog||0})}
 function bindGeo(g){gl.bindBuffer(gl.ARRAY_BUFFER,g.b);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,32,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,32,12);gl.enableVertexAttribArray(2);gl.vertexAttribPointer(2,2,gl.FLOAT,false,32,24)}
 
 // world objects (DIGITAL)
@@ -151,7 +151,7 @@ function world(t){
   // mural wall left
   D(G.box,M.chain(M.T(-58,0,-10),M.RY(Math.PI/2),M.S(16,5.5,.4)),'#231848');D(G.plane,M.chain(M.T(-57.78,2.75,-10),M.RY(Math.PI/2),M.S(15.6,5.3,1)),[1,1,1],{tex:muralTex,em:.7,cast:false});
   // plaza ring light
-  D(G.cyl16,M.chain(M.T(0,.015,0.5),M.S(9.5,.01,9.5)),'#38E1FF',{em:.9,alpha:.18,cast:false});
+  D(G.cyl16,M.chain(M.T(0,.015,-.6),M.S(12.5,.01,8.6)),'#38E1FF',{em:.9,alpha:.16,cast:false});
 }
 
 // ================== mascot (Wali Kota) ==================
