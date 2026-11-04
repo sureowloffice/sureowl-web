@@ -41,6 +41,21 @@ const yesterday = () => new Date(Date.now() + 7 * 36e5 - 864e5).toISOString().sl
 const level = exp => Math.floor(Math.sqrt((exp || 0) / 25)) + 1;
 const hashKey = k => crypto.createHash('sha256').update(k).digest('hex').slice(0, 32);
 
+// kebutuhan avatar: turun pelan tiap jam (juga saat offline)
+const NEED_DECAY = { l: 5, e: 2, b: 4, m: 3, i: 2 };
+const AKSI = { roti: { koin: 15, l: 25 }, nasi: { koin: 30, l: 50 }, tidur: { e: 40, cd: 20 }, mandi: { b: 50, cd: 10 }, nongkrong: { m: 12, cd: 10 }, dengar: { i: 18, m: 4, cd: 15 } };
+function needNow(raw) {
+  let n = null; try { n = raw ? JSON.parse(raw) : null } catch (e) { n = null }
+  const now = Date.now(); if (!n) n = { l: 80, e: 80, b: 80, m: 70, i: 50, t: now, kc: 0, cd: {} };
+  const h = Math.max(0, (now - (n.t || now)) / 36e5);
+  for (const k in NEED_DECAY) n[k] = Math.max(0, Math.min(100, (n[k] == null ? 80 : n[k]) - NEED_DECAY[k] * h));
+  n.t = now; n.cd = n.cd || {}; return n;
+}
+const r1 = x => Math.round(x * 10) / 10;
+function needOut(n, koin) {
+  return { lapar: r1(n.l), energi: r1(n.e), bersih: r1(n.b), mood: r1(n.m), inspirasi: r1(n.i), lemas: ['l', 'e', 'b', 'm', 'i'].some(k => n[k] <= 0), kerja: n.kc || 0, karier: Math.min(5, Math.floor((n.kc || 0) / 10)), koin, cd: n.cd, now: Date.now() };
+}
+
 function send(res, code, obj) {
   res.statusCode = code;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -144,7 +159,7 @@ module.exports = async (req, res) => {
 
     if (a === 'pos') { // posisi karakter saat mode main
       const num = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round((+v || 0) * 100) / 100));
-      const p = { x: num(body.x, -60, 60), z: num(body.z, -80, 34), yaw: num(body.yaw, -50, 50), emo: ['wave', 'dance', 'music'].includes(body.emo) ? body.emo : '' };
+      const p = { x: num(body.x, -60, 60), z: num(body.z, -95, 46), yaw: num(body.yaw, -50, 50), emo: ['wave', 'dance', 'music'].includes(body.emo) ? body.emo : '' };
       const [ok] = await redis([['SET', 'rlp:' + u, '1', 'NX', 'PX', '1800']]);
       if (!ok) return send(res, 200, { ok: true, skip: true });
       await redis([['SET', 'pos:' + u, JSON.stringify(p), 'EX', '40'], ['ZADD', 'online', String(Date.now()), u]]);
@@ -185,6 +200,37 @@ module.exports = async (req, res) => {
       koin += bonus;
       await redis([['INCRBY', 'koin:' + u, String(koin)], ['INCRBY', 'exp:' + u, String(koin)], ['ZINCRBY', 'papan:exp', String(koin), u]]);
       return send(res, 200, { ok: true, dapat: koin, bonus, profil: await profil(u) });
+    }
+    // ---- kebutuhan avatar (game): lapar, energi, kebersihan, mood, inspirasi ----
+    if (a === 'status' || a === 'aksi' || a === 'kerja') {
+      const [raw, koinS] = await redis([['GET', 'need:' + u], ['GET', 'koin:' + u]]);
+      const n = needNow(raw); const now = Date.now(); let koin = +koinS || 0;
+      if (a === 'status') { await redis([['SET', 'need:' + u, JSON.stringify(n)]]); return send(res, 200, { ok: true, need: needOut(n, koin) }) }
+      if (a === 'aksi') {
+        const j = String(body.j || ''); const A = AKSI[j];
+        if (!A) return send(res, 400, { error: 'Aksi tidak dikenal.' });
+        const [rl] = await redis([['SET', 'rln:' + u, '1', 'NX', 'PX', '1200']]);
+        if (!rl) return send(res, 429, { error: 'Pelan-pelan ya.', need: needOut(n, koin) });
+        if (A.cd && n.cd[j] && now < n.cd[j]) return send(res, 429, { error: 'Bisa lagi ' + Math.ceil((n.cd[j] - now) / 60000) + ' menit lagi.', need: needOut(n, koin) });
+        if (A.koin && koin < A.koin) return send(res, 400, { error: 'Koin Nada kurang. Kerja dulu di Studio Rekaman.', need: needOut(n, koin) });
+        for (const k of ['l', 'e', 'b', 'm', 'i']) if (A[k]) n[k] = Math.min(100, n[k] + A[k]);
+        if (A.cd) n.cd[j] = now + A.cd * 60000;
+        const cmds = [['SET', 'need:' + u, JSON.stringify(n)]]; if (A.koin) cmds.push(['DECRBY', 'koin:' + u, String(A.koin)]);
+        const out = await redis(cmds); if (A.koin) koin = +out[1];
+        return send(res, 200, { ok: true, need: needOut(n, koin) });
+      }
+      // kerja: dipanggil setelah mini game selesai; gaji sesuai akurasi, jabatan & inspirasi
+      const acc = Math.max(0, Math.min(1, +body.acc || 0));
+      if (['l', 'e', 'b', 'm', 'i'].some(k => n[k] <= 0)) return send(res, 400, { error: 'Avatarmu lemas. Rawat dulu (makan, tidur, mandi) baru bisa kerja.', need: needOut(n, koin) });
+      if (n.e < 20) return send(res, 400, { error: 'Energi kurang. Tidur dulu di rumah.', need: needOut(n, koin) });
+      const [rl] = await redis([['SET', 'rlk:' + u, '1', 'NX', 'PX', '25000']]);
+      if (!rl) return send(res, 429, { error: 'Istirahat sebentar sebelum kerja lagi.', need: needOut(n, koin) });
+      const lv = Math.min(5, Math.floor((n.kc || 0) / 10));
+      const gaji = Math.min(90, Math.round((20 + 40 * acc) * (1 + 0.1 * lv) * (n.i >= 70 ? 1.2 : 1)));
+      n.e = Math.max(0, n.e - 20); n.l = Math.max(0, n.l - 10); n.b = Math.max(0, n.b - 5); n.m = Math.min(100, n.m + 5); n.i = Math.max(0, n.i - 3); n.kc = (n.kc || 0) + 1;
+      const out = await redis([['SET', 'need:' + u, JSON.stringify(n)], ['INCRBY', 'koin:' + u, String(gaji)], ['INCRBY', 'exp:' + u, String(gaji)], ['ZINCRBY', 'papan:exp', String(gaji), u]]);
+      const naik = Math.min(5, Math.floor(n.kc / 10)) > lv;
+      return send(res, 200, { ok: true, gaji, naik, need: needOut(n, +out[1]) });
     }
     return send(res, 400, { error: 'Aksi tidak dikenal.' });
   } catch (e) {
