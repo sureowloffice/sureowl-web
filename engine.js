@@ -85,7 +85,7 @@ function texFromCanvas(cv){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_
 // ================== meshes ==================
 seed=11;
 const G={box:upload(box(1,1,1)),cyl8:upload(cyl(1,1,1,8)),cyl16:upload(cyl(1,1,1,16)),cone6:upload(cyl(0,1,1,6)),cone8:upload(cyl(0,1,1,8)),
- sph:upload(sphere(1,6,10)),sphHi:upload(sphere(1,12,20)),plane:upload(plane(1,1)),ground:upload(ground(80,40)),gnd:upload((()=>{const g=new Geo();const S=90,R=45,x=S/2;g.tri([-x,0,-x],[x,0,-x],[x,0,x],[0,0],[R,0],[R,R],null,[0,1,0]);g.tri([-x,0,-x],[x,0,x],[-x,0,x],[0,0],[R,R],[0,R],null,[0,1,0]);return g})())};
+ sph:upload(sphere(1,6,10)),sphHi:upload(sphere(1,12,20)),plane:upload(plane(1,1)),ground:upload(ground(80,40)),gnd:upload((()=>{const g=new Geo();const S=240,R=120,x=S/2;g.tri([-x,0,-x],[x,0,-x],[x,0,x],[0,0],[R,0],[R,R],null,[0,1,0]);g.tri([-x,0,-x],[x,0,x],[-x,0,x],[0,0],[R,R],[0,R],null,[0,1,0]);return g})())};
 // ================== palette ==================
 const C={grass:'#79C46A',grass2:'#5FAE57',trunk:'#8A5A3B',leaf:'#3E9A4E',leaf2:'#57B85C',rock:'#A9A7A0',cloud:'#FFFFFF',
  purple:'#6C2BFF',purpleD:'#4A1BC2',ink:'#14102B',cream:'#FFF7E8',yellow:'#FFD23F',pink:'#FF5A8C',wood:'#C98B52',woodD:'#9E6838',
@@ -149,7 +149,7 @@ function world(t){
   for(const [x,y,z,s,c,ph] of CUBES){D(G.box,M.chain(M.T(x,y+Math.sin(t*1.3+ph)*.4,z),M.RY(t*.8+ph),M.RX(t*.5+ph),M.S(s,s,s)),c,{em:1,cast:false})}
   HOLO.forEach(([x,y,z,yaw],i)=>{D(G.plane,M.chain(M.T(x,y+Math.sin(t*1.1+i)*.25,z),M.RY(yaw),M.S(3.2,1.8,1)),[1,1,1],{tex:SCR[i%3],em:1,alpha:.82,cast:false})});
   // mural wall left
-  D(G.box,M.chain(M.T(-15.5,0,-1),M.RY(Math.PI/2),M.S(12,4.5,.4)),'#231848');D(G.plane,M.chain(M.T(-15.28,2.25,-1),M.RY(Math.PI/2),M.S(11.6,4.3,1)),[1,1,1],{tex:muralTex,em:.7,cast:false});
+  D(G.box,M.chain(M.T(-46,0,-3),M.RY(Math.PI/2),M.S(16,5.5,.4)),'#231848');D(G.plane,M.chain(M.T(-45.78,2.75,-3),M.RY(Math.PI/2),M.S(15.6,5.3,1)),[1,1,1],{tex:muralTex,em:.7,cast:false});
   // plaza ring light
   D(G.cyl16,M.chain(M.T(0,.015,0.5),M.S(9.5,.01,9.5)),'#38E1FF',{em:.9,alpha:.18,cast:false});
 }
