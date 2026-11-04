@@ -270,7 +270,7 @@ jemput();setInterval(jemput,1000);
    netT=now;lastEmo=p.emo;K.resetMoved();try{await api('pos',p)}catch(e){}}
  async function poll(){pollT=Date.now();try{const j=await (await fetch('/api/akun?a=online')).json();online=j.online||[];K.setOnline(online,K.playing?store.get('me','').toLowerCase():null);
    const n=online.filter(o=>o.u!==store.get('me','').toLowerCase()).length;$('onlineCt').textContent=n?`🟢 ${n} warga lain lagi main`:'🟢 kamu lagi main';
-   $('playRail').dataset.tip=n?`Main karaktermu · ${n} online`:'Main karaktermu'}catch(e){}}
+   $('playSub').textContent=n?`${n} online`:'jalan-jalan'}catch(e){}}
  setInterval(()=>{if(document.hidden)return;if(K.playing)sendPos(false);const gap=K.playing?5000:20000;if(Date.now()-pollT>gap)poll()},1000);
  setTimeout(poll,2500);
  // jelajah kota
@@ -278,8 +278,12 @@ jemput();setInterval(jemput,1000);
  $('goMenu').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{$('goMenu').hidden=true;const g=b.dataset.go;
    if(g==='rumahku'){const me=K.byName.get(store.get('me',''));if(me){K.focusHouse(me);toast('🏠 Ini rumahmu, @'+me.u+'!')}else open('rumah');return}
    placeGo(g)});
- function placeGo(g){K.focusPlace(g);const T={home:'🗺️ Seluruh Kota Seni',plaza:'🎪 Panggung Festival · musisi tampil, ilustrator, booth kamera & tarot di sekitarnya',kampung:'🏘️ Kampung Warga · ketuk rumah buat lihat pemiliknya',studio:'🏗️ Studio Rekaman sedang dibangun · hasil voting warga!'};if(T[g])toast(T[g])}
+ function placeGo(g){K.focusPlace(g);const T={home:'🗺️ Seluruh Kota Seni',plaza:'🎪 Panggung Festival · musisi tampil, ilustrator, booth kamera & tarot di sekitarnya',kampung:'🏘️ Kampung Warga · ketuk rumah buat lihat pemiliknya',studio:'🏗️ Studio Rekaman sedang dibangun · hasil voting warga!',isr:'🏢 Indo Semar Records · kantor label musik Kota Seni'};if(T[g])toast(T[g])}
  window.KOTA_onPlace=placeGo;
+ $('zIn').onclick=()=>K.zoomStep(.6);$('zOut').onclick=()=>K.zoomStep(1.65);
+ window.KOTA_onCluster=C=>toast(C.nm+' · '+C.n+' rumah · ketuk rumah buat lihat pemiliknya');
+ let pickR=null;window.KOTA_onPick=r=>{pickR=r;const p=$('pick');if(!r){p.hidden=true;return}$('pkName').textContent='@'+r.u;$('pkSub').textContent=(r.own?'💎 Pemilik Kota':(r.p||'Warga'))+(r.net?' · 🟢 online':'');p.hidden=false};
+ $('pkX').onclick=()=>{K.select(null);$('pick').hidden=true};$('pkHome').onclick=()=>{if(pickR&&window.KOTA_onHouse)window.KOTA_onHouse(pickR);$('pick').hidden=true};
  window.KOTA_onHouse=r=>{const me=store.get('me','');if(r.u.toLowerCase()===me){open('rumah');return}K.focusHouse(r);toast('🏠 Rumah @'+r.u+' · '+(r.p||'Warga'))}}
 
 // ---------- deep link ----------
