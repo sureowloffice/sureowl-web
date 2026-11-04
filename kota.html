@@ -352,6 +352,19 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .playbig small{max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chatbtn i{background:none!important;box-shadow:none!important;border-radius:0!important}
 @media (max-width:720px){.playbig{width:68px!important;height:78px!important}}
+.needhud{appearance:none;cursor:pointer;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:74px;padding:6px 5px;border-radius:14px;border:1px solid var(--line2)}
+.needhud[hidden]{display:none}.needhud .nb2{display:grid;justify-items:center;gap:2px}.needhud i{font-style:normal;font-size:10px;line-height:1}
+.needhud b{display:block;width:6px;height:26px;border-radius:3px;background:linear-gradient(to top,var(--c) var(--v),rgba(255,255,255,.1) var(--v))}
+.needhud .low b{box-shadow:0 0 6px #FF6B6B}.needhud.lemas{border-color:#FF6B6B!important;animation:lem 1.2s ease-in-out infinite}
+@keyframes lem{50%{box-shadow:0 0 14px rgba(255,107,107,.6)}}
+.avtop{display:flex;gap:12px;align-items:center;margin:6px 0 12px}.avtop svg{width:58px;height:58px;flex:none}.avtop>div{display:grid;gap:3px;min-width:0;flex:1}.avtop b{font:700 16px var(--sans)}.avtop small{color:var(--muted);font:600 12px var(--sans)}
+.avkoin{flex:none!important;text-align:right}.avkoin b{font:700 22px var(--brand);color:var(--gold)}
+.avst{font:700 12px var(--sans);padding:3px 8px;border-radius:999px;justify-self:start}.avst.ok{background:rgba(155,225,93,.15);color:#9BE15D}.avst.warn{background:rgba(242,201,76,.15);color:#F2C94C}.avst.bad{background:rgba(255,107,107,.15);color:#FF8A8A}
+.avbars{display:grid;gap:7px;margin-bottom:8px}.avb{display:grid;grid-template-columns:110px 1fr 30px;align-items:center;gap:8px;font:600 13px var(--sans)}
+.avb i{height:9px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.avb i b{display:block;height:100%;border-radius:5px}.avb em{font-style:normal;text-align:right;color:var(--muted)}
+.avact{display:grid;grid-template-columns:1fr 1fr;gap:8px}.avact .btn{display:grid;justify-items:start;text-align:left;padding:10px 12px;min-height:56px}.avact .btn small{font:600 11px var(--sans);opacity:.75}
+.avact .btn:only-child{grid-column:1/-1}
+.sgpay{text-align:center;font:600 14px var(--sans);color:var(--gold);min-height:1em}
 .pick{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 250px);transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:18px;max-width:calc(100vw - 24px);animation:pop .25s ease-out}
 .pick[hidden]{display:none}.pk-t{display:grid;min-width:0}.pk-t b{font:900 15px var(--sans);color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pk-t small{font:800 11.5px var(--sans);color:var(--yellow);white-space:nowrap}
 .pick button{appearance:none;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);font:900 13px var(--sans);padding:9px 12px;border-radius:12px;cursor:pointer;white-space:nowrap}
@@ -424,6 +437,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 </nav>
 <div class="leftctl">
   <button type="button" id="playRail" class="playbig" aria-label="Main pakai avatarmu"><span class="pe"><svg class="av" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="avg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7CF2FF"/><stop offset=".55" stop-color="#9B7CFF"/><stop offset="1" stop-color="#FF7AC8"/></linearGradient></defs><circle cx="24" cy="18" r="8" fill="none" stroke="url(#avg)" stroke-width="2.6"/><path d="M9.5 40c1.8-7.5 7.6-11.5 14.5-11.5S36.7 32.5 38.5 40" fill="none" stroke="url(#avg)" stroke-width="2.6" stroke-linecap="round"/><path d="M4 12V6h6M44 12V6h-6M4 36v6h6M44 36v6h-6" fill="none" stroke="#7CF2FF" stroke-width="2" stroke-linecap="round" opacity=".8"/></svg></span><b>AVATAR</b><small id="playSub">jalan-jalan</small></button>
+  <button type="button" class="needhud glass" id="needHud" hidden aria-label="Kondisi avatar"></button>
   <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></button><button type="button" id="zOut" aria-label="Zoom keluar"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button></div>
 </div>
 <button type="button" class="cta" id="cta" style="display:none"><small id="ctaN">Warga Kota Seni</small><b>🪪 AMBIL KARTU WARGA</b><span>Cek namamu di Balai Warga ›</span></button>
@@ -538,6 +552,13 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 </section>
 <button class="chatpop" id="chatPop" type="button" hidden></button>
 
+<!-- Avatarku: kebutuhan & kerja -->
+<div class="sheet" id="s-avatar" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-avatar">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-avatar">Avatarku</h2>
+  <p class="sub">Rawat avatarmu biar tetap segar dan bisa kerja</p>
+  <div id="avBody"></div>
+</div></div>
 <!-- Kartu info gedung -->
 <div class="sheet" id="s-place" hidden><div class="card pcard" role="dialog" aria-modal="true" aria-labelledby="plNm">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
@@ -558,6 +579,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <div class="sgame"><canvas id="sgCv" width="360" height="400"></canvas><div class="sg-hud"><b id="sgScore">0</b><span id="sgCombo"></span></div></div>
   <div class="sg-pads" id="sgPads"><button type="button" style="--c:#FF4FA3" aria-label="Drum">🥁</button><button type="button" style="--c:#FFD23F" aria-label="Gitar">🎸</button><button type="button" style="--c:#38E1FF" aria-label="Keyboard">🎹</button><button type="button" style="--c:#9BE15D" aria-label="Vokal">🎤</button></div>
   <div class="row" style="margin-top:12px"><button class="btn" type="button" id="sgStart">▶ Mulai rekam</button></div>
+  <p class="sgpay" id="sgPay"></p>
   <p class="muted" id="sgBest"></p>
 </div></div>
 <!-- Dalam rumah -->
@@ -624,7 +646,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=18';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=19';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
