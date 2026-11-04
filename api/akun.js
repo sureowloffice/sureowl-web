@@ -87,6 +87,14 @@ module.exports = async (req, res) => {
         onlineCache = { at: Date.now(), body };
         return send(res, 200, body);
       }
+      if (q.get('a') === 'rumah') { // dekorasi rumah warga (publik, hanya baca)
+        const ru = String(q.get('u') || '').toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 40);
+        if (!ru) return send(res, 400, { error: 'Username tidak valid.' });
+        const [v] = await redis([['GET', 'rumah:' + ru]]);
+        res.setHeader('Cache-Control', 'public, max-age=10');
+        let deco = null; try { deco = v ? JSON.parse(v) : null } catch (e) { deco = null }
+        return send(res, 200, { deco });
+      }
       return send(res, 400, { error: 'Permintaan tidak dikenal.' });
     }
     if (req.method !== 'POST') return send(res, 405, { error: 'Metode tidak didukung.' });
@@ -136,11 +144,21 @@ module.exports = async (req, res) => {
 
     if (a === 'pos') { // posisi karakter saat mode main
       const num = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round((+v || 0) * 100) / 100));
-      const p = { x: num(body.x, -60, 60), z: num(body.z, -40, 34), yaw: num(body.yaw, -50, 50), emo: ['wave', 'dance', 'music'].includes(body.emo) ? body.emo : '' };
+      const p = { x: num(body.x, -60, 60), z: num(body.z, -80, 34), yaw: num(body.yaw, -50, 50), emo: ['wave', 'dance', 'music'].includes(body.emo) ? body.emo : '' };
       const [ok] = await redis([['SET', 'rlp:' + u, '1', 'NX', 'PX', '1800']]);
       if (!ok) return send(res, 200, { ok: true, skip: true });
       await redis([['SET', 'pos:' + u, JSON.stringify(p), 'EX', '40'], ['ZADD', 'online', String(Date.now()), u]]);
       return send(res, 200, { ok: true });
+    }
+    if (a === 'rumah') { // simpan dekorasi rumah sendiri
+      const d = body.deco || {};
+      const ITEMS = ['🛋️','🛏️','🪑','📺','🪴','💡','📚','🖼️','🎸','🥁','🎹','🎤','🎧','🎨','🎥','🔮','🧸','🏆','🪩','🐱','☕','🕯️'];
+      const it = (Array.isArray(d.it) ? d.it : []).slice(0, 40).filter(a => Array.isArray(a) && Number.isInteger(a[0]) && Number.isInteger(a[1]) && a[0] >= 0 && a[0] < 6 && a[1] >= 0 && a[1] < 6 && ITEMS.includes(a[2])).map(a => [a[0], a[1], a[2]]);
+      const deco = { f: Math.max(0, Math.min(5, d.f | 0)), w: Math.max(0, Math.min(5, d.w | 0)), it };
+      const [rl] = await redis([['SET', 'rlr:' + u, '1', 'NX', 'PX', '3000']]);
+      if (!rl) return send(res, 429, { error: 'Tunggu sebentar sebelum simpan lagi.' });
+      await redis([['SET', 'rumah:' + u, JSON.stringify(deco)]]);
+      return send(res, 200, { ok: true, deco });
     }
     if (a === 'keluar') { await redis([['ZREM', 'online', u], ['DEL', 'pos:' + u]]); return send(res, 200, { ok: true }) }
 
