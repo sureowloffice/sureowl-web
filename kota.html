@@ -242,6 +242,9 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .chatpop span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chatpop b{color:var(--purple)}
 .tag.car{background:linear-gradient(90deg,#38E1FF,#8A57FF);color:#fff;border:1.5px solid #fff;font-size:12.5px;font-weight:900;padding:5px 10px;letter-spacing:.2px;text-shadow:0 1px 2px rgba(20,16,43,.5);box-shadow:0 0 14px rgba(56,225,255,.75),0 0 2px #fff}
+.tag.land{pointer-events:auto;cursor:pointer;appearance:none;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--yellow);color:var(--ink);border:3px solid var(--ink);border-radius:16px;padding:7px 12px;box-shadow:0 5px 0 rgba(0,0,0,.35),0 0 18px rgba(255,210,63,.55);z-index:5;animation:landbob 2.4s ease-in-out infinite}
+.tag.land b{font:900 14px var(--sans);white-space:nowrap}.tag.land small{font:800 10.5px var(--sans);color:#4A2C8A;white-space:nowrap}
+@keyframes landbob{0%,100%{margin-top:0}50%{margin-top:-5px}}
 .tag.house{pointer-events:auto;cursor:pointer;background:rgba(255,247,232,.95);color:#14102B;border:2px solid #14102B;font-size:11px;font-weight:900;appearance:none}
 .tag.house.own{background:#FFD23F}
 .tag.online{border-color:#9BE15D;box-shadow:0 0 10px rgba(155,225,93,.6)}
@@ -311,7 +314,8 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <button type="button" id="goRail" data-tip="Jelajah kota" style="background:#B69CFF" aria-label="Jelajah kota">🧭</button>
 </nav>
 <div class="gomenu glass" id="goMenu" hidden>
-  <button type="button" data-go="plaza">🎪 Plaza & Panggung</button>
+  <button type="button" data-go="home">🗺️ Lihat seluruh kota</button>
+  <button type="button" data-go="plaza">🎪 Panggung Festival</button>
   <button type="button" data-go="kampung">🏘️ Kampung Warga</button>
   <button type="button" data-go="studio">🏗️ Studio Rekaman</button>
   <button type="button" data-go="rumahku">🏠 Rumahku</button>
@@ -326,7 +330,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div class="dock">
-  <div class="hint" id="hint">Geser untuk muter kota · cubit untuk zoom</div>
+  <div class="hint" id="hint">Geser buat jalan-jalan · cubit buat zoom · putar 2 jari</div>
   <div class="arr-m" id="arrM"></div>
   <div class="start glass" id="start">
     <span>MULAI</span>
@@ -472,7 +476,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=12';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=13';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
