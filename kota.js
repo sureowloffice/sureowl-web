@@ -60,7 +60,7 @@ let rotDrag=false,tapS=null,lastTap=0;
 // ketuk karakter = zoom ke dia · ketuk rumah = lihat rumahnya · ketuk 2x = zoom ke titik itu
 function onTap(x,y){const now=performance.now();
   if(!PLAY.on){let best=null,bd=1e9;for(const [r,bx,by,ty] of SCR){const d=Math.min(Math.hypot(bx-x,by-y),Math.hypot(bx-x,ty-y)*1.2);if(d<bd){bd=d;best=r}}
-    if(best&&bd<34){selected=best;focus=null;lastTap=0;if(window.KOTA_onPick)window.KOTA_onPick(best);return}
+    if(best&&bd<Math.max(12,Math.min(34,1.1*innerHeight/(2*HALF(cam.dist))))){selected=best;focus=null;lastTap=0;if(window.KOTA_onPick)window.KOTA_onPick(best);return}
     if(VPprev){const ppu=innerHeight/(2*HALF(cam.dist));let hb2=null,hd2=1e9;for(const H of HOUSES){const s=project(VPprev,[H.x,1.1,H.z]);if(!s)continue;const d=Math.hypot(s[0]-x,s[1]-y)/(1.5*ppu);if(d<hd2){hd2=d;hb2=H}}
       if(hb2&&hd2<1&&cam.dist<34){lastTap=0;if(window.KOTA_onHouse)window.KOTA_onHouse(hb2.r);return}
       let bp=null,bd2=1e9;for(const P of picks()){const s=project(VPprev,[P[1],P[2],P[3]]);if(!s)continue;const d=Math.hypot(s[0]-x,s[1]-y)/(P[4]*ppu);if(d<bd2){bd2=d;bp=P}}
