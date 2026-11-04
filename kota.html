@@ -76,7 +76,7 @@ button{font-family:inherit}
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translate(-50%,-20px);opacity:0;transition:.4s;background:var(--cream);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:8px 14px;font:800 13px var(--sans);white-space:nowrap;pointer-events:none;box-shadow:0 6px 0 rgba(0,0,0,.25)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 /* sheets */
-.sheet{position:fixed;inset:0;display:grid;place-items:center;background:rgba(8,5,22,.55);padding:12px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
+.sheet{position:fixed;inset:0;z-index:25;display:grid;place-items:center;background:rgba(8,5,22,.55);padding:12px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
 @media (max-width:720px){.sheet{place-items:end center}}
 .sheet[hidden]{display:none!important}
 .card{width:100%;max-width:560px;max-height:84vh;overflow:auto;background:#1B1440;color:var(--cream);border-radius:24px;padding:20px;position:relative;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -254,10 +254,29 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .playbig:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.4)}
 @keyframes pbpulse{0%,100%{box-shadow:0 6px 0 rgba(0,0,0,.4),0 0 14px rgba(155,225,93,.45)}50%{box-shadow:0 6px 0 rgba(0,0,0,.4),0 0 30px rgba(155,225,93,.95)}}
 .zoomctl{display:grid;gap:4px;padding:5px;border-radius:999px}
-.zoomctl button{appearance:none;width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);background:var(--cream);color:var(--ink);font:900 24px var(--sans);cursor:pointer;line-height:1}
+.zoomctl button{appearance:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:var(--cream);color:var(--ink);font:900 18px var(--sans);cursor:pointer;line-height:1}
 .zoomctl button:active{transform:scale(.94)}
 body.playing .playbig{display:none}body.playing .leftctl{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 190px);transform:none}
 @media (max-width:720px){.leftctl{top:calc(env(safe-area-inset-top,0px) + 178px);transform:none;justify-items:start}.zoomctl{grid-auto-flow:column}.playbig{width:80px;height:84px}.playbig .pe{font-size:32px}}
+.mpill{position:fixed;right:max(12px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 106px);z-index:12;display:flex;align-items:center;gap:2px;padding:3px;border-radius:999px;max-width:210px}
+.mpill button{appearance:none;border:0;background:transparent;color:var(--cream);font:800 12px var(--sans);cursor:pointer;height:30px;border-radius:999px;padding:0 8px}
+.mpill .mt{max-width:132px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.mpill.on .mt{color:var(--yellow)}
+.mpill #mBtn,.mpill #mNext{width:30px;padding:0;background:rgba(255,247,232,.12)}
+body.playing .mpill{top:calc(env(safe-area-inset-top,0px) + 160px)}
+.sgame{position:relative;border-radius:18px;overflow:hidden;border:2px solid var(--line);max-width:360px;margin:0 auto}
+.sgame canvas{display:block;width:100%;height:auto;touch-action:none}
+.sg-hud{position:absolute;left:10px;top:8px;display:grid;gap:2px}.sg-hud b{font:900 24px var(--sans);color:var(--yellow)}.sg-hud span{font:800 12px var(--sans);color:#FF9F1C}
+.sg-pads{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:360px;margin:10px auto 0}
+.sg-pads button{appearance:none;height:64px;border-radius:16px;border:3px solid var(--ink);background:var(--c);font-size:30px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.35);touch-action:manipulation}
+.sg-pads button.hit{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.35);filter:brightness(1.25)}
+.roomv{border-radius:18px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#3B2A6E,#14102B);border:1px solid var(--line)}
+.roomv canvas{display:block;width:100%;height:auto;touch-action:manipulation}
+.rpal{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;margin:12px 0 8px}
+.rpal button{appearance:none;height:42px;border-radius:12px;border:2px solid var(--line);background:#241B52;font-size:22px;cursor:pointer}
+.rpal button.on{border-color:var(--yellow);background:#3B2A6E;box-shadow:0 0 0 2px var(--yellow)}
+.rrow{display:flex;align-items:center;gap:6px;margin:6px 0;flex-wrap:wrap}.rrow span{font:800 12px var(--sans);color:#B9AEDF;min-width:56px}
+.rrow .sw{appearance:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer}.rrow .sw.on{box-shadow:0 0 0 3px var(--yellow)}
+#studioIn{bottom:calc(env(safe-area-inset-bottom,0px) + 240px)}
 .pick{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 250px);transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:18px;max-width:calc(100vw - 24px);animation:pop .25s ease-out}
 .pick[hidden]{display:none}.pk-t{display:grid;min-width:0}.pk-t b{font:900 15px var(--sans);color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pk-t small{font:800 11.5px var(--sans);color:var(--yellow);white-space:nowrap}
 .pick button{appearance:none;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);font:900 13px var(--sans);padding:9px 12px;border-radius:12px;cursor:pointer;white-space:nowrap}
@@ -331,6 +350,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <button type="button" id="playRail" class="playbig" aria-label="Main karaktermu"><span class="pe">🎮</span><b>MAIN</b><small id="playSub">jalan-jalan</small></button>
   <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk">＋</button><button type="button" id="zOut" aria-label="Zoom keluar">－</button></div>
 </div>
+<div class="mpill glass" id="mPill"><button type="button" id="mTitle" class="mt" aria-label="Buka daftar lagu">🎵 <span id="mTitleTx"></span></button><button type="button" id="mBtn" aria-label="Putar atau jeda musik">▶</button><button type="button" id="mNext" aria-label="Lagu berikutnya">⏭</button></div>
 <div class="pick glass" id="pick" hidden><div class="pk-t"><b id="pkName">@warga</b><small id="pkSub">Warga</small></div><button type="button" id="pkHome">🏠 Rumahnya</button><button type="button" id="pkX" aria-label="Tutup">✕</button></div>
 <div class="gomenu glass" id="goMenu" hidden>
   <button type="button" data-go="home">🗺️ Lihat seluruh kota</button>
@@ -344,6 +364,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <div class="joy" id="joy" aria-label="Joystick"><div class="knob" id="knob"></div></div>
   <div class="emos"><button type="button" data-emo="wave" aria-label="Lambai">👋</button><button type="button" data-emo="dance" aria-label="Joget">💃</button><button type="button" data-emo="music" aria-label="Main musik">🎵</button><button type="button" data-open="chat" aria-label="Ngobrol">💬</button></div>
   <button type="button" class="homein" id="homeIn" hidden>🏠 Masuk rumahku</button>
+  <button type="button" class="homein" id="studioIn" hidden>🎙️ Masuk studio · main game</button>
   <div class="ptop"><span id="onlineCt">🟢 kamu lagi main</span><button type="button" id="playX">✕ Selesai</button></div>
 </div>
 
@@ -440,18 +461,36 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 </section>
 <button class="chatpop" id="chatPop" type="button" hidden></button>
 
+<!-- Studio Rekaman -->
+<div class="sheet" id="s-studio" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-studio">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-studio">🎙️ Studio Rekaman</h2>
+  <p class="sub">Rekam lagu bareng band kota! Ketuk tombol pas not nyampe di garis putih.</p>
+  <div class="sgame"><canvas id="sgCv" width="360" height="400"></canvas><div class="sg-hud"><b id="sgScore">0</b><span id="sgCombo"></span></div></div>
+  <div class="sg-pads" id="sgPads"><button type="button" style="--c:#FF4FA3" aria-label="Drum">🥁</button><button type="button" style="--c:#FFD23F" aria-label="Gitar">🎸</button><button type="button" style="--c:#38E1FF" aria-label="Keyboard">🎹</button><button type="button" style="--c:#9BE15D" aria-label="Vokal">🎤</button></div>
+  <div class="row" style="margin-top:12px"><button class="btn" type="button" id="sgStart">▶ Mulai rekam</button></div>
+  <p class="muted" id="sgBest"></p>
+</div></div>
+<!-- Dalam rumah -->
+<div class="sheet" id="s-room" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="roomT">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="roomT">Rumah</h2>
+  <p class="sub" id="roomSub"></p>
+  <div class="roomv"><canvas id="roomCv" width="720" height="560"></canvas></div>
+  <div id="roomTools"></div>
+</div></div>
 <!-- Radio -->
 <div class="sheet" id="s-radio" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-radio">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
   <h2 id="h-radio">Radio Kota Seni</h2>
-  <p class="sub">Siaran lagu karya warga, 24 jam</p>
+  <p class="sub">Lagu kota yang muter di seluruh Kota Seni · ganti lagu atau matikan di sini</p>
   <div class="radio" id="radioBox">
     <div class="fm">98.7 FM</div>
     <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="now" id="radioNow">Siaran lo-fi kota</div>
     <button class="play" type="button" id="radioPlay" aria-label="Putar radio">▶</button>
   </div>
-  <h3>Lagu warga</h3>
+  <h3>Daftar lagu</h3>
   <ul class="list" id="radioList"></ul>
 </div></div>
 
@@ -496,7 +535,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=14';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=15';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
