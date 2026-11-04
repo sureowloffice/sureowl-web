@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%236C2BFF'/%3E%3Cellipse cx='34' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Cellipse cx='67' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Ccircle cx='41' cy='42' r='8' fill='%2314102B'/%3E%3Ccircle cx='74' cy='42' r='8' fill='%2314102B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800&family=DM+Serif+Display&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fraunces:opsz,wght@9..144,500;600;700&family=Space+Grotesk:wght@500;700&family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800&family=DM+Serif+Display&display=swap">
 <style>
 :root{--ink:#14102B;--ink2:#1E1645;--ink3:#2A2058;--purple:#6C2BFF;--violet:#8A57FF;--cream:#FFF7E8;--yellow:#FFD23F;--pink:#FF4FA3;--cyan:#38E1FF;--muted:#B9AEDF;--line:rgba(255,255,255,.12);
 --sans:Inter,system-ui,sans-serif;--brand:Poppins,Inter,system-ui,sans-serif}
@@ -301,6 +301,54 @@ body.playing .mpill{top:calc(env(safe-area-inset-top,0px) + 160px)}
 .pchip{appearance:none;border:1px solid var(--line);background:var(--ink3);color:var(--cream);font:700 12.5px var(--sans);padding:6px 10px;border-radius:999px;cursor:pointer}
 #plAct{margin-bottom:20px}#plAct .btn{flex:1}
 .playbig{width:72px;height:78px;border-radius:20px;animation:none;box-shadow:0 5px 0 rgba(0,0,0,.4)}.playbig .pe{font-size:30px}.playbig b{font-size:14px}
+/* ===== tema kelas atas: kaca gelap, aksen emas, ikon garis, font modern ===== */
+:root{--sans:'Plus Jakarta Sans',Inter,system-ui,sans-serif;--brand:'Fraunces',Georgia,serif;--gold:#E8C27A;--gold2:#C99A4B;--glass2:rgba(13,11,26,.78);--line2:rgba(255,255,255,.09)}
+body{font-family:var(--sans)}
+.glass{background:var(--glass2)!important;backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);border:1px solid var(--line2)!important;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;display:block}
+.tbtn{font:600 13px var(--sans)!important;letter-spacing:.01em;color:#F4EFE6}
+.tbtn .ic{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(232,194,122,.12);color:var(--gold)}
+.tbtn .ic svg.i{width:17px;height:17px}
+.tbtn .ct{background:var(--gold)!important;color:#1A1408!important;font:800 11px var(--sans)!important}
+#clkIc{color:var(--gold)}#clkIc svg.i{width:17px;height:17px}
+.day{background:transparent!important;border:1px solid rgba(232,194,122,.55)!important;color:var(--gold)!important;font:700 11px var(--sans)!important;letter-spacing:.14em}
+.pill b{font:600 16px var(--brand)!important;letter-spacing:.01em}
+.rail{gap:6px!important;padding:6px!important}
+.rail button{background:rgba(255,255,255,.04)!important;color:#EDE6D8!important;border:1px solid var(--line2)!important;width:40px!important;height:40px!important}
+.rail button:hover{color:var(--gold)!important;border-color:rgba(232,194,122,.5)!important}
+.rail button svg.i{width:19px;height:19px}
+.rail .rt{height:26px!important;border:0!important;background:transparent!important;color:#9C93B8!important}
+.nb{color:#BFB6D6!important;font:600 11px var(--sans)!important;letter-spacing:.02em}
+.nb i{display:grid;place-items:center;height:24px}.nb i svg.i{width:22px;height:22px}
+.nb:hover,.nb:focus-visible{color:var(--gold)!important;background:rgba(232,194,122,.08)!important}
+.search label{background:rgba(255,255,255,.04)!important;border:1px solid var(--line2)!important;color:#9C93B8}
+.search label svg.i{width:18px;height:18px}
+.search input{font:500 15px var(--sans)!important}
+.btn{background:linear-gradient(180deg,#F1D79E,#D6A957)!important;color:#1A1408!important;font:700 14px var(--sans)!important;letter-spacing:.02em;box-shadow:0 6px 18px rgba(214,169,87,.25),inset 0 1px 0 rgba(255,255,255,.5)}
+.btn.ghost,.btn.dark{background:rgba(255,255,255,.05)!important;color:#F4EFE6!important;border:1px solid rgba(255,255,255,.14)!important;box-shadow:none}
+.card{background:linear-gradient(180deg,rgba(24,20,44,.97),rgba(14,12,28,.98))!important;border:1px solid var(--line2)!important;box-shadow:0 30px 80px rgba(0,0,0,.6)!important}
+.card h2{font:600 26px var(--brand)!important;letter-spacing:.005em}
+.pname{font:600 30px var(--brand)!important}
+.pill2{background:rgba(232,194,122,.14)!important;color:var(--gold)!important;border:1px solid rgba(232,194,122,.35)!important}
+.psec b,.sub,.muted{letter-spacing:.04em}
+.xbtn{background:rgba(255,255,255,.06)!important;color:#F4EFE6!important;border:1px solid var(--line2)!important}
+.toast{background:rgba(13,11,26,.92)!important;color:#F4EFE6!important;border:1px solid rgba(232,194,122,.45)!important;font:600 13px var(--sans)!important;backdrop-filter:blur(14px)}
+.cta{background:linear-gradient(180deg,rgba(26,21,48,.95),rgba(14,12,28,.95))!important;border:1px solid rgba(232,194,122,.75)!important;border-radius:14px!important;box-shadow:0 12px 34px rgba(0,0,0,.5),0 0 0 4px rgba(232,194,122,.08)!important}
+.cta b{font:600 18px var(--brand)!important;letter-spacing:.02em}.cta span{color:var(--gold)!important;font:600 12px var(--sans)!important}
+.cta small{background:var(--gold)!important;color:#1A1408!important;font:700 11px var(--sans)!important}
+.zoomctl{background:var(--glass2)!important}
+.zoomctl button{background:rgba(255,255,255,.05)!important;color:#F4EFE6!important;border:1px solid var(--line2)!important;display:grid;place-items:center}
+.zoomctl button svg.i{width:16px;height:16px}
+/* tombol AVATAR: digital, kaca gelap dengan bingkai neon bergerak */
+.playbig{position:relative;width:74px!important;height:84px!important;border-radius:18px!important;border:0!important;background:linear-gradient(180deg,rgba(18,16,40,.92),rgba(10,9,24,.95))!important;color:#E8FBFF!important;box-shadow:0 10px 26px rgba(0,0,0,.45),0 0 22px rgba(124,242,255,.18)!important;overflow:hidden;isolation:isolate;gap:2px!important}
+.playbig::before{content:'';position:absolute;inset:-40%;z-index:-2;background:conic-gradient(from 0deg,#7CF2FF,#9B7CFF,#FF7AC8,#7CF2FF);animation:avspin 4s linear infinite}
+.playbig::after{content:'';position:absolute;inset:1.5px;z-index:-1;border-radius:16.5px;background:linear-gradient(180deg,#141230,#0B0A1C);background-image:repeating-linear-gradient(0deg,rgba(124,242,255,.05) 0 1px,transparent 1px 4px),linear-gradient(180deg,#141230,#0B0A1C)}
+.playbig .pe svg.av{width:34px;height:34px;display:block;filter:drop-shadow(0 0 6px rgba(124,242,255,.55))}
+.playbig b{font:700 12px 'Space Grotesk',var(--sans)!important;letter-spacing:.2em;margin-top:2px;background:linear-gradient(90deg,#7CF2FF,#C9B8FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.playbig small{font:500 9px 'Space Grotesk',var(--sans)!important;letter-spacing:.06em;color:#8FA9C4!important;opacity:1!important}
+@keyframes avspin{to{transform:rotate(360deg)}}
+.chatbtn i{background:none!important;box-shadow:none!important;border-radius:0!important}
+@media (max-width:720px){.playbig{width:68px!important;height:78px!important}}
 .pick{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 250px);transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:18px;max-width:calc(100vw - 24px);animation:pop .25s ease-out}
 .pick[hidden]{display:none}.pk-t{display:grid;min-width:0}.pk-t b{font:900 15px var(--sans);color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pk-t small{font:800 11.5px var(--sans);color:var(--yellow);white-space:nowrap}
 .pick button{appearance:none;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);font:900 13px var(--sans);padding:9px 12px;border-radius:12px;cursor:pointer;white-space:nowrap}
@@ -355,25 +403,25 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
       <svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#6C2BFF"/><ellipse cx="34" cy="52" rx="17" ry="21" fill="#FFF7E8"/><ellipse cx="67" cy="52" rx="17" ry="21" fill="#FFF7E8"/><circle cx="41" cy="42" r="8" fill="#14102B"/><circle cx="74" cy="42" r="8" fill="#14102B"/><circle cx="44" cy="39" r="2.4" fill="#fff"/><circle cx="77" cy="39" r="2.4" fill="#fff"/></svg>
       <div><b>Kota Seni</b><small>Populasi <strong id="pop">…</strong> warga</small></div>
     </a>
-    <button class="tbtn glass" type="button" data-open="misi" aria-label="Misi harian"><span class="ic">🎯</span>Misi <span class="ct" id="misiCt">0/7</span></button>
-    <button class="tbtn glass wbtn" type="button" id="walletBtn" data-open="akun" aria-label="Dompet dan akun warga"><span class="ic">🪙</span><span id="koinCt">Masuk</span></button>
+    <button class="tbtn glass" type="button" data-open="misi" aria-label="Misi harian"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg></span>Misi <span class="ct" id="misiCt">0/7</span></button>
+    <button class="tbtn glass wbtn" type="button" id="walletBtn" data-open="akun" aria-label="Dompet dan akun warga"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><circle cx="16.5" cy="13.5" r="1.2"/></svg></span><span id="koinCt">Masuk</span></button>
   </div>
   <div>
-    <button class="tbtn glass clock" type="button" data-open="kalender" aria-label="Jam kota, buka kalender"><span id="clkIc">🌙</span><span id="clk">--:--</span></button>
+    <button class="tbtn glass clock" type="button" data-open="kalender" aria-label="Jam kota, buka kalender"><span id="clkIc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span><span id="clk">--:--</span></button>
     <div class="day" id="day">DAY 1</div>
   </div>
 </header>
 
 <nav class="rail glass" aria-label="Menu warga">
   <button type="button" id="railT" class="rt" aria-label="Ciutkan menu">⌃</button>
-  <button type="button" data-open="rumah" data-tip="Rumahku" style="background:#38E1FF" aria-label="Rumahku">🏠</button>
-  <button type="button" data-open="kalender" data-tip="Kalender kota" style="background:#FFD23F" aria-label="Kalender kota">📅</button>
-  <button type="button" data-open="voting" data-tip="Voting gedung" style="background:#FF4FA3" aria-label="Voting gedung">🗳️</button>
-  <button type="button" id="goRail" data-tip="Jelajah kota" style="background:#B69CFF" aria-label="Jelajah kota">🧭</button>
+  <button type="button" data-open="rumah" data-tip="Rumahku" aria-label="Rumahku"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg></button>
+  <button type="button" data-open="kalender" data-tip="Kalender kota" aria-label="Kalender kota"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/></svg></button>
+  <button type="button" data-open="voting" data-tip="Voting gedung" aria-label="Voting gedung"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13h14v7H5z"/><path d="M8 13V5.5h8V13"/><path d="m10 9 1.5 1.5L14.5 7.5"/></svg></button>
+  <button type="button" id="goRail" data-tip="Jelajah kota" aria-label="Jelajah kota"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></button>
 </nav>
 <div class="leftctl">
-  <button type="button" id="playRail" class="playbig" aria-label="Main karaktermu"><span class="pe">🎮</span><b>MAIN</b><small id="playSub">jalan-jalan</small></button>
-  <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk">＋</button><button type="button" id="zOut" aria-label="Zoom keluar">－</button></div>
+  <button type="button" id="playRail" class="playbig" aria-label="Main pakai avatarmu"><span class="pe"><svg class="av" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="avg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7CF2FF"/><stop offset=".55" stop-color="#9B7CFF"/><stop offset="1" stop-color="#FF7AC8"/></linearGradient></defs><circle cx="24" cy="18" r="8" fill="none" stroke="url(#avg)" stroke-width="2.6"/><path d="M9.5 40c1.8-7.5 7.6-11.5 14.5-11.5S36.7 32.5 38.5 40" fill="none" stroke="url(#avg)" stroke-width="2.6" stroke-linecap="round"/><path d="M4 12V6h6M44 12V6h-6M4 36v6h6M44 36v6h-6" fill="none" stroke="#7CF2FF" stroke-width="2" stroke-linecap="round" opacity=".8"/></svg></span><b>AVATAR</b><small id="playSub">jalan-jalan</small></button>
+  <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></button><button type="button" id="zOut" aria-label="Zoom keluar"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button></div>
 </div>
 <button type="button" class="cta" id="cta" style="display:none"><small id="ctaN">Warga Kota Seni</small><b>🪪 AMBIL KARTU WARGA</b><span>Cek namamu di Balai Warga ›</span></button>
 <div class="mpill glass" id="mPill"><button type="button" id="mTitle" class="mt" aria-label="Buka daftar lagu">🎵 <span id="mTitleTx"></span></button><button type="button" id="mBtn" aria-label="Putar atau jeda musik">▶</button><button type="button" id="mNext" aria-label="Lagu berikutnya">⏭</button></div>
@@ -408,16 +456,16 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   </div>
   <div class="bar glass">
     <form class="search" id="sf" autocomplete="off" role="search">
-      <label for="q"><span aria-hidden="true">🔍</span><input id="q" name="q" placeholder="Cari warga: @username" aria-label="Cari warga" autocapitalize="off" spellcheck="false"><span class="arr" id="arr"></span></label>
+      <label for="q"><span aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input id="q" name="q" placeholder="Cari warga: @username" aria-label="Cari warga" autocapitalize="off" spellcheck="false"><span class="arr" id="arr"></span></label>
       <button class="btn" type="submit">Cari</button>
     </form>
     <nav class="nav" aria-label="Fasilitas kota">
-      <button class="nb chatbtn" type="button" data-open="chat" aria-label="Chat warga"><i>💬</i>Chat<span class="badge pulse" id="chatBadge" hidden>0</span></button>
-      <button class="nb" type="button" data-open="radio"><i>📻</i>Radio</button>
-      <button class="nb" type="button" data-open="koran"><i>📰</i>Koran<span class="dot" id="koranDot" hidden></span></button>
-      <button class="nb" type="button" data-open="balai"><i>🏛️</i>Balai</button>
-      <button class="nb" type="button" data-open="kerja"><i>💼</i>Kerja</button>
-      <button class="nb" type="button" data-open="info"><i>📣</i>Info<span class="badge" id="infoBadge" hidden>0</span></button>
+      <button class="nb chatbtn" type="button" data-open="chat" aria-label="Chat warga"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18.5V7a2.5 2.5 0 0 1 2.5-2.5h9A2.5 2.5 0 0 1 19 7v6a2.5 2.5 0 0 1-2.5 2.5H9z"/></svg></i>Chat<span class="badge pulse" id="chatBadge" hidden>0</span></button>
+      <button class="nb" type="button" data-open="radio"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8" width="17" height="12" rx="2.5"/><path d="m7 8 9-4.5"/><circle cx="15.5" cy="14" r="2.5"/><path d="M7 12.5h3M7 15.5h3"/></svg></i>Radio</button>
+      <button class="nb" type="button" data-open="koran"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h11v14H6.5A1.5 1.5 0 0 1 5 17.5z"/><path d="M16 9h3v8.5a1.5 1.5 0 0 1-3 0"/><path d="M8 9h5M8 12h5M8 15h3"/></svg></i>Koran<span class="dot" id="koranDot" hidden></span></button>
+      <button class="nb" type="button" data-open="balai"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9.5 12 4.5l8.5 5"/><path d="M5.5 10v7M10 10v7M14 10v7M18.5 10v7M3.5 19.5h17"/></svg></i>Balai</button>
+      <button class="nb" type="button" data-open="kerja"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 13h17"/></svg></i>Kerja</button>
+      <button class="nb" type="button" data-open="info"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9.5a3.5 3.5 0 0 1 0 5"/></svg></i>Info<span class="badge" id="infoBadge" hidden>0</span></button>
     </nav>
   </div>
 </div>
@@ -573,7 +621,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=16';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=17';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
