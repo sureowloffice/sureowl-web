@@ -248,6 +248,21 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .tag.house{pointer-events:auto;cursor:pointer;background:rgba(255,247,232,.95);color:#14102B;border:2px solid #14102B;font-size:11px;font-weight:900;appearance:none}
 .tag.house.own{background:#FFD23F}
 .tag.online{border-color:#9BE15D;box-shadow:0 0 10px rgba(155,225,93,.6)}
+.leftctl{position:fixed;left:max(12px,env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%);z-index:13;display:grid;gap:12px;justify-items:center}
+.playbig{appearance:none;width:84px;height:92px;border-radius:24px;border:3px solid var(--ink);background:linear-gradient(180deg,#B8F27A,#6FCF3A);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.4),0 0 24px rgba(155,225,93,.65);animation:pbpulse 2.2s ease-in-out infinite}
+.playbig .pe{font-size:36px;line-height:1}.playbig b{font:900 16px var(--sans);letter-spacing:.06em;margin-top:2px}.playbig small{font:800 9.5px var(--sans);opacity:.8;white-space:nowrap}
+.playbig:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+@keyframes pbpulse{0%,100%{box-shadow:0 6px 0 rgba(0,0,0,.4),0 0 14px rgba(155,225,93,.45)}50%{box-shadow:0 6px 0 rgba(0,0,0,.4),0 0 30px rgba(155,225,93,.95)}}
+.zoomctl{display:grid;gap:4px;padding:5px;border-radius:999px}
+.zoomctl button{appearance:none;width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);background:var(--cream);color:var(--ink);font:900 24px var(--sans);cursor:pointer;line-height:1}
+.zoomctl button:active{transform:scale(.94)}
+body.playing .playbig{display:none}body.playing .leftctl{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 190px);transform:none}
+@media (max-width:720px){.leftctl{top:calc(env(safe-area-inset-top,0px) + 178px);transform:none;justify-items:start}.zoomctl{grid-auto-flow:column}.playbig{width:80px;height:84px}.playbig .pe{font-size:32px}}
+.pick{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 250px);transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:18px;max-width:calc(100vw - 24px);animation:pop .25s ease-out}
+.pick[hidden]{display:none}.pk-t{display:grid;min-width:0}.pk-t b{font:900 15px var(--sans);color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pk-t small{font:800 11.5px var(--sans);color:var(--yellow);white-space:nowrap}
+.pick button{appearance:none;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);font:900 13px var(--sans);padding:9px 12px;border-radius:12px;cursor:pointer;white-space:nowrap}
+.pick #pkX{background:var(--cream);padding:9px 11px}
+.tag.cluster{pointer-events:auto;cursor:pointer;appearance:none;background:rgba(20,16,43,.86);border:2.5px solid;font:900 13px var(--sans);padding:6px 12px;border-radius:12px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .gomenu{position:fixed;right:68px;top:50%;transform:translateY(-50%);z-index:16;display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:18px}
 .gomenu[hidden]{display:none}
 .gomenu button{appearance:none;border:2px solid var(--ink);background:var(--cream);color:var(--ink);font:800 13px var(--sans);padding:9px 12px;border-radius:12px;text-align:left;cursor:pointer}
@@ -310,14 +325,19 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <button type="button" data-open="rumah" data-tip="Rumahku" style="background:#38E1FF" aria-label="Rumahku">🏠</button>
   <button type="button" data-open="kalender" data-tip="Kalender kota" style="background:#FFD23F" aria-label="Kalender kota">📅</button>
   <button type="button" data-open="voting" data-tip="Voting gedung" style="background:#FF4FA3" aria-label="Voting gedung">🗳️</button>
-  <button type="button" id="playRail" data-tip="Main karaktermu" style="background:#9BE15D" aria-label="Main karaktermu">🎮</button>
   <button type="button" id="goRail" data-tip="Jelajah kota" style="background:#B69CFF" aria-label="Jelajah kota">🧭</button>
 </nav>
+<div class="leftctl">
+  <button type="button" id="playRail" class="playbig" aria-label="Main karaktermu"><span class="pe">🎮</span><b>MAIN</b><small id="playSub">jalan-jalan</small></button>
+  <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk">＋</button><button type="button" id="zOut" aria-label="Zoom keluar">－</button></div>
+</div>
+<div class="pick glass" id="pick" hidden><div class="pk-t"><b id="pkName">@warga</b><small id="pkSub">Warga</small></div><button type="button" id="pkHome">🏠 Rumahnya</button><button type="button" id="pkX" aria-label="Tutup">✕</button></div>
 <div class="gomenu glass" id="goMenu" hidden>
   <button type="button" data-go="home">🗺️ Lihat seluruh kota</button>
   <button type="button" data-go="plaza">🎪 Panggung Festival</button>
   <button type="button" data-go="kampung">🏘️ Kampung Warga</button>
   <button type="button" data-go="studio">🏗️ Studio Rekaman</button>
+  <button type="button" data-go="isr">🏢 Indo Semar Records</button>
   <button type="button" data-go="rumahku">🏠 Rumahku</button>
 </div>
 <div class="playhud" id="playHud" hidden>
@@ -330,7 +350,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div class="dock">
-  <div class="hint" id="hint">Geser buat jalan-jalan · cubit buat zoom · putar 2 jari</div>
+  <div class="hint" id="hint">Geser buat jalan-jalan · ketuk karakter buat zoom · ketuk 2x buat mendekat</div>
   <div class="arr-m" id="arrM"></div>
   <div class="start glass" id="start">
     <span>MULAI</span>
@@ -476,7 +496,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=13';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=14';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
