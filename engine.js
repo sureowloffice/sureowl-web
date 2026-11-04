@@ -113,8 +113,8 @@ function bindGeo(g){gl.bindBuffer(gl.ARRAY_BUFFER,g.b);gl.enableVertexAttribArra
 // world objects (DIGITAL)
 function texRep(cv){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,cv);gl.generateMipmap(gl.TEXTURE_2D);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);return t}
-const gridTex=texRep(signCanvas(256,256,(x,w,h)=>{x.fillStyle='#160F33';x.fillRect(0,0,w,h);x.fillStyle='#1E1545';x.fillRect(8,8,w-16,h-16);
-  x.strokeStyle='#38E1FF';x.lineWidth=6;x.strokeRect(0,0,w,h);x.strokeStyle='rgba(255,79,163,.55)';x.lineWidth=2;x.beginPath();x.moveTo(w/2,0);x.lineTo(w/2,h);x.moveTo(0,h/2);x.lineTo(w,h/2);x.stroke()}));
+const gridTex=texRep(signCanvas(256,256,(x,w,h)=>{x.fillStyle='#2B2450';x.fillRect(0,0,w,h);x.fillStyle='#302957';x.fillRect(4,4,w/2-6,h/2-6);x.fillRect(w/2+2,h/2+2,w/2-6,h/2-6);x.fillStyle='#2E2754';x.fillRect(w/2+2,4,w/2-6,h/2-6);x.fillRect(4,h/2+2,w/2-6,h/2-6);
+  x.strokeStyle='rgba(255,255,255,.07)';x.lineWidth=2;x.strokeRect(1,1,w-2,h-2)}));
 let SEED2=5;function r2(){SEED2=(SEED2*16807)%2147483647;return (SEED2-1)/2147483646}
 function winTex(hue){return texFromCanvas(signCanvas(256,512,(x,w,h)=>{x.fillStyle='#120C2A';x.fillRect(0,0,w,h);const cols=['#FFD23F','#38E1FF','#FF4FA3','#B69CFF','#FFF7E8'];
   for(let r=0;r<16;r++)for(let c=0;c<6;c++){if(r2()<.42)continue;x.fillStyle=cols[(hue+Math.floor(r2()*2))%cols.length];x.globalAlpha=.55+r2()*.45;x.fillRect(18+c*38,20+r*30,22,16)}x.globalAlpha=1}))}
@@ -139,15 +139,15 @@ const POLES=[[-6.5,5.5],[6.5,5.5],[-6.5,-6],[6.5,-6],[-10,0],[10,0],[-3,9],[3,9]
 const CUBES=[];for(let i=0;i<34;i++){const a=r2()*Math.PI*2,r=6+r2()*14;CUBES.push([Math.cos(a)*r,2.5+r2()*7,Math.sin(a)*r-2,.15+r2()*.25,['#38E1FF','#FF4FA3','#FFD23F','#B69CFF'][i%4],r2()*6])}
 const HOLO=[[-6.8,5.2,-1.5,.45],[6.8,5.6,-1.0,-.45],[-9,3.6,4,.8]];
 function world(t){
-  D(G.gnd,M.id(),[1,1,1],{tex:gridTex,em:.55,cast:false});
+  D(G.gnd,M.id(),[1,1,1],{tex:gridTex,em:.5,cast:false});
   D(G.plane,M.chain(M.T(0,9,-75),M.S(40,40,1)),[1,1,1],{tex:sunTex,em:1,cast:false,nofog:1});
   for(const B of BUILDINGS){const m=M.chain(M.T(B.x,0,B.z),M.RY(B.yaw),M.S(B.w,B.h,B.d));D(G.box,m,[1,1,1],{tex:B.tex,em:.55});
     D(G.box,M.chain(M.T(B.x,B.h,B.z),M.RY(B.yaw),M.S(B.w+.15,.18,B.d+.15)),B.rim,{em:1,cast:false});
     if(B.scr){D(G.plane,M.chain(M.T(B.x,B.h*.62,B.z),M.RY(B.yaw),M.T(0,0,B.d/2+.08),M.S(B.w*.9,B.w*.9*.5625,1)),[1,1,1],{tex:B.scr,em:1,cast:false})}}
   for(const [x,z] of POLES){D(G.cyl8,M.chain(M.T(x,0,z),M.S(.09,3.6,.09)),'#3A3354');const c=(x+z)%2?'#38E1FF':'#FF4FA3';D(G.cyl8,M.chain(M.T(x,3.6,z),M.S(.22,.5,.22)),c,{em:1,cast:false});
     D(G.cyl16,M.chain(M.T(x,.02,z),M.S(1.1,.01,1.1)),c,{em:.8,alpha:.35,cast:false})}
-  for(const [x,y,z,s,c,ph] of CUBES){D(G.box,M.chain(M.T(x,y+Math.sin(t*1.3+ph)*.4,z),M.RY(t*.8+ph),M.RX(t*.5+ph),M.S(s,s,s)),c,{em:1,cast:false})}
-  HOLO.forEach(([x,y,z,yaw],i)=>{D(G.plane,M.chain(M.T(x,y+Math.sin(t*1.1+i)*.25,z),M.RY(yaw),M.S(3.2,1.8,1)),[1,1,1],{tex:SCR[i%3],em:1,alpha:.82,cast:false})});
+  for(const [x,y,z,s,c,ph] of CUBES.slice(0,0)){D(G.box,M.chain(M.T(x,y+Math.sin(t*1.3+ph)*.4,z),M.RY(t*.8+ph),M.RX(t*.5+ph),M.S(s,s,s)),c,{em:1,cast:false})}
+  HOLO.slice(0,0).forEach(([x,y,z,yaw],i)=>{D(G.plane,M.chain(M.T(x,y+Math.sin(t*1.1+i)*.25,z),M.RY(yaw),M.S(3.2,1.8,1)),[1,1,1],{tex:SCR[i%3],em:1,alpha:.82,cast:false})});
   // mural wall left
   D(G.box,M.chain(M.T(-58,0,-10),M.RY(Math.PI/2),M.S(16,5.5,.4)),'#231848');D(G.plane,M.chain(M.T(-57.78,2.75,-10),M.RY(Math.PI/2),M.S(15.6,5.3,1)),[1,1,1],{tex:muralTex,em:.7,cast:false});
   // plaza ring light
