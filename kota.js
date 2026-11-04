@@ -41,12 +41,15 @@ size();addEventListener('resize',size);
 // ---------- camera control ----------
 const PORT=innerWidth<innerHeight;
 // tampilan awal: Kampung Warga, Panggung Festival & Studio Rekaman kelihatan sekaligus
-const HOME=PORT?{x:4,z:-15,yaw:0,pitch:1.0,d:92}:{x:0,z:-17,yaw:0,pitch:.8,d:70};
+const ISO_Y=Math.PI/4,ISO_P=.66;
+const HOME=PORT?{x:-5,z:-6,yaw:ISO_Y,pitch:ISO_P,d:64}:{x:-2,z:-14,yaw:ISO_Y,pitch:ISO_P,d:50};
+const HALF=d=>d*.4663;
 {const q=new URLSearchParams(location.search).get('cam');if(q){const [a,b,c,d,e]=q.split(',').map(Number);Object.assign(HOME,{yaw:a,pitch:b,d:c,x:d,z:e})}}
 const cam={yaw:HOME.yaw,pitch:HOME.pitch,dist:HOME.d,tx:HOME.x,ty:1.5,tz:HOME.z,fov:50};let target=null,lastInput=performance.now(),autoT=0;
 const ptrs=new Map();let two=null;
 function camPos(){return [cam.tx+Math.sin(cam.yaw)*Math.cos(cam.pitch)*cam.dist,cam.ty+Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*Math.cos(cam.pitch)*cam.dist]}
 function groundAt(sx,sy){const cp=camPos();const f=norm(sub([cam.tx,cam.ty,cam.tz],cp));const r=norm(cross(f,[0,1,0]));const u=cross(r,f);const asp=innerWidth/innerHeight;
+  {const hh=HALF(cam.dist),hw=hh*asp,nx=sx/innerWidth*2-1,ny=1-sy/innerHeight*2;const o=add(add([cam.tx,cam.ty,cam.tz],scl(r,nx*hw)),scl(u,ny*hh));if(f[1]>-.02)return null;const t=-o[1]/f[1];return [o[0]+f[0]*t,o[2]+f[2]*t]}
   const fov=(asp<1?cam.fov:Math.min(cam.fov,42))*Math.PI/180,th=Math.tan(fov/2);const nx=sx/innerWidth*2-1,ny=1-sy/innerHeight*2;
   const d=norm(add(add(f,scl(r,nx*th*asp)),scl(u,ny*th)));if(d[1]>-.02)return null;const t=-cp[1]/d[1];return [cp[0]+d[0]*t,cp[2]+d[2]*t]}
 function ensureFocus(){if(!focus)focus={x:cam.tx,z:cam.tz,d:cam.dist};selected=null}
@@ -58,19 +61,24 @@ let rotDrag=false,tapS=null,lastTap=0;
 function onTap(x,y){const now=performance.now();
   if(!PLAY.on){let best=null,bd=1e9;for(const [r,bx,by,ty] of SCR){const d=Math.min(Math.hypot(bx-x,by-y),Math.hypot(bx-x,ty-y)*1.2);if(d<bd){bd=d;best=r}}
     if(best&&bd<34){selected=best;focus=null;lastTap=0;if(window.KOTA_onPick)window.KOTA_onPick(best);return}
-    if(VPprev){let hb=null,hd=1e9;for(const H of HOUSES){const s=project(VPprev,[H.x,1.2,H.z]);if(!s)continue;const d=Math.hypot(s[0]-x,s[1]-y);if(d<hd){hd=d;hb=H}}
+    if(VPprev){const ppu=innerHeight/(2*HALF(cam.dist));let hb2=null,hd2=1e9;for(const H of HOUSES){const s=project(VPprev,[H.x,1.1,H.z]);if(!s)continue;const d=Math.hypot(s[0]-x,s[1]-y)/(1.5*ppu);if(d<hd2){hd2=d;hb2=H}}
+      if(hb2&&hd2<1&&cam.dist<34){lastTap=0;if(window.KOTA_onHouse)window.KOTA_onHouse(hb2.r);return}
+      let bp=null,bd2=1e9;for(const P of picks()){const s=project(VPprev,[P[1],P[2],P[3]]);if(!s)continue;const d=Math.hypot(s[0]-x,s[1]-y)/(P[4]*ppu);if(d<bd2){bd2=d;bp=P}}
+      if(bp&&bd2<1){lastTap=0;if(window.KOTA_onPlaceInfo)window.KOTA_onPlaceInfo(bp[0]);return}}
+    if(false&&VPprev){let hb=null,hd=1e9;for(const H of HOUSES){const s=project(VPprev,[H.x,1.2,H.z]);if(!s)continue;const d=Math.hypot(s[0]-x,s[1]-y);if(d<hd){hd=d;hb=H}}
       const lim=Math.max(22,Math.min(60,900/cam.dist));if(hb&&hd<lim){lastTap=0;if(window.KOTA_onHouse)window.KOTA_onHouse(hb.r);return}}}
   if(now-lastTap<380){lastTap=0;zoomTo(x,y,.42);return}lastTap=now;
   if(selected&&!PLAY.on){selected=null;if(window.KOTA_onPick)window.KOTA_onPick(null)}}
+function picks(){const P=[['plaza',0,2.2,-1.5,5.2],['studio',16,2.4,-3.4,4.2],['isr',-14,6,-15,4.6],['mansion',0,2.6,-17.4,6],['halte',0,1.2,10.6,2],['papan',-6.3,2.6,-1.3,1.8],['lot',16,.8,7.2,3.2]];for(const C of CLUSTERS)if(C.x0!==undefined)P.push(['cluster:'+C.k,C.cx,1.2,C.cz,Math.max(8,C.rows*2.6)]);return P}
 function zoomTo(x,y,k){if(PLAY.on){cam.dist=clamp(cam.dist*k,6,30);return}const g=x==null?null:groundAt(x,y);ensureFocus();if(g){focus.x=clamp(g[0],-62,62);focus.z=clamp(g[1],-80,42)}focus.d=clamp(cam.dist*k,7,95);lastInput=performance.now()}
 glc.addEventListener('contextmenu',e=>e.preventDefault());
 glc.addEventListener('pointerdown',e=>{glc.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);lastInput=performance.now();hideHint();rotDrag=e.button===2||e.shiftKey||e.ctrlKey;if(ptrs.size===1)tapS={x:e.clientX,y:e.clientY,t:performance.now(),ok:true};else tapS=null;if(ptrs.size===2)two=twoState()});
 glc.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;const prev=ptrs.get(e.pointerId);if(tapS&&Math.hypot(e.clientX-tapS.x,e.clientY-tapS.y)>=10)tapS.ok=false;ptrs.set(e.pointerId,[e.clientX,e.clientY]);lastInput=performance.now();
-  if(ptrs.size===1){if(PLAY.on||rotDrag){cam.yaw-=(e.clientX-prev[0])*0.006;cam.pitch=clamp(cam.pitch+(e.clientY-prev[1])*0.004,0.15,1.35);return}
+  if(ptrs.size===1){if(PLAY.on){cam.yaw-=(e.clientX-prev[0])*0.006;cam.pitch=clamp(cam.pitch+(e.clientY-prev[1])*0.004,0.15,1.35);return}
     const g0=groundAt(prev[0],prev[1]),g1=groundAt(e.clientX,e.clientY);if(g0&&g1)panBy(g0[0]-g1[0],g0[1]-g1[1])}
   else if(ptrs.size===2&&two){const s=twoState();
     if(PLAY.on){cam.dist=clamp(cam.dist*two.d/s.d,6,30)}else zoomAt(s.mx,s.my,two.d/s.d);
-    let da=s.a-two.a;da=Math.atan2(Math.sin(da),Math.cos(da));cam.yaw-=da;cam.pitch=clamp(cam.pitch+(s.my-two.my)*0.004,0.15,1.35);two=s}});
+    if(PLAY.on){let da=s.a-two.a;da=Math.atan2(Math.sin(da),Math.cos(da));cam.yaw-=da;cam.pitch=clamp(cam.pitch+(s.my-two.my)*0.004,0.15,1.35)}two=s}});
 const up=e=>{const was=ptrs.size;ptrs.delete(e.pointerId);if(ptrs.size<2)two=null;
   if(was===1&&tapS&&tapS.ok&&e.type==='pointerup'&&performance.now()-tapS.t<350&&Math.hypot(e.clientX-tapS.x,e.clientY-tapS.y)<10)onTap(e.clientX,e.clientY);tapS=null};glc.addEventListener('pointerup',up);glc.addEventListener('pointercancel',up);
 glc.addEventListener('wheel',e=>{e.preventDefault();lastInput=performance.now();const k=Math.exp(e.deltaY*0.0012);if(PLAY.on)cam.dist=clamp(cam.dist*k,6,30);else zoomAt(e.clientX,e.clientY,k)},{passive:false});
@@ -267,8 +275,13 @@ for(let i=BUILDINGS.length-1;i>=0;i--){const B=BUILDINGS[i];const dx=B.x,dz=B.z+
 const TREES=[];{let sd=11;const rn=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646};
   for(let x=-56;x<=56;x+=4.6)for(let z=-36;z<=32;z+=4.6){const px=x+(rn()-.5)*3,pz=z+(rn()-.5)*3;if(rn()<.42)continue;
     if(Math.abs(px)<14.5&&pz>-10&&pz<11.5)continue;if(Math.abs(pz-ROAD_Z)<3.4)continue;if(px>11&&px<24.5&&pz>-8.5&&pz<11)continue;
-    if(BUILDINGS.some(B=>Math.hypot(B.x-px,B.z-pz)<Math.max(B.w,B.d)*.8+1.2))continue;TREES.push([px,pz,.8+rn()*.7,['#7B4DFF','#2EC4B6','#FF4FA3','#38E1FF'][Math.floor(rn()*4)]])}}
-function decor(t,cp){for(const [x,z,s,c] of TREES){if(Math.hypot(x-cp[0],z-cp[2])>75)continue;D(G.cyl8,M.chain(M.T(x,0,z),M.S(.12*s,1.1*s,.12*s)),'#3A2A5E',{cast:false});
+    if(BUILDINGS.some(B=>Math.hypot(B.x-px,B.z-pz)<Math.max(B.w,B.d)*.8+1.2))continue;if([-10,10,-30,30].some(v=>Math.abs(px-v)<2.4)&&pz<10)continue;if([-24,-9.5].some(v=>Math.abs(pz-v)<2.4))continue;TREES.push([px,pz,.8+rn()*.7,['#7B4DFF','#2EC4B6','#FF4FA3','#38E1FF'][Math.floor(rn()*4)]])}}
+const STREETS=[[-10,-30,10,-66,2.2],[10,-30,10,-66,2.2],[-30,-30,10,-66,2.2],[30,-30,10,-66,2.2],[0,-24,0,0,0]];
+function streets(){const C='#130F26';
+  for(const x of [-10,10,-30,30]){D(G.box,M.chain(M.T(x,.008,-28),M.S(2.4,.016,76)),C,{cast:false});for(let z=8;z>-64;z-=4)D(G.box,M.chain(M.T(x,.02,z),M.S(.12,.01,1.6)),'#CFC8E8',{em:.25,cast:false})}
+  for(const z of [-24,-9.5]){D(G.box,M.chain(M.T(0,.008,z),M.S(62,.016,2.4)),C,{cast:false});for(let x=-30;x<=30;x+=4)D(G.box,M.chain(M.T(x,.02,z),M.S(1.6,.01,.12)),'#CFC8E8',{em:.25,cast:false})}
+  for(const [x,z] of [[-10,-24],[10,-24],[-10,-9.5],[10,-9.5],[-30,-24],[30,-24]])for(let k=-2;k<=2;k++){D(G.box,M.chain(M.T(x+k*.42,.024,z+1.7),M.S(.24,.01,.7)),'#E8E1FF',{em:.3,cast:false})}}
+function decor(t,cp){streets();for(const [x,z,s,c] of TREES){if(Math.hypot(x-cp[0],z-cp[2])>75)continue;D(G.cyl8,M.chain(M.T(x,0,z),M.S(.12*s,1.1*s,.12*s)),'#3A2A5E',{cast:false});
     D(G.cone8,M.chain(M.T(x,.8*s,z),M.S(.9*s,1.3*s,.9*s)),c,{em:.35,cast:false});D(G.cone8,M.chain(M.T(x,1.6*s,z),M.S(.6*s,1.0*s,.6*s)),c,{em:.5,cast:false})}
   for(let x=-60;x<=60;x+=7.5){if(Math.abs(x)<4)continue;for(const zz of [ROAD_Z-1.6,ROAD_Z+1.6]){if(Math.hypot(x-cp[0],zz-cp[2])>80)continue;D(G.cyl8,M.chain(M.T(x,0,zz),M.S(.07,2.6,.07)),'#3A3354',{cast:false});
     D(G.sph,M.chain(M.T(x,2.65,zz),M.S(.18,.18,.18)),(Math.round(x/7.5)%2)?'#38E1FF':'#FF4FA3',{em:1,cast:false})}}}
@@ -507,8 +520,9 @@ let selected=null;
 function sayOf(u){const L=window.KOTA_SAY;if(!L||!L.length)return '';for(let i=L.length-1;i>=0&&i>L.length-30;i--){const m=L[i];if(m.u===u.toLowerCase()&&Date.now()-m.ts<90000)return m.t.length>40?m.t.slice(0,40)+'…':m.t}return ''}
 function frame(now){const t=now/1000;
   const dtn=Math.min(.05,t-(frame.lt||t));frame.lt=t;playStep(t);netStep(t,dtn);wanderStep(t,dtn);
+  if(!PLAY.on){const ki=1-Math.exp(-dtn*4);let dy=ISO_Y-cam.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));cam.yaw+=dy*ki;cam.pitch+=(ISO_P-cam.pitch)*ki}
   const tgt=PLAY.on?[PLAY.x,1.1,PLAY.z]:selected?resPos(selected,t):focus?[focus.x,1.5,focus.z]:[HOME.x,1.5,HOME.z];const k=1-Math.exp(-dtn*(PLAY.on?7:3.6));cam.tx+=(tgt[0]-cam.tx)*k;cam.ty+=((selected?1.2:tgt[1])-cam.ty)*k;cam.tz+=(tgt[2]-cam.tz)*k;
-  const kd=1-Math.exp(-dtn*3);if(PLAY.on&&ptrs.size===0&&performance.now()-lastInput>4000)cam.dist+=(13-cam.dist)*kd;else if(selected)cam.dist+=(11-cam.dist)*kd;else if(focus&&ptrs.size===0)cam.dist+=(focus.d-cam.dist)*kd;else if(!focus&&!selected&&!PLAY.on)cam.dist+=(HOME.d-cam.dist)*kd;
+  const kd=1-Math.exp(-dtn*3);if(PLAY.on&&ptrs.size===0&&performance.now()-lastInput>4000)cam.dist+=(16-cam.dist)*kd;else if(selected)cam.dist+=(17-cam.dist)*kd;else if(focus&&ptrs.size===0)cam.dist+=(focus.d-cam.dist)*kd;else if(!focus&&!selected&&!PLAY.on)cam.dist+=(HOME.d-cam.dist)*kd;
   const cp=[cam.tx+Math.sin(cam.yaw)*Math.cos(cam.pitch)*cam.dist,cam.ty+Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*Math.cos(cam.pitch)*cam.dist];
   DL=[];world(t);stage(99);sign(99);notes(40+t%600);road();places(t);houses(t,cp);office(t,cp);staff(t);site(t,cp);decor(t,cp);cars(t);heli(t);sparks(t);
   vilDraw(t);
@@ -520,9 +534,9 @@ function frame(now){const t=now/1000;
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
   gl.disable(gl.DEPTH_TEST);gl.useProgram(P_SKY.p);const L=light();gl.uniform3fv(P_SKY.u.uTop,L.top);gl.uniform3fv(P_SKY.u.uHor,L.hor);bindGeo(skyQ);gl.drawArrays(gl.TRIANGLES,0,6);gl.enable(gl.DEPTH_TEST);
   const asp=W/H;const fov=asp<1?cam.fov*Math.PI/180:Math.min(cam.fov,42)*Math.PI/180;
-  const V=M.look(cp,[cam.tx,cam.ty,cam.tz],[0,1,0]);const VP=M.mul(M.persp(fov,asp,.1,260),V);VPprev=VP;
+  const tg3=[cam.tx,cam.ty,cam.tz];const far=add(tg3,scl(norm(sub(cp,tg3)),160));const V=M.look(far,tg3,[0,1,0]);const hh=HALF(cam.dist);const VP=M.mul(M.ortho(-hh*asp,hh*asp,-hh,hh,1,420),V);VPprev=VP;
   const u=P_MAIN.u;gl.useProgram(P_MAIN.p);gl.uniformMatrix4fv(u.uVP,false,VP);gl.uniformMatrix4fv(u.uLVP,false,LVP);gl.uniform3fv(u.uSun,sun);gl.uniform3fv(u.uSunC,L.sunC);
-  gl.uniform3fv(u.uSky,L.sky);gl.uniform3fv(u.uGnd,L.gnd);gl.uniform3fv(u.uFog,L.fog);gl.uniform1f(u.uFogN,48);gl.uniform1f(u.uFogF,135);gl.uniform3fv(u.uCam,cp);gl.uniform1f(u.uShRes,SHS);
+  gl.uniform3fv(u.uSky,L.sky);gl.uniform3fv(u.uGnd,L.gnd);gl.uniform3fv(u.uFog,L.fog);gl.uniform1f(u.uFogN,90);gl.uniform1f(u.uFogF,230);gl.uniform3fv(u.uCam,cp);gl.uniform1f(u.uShRes,SHS);
   gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,shTex);gl.uniform1i(u.uSh,0);gl.uniform1i(u.uTex,1);
   gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
   for(const d of [...DL.filter(d=>d.alpha>=1),...DL.filter(d=>d.alpha<1)]){bindGeo(d.g);gl.uniformMatrix4fv(u.uM,false,d.m);gl.uniformMatrix3fv(u.uNM,false,M.normal(d.m));gl.uniform3fv(u.uC,d.c);gl.uniform1f(u.uEm,d.em);gl.uniform1f(u.uAlpha,d.alpha);
@@ -531,7 +545,7 @@ function frame(now){const t=now/1000;
   gl.depthMask(true);
   // labels: nearest ~28 + selected + wali kota
   SCR.length=0;const cand=[];for(const r of RES){if((r.i>=260&&r!==selected)||r.q)continue;const p=resPos(r,t);const top=[p[0],p[1]+(r.i===0?2.4:r.own?1.75:(r===selected?1.4:1.1)),p[2]];const s=project(VP,top);if(!s)continue;if(s[0]<-60||s[0]>innerWidth+60||s[1]<-20||s[1]>innerHeight+20)continue;cand.push([r,s]);const b=project(VP,[p[0],p[1]+.6,p[2]]);if(b)SCR.push([r,b[0],b[1],s[1]])}
-  cand.sort((a,b)=>a[1][2]-b[1][2]);const keep=new Set();if(cam.dist<48||selected)cand.slice(0,28).forEach(c=>keep.add(c[0]));if(selected)keep.add(selected);if(PLAY.on&&PLAY.r)keep.add(PLAY.r);for(const r of RES)if(r.net)keep.add(r);RES[0]&&keep.add(RES[0]);for(const r of RES)if(r.own)keep.add(r);
+  cand.sort((a,b)=>a[1][2]-b[1][2]);const keep=new Set();if(cam.dist<24)cand.slice(0,14).forEach(c=>keep.add(c[0]));if(selected)keep.add(selected);if(PLAY.on&&PLAY.r)keep.add(PLAY.r);for(const r of RES)if(r.net)keep.add(r);if(RES[0]&&cam.dist<44)keep.add(RES[0]);
   for(const [r,s] of cand){const el=tagFor(r);if(!keep.has(r)){el.style.display='none';continue}el.style.display='';const sy=sayOf(r.u);const pl=PLAY.on&&r===PLAY.r;el.className='tag'+(r.own?' own':'')+(r===selected||pl?' me':'')+(sy?' say':'')+(r.net?' online':'');el.textContent=(pl?'🎮 ':r.net?'🟢 ':'')+dname(r)+(sy?': '+sy:'');el.style.left=s[0]+'px';el.style.top=s[1]+'px'}
   // papan nama mobil (HTML, selalu tajam & terbaca)
   for(let k=0;k<NCAR;k++){const el=carTag(k);const r=NAMES.length?NAMES[carCyc(t)%NAMES.length]:null;
@@ -540,14 +554,15 @@ function frame(now){const t=now/1000;
     if(!s||s[0]<-80||s[0]>innerWidth+80||s[1]<40||s[1]>innerHeight-150){el.style.display='none';continue}
     const txt=(ARR.length?'🚘 BARU TIBA · @':'🚘 @')+r.u;if(el.textContent!==txt)el.textContent=txt;
     el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px';el.style.zIndex=String(1000-Math.round(s[2]))}
+  {const el=document.getElementById('cta');if(el){const s=project(VP,[0,7.6,-1]);const ok=s&&!PLAY.on&&!selected&&cam.dist>34&&s[0]>60&&s[0]<innerWidth-60&&s[1]>110&&s[1]<innerHeight-220;el.style.display=ok?'':'none';if(ok){el.style.left=s[0]+'px';el.style.top=s[1]+'px'}}}
   // label tempat
-  PLACES.forEach(([nm,p],k)=>{const el=placeTag(k);const s=project(VP,p);if(!s||hidBy(cp,p)||s[0]<20||s[0]>innerWidth-20||s[1]<60||s[1]>innerHeight-160||s[2]>(k<2?70:34)){el.style.display='none';return}
+  PLACES.forEach(([nm,p],k)=>{const el=placeTag(k);const s=project(VP,p);if(!s||cam.dist>15||PLAY.on||hidBy(cp,p)||s[0]<20||s[0]>innerWidth-20||s[1]<60||s[1]>innerHeight-160||s[2]>(k<2?70:34)){el.style.display='none';return}
     if(el.textContent!==nm)el.textContent=nm;el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px'});
-  CLUSTERS.forEach((C,k)=>{const el=clusterTag(C);if(C.x0===undefined||cam.dist<=26||PLAY.on){el.style.display='none';return}const s=project(VP,[C.cx,4.6,C.gz]);
+  CLUSTERS.forEach((C,k)=>{const el=clusterTag(C);if(true){el.style.display='none';return}const s=project(VP,[C.cx,4.6,C.gz]);
     if(!s||s[0]<20||s[0]>innerWidth-20||s[1]<70||s[1]>innerHeight-170||s[2]>140){el.style.display="none";return}el.style.display="";el.style.left=s[0]+"px";el.style.top=s[1]+"px"});
-  LANDMARKS.forEach(([key,nm,sub,p],k)=>{const el=landTag(k,key,nm,sub);const s=project(VP,p);const near=Math.hypot(p[0]-cp[0],p[2]-cp[2])<14||(key==='kampung'&&cam.dist>26&&!PLAY.on);
+  LANDMARKS.forEach(([key,nm,sub,p],k)=>{const el=landTag(k,key,nm,sub);const s=project(VP,p);const near=true;
     if(!s||near||PLAY.on||s[0]<30||s[0]>innerWidth-30||s[1]<70||s[1]>innerHeight-170){el.style.display='none';return}el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px'});
-  {const hc=[];for(const Hh of HOUSES){const d=Math.hypot(Hh.x-cp[0],Hh.z-cp[2]);if(d>26||cam.dist>26)continue;const s=project(VP,[Hh.x,3.0,Hh.z]);if(!s||s[0]<0||s[0]>innerWidth||s[1]<60||s[1]>innerHeight-150)continue;hc.push([Hh,s,d])}
+  {const hc=[];for(const Hh of HOUSES){const d=Math.hypot(Hh.x-cp[0],Hh.z-cp[2]);if(d>40||cam.dist>22)continue;const s=project(VP,[Hh.x,3.0,Hh.z]);if(!s||s[0]<0||s[0]>innerWidth||s[1]<60||s[1]>innerHeight-150)continue;hc.push([Hh,s,d])}
    hc.sort((a,b)=>a[2]-b[2]);const show=new Set(hc.slice(0,10).map(h=>h[0]));
    for(const Hh of HOUSES){const el=houseTag(Hh);const c=hc.find(h=>h[0]===Hh);if(!c||!show.has(Hh)){el.style.display='none';continue}el.style.display='';el.style.left=c[1][0]+'px';el.style.top=c[1][1]+'px'}}
   for(const [u,el] of tags){if(!cand.find(c=>c[0].u===u))el.style.display='none'}
@@ -579,8 +594,8 @@ function makeCard(r){const c=document.createElement('canvas');c.width=1080;c.hei
   x.fillStyle='#FFF7E8';x.font='600 30px Inter';x.fillText(location.host||'kota seni',540,1680);
   return c}
 // ---------- API for ui.js ----------
-window.KOTA={RES,byName,makeCard,jabatan,tgl,arrive,QUEUE,HOUSES,CLUSTERS,isrMsg(){return ISR_MSG[Math.floor(performance.now()/5000)%ISR_MSG.length].replace(/^\S+\s/,'').toLowerCase()},select(r){selected=r;if(r)focus=null},zoomStep(k){zoomTo(null,null,k)},get selected(){return selected},
+window.KOTA={RES,byName,makeCard,jabatan,tgl,arrive,QUEUE,HOUSES,CLUSTERS,band(){return [...BAND.keys()]},FOUND,isrMsg(){return ISR_MSG[Math.floor(performance.now()/5000)%ISR_MSG.length].replace(/^\S+\s/,'').toLowerCase()},select(r){selected=r;if(r)focus=null},zoomStep(k){zoomTo(null,null,k)},get selected(){return selected},
   startPlay,stopPlay,get playing(){return PLAY.on},get me(){return PLAY.r},joy(x,z){PLAY.joy=[x,z]},emote(e){PLAY.emo=e;PLAY.emoT=performance.now()/1000+(e==='dance'?3:e==='music'?3:1.4)},
   pos(){return PLAY.on?{x:+PLAY.x.toFixed(2),z:+PLAY.z.toFixed(2),yaw:+PLAY.yaw.toFixed(2),emo:PLAY.emoT>performance.now()/1000?PLAY.emo:'',moved:PLAY.moved}:null},resetMoved(){PLAY.moved=0},
-  setOnline,focusAt,focusHouse(r){if(r&&r.house){const mn=r.house.mansion;focusAt(r.house.x,r.house.z+(mn?1:0),mn?32:12);cam.yaw=mn?.15:.3;cam.pitch=mn?.68:.55}},focusPlace(k){const P={plaza:[0,1,24,.3,.55],kampung:[KAMP_C[0],KAMP_C[1],50,0,.88],studio:[16,-1,20,.45,.5],isr:[-14,-14,40,-.3,.5]}[k];if(k==='home'){focus=null;selected=null;cam.yaw=HOME.yaw;cam.pitch=HOME.pitch;return}if(P){focusAt(P[0],P[1],P[2]);cam.yaw=P[3];cam.pitch=P[4]}},clearFocus(){focus=null}};
+  setOnline,focusAt,focusHouse(r){if(r&&r.house){const mn=r.house.mansion;focusAt(r.house.x,r.house.z+(mn?1:0),mn?34:18);cam.yaw=mn?.15:.3;cam.pitch=mn?.68:.55}},focusPlace(k){if(String(k).startsWith('cluster:')){const C=CLUSTERS.find(c=>'cluster:'+c.k===k);if(C){focusAt(C.cx,C.cz,Math.max(30,C.rows*6+16))}return}const P={plaza:[0,0,30,.3,.55],kampung:[KAMP_C[0],KAMP_C[1],60,0,.88],studio:[15,-2,28,.45,.5],isr:[-13,-13,34,-.3,.5],mansion:[0,-16,32,0,.6],halte:[0,9,24,0,.6],papan:[-6,-1,22,0,.6],lot:[16,6,24,0,.6]}[k];if(k==='home'){focus=null;selected=null;cam.yaw=HOME.yaw;cam.pitch=HOME.pitch;return}if(P){focusAt(P[0],P[1],P[2]);cam.yaw=P[3];cam.pitch=P[4]}},clearFocus(){focus=null}};
 })();
