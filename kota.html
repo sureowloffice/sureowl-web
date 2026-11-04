@@ -347,6 +347,9 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .playbig b{font:700 12px 'Space Grotesk',var(--sans)!important;letter-spacing:.2em;margin-top:2px;background:linear-gradient(90deg,#7CF2FF,#C9B8FF);-webkit-background-clip:text;background-clip:text;color:transparent}
 .playbig small{font:500 9px 'Space Grotesk',var(--sans)!important;letter-spacing:.06em;color:#8FA9C4!important;opacity:1!important}
 @keyframes avspin{to{transform:rotate(360deg)}}
+.playbig .pe svg.av.me{width:42px;height:42px;filter:drop-shadow(0 0 8px rgba(124,242,255,.45));animation:avbob 2.2s ease-in-out infinite}
+@keyframes avbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.playbig small{max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chatbtn i{background:none!important;box-shadow:none!important;border-radius:0!important}
 @media (max-width:720px){.playbig{width:68px!important;height:78px!important}}
 .pick{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 250px);transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:18px;max-width:calc(100vw - 24px);animation:pop .25s ease-out}
@@ -621,7 +624,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=17';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=18';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
