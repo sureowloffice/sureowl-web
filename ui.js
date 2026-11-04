@@ -277,7 +277,9 @@ jemput();setInterval(jemput,1000);
  $('goRail').onclick=()=>{$('goMenu').hidden=!$('goMenu').hidden};
  $('goMenu').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{$('goMenu').hidden=true;const g=b.dataset.go;
    if(g==='rumahku'){const me=K.byName.get(store.get('me',''));if(me){K.focusHouse(me);toast('🏠 Ini rumahmu, @'+me.u+'!')}else open('rumah');return}
-   K.focusPlace(g);toast({plaza:'🎪 Plaza & Panggung Festival',kampung:'🏘️ Kampung Warga: satu rumah untuk tiap warga',studio:'🏗️ Studio Rekaman sedang dibangun!'}[g])});
+   placeGo(g)});
+ function placeGo(g){K.focusPlace(g);const T={home:'🗺️ Seluruh Kota Seni',plaza:'🎪 Panggung Festival · musisi tampil, ilustrator, booth kamera & tarot di sekitarnya',kampung:'🏘️ Kampung Warga · ketuk rumah buat lihat pemiliknya',studio:'🏗️ Studio Rekaman sedang dibangun · hasil voting warga!'};if(T[g])toast(T[g])}
+ window.KOTA_onPlace=placeGo;
  window.KOTA_onHouse=r=>{const me=store.get('me','');if(r.u.toLowerCase()===me){open('rumah');return}K.focusHouse(r);toast('🏠 Rumah @'+r.u+' · '+(r.p||'Warga'))}}
 
 // ---------- deep link ----------
