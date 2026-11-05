@@ -56,6 +56,20 @@ function needOut(n, koin) {
   return { lapar: r1(n.l), energi: r1(n.e), bersih: r1(n.b), mood: r1(n.m), inspirasi: r1(n.i), lemas: ['l', 'e', 'b', 'm', 'i'].some(k => n[k] <= 0), kerja: n.kc || 0, karier: Math.min(5, Math.floor((n.kc || 0) / 10)), koin, cd: n.cd, now: Date.now() };
 }
 
+
+// ---- Karya warga untuk Layar Raksasa Alun-alun (wajib disetujui admin dulu) ----
+const KARYA_JENIS = { gambar: 'Gambar', foto: 'Foto', lagu: 'Lagu', video: 'Video' };
+const LINK_OK = ['youtube.com', 'youtu.be', 'spotify.com', 'soundcloud.com', 'instagram.com', 'tiktok.com', 'music.apple.com', 'drive.google.com'];
+function cleanLink(s) {
+  s = String(s || '').trim(); if (!s) return '';
+  try { const x = new URL(s); if (x.protocol !== 'https:') return null; const h = x.hostname.replace(/^www\./, '').replace(/^m\./, ''); if (!LINK_OK.some(d => h === d || h.endsWith('.' + d))) return null; return x.toString().slice(0, 300) } catch (e) { return null }
+}
+async function karyaMetas(ids) {
+  if (!ids || !ids.length) return [];
+  const [vals] = await redis([['MGET', ...ids.map(id => 'karya:' + id)]]);
+  return (vals || []).map(v => { try { return v ? JSON.parse(v) : null } catch (e) { return null } }).filter(Boolean);
+}
+
 function send(res, code, obj) {
   res.statusCode = code;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -110,6 +124,20 @@ module.exports = async (req, res) => {
         let deco = null; try { deco = v ? JSON.parse(v) : null } catch (e) { deco = null }
         return send(res, 200, { deco });
       }
+      if (q.get('a') === 'karya') { // daftar karya yang sudah disetujui (publik)
+        const [ids] = await redis([['LRANGE', 'karya:ok', '0', '39']]);
+        const list = (await karyaMetas(ids)).map(k => ({ id: k.id, u: k.u, jenis: k.jenis, judul: k.judul, link: k.link || '', t: k.t, ok: k.ok }));
+        res.setHeader('Cache-Control', 'public, max-age=30');
+        return send(res, 200, { karya: list });
+      }
+      if (q.get('a') === 'karyaImg') { // gambar karya yang sudah disetujui
+        const id = String(q.get('id') || '').replace(/[^a-z0-9]/g, '').slice(0, 24);
+        const [m, img] = await redis([['GET', 'karya:' + id], ['GET', 'karyaimg:' + id]]);
+        let meta = null; try { meta = m ? JSON.parse(m) : null } catch (e) { meta = null }
+        if (!meta || meta.st !== 'ok' || !img) { res.statusCode = 404; return res.end() }
+        res.statusCode = 200; res.setHeader('Content-Type', 'image/jpeg'); res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+        return res.end(Buffer.from(img, 'base64'));
+      }
       return send(res, 400, { error: 'Permintaan tidak dikenal.' });
     }
     if (req.method !== 'POST') return send(res, 405, { error: 'Metode tidak didukung.' });
@@ -134,11 +162,39 @@ module.exports = async (req, res) => {
       return send(res, 200, { ok: true, u: ku });
     }
 
+    if (a === 'karyaAdmin') { // moderasi karya: hanya pemegang ADMIN_KEY
+      if (!ADMIN || body.admin !== ADMIN) return send(res, 403, { error: 'Kunci admin salah.' });
+      const op = String(body.op || 'list'), id = String(body.id || '').replace(/[^a-z0-9]/g, '').slice(0, 24);
+      if (op === 'count') { const [n] = await redis([['LLEN', 'karya:pending']]); return send(res, 200, { pending: +n || 0 }) }
+      if (op === 'list') {
+        const [pid, oid] = await redis([['LRANGE', 'karya:pending', '0', '29'], ['LRANGE', 'karya:ok', '0', '39']]);
+        const pend = await karyaMetas(pid);
+        let imgs = [];
+        if (pend.length) { const [v] = await redis([['MGET', ...pend.map(k => 'karyaimg:' + k.id)]]); imgs = v || [] }
+        return send(res, 200, { pending: pend.map((k, i) => Object.assign({}, k, { img: imgs[i] ? 'data:image/jpeg;base64,' + imgs[i] : '' })), ok: await karyaMetas(oid) });
+      }
+      const [m] = await redis([['GET', 'karya:' + id]]);
+      let meta = null; try { meta = m ? JSON.parse(m) : null } catch (e) { meta = null }
+      if (!meta) return send(res, 404, { error: 'Karya tidak ditemukan.' });
+      if (op === 'ok') {
+        if (meta.st === 'ok') return send(res, 200, { ok: true });
+        meta.st = 'ok'; meta.ok = Date.now();
+        await redis([['SET', 'karya:' + id, JSON.stringify(meta)], ['LREM', 'karya:pending', '0', id], ['LPUSH', 'karya:ok', id], ['LTRIM', 'karya:ok', '0', '39'],
+          ['INCRBY', 'koin:' + meta.u, '100'], ['INCRBY', 'exp:' + meta.u, '100'], ['ZINCRBY', 'papan:exp', '100', meta.u]]);
+        return send(res, 200, { ok: true });
+      }
+      if (op === 'tolak' || op === 'hapus') {
+        await redis([['LREM', 'karya:pending', '0', id], ['LREM', 'karya:ok', '0', id], ['DEL', 'karya:' + id], ['DEL', 'karyaimg:' + id]]);
+        return send(res, 200, { ok: true });
+      }
+      return send(res, 400, { error: 'Operasi tidak dikenal.' });
+    }
+
     const key = String(body.k || '');
     if (!u || !/^[a-z0-9._]+$/.test(u)) return send(res, 400, { error: 'Username tidak valid.' });
     if (key.length < 16 || key.length > 80) return send(res, 400, { error: 'Sesi tidak valid, muat ulang halaman.' });
     const set = await warga(host);
-    if (!set.has(u)) return send(res, 403, { error: 'Username ini belum jadi warga. Komen NADA dulu di @viralindongid.' });
+    if (!set.has(u)) return send(res, 403, { error: 'Username ini belum jadi warga. Follow @viralindongid dulu, nanti namamu masuk kota paling lama 1 jam.' });
     const kh = hashKey(key);
 
     // klaim perangkat (sama dengan chat): perangkat pertama memegang username, KTW bisa memindahkan
@@ -156,6 +212,27 @@ module.exports = async (req, res) => {
     if (!mine) return send(res, 403, { error: 'Username ini sudah dipakai di perangkat lain. Kalau ini akunmu, ambil KTW: kirim kode verifikasi lewat DM ke @viralindongid.', perluKTW: true });
 
     if (a === 'masuk' || a === 'profil') return send(res, 200, { ok: true, profil: await profil(u) });
+
+    if (a === 'karya') { // kirim karya ke Layar Raksasa: masuk antrean, tampil setelah disetujui
+      const jenis = KARYA_JENIS[body.jenis] ? body.jenis : null;
+      const judul = String(body.judul || '').replace(/[<>]/g, '').trim().slice(0, 60);
+      const link = cleanLink(body.link);
+      const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(body.img || ''));
+      if (!jenis) return send(res, 400, { error: 'Pilih jenis karya.' });
+      if (judul.length < 2) return send(res, 400, { error: 'Isi judul karyamu.' });
+      if (link === null) return send(res, 400, { error: 'Link harus dari YouTube, Spotify, SoundCloud, Instagram, TikTok, Apple Music atau Google Drive.' });
+      if ((jenis === 'lagu' || jenis === 'video') && !link) return send(res, 400, { error: 'Untuk lagu atau video, tambahkan link-nya.' });
+      if (!m) return send(res, 400, { error: 'Tambahkan gambar karya (atau cover/thumbnail).' });
+      if (m[1].length > 600000) return send(res, 413, { error: 'Gambar terlalu besar.' });
+      if (!body.setuju) return send(res, 400, { error: 'Centang dulu pernyataan karya milikmu sendiri.' });
+      const [rl, npend] = await redis([['SET', 'rlkarya:' + u, '1', 'NX', 'EX', '21600'], ['LLEN', 'karya:pending']]);
+      if (!rl) return send(res, 429, { error: 'Satu karya tiap 6 jam ya. Coba lagi nanti.' });
+      if (+npend >= 60) return send(res, 429, { error: 'Antrean karya lagi penuh. Coba lagi besok.' });
+      const id = Date.now().toString(36) + crypto.randomBytes(3).toString('hex');
+      const meta = { id, u, jenis, judul, link: link || '', t: Date.now(), st: 'pending' };
+      await redis([['SET', 'karya:' + id, JSON.stringify(meta)], ['SET', 'karyaimg:' + id, m[1]], ['LPUSH', 'karya:pending', id]]);
+      return send(res, 200, { ok: true, id });
+    }
 
     if (a === 'pos') { // posisi karakter saat mode main
       const num = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round((+v || 0) * 100) / 100));
