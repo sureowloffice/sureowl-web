@@ -276,7 +276,19 @@ body.playing .mpill{top:calc(env(safe-area-inset-top,0px) + 160px)}
 .rpal button.on{border-color:var(--yellow);background:#3B2A6E;box-shadow:0 0 0 2px var(--yellow)}
 .rrow{display:flex;align-items:center;gap:6px;margin:6px 0;flex-wrap:wrap}.rrow span{font:800 12px var(--sans);color:#B9AEDF;min-width:56px}
 .rrow .sw{appearance:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer}.rrow .sw.on{box-shadow:0 0 0 3px var(--yellow)}
-#studioIn{bottom:calc(env(safe-area-inset-bottom,0px) + 240px)}
+#studioIn{bottom:calc(env(safe-area-inset-bottom,0px) + 240px)}#dengarIn{bottom:calc(env(safe-area-inset-bottom,0px) + 300px)}
+.pfgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.pfgrid button{appearance:none;border:2px solid var(--line);background:#241B52;color:var(--cream);border-radius:18px;padding:14px 10px;cursor:pointer;font:900 16px var(--sans);text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.pfgrid button i{font-style:normal;font-size:34px;line-height:1}.pfgrid button small{font:700 11px var(--sans);color:#B9AEDF}
+.pfgrid button.on,.pfgrid button:hover{border-color:var(--c,var(--yellow));box-shadow:0 0 0 2px var(--c,var(--yellow));background:#2E2366}
+.pfgrid.sub{grid-template-columns:1fr 1fr}.pfgrid.sub button{flex-direction:row;justify-content:flex-start;padding:12px 14px;font-size:14px;text-align:left}.pfgrid.sub button i{font-size:22px}
+.pfstep{font:800 12px var(--sans);letter-spacing:1px;color:var(--yellow);text-transform:uppercase}
+.mart-items{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.mart-items button{appearance:none;border:2px solid var(--line);background:#241B52;color:var(--cream);border-radius:18px;padding:14px 10px;cursor:pointer;font:900 15px var(--sans);display:flex;flex-direction:column;align-items:center;gap:4px}
+.mart-items button i{font-style:normal;font-size:36px}.mart-items button small{font:700 11px var(--sans);color:#B9AEDF}
+.zzcard{background:linear-gradient(135deg,#1F2A5C,#14102B);border:2px solid #7FB8FF;border-radius:18px;padding:14px;margin:10px 0;display:flex;gap:12px;align-items:center}
+.zzcard b{font-size:16px}.zzcard small{display:block;color:#B9D4FF;font-weight:700}.zzcard .zi{font-size:38px}
+.goto{display:flex;gap:10px;align-items:center;background:#241B52;border:1px dashed var(--line);border-radius:14px;padding:10px 12px;margin:6px 0}.goto span{flex:1;font:700 13px var(--sans);color:#D8CFF5}
 /* gaya peta kota yang tenang */
 .hint,.start,.arr-m,#mPill{display:none!important}
 .glass{background:rgba(26,21,44,.9)}
@@ -500,6 +512,9 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <div class="emos"><button type="button" data-emo="wave" aria-label="Lambai">👋</button><button type="button" data-emo="dance" aria-label="Joget">💃</button><button type="button" data-emo="music" aria-label="Main musik">🎵</button><button type="button" data-open="chat" aria-label="Ngobrol">💬</button></div>
   <button type="button" class="homein" id="homeIn" hidden>🏠 Masuk rumahku</button>
   <button type="button" class="homein" id="studioIn" hidden>🎙️ Masuk studio · main game</button>
+  <button type="button" class="homein" id="martIn" hidden>🛒 Masuk Seni Mart</button>
+  <button type="button" class="homein" id="plazaIn" hidden>🎪 Nongkrong di alun-alun · +12 mood</button>
+  <button type="button" class="homein" id="dengarIn" hidden>🎧 Dengar sesi musik · +18 inspirasi</button>
   <div class="ptop"><span id="onlineCt">🟢 kamu lagi main</span><button type="button" id="playX">✕ Selesai</button></div>
 </div>
 
@@ -643,6 +658,16 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <p class="sub">Karyamu bisa tayang di layar raksasa Alun-alun Kota Seni</p>
   <div id="kirimBody"></div>
 </div></div>
+<div class="sheet" id="s-profesi" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-prof">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-prof">🎭 Pilih Profesimu</h2>
+  <div id="profBody"></div>
+</div></div>
+<div class="sheet" id="s-mart" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-mart">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-mart">🛒 Seni Mart</h2>
+  <div id="martBody"></div>
+</div></div>
 <div class="sheet" id="s-karya" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-karya">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
   <h2 id="h-karya">📺 Karya Warga</h2>
@@ -723,12 +748,16 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 (async function(){
   try{await Promise.all([document.fonts.load('900 40px Inter'),document.fonts.load('800 40px Inter'),document.fonts.load('700 40px Poppins')])}catch(e){}
   let data={day:1,warga:[]},info={};
-  try{data=await (await fetch('warga.json',{cache:'no-store'})).json()}catch(e){}
-  try{info=await (await fetch('kota.json?v='+Date.now(),{cache:'no-store'})).json()}catch(e){}
+  const ft=(u,o)=>fetch(u,o).then(r=>r.json()).catch(()=>null);
+  const [d0,i0,pf,zz]=await Promise.all([ft('warga.json',{cache:'no-store'}),ft('kota.json?v='+Date.now(),{cache:'no-store'}),ft('/api/akun?a=prof'),ft('/api/akun?a=tidur')]);
+  if(d0)data=d0;if(i0)info=i0;
+  // profesi pilihan warga sendiri (bukan dari komentar) + siapa yang lagi tidur
+  const PM=(pf&&pf.prof)||{};for(const w of data.warga||[]){const v=PM[String(w.u).toLowerCase()];if(v){const [a,b]=String(v).split(':');w.pk=a;w.ps=b}}
+  window.KOTA_TIDUR=(zz&&zz.tidur)||[];
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=24';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=25';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
