@@ -432,6 +432,7 @@ jemput();setInterval(jemput,1000);
   mansion:{cat:'Pemerintahan',ic:'👑',bg:'#FFD23F',nm:'Istana Seni President',al:'Jl. Utama No. 1 · Belakang Panggung',ds:'Istana Seni, rumah President Kota Seni. President lagi ada di dalam.',sec:'ISTANA',act:[['🚪 Masuk istana','mansion']]},
   halte:{cat:'Transportasi',ic:'🚘',bg:'#9BE15D',nm:'Halte Jemputan',al:'Jl. Raya Kota Seni',ds:'Warga baru dijemput mobil tiap jam tepat, lalu turun di sini.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
   papan:{cat:'Sejarah',ic:'🏛️',bg:'#FFD23F',nm:'Papan Pendiri Kota',al:'Plaza Panggung Festival',ds:'10 warga pertama yang ikut membangun Kota Seni.',sec:'PENDIRI',act:[['🪪 Lihat kartu warga','balai']]},
+  layar:{cat:'Karya Warga',ic:'📺',bg:'#FF4FA3',nm:'Layar Raksasa Kota',al:'Alun-alun Kota Seni · sayap kiri',ds:'Lagu, gambar, foto dan video asli warga tayang bergantian di sini. Kirim karyamu, setelah disetujui Wali Kota langsung tayang dan kamu dapat 100 Koin Nada.',sec:'SEDANG TAYANG',act:[['🎨 Kirim karyamu','kirim']]},
   bandara:{cat:'Transportasi',ic:'✈️',bg:'#38E1FF',nm:'Bandara Kota Seni',al:'Seberang Jl. Raya Kota Seni',ds:'Warga baru mendarat di sini, lalu mobil jemputan mengantar mereka sampai rumah di cluster masing-masing. Pesawat lepas landas dan mendarat bergantian.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
   billboard:{cat:'Iklan',ic:'📣',bg:'#FF4FA3',nm:'Billboard Kota',al:'Jl. Raya, bandara & pinggir kota',ds:'Layar digital yang gantian menampilkan kabar kota: warga baru, donatur, Seni Mart, Indo Semar Records. Nanti bisa dipasangi iklan brand.',sec:'TAMPIL SEKARANG',act:[['🎵 Cara jadi warga','jadi']]},
   mart:{cat:'Belanja',ic:'🛒',bg:'#8A57FF',nm:'Seni Mart',al:'Minimarket warga · buka 24 jam',ds:'Belanja makan & minum biar avatar tetap segar. Bayar pakai Koin Nada hasil kerja. Ada di dekat Halte, di Alun-alun dan di gerbang barat kota.',sec:'BELANJA',act:[['🍞 Roti · 15','roti'],['🍚 Nasi · 30','nasi'],['☕ Kopi · 12','kopi'],['🧋 Es Teh · 8','esteh']]},
@@ -441,6 +442,7 @@ jemput();setInterval(jemput,1000);
  function extra(k){if(k==='plaza'){const b=K.band();return b.length?chips(b):'<p class="muted">Panggung lagi istirahat.</p>'}
    if(k==='isr')return `<p class="pnow">🎧 ${esc(K.isrMsg())}</p>`;if(String(k).startsWith('mart')){const n=window.KOTA_NEED&&window.KOTA_NEED.n;return `<p class="pnow">${n?'🍞 Lapar '+Math.round(n.lapar)+' · ⚡ Energi '+Math.round(n.energi):'Masuk dulu biar bisa belanja'}</p>`}
    if(k==='studio'){const b=store.get('sgBest',0);return `<p class="pnow">${b?'🏆 Skor terbaikmu: '+b:'Belum pernah rekam. Coba 30 detik aja!'}</p>`}
+   if(k==='layar'){const L=window.KOTA_KARYA||[];return L.length?'<div class="kgrid">'+L.slice(0,12).map(kr=>`<button type="button" class="kthumb" data-karya="${esc(kr.id)}"><img src="/api/akun?a=karyaImg&id=${encodeURIComponent(kr.id)}" alt="${esc(kr.judul)}" loading="lazy"><small>${esc(kr.judul)}<br>@${esc(kr.u)}</small></button>`).join('')+'</div>':'<p class="muted">Belum ada karya. Jadilah yang pertama tayang di layar kota!</p>'}
    if(k==='bandara'){const d=nowWIB();return `<p class="pnow">✈️ Penerbangan warga baru berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00</p>`}
    if(k==='halte'){const d=nowWIB();return `<p class="pnow">Jemputan berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00 · ${(K.QUEUE||[]).filter(r=>r.q).length} warga antre</p>`}
    if(k==='papan')return chips(K.FOUND||[]);
@@ -453,6 +455,7 @@ jemput();setInterval(jemput,1000);
    $('plCat').textContent=P.cat;$('plIll').style.setProperty('--c',P.bg);$('plIc').textContent=P.ic;$('plNm').textContent=P.nm;$('plAl').textContent=P.al;$('plDs').textContent=P.ds;$('plSec').textContent=P.sec;$('plX').innerHTML=body;
    $('plAct').innerHTML=P.act.map(([t,a],i)=>`<button class="btn${i?' ghost':''}" type="button" data-a="${a}">${t}</button>`).join('');
    $('plAct').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='play'){closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()}else if(FOOD[a]){window.KOTA_AKSI(a,FOOD[a].t)}else if(a==='mansion'){const o=K.RES.find(r=>r.own);if(o)window.KOTA_ROOM(o)}else open(a)});
+   $('plX').querySelectorAll('[data-karya]').forEach(b=>b.onclick=()=>window.KOTA_KARYA_VIEW(b.dataset.karya));
    $('plX').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const r=K.byName.get(b.dataset.u.toLowerCase());if(r){closeAll();if(r.house){K.focusHouse(r);window.KOTA_onPick(r)}else{K.select(r);window.KOTA_onPick(r)}}});
    K.focusPlace(k);open('place')}
  window.KOTA_onPlaceInfo=show;window.KOTA_onPlace=g=>{if(g==='home'||g==='kampung'){K.focusPlace(g);toast(g==='home'?'🗺️ Seluruh Kota Seni':'🏘️ Kampung Warga');return}show(g)};
@@ -527,8 +530,38 @@ jemput();setInterval(jemput,1000);
    $('kgPay').innerHTML='Menghitung gaji…';if(window.KOTA_KERJA)window.KOTA_KERJA(acc).then(h=>{$('kgPay').innerHTML=`<span>✅ ${KG.hit} dari ${KG.tot} tugas (${Math.round(acc*100)}%)</span><br>`+h});const best=store.get('kgBest',0);if(KG.hit>best)store.set('kgBest',KG.hit)}
  R.kantor=()=>{grid();if(!KG.run){for(let i=0;i<9;i++)setCell(i,false);const b=store.get('kgBest',0);$('kgBest').textContent=b?'Rekor tugasmu: '+b:'Belum pernah kerja kantoran. Cuma 25 detik!';KG.end=performance.now();$('kgScore').textContent='Siap kerja';$('kgTime').textContent='25 dtk'}};
  if($('kgStart'))$('kgStart').onclick=()=>{if(KG.run)finish();else start()}}
+// ---------- KARYA WARGA: kirim, lihat, moderasi ----------
+{const JN={gambar:'🎨 Gambar / ilustrasi',foto:'📷 Foto',lagu:'🎵 Lagu',video:'🎬 Video'};
+ async function loadKarya(){try{const j=await fetch('/api/akun?a=karya').then(r=>r.json());window.KOTA_KARYA=j.karya||[];if(K.setKarya)K.setKarya(window.KOTA_KARYA)}catch(e){}}
+ loadKarya();setInterval(loadKarya,300000);
+ window.KOTA_KARYA_VIEW=id=>{const kr=(window.KOTA_KARYA||[]).find(x=>x.id===id);if(!kr)return;open('karya');
+   $('kvBody').innerHTML=`<img class="kvimg" src="/api/akun?a=karyaImg&id=${encodeURIComponent(kr.id)}" alt="${esc(kr.judul)}"><h3>${esc(JN[kr.jenis]||'')} · ${esc(kr.judul)}</h3><p class="muted">Karya @${esc(kr.u)} · warga Kota Seni</p>`+(kr.link?`<div class="row"><a class="btn" href="${esc(kr.link)}" target="_blank" rel="noopener">${kr.jenis==='lagu'?'🎧 Dengarkan':kr.jenis==='video'?'▶ Tonton':'🔗 Buka'}</a></div>`:'')};
+ function shrink(file){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>{let w=im.width,h=im.height;const s=Math.min(1,1280/w,1280/h);w=Math.round(w*s);h=Math.round(h*s);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
+   let q=.85,d=c.toDataURL('image/jpeg',q);while(d.length>580000&&q>.4){q-=.1;d=c.toDataURL('image/jpeg',q)}URL.revokeObjectURL(im.src);res(d)};im.onerror=()=>rej(new Error('Gambar tidak bisa dibaca'));im.src=URL.createObjectURL(file)})}
+ R.kirim=()=>{const me=K.byName.get(store.get('me',''));const b=$('kirimBody');
+   if(!me){b.innerHTML='<p>Masuk dulu pakai username warga-mu biar karyamu tercatat atas namamu.</p>'+balaiForm();$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)};return}
+   b.innerHTML=`<form id="kf" class="kform"><label>Jenis karya<select id="kJenis">${Object.entries(JN).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
+   <label>Judul<input id="kJudul" maxlength="60" placeholder="Judul karyamu" required></label>
+   <label id="kImgL">Gambar karya<input id="kImg" type="file" accept="image/*" required></label><img id="kPrev" class="kvimg" alt="" hidden>
+   <label>Link <small id="kLinkHint">(opsional)</small><input id="kLink" type="url" inputmode="url" placeholder="https://youtube.com/… atau https://open.spotify.com/…"></label>
+   <label class="kcheck"><input id="kSetuju" type="checkbox"> Ini karya saya sendiri dan boleh ditampilkan di Kota Seni</label>
+   <button class="btn" type="submit" id="kGo">Kirim ke Wali Kota</button><p class="sgpay" id="kMsg"></p></form>
+   <p class="muted">Karya dicek Wali Kota dulu. Kalau disetujui, tayang di layar raksasa Alun-alun dan kamu dapat 100 Koin Nada. Satu karya tiap 6 jam.</p>`;
+   let data='';const upd=()=>{const j=$('kJenis').value;$('kImgL').firstChild.textContent=j==='lagu'?'Cover lagu':j==='video'?'Thumbnail video':'Gambar karya';$('kLinkHint').textContent=j==='lagu'||j==='video'?'(wajib, YouTube/Spotify/SoundCloud/IG/TikTok)':'(opsional)'};$('kJenis').onchange=upd;upd();
+   $('kImg').onchange=async()=>{const f=$('kImg').files[0];if(!f)return;try{data=await shrink(f);$('kPrev').src=data;$('kPrev').hidden=false}catch(e){$('kMsg').textContent='⚠️ '+e.message}};
+   $('kf').onsubmit=async e=>{e.preventDefault();if(!data){$('kMsg').textContent='⚠️ Pilih gambar dulu';return}$('kGo').disabled=true;$('kMsg').textContent='Mengirim…';
+     try{await api('karya',{jenis:$('kJenis').value,judul:$('kJudul').value,link:$('kLink').value,img:data,setuju:$('kSetuju').checked});$('kMsg').innerHTML='✅ Terkirim! Tunggu disetujui Wali Kota ya.';sfx('coin');$('kf').reset();data='';$('kPrev').hidden=true}
+     catch(err){$('kMsg').textContent='⚠️ '+err.message}$('kGo').disabled=false}};
+ // moderasi: buka kotaseni.vercel.app/kota.html?admin=1 lalu masukkan kunci admin sendiri
+ async function adm(op,id){const r=await fetch('/api/akun',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({a:'karyaAdmin',admin:store.get('adm',''),op,id})});const j=await r.json();if(!r.ok)throw new Error(j.error||'Gagal');return j}
+ R.moderasi=async()=>{const b=$('modBody');if(!store.get('adm','')){b.innerHTML='<form id="mf" class="kform"><label>Kunci admin<input id="mKey" type="password" autocomplete="off"></label><button class="btn" type="submit">Masuk</button></form><p class="muted">Kunci disimpan di perangkat ini saja.</p>';$('mf').onsubmit=e=>{e.preventDefault();store.set('adm',$('mKey').value.trim());R.moderasi()};return}
+   b.innerHTML='<p class="muted">Memuat…</p>';let j;try{j=await adm('list')}catch(e){b.innerHTML='<p>⚠️ '+esc(e.message)+'</p><button class="btn ghost" type="button" id="mOut">Ganti kunci</button>';$('mOut').onclick=()=>{store.set('adm','');R.moderasi()};return}
+   const card=(kr,pend)=>`<div class="mcard"><img src="${pend?kr.img:'/api/akun?a=karyaImg&id='+encodeURIComponent(kr.id)}" alt=""><div><b>${esc(JN[kr.jenis]||kr.jenis)} · ${esc(kr.judul)}</b><small>@${esc(kr.u)} · ${new Date(kr.t).toLocaleString('id-ID')}</small>${kr.link?`<a href="${esc(kr.link)}" target="_blank" rel="noopener">${esc(kr.link)}</a>`:''}<div class="row">${pend?`<button class="btn" type="button" data-op="ok" data-id="${esc(kr.id)}">✅ Setujui</button><button class="btn ghost" type="button" data-op="tolak" data-id="${esc(kr.id)}">✖ Tolak</button>`:`<button class="btn ghost" type="button" data-op="hapus" data-id="${esc(kr.id)}">🗑 Turunkan</button>`}</div></div></div>`;
+   b.innerHTML=`<h3>Menunggu persetujuan (${j.pending.length})</h3>`+(j.pending.map(k=>card(k,true)).join('')||'<p class="muted">Tidak ada.</p>')+`<h3>Sedang tayang (${j.ok.length})</h3>`+(j.ok.map(k=>card(k,false)).join('')||'<p class="muted">Belum ada.</p>');
+   b.querySelectorAll('[data-op]').forEach(x=>x.onclick=async()=>{x.disabled=true;try{await adm(x.dataset.op,x.dataset.id);toast(x.dataset.op==='ok'?'✅ Karya tayang di layar kota':'Karya diturunkan');loadKarya();R.moderasi()}catch(e){toast('⚠️ '+e.message);x.disabled=false}})};
+ if(/[?&]admin=1/.test(location.search))setTimeout(()=>open('moderasi'),1200)}
 // ---------- UCAPAN SELAMAT DATANG ----------
-{const w=$('welcome');if(w){if(/[?&](cam|nowl)=/.test(location.search))w.remove();else{const me=K.byName.get(store.get('me',''));$('wlPop').textContent=K.RES.length.toLocaleString('id-ID');
+{const w=$('welcome');if(w){if(/[?&](cam|nowl|admin)=/.test(location.search))w.remove();else{const me=K.byName.get(store.get('me',''));$('wlPop').textContent=K.RES.length.toLocaleString('id-ID');
   $('wlMe').textContent=me?(me.own?'Selamat datang kembali, President':'Selamat datang kembali, @'+me.u):'Tempat para seniman tinggal, berkarya dan tampil';
   let done=false;const go=()=>{if(done)return;done=true;w.classList.add('out');try{auInit();sfx('chime')}catch(e){}if(K.intro)K.intro();setTimeout(()=>{w.remove();if(K.vilSay)K.vilSay(me?(me.own?'Selamat datang, President! 👑':'Selamat datang, @'+me.u+'! 🦉'):'Selamat datang di Kota Seni! 🦉',5)},900)};
   $('wlGo').onclick=go;setTimeout(go,9000);requestAnimationFrame(()=>requestAnimationFrame(()=>w.classList.add('on')))}}}
