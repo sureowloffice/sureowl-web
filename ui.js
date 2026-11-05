@@ -258,7 +258,7 @@ async function api(a,extra){const me=store.get('me','');const r=await fetch('/ap
   let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw Object.assign(new Error(j.error||'Gagal'),{j});return j}
 function pillUpdate(){const p=AK.p;$('koinCt').innerHTML=p?`<b>${p.koin}</b><small>Lv ${p.level}${p.verified?' ✓':''}</small>`:'Masuk';
   $('misiCt').textContent=(p?p.misi.filter(id=>MISI2.some(m=>m.id===id)).length:0)+'/'+MISI2.length}
-async function refresh(){if(!store.get('me',''))return;try{const j=await api('profil');AK.p=j.profil;pillUpdate();if(!$('s-akun').hidden)R.akun();if(!$('s-misi').hidden)R.misi()}catch(e){if(e.j&&e.j.perluKTW){AK.p=null;AK.err=e.message;pillUpdate()}}}
+async function refresh(){if(!store.get('me',''))return;try{const j=await api('profil');AK.p=j.profil;pillUpdate();profCheck();if(!$('s-akun').hidden)R.akun();if(!$('s-misi').hidden)R.misi()}catch(e){if(e.j&&e.j.perluKTW){AK.p=null;AK.err=e.message;pillUpdate()}}}
 const pending=new Set();
 async function claim(id){if(!store.get('me','')||!AK.p||AK.p.misi.includes(id)||pending.has(id))return;pending.add(id);
   try{const j=await api('misi',{id});AK.p=j.profil;pillUpdate();if(j.dapat){coinFx('+'+j.dapat);toast('🪙 +'+j.dapat+' Koin Nada · '+(MISI2.find(m=>m.id===id)||{}).judul+(j.bonus?' (bonus beruntun +'+j.bonus+')':''))}
@@ -271,7 +271,7 @@ async function topHTML(){try{const j=await (await fetch('/api/akun?a=top')).json
 R.akun=async()=>{const me=store.get('me',''),b=$('akunBody');
   if(!me){b.innerHTML=`<p class="muted" style="margin:0 0 10px">Masuk pakai username Instagram yang udah jadi warga. Kumpulin <b>Koin Nada</b> dari misi harian, naik level, dan nanti belanja perabot rumah & kostum.</p>`+balaiForm().replace('Ambil kartu','Masuk')+`<h3 class="h3">🏆 Warga Teraktif</h3><div id="topBox"></div>`;
     $('bf').onsubmit=async e=>{e.preventDefault();const q=$('bq').value.trim().replace(/^@/,'').toLowerCase();if(!K.byName.get(q)){$('bq').value='';$('bq').placeholder='@'+q+' belum terdaftar';return}
-      store.set('me',q);try{const j=await api('masuk');AK.p=j.profil;AK.err=null;pillUpdate();claim('absen');R.akun()}catch(err){AK.p=null;AK.err=err.message;R.akun()}};
+      store.set('me',q);try{const j=await api('masuk');AK.p=j.profil;AK.err=null;pillUpdate();claim('absen');R.akun();profCheck()}catch(err){AK.p=null;AK.err=err.message;R.akun()}};
     $('topBox').innerHTML=await topHTML();return}
   const r=K.byName.get(me),p=AK.p;
   if(!p){b.innerHTML=`<div class="item"><span class="ic">⚠️</span><span><b>@${esc(me)}</b><small>${esc(AK.err||'Memuat akun…')}</small></span></div>`+(AK.err?ktwHTML():'')+`<p style="margin-top:10px"><button class="btn dark" type="button" id="akOut">Ganti akun</button></p>`;
@@ -314,9 +314,10 @@ jemput();setInterval(jemput,1000);
  joy.addEventListener('pointermove',move);const end=e=>{if(e.pointerId!==jid)return;jid=null;setJoy(0,0)};joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end);
  hud.querySelectorAll('[data-emo]').forEach(b=>b.onclick=()=>{auInit();K.emote(b.dataset.emo);sfx(b.dataset.emo,K.me&&K.me.prop);sendPos(true)});
  function enter(){const me=store.get('me','');if(!me||!K.byName.get(me)){toast('🎮 Masuk dulu pakai username warga-mu, baru bisa main');open('akun');return}if(!AK.p)refresh();
-   if(!K.startPlay(me)){toast('Username ini belum jadi warga');return}
-   closeAll(true);$('goMenu').hidden=true;document.body.classList.add('playing');hud.hidden=false;toast('🎮 Kamu keluar dari rumah! Geser joystick (atau WASD) buat jalan-jalan.');sendPos(true);poll()}
- function exit(){K.stopPlay();document.body.classList.remove('playing');hud.hidden=true;$('homeIn').hidden=true;$('studioIn').hidden=true;setJoy(0,0);api('keluar').catch(()=>{})}
+   {const N=window.KOTA_NEED&&window.KOTA_NEED.n;if(N&&N.tidur){toast('😴 Avatarmu lagi tidur di rumah. Bangunkan dulu di Avatarku');open('avatar');return false}}
+   if(!K.startPlay(me)){toast('Username ini belum jadi warga');return false}
+   closeAll(true);$('goMenu').hidden=true;document.body.classList.add('playing');hud.hidden=false;toast('🎮 Kamu keluar dari rumah! Geser joystick (atau WASD) buat jalan-jalan.');sendPos(true);poll();return true}
+ function exit(){K.stopPlay();document.body.classList.remove('playing');hud.hidden=true;$('homeIn').hidden=true;$('studioIn').hidden=true;$('martIn').hidden=true;$('plazaIn').hidden=true;$('dengarIn').hidden=true;setJoy(0,0);api('keluar').catch(()=>{})}
  window.KOTA_PLAY={enter,exit};
  $('playRail').onclick=()=>K.playing?exit():enter();$('playX').onclick=exit;
  addEventListener('kota-home',e=>{$('homeIn').hidden=!e.detail});$('homeIn').onclick=()=>{const me=K.byName.get(store.get('me',''));if(me)window.KOTA_ROOM(me);else open('rumah')};
@@ -327,6 +328,9 @@ jemput();setInterval(jemput,1000);
    if(K.playing)$('playSub').textContent=n?`${n} online`:'lagi main'}catch(e){}}
  setInterval(()=>{if(document.hidden)return;if(K.playing)sendPos(false);const gap=K.playing?5000:20000;if(Date.now()-pollT>gap)poll()},1000);
  setTimeout(poll,2500);
+ // siapa yang lagi tidur di rumahnya (Zzz di atas rumah)
+ async function pollZ(){try{const j=await (await fetch('/api/akun?a=tidur')).json();window.KOTA_TIDUR=j.tidur||[];window.KOTA_ZZ_SYNC&&window.KOTA_ZZ_SYNC()}catch(e){}}
+ setInterval(()=>{if(!document.hidden)pollZ()},60000);
  // jelajah kota
  $('goRail').onclick=()=>{$('goMenu').hidden=!$('goMenu').hidden};
  $('goMenu').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{$('goMenu').hidden=true;const g=b.dataset.go;
@@ -374,14 +378,14 @@ jemput();setInterval(jemput,1000);
  addEventListener('keydown',e=>{if($('s-studio').hidden)return;const i=KEYS.indexOf(e.key.toLowerCase());if(i>=0){e.preventDefault();press(i)}});
  R.studio=()=>{const b=store.get('sgBest',0);$('sgBest').textContent=b?'Skor terbaikmu: '+b:'Belum pernah rekam. Coba dulu, 30 detik aja!';G.done='';draw()};
  new MutationObserver(()=>{if($('s-studio').hidden)stop()}).observe($('s-studio'),{attributes:true,attributeFilter:['hidden']});
- addEventListener('kota-studio',e=>{$('studioIn').hidden=!e.detail});$('studioIn').onclick=()=>open('studio');draw()}
+ addEventListener('kota-studio',e=>{$('studioIn').hidden=!e.detail;$('dengarIn').hidden=!e.detail});$('studioIn').onclick=()=>open('studio');draw()}
 
 // ---------- RUMAH: masuk rumah, tiap warga punya layout & dekorasi sendiri ----------
 {const cv=$('roomCv'),cx=cv.getContext('2d');const N=6,TW=100,TH=50,OX=360,OY=170,WH=170;
  const ITEMS=['🛋️','🛏️','🪑','📺','🪴','💡','📚','🖼️','🎸','🥁','🎹','🎤','🎧','🎨','🎥','🔮','🧸','🏆','🪩','🐱','☕','🕯️'];
  const FLOOR=['#C98B52','#6C4AB6','#2EC4B6','#E0855A','#3A2C5E','#9BB8D3'],WALL=['#FFE6F2','#E8E1FF','#E1FFF6','#FFF1D6','#2A1C4F','#38E1FF'];
  const RM={r:null,d:null,edit:false,sel:'🪴'};
- function defDeco(r){let h=7;for(const ch of r.u)h=(h*31+ch.charCodeAt(0))>>>0;const P={perkusi:'🥁',bass:'🎸',gitar:'🎸',terompet:'🎺',mic2:'🎤',kuas:'🎨',clip:'📚'}[r.prop]||(r.grp==='edit'?'🎥':r.grp==='tarot'?'🔮':'📺');
+ function defDeco(r){let h=7;for(const ch of r.u)h=(h*31+ch.charCodeAt(0))>>>0;const P={perkusi:'🥁',bass:'🎸',gitar:'🎸',terompet:'🎺',mic2:'🎤',kuas:'🎨',clip:'📚',keytar:'🎹',laptop:'🎧',vinyl:'🪩',palet:'🎨',tatu:'🖼️',spray:'🎨',tablet:'🖼️',kamera:'🎥',kamvid:'🎥',clapper:'🎥',hp:'📺',palu:'🏆',pot:'🪴',pita:'🪩',buku:'📚',topeng:'🖼️',kartu:'🔮'}[r.prop]||(r.grp==='edit'?'🎥':r.grp==='tarot'?'🔮':'📺');
    const it=[[0,1,'🛏️'],[0,4,'🛋️'],[2,4,'☕'],[1,0,P],[4,0,'🪴'],[0,0,'💡'],[3,2,'🧸']];if(r.grp==='musik')it.push([2,0,'🎧']);if(r.own)it.push([3,3,'🏆'],[2,2,'🪩']);
    return {f:h%FLOOR.length,w:(h>>>3)%WALL.length,it:it.map(a=>[a[0],a[1],a[2]==='🎺'?'🎤':a[2]])}}
  const iso=(i,j)=>[OX+(i-j)*TW/2,OY+(i+j)*TH/2];
@@ -410,12 +414,12 @@ jemput();setInterval(jemput,1000);
    t.innerHTML=`<div class="rpal">${['🧽',...ITEMS].map(e=>`<button type="button" data-it="${e}" class="${e===RM.sel?'on':''}" aria-label="${e==='🧽'?'Hapus perabot':'Pilih '+e}">${e}</button>`).join('')}</div>
    <div class="rrow"><span>Lantai</span>${FLOOR.map((c,i)=>`<button type="button" data-f="${i}" style="background:${c}" class="sw${RM.d.f===i?' on':''}" aria-label="Warna lantai ${i+1}"></button>`).join('')}</div>
    <div class="rrow"><span>Dinding</span>${WALL.map((c,i)=>`<button type="button" data-w="${i}" style="background:${c}" class="sw${RM.d.w===i?' on':''}" aria-label="Warna dinding ${i+1}"></button>`).join('')}</div>
-   <div class="row"><button class="btn ghost" type="button" id="roomSleep">🛏️ Tidur</button><button class="btn ghost" type="button" id="roomBath">🚿 Mandi</button></div>
+   <div class="row"><button class="btn ghost" type="button" id="roomSleep">🛏️ Tidur (sampai energi penuh)</button><button class="btn ghost" type="button" id="roomBath">🚿 Mandi</button></div>
    <div class="row"><button class="btn" type="button" id="roomSave">💾 Simpan dekorasi</button><button class="btn ghost" type="button" id="roomReset">↺ Atur ulang</button></div>`;
    t.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{RM.sel=b.dataset.it;tools()});
    t.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{RM.d.f=+b.dataset.f;RM.dirty=true;tools();draw()});
    t.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{RM.d.w=+b.dataset.w;RM.dirty=true;tools();draw()});
-   $('roomSleep').onclick=()=>window.KOTA_AKSI('tidur','🛏️ Tidur nyenyak, energi +40');$('roomBath').onclick=()=>window.KOTA_AKSI('mandi','🚿 Segar! Kebersihan +50');
+   $('roomSleep').onclick=()=>window.KOTA_AKSI('tidur','😴 Tidur');$('roomBath').onclick=()=>window.KOTA_AKSI('mandi','🚿 Segar! Kebersihan +50');
    $('roomReset').onclick=()=>{RM.d=defDeco(RM.r);RM.dirty=true;tools();draw()};
    $('roomSave').onclick=async()=>{store.set('deco_'+RM.r.u.toLowerCase(),RM.d);try{await api('rumah',{deco:RM.d});RM.dirty=false;sfx('coin');toast('🏠 Dekorasi rumahmu tersimpan! Warga lain bisa lihat waktu mampir')}catch(e){toast('🏠 Tersimpan di HP ini. '+(e.message||'Sambungan ke server lagi gangguan'))}}}
  async function enterRoom(r){if(!r)return;if(r.nohouse){toast('🏗️ @'+r.u+' belum punya rumah. Komen di postingan @viralindongid buat dapat rumah');return}const me=store.get('me','');RM.r=r;RM.edit=!!me&&me===r.u.toLowerCase();RM.d=null;RM.dirty=false;RM.sel='🪴';
@@ -481,13 +485,39 @@ jemput();setInterval(jemput,1000);
 {const NB=[['lapar','🍞','Lapar','#F2C94C'],['energi','⚡','Energi','#7CF2FF'],['bersih','🫧','Kebersihan','#9BD8FF'],['mood','😊','Mood','#FF7AC8'],['inspirasi','✨','Inspirasi','#C9B8FF']];
  const KAR=['Pemula','Asisten','Kru','Profesional','Senior','Maestro'];
  const NS={n:null,at:0};window.KOTA_NEED=NS;
- function now(){if(!NS.n)return null;const h=(Date.now()-NS.at)/36e5;const D={lapar:5,energi:2,bersih:4,mood:3,inspirasi:2};const o={...NS.n};for(const k in D)o[k]=Math.max(0,o[k]-D[k]*h);o.lemas=NB.some(([k])=>o[k]<=0);return o}
- function setN(n){if(!n)return;window.KOTA_ME=store.get('me','');NS.n=n;NS.at=Date.now();if(AK.p&&n.koin!=null){AK.p.koin=n.koin;pillUpdate()}draw();if(window.KOTA&&K.setLemas)K.setLemas(!!n.lemas)}
+ function now(){if(!NS.n)return null;const h=(Date.now()-NS.at)/36e5;const D={lapar:5,energi:2,bersih:4,mood:3,inspirasi:2};const o={...NS.n};const zz=!!o.tidur;
+   for(const k in D){if(k==='energi'&&zz)continue;o[k]=Math.max(0,o[k]-D[k]*h*(zz&&k!=='lapar'?.4:1))}if(zz){o.energi=Math.min(100,o.energi+(o.rate||60)*h);if(o.energi>=100)o.tidur=null}
+   o.lemas=NB.some(([k])=>o[k]<=0);return o}
+ // tidur: avatar masuk rumah, Zzz kelihatan oleh semua warga
+ window.KOTA_ZZ_SYNC=()=>{const me=store.get('me','');const n=now();const L=(window.KOTA_TIDUR||[]).map(x=>String(x).toLowerCase()).filter(x=>x!==me);if(n&&n.tidur&&me)L.push(me);K.setSleep&&K.setSleep(L)};
+ const WHERE={roti:'mart',nasi:'mart',kopi:'mart',esteh:'mart',tidur:'home',mandi:'home',nongkrong:'plaza',dengar:'studio'};
+ const PLACE={mart:['🛒','Seni Mart','Makanan & minuman cuma bisa dibeli di Seni Mart'],home:['🏠','rumahmu','Tidur & mandi harus di rumahmu sendiri'],plaza:['🎪','alun-alun','Nongkrong buat naikin mood harus di alun-alun'],studio:['🎧','Gedung Musik','Dengar sesi musik ada di Gedung Musik']};
+ function goPlace(k){const P=PLACE[k];const N=now();if(N&&N.tidur){toast('😴 Avatarmu lagi tidur. Bangun dulu ya');return}
+   const go=()=>{if(K.goTo&&K.goTo(k))toast(P[0]+' Avatarmu jalan ke '+P[1]+'… (geser joystick buat jalan sendiri)');else toast('Jalannya ketutup. Coba jalan sedikit pakai joystick dulu')};
+   if(!K.playing){closeAll();const ok=window.KOTA_PLAY&&window.KOTA_PLAY.enter();if(ok===false)return;setTimeout(go,400)}else{closeAll();go()}}
+ window.KOTA_GO=goPlace;
+ addEventListener('kota-arrive',e=>{const k=e.detail;sfx('place');setTimeout(()=>arrived(k),250)});
+ function arrived(k){if(k==='mart')open('mart');else if(k==='home'){const me=K.byName.get(store.get('me',''));if(me)window.KOTA_ROOM(me)}
+   else if(k==='plaza')toast('🎪 Sampai di alun-alun! Ketuk tombol Nongkrong');else if(k==='studio')toast('🎧 Sampai di Gedung Musik! Ketuk Dengar sesi musik')}
+ addEventListener('kota-mart',e=>{$('martIn').hidden=!(e.detail>=0)});$('martIn').onclick=()=>open('mart');
+ addEventListener('kota-plaza',e=>{$('plazaIn').hidden=!e.detail});$('plazaIn').onclick=()=>aksi('nongkrong','🎪 Seru nongkrong, mood +12');
+ $('dengarIn').onclick=()=>aksi('dengar','🎧 Dapat inspirasi baru, +18');
+ R.mart=()=>{const b=$('martBody');const me=K.byName.get(store.get('me',''));const n=now();
+   if(!me){b.innerHTML='<p>Masuk dulu pakai username warga-mu biar bisa belanja.</p>';return}
+   if(!K.near('mart')){b.innerHTML=`<div class="goto"><span>🛒 Belanja cuma bisa kalau avatarmu ada di Seni Mart.</span><button class="btn" type="button" id="mGo">🚶 Jalan ke sana</button></div>`;$('mGo').onclick=()=>goPlace('mart');return}
+   b.innerHTML=`<p class="sub">Selamat datang! Koin Nada kamu: <b>${(AK.p&&AK.p.koin)||(n&&n.koin)||0}</b>${n?' · 🍞 Lapar '+Math.round(n.lapar)+' · ⚡ Energi '+Math.round(n.energi):''}</p>
+   <div class="mart-items"><button type="button" data-m="roti"><i>🍞</i>Roti<small>−15 koin · +25 lapar</small></button><button type="button" data-m="nasi"><i>🍚</i>Nasi<small>−30 koin · +50 lapar</small></button><button type="button" data-m="kopi"><i>☕</i>Kopi<small>−12 koin · +15 energi</small></button><button type="button" data-m="esteh"><i>🧋</i>Es Teh<small>−8 koin · +5 mood</small></button></div>`;
+   b.querySelectorAll('[data-m]').forEach(x=>x.onclick=()=>{const j=x.dataset.m;const L={kopi:'☕ Energi +15',esteh:'🧋 Mood +5',roti:'🍞 Nyam! Lapar +25',nasi:'🍚 Kenyang! Lapar +50'};aksi(j,L[j])})};
+ function setN(n){if(!n)return;window.KOTA_ME=store.get('me','');const was=NS.n&&NS.n.tidur;NS.n=n;NS.at=Date.now();if(!!was!==!!n.tidur)setTimeout(()=>window.KOTA_ZZ_SYNC&&window.KOTA_ZZ_SYNC(),0);if(AK.p&&n.koin!=null){AK.p.koin=n.koin;pillUpdate()}draw();if(window.KOTA&&K.setLemas)K.setLemas(!!n.lemas)}
  function draw(){const n=now();const hud=$('needHud');if(!hud)return;hud.hidden=!n;if(!n)return;
-   hud.innerHTML=NB.map(([k,ic,nm,c])=>`<span class="nb2${n[k]<20?' low':''}" title="${nm} ${Math.round(n[k])}"><i>${ic}</i><b style="--v:${Math.round(n[k])}%;--c:${c}"></b></span>`).join('');
+   hud.innerHTML=(n.tidur?'<span class="nb2" title="Lagi tidur"><i>😴</i></span>':'')+NB.map(([k,ic,nm,c])=>`<span class="nb2${n[k]<20?' low':''}" title="${nm} ${Math.round(n[k])}"><i>${ic}</i><b style="--v:${Math.round(n[k])}%;--c:${c}"></b></span>`).join('');
    hud.classList.toggle('lemas',n.lemas);if(!$('s-avatar').hidden)R.avatar()}
  async function load(){if(!store.get('me',''))return;try{const j=await api('status');setN(j.need)}catch(e){}}
- async function aksi(j,label){const b4=now();try{const r=await api('aksi',{j});setN(r.need);const F=FOOD[j]||ACT2[j];if(F){eatFx(j,F,b4,r.need)}else{sfx('place');toast(label)}}catch(e){if(e.j&&e.j.need)setN(e.j.need);toast('⚠️ '+e.message)}}
+ async function aksi(j,label){const b4=now();const w=WHERE[j];if(w&&!K.near(w)){toast('📍 '+PLACE[w][2]);goPlace(w);return}
+   try{const r=await api('aksi',{j});setN(r.need);
+     if(j==='tidur'){window.KOTA_ZZ_SYNC();closeAll();if(K.playing&&window.KOTA_PLAY)window.KOTA_PLAY.exit();const me=K.byName.get(store.get('me',''));if(me)K.focusHouse(me);sfx('place');toast('😴 Avatarmu tidur di rumah. Energi naik pelan (±1 per menit), bangun sendiri kalau penuh');return}
+     if(j==='bangun'){window.KOTA_ZZ_SYNC();sfx('coin');toast('☀️ Bangun! Energi sekarang '+Math.round(r.need.energi));if(!$('s-avatar').hidden)R.avatar();return}
+     const F=FOOD[j]||ACT2[j];if(F){eatFx(j,F,b4,r.need)}else{sfx('place');toast(label)}}catch(e){if(e.j&&e.j.need)setN(e.j.need);toast('⚠️ '+e.message)}}
  function eatFx(j,F,b4,n){const me=store.get('me','');const food=!!FOOD[j];closeAll();sfx(food?'eat':'place');if(food)setTimeout(()=>sfx('coin'),900);
    const r=K.byName.get(me);if(r){K.select(r);K.fx(me,F.ic,food?F.c:null,food?'Kenyang!':'Segar!');setTimeout(()=>{if(K.selected===r)K.select(null)},4200)}
    const k=F.k,a=b4?Math.round(b4[k]):null,z=Math.round(n[k]);const d=document.createElement('div');d.className='eatpop';
@@ -503,15 +533,18 @@ jemput();setInterval(jemput,1000);
    if(!me){b.innerHTML='<p>Masuk dulu pakai username warga-mu biar avatarmu punya kebutuhan, bisa kerja dan dapat Koin Nada.</p>'+balaiForm();$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)};return}
    if(!n){b.innerHTML='<p class="muted">Memuat kondisi avatar…</p>';load();return}
    const st=n.lemas?'<span class="avst bad">😵 Lemas · rawat dulu biar bisa kerja</span>':n.energi<20?'<span class="avst warn">🥱 Capek · tidur dulu</span>':'<span class="avst ok">🙂 Segar · siap kerja</span>';
-   b.innerHTML=`<div class="avtop">${document.querySelector('.playbig .pe').innerHTML}<div><b>${me.own?'👑 President':'@'+esc(me.u)}</b><small>${esc(me.p||'Warga')} · ${KAR[n.karier||0]} (${n.kerja||0}× kerja)</small>${st}</div><div class="avkoin"><small>Koin Nada</small><b>${(AK.p&&AK.p.koin)||n.koin||0}</b></div></div>
+   b.innerHTML=`<div class="avtop">${document.querySelector('.playbig .pe').innerHTML}<div><b>${me.own?'👑 President':'@'+esc(me.u)}</b><small>${me.pk&&K.PROF[me.pk]?K.PROF[me.pk].ic+' ':''}${esc(me.p||'Warga')} · ${KAR[n.karier||0]} (${n.kerja||0}× kerja) · <a href="#" data-pf="1" style="color:var(--yellow)">ganti profesi</a></small>${st}</div><div class="avkoin"><small>Koin Nada</small><b>${(AK.p&&AK.p.koin)||n.koin||0}</b></div></div>
    <div class="avbars">${NB.map(([k,ic,nm,c])=>`<div class="avb"><span>${ic} ${nm}</span><i><b style="width:${Math.round(n[k])}%;background:${c}"></b></i><em>${Math.round(n[k])}</em></div>`).join('')}</div>
    <h3>Kerja</h3><div class="avact"><button class="btn" type="button" data-av="kerja">🎙️ Sesi Rekaman<small>Gedung Musik · +20–60 koin</small></button><button class="btn" type="button" data-av="kantor">💼 Kerja Kantoran<small>Kantor ISR · +20–60 koin</small></button></div>
-   <h3>Seni Mart</h3><div class="avact"><button class="btn ghost" type="button" data-av="roti">🍞 Roti<small>−15 koin · +25 lapar</small></button><button class="btn ghost" type="button" data-av="nasi">🍚 Nasi<small>−30 koin · +50 lapar</small></button><button class="btn ghost" type="button" data-av="kopi">☕ Kopi<small>−12 koin · +15 energi</small></button><button class="btn ghost" type="button" data-av="esteh">🧋 Es Teh<small>−8 koin · +5 mood</small></button></div>
-   <h3>Di rumah</h3><div class="avact"><button class="btn ghost" type="button" data-av="tidur">🛏️ Tidur<small>+40 energi${cdTxt(n,'tidur')}</small></button><button class="btn ghost" type="button" data-av="mandi">🚿 Mandi<small>+50 kebersihan${cdTxt(n,'mandi')}</small></button></div>
-   <h3>Main & cari inspirasi</h3><div class="avact"><button class="btn ghost" type="button" data-av="nongkrong">🎪 Nongkrong di panggung<small>+12 mood${cdTxt(n,'nongkrong')}</small></button><button class="btn ghost" type="button" data-av="dengar">🎧 Dengar sesi di Gedung Musik<small>+18 inspirasi${cdTxt(n,'dengar')}</small></button></div>
+   ${n.tidur?`<div class="zzcard"><span class="zi">😴</span><div><b>Lagi tidur di rumah</b><small>Energi naik ±1 per menit · bangun sendiri kalau penuh</small></div><button class="btn" type="button" data-av="bangun">☀️ Bangun</button></div>`:''}
+   <h3>Seni Mart</h3>${K.near('mart')?`<div class="avact"><button class="btn ghost" type="button" data-av="roti">🍞 Roti<small>−15 koin · +25 lapar</small></button><button class="btn ghost" type="button" data-av="nasi">🍚 Nasi<small>−30 koin · +50 lapar</small></button><button class="btn ghost" type="button" data-av="kopi">☕ Kopi<small>−12 koin · +15 energi</small></button><button class="btn ghost" type="button" data-av="esteh">🧋 Es Teh<small>−8 koin · +5 mood</small></button></div>`:`<div class="goto"><span>🛒 Makan & minum harus beli langsung di Seni Mart</span><button class="btn" type="button" data-goto="mart">🚶 Ke Seni Mart</button></div>`}
+   <h3>Di rumah</h3>${n.tidur?'<p class="muted">Avatarmu sedang tidur di dalam rumah.</p>':K.near('home')?`<div class="avact"><button class="btn ghost" type="button" data-av="tidur">🛏️ Tidur<small>energi +1/menit · sampai penuh</small></button><button class="btn ghost" type="button" data-av="mandi">🚿 Mandi<small>+50 kebersihan${cdTxt(n,'mandi')}</small></button></div>`:`<div class="goto"><span>🏠 Tidur & mandi harus di rumahmu</span><button class="btn" type="button" data-goto="home">🚶 Pulang</button></div>`}
+   <h3>Main & cari inspirasi</h3>${K.near('plaza')?`<div class="avact"><button class="btn ghost" type="button" data-av="nongkrong">🎪 Nongkrong di alun-alun<small>+12 mood${cdTxt(n,'nongkrong')}</small></button></div>`:`<div class="goto"><span>🎪 Mood naik kalau nongkrong di alun-alun</span><button class="btn" type="button" data-goto="plaza">🚶 Ke alun-alun</button></div>`}
+   ${K.near('studio')?`<div class="avact"><button class="btn ghost" type="button" data-av="dengar">🎧 Dengar sesi di Gedung Musik<small>+18 inspirasi${cdTxt(n,'dengar')}</small></button></div>`:`<div class="goto"><span>🎧 Inspirasi dari dengar sesi di Gedung Musik</span><button class="btn" type="button" data-goto="studio">🚶 Ke Gedung Musik</button></div>`}
    <p class="muted">Semua bar turun pelan, juga waktu kamu offline. Kalau ada yang habis, avatarmu lemas dan belum bisa kerja. Inspirasi di atas 70 = gaji +20%.</p>`;
-   b.querySelectorAll('[data-av]').forEach(x=>x.onclick=()=>{const j=x.dataset.av;if(j==='kerja'){open('studio');return}if(j==='kantor'){open('kantor');return}
-     const L={kopi:'☕ Energi +15',esteh:'🧋 Mood +5',roti:'🍞 Nyam! Lapar +25',nasi:'🍚 Kenyang! Lapar +50',tidur:'🛏️ Tidur nyenyak, energi +40',mandi:'🚿 Segar! Kebersihan +50',nongkrong:'🎪 Seru nongkrong, mood +12',dengar:'🎧 Dapat inspirasi baru, +18'};aksi(j,L[j])})};
+   b.querySelectorAll('[data-goto]').forEach(x=>x.onclick=()=>goPlace(x.dataset.goto));b.querySelectorAll('[data-pf]').forEach(x=>x.onclick=()=>{window.KOTA_PF.pk=null;open('profesi')});
+     b.querySelectorAll('[data-av]').forEach(x=>x.onclick=()=>{const j=x.dataset.av;if(j==='kerja'){open('studio');return}if(j==='kantor'){open('kantor');return}if(j==='bangun'){aksi('bangun','');return}
+     const L={kopi:'☕ Energi +15',esteh:'🧋 Mood +5',roti:'🍞 Nyam! Lapar +25',nasi:'🍚 Kenyang! Lapar +50',tidur:'😴 Tidur',mandi:'🚿 Segar! Kebersihan +50',nongkrong:'🎪 Seru nongkrong, mood +12',dengar:'🎧 Dapat inspirasi baru, +18'};aksi(j,L[j])})};
  $('needHud').onclick=()=>open('avatar');
  let lastMe=null;setInterval(()=>{const me=store.get('me','');if(me!==lastMe){lastMe=me;NS.n=null;draw();load()}else draw()},5000);
  setInterval(load,90000);setTimeout(load,1500)}
@@ -568,4 +601,26 @@ jemput();setInterval(jemput,1000);
 // ---------- deep link ----------
 const qp=new URLSearchParams(location.search);if(qp.get('u')){$('q').value=qp.get('u');find(qp.get('u'))}
 else if(qp.get('buka'))open(qp.get('buka'));
+// ---------- PILIH PROFESI: kategori lalu bidang (dipilih sendiri waktu masuk kota) ----------
+const SUBIC={gitaris:'🎸',vokalis:'🎤',drummer:'🥁',bassist:'🎸',keyboard:'🎹',produser:'🎛️',dj:'🎧',tiup:'🎺',penulis:'📝',digital:'💻',komik:'💬',karakter:'🧸',pelukis:'🖼️',tattoo:'🖋️',mural:'🎨',
+  fotografer:'📸',videografer:'🎥',filmmaker:'🎬',editor:'🎞️',desainer:'📐',animator:'🌀',kreator:'📱',kayu:'🪵',batu:'🪨',patung:'🗿',keramik:'🏺',kriya:'🧺',sculpt3d:'🧊',penari:'💃',sastra:'📖',teater:'🎭',tarot:'🔮',penikmat:'👀'};
+window.KOTA_PF={pk:null};let PROF_ASKED=false;
+function profCheck(){const P=AK.p;if(!P||P.prof||PROF_ASKED)return;PROF_ASKED=true;window.KOTA_PF.pk=null;setTimeout(()=>{if(!AK.p||AK.p.prof)return;open('profesi')},900)}
+R.profesi=()=>{const P=K.PROF,PF=window.KOTA_PF,b=$('profBody');const me=K.byName.get(store.get('me',''));
+  if(!me){b.innerHTML='<p>Masuk dulu pakai username warga-mu, baru pilih profesi.</p>';return}
+  if(!PF.pk){b.innerHTML=`<p class="pfstep">Langkah 1 dari 2</p><p class="sub">Kamu seniman di bidang apa? Profesi menentukan warna & barang bawaan avatarmu, juga cluster rumahmu.</p>
+    <div class="pfgrid">${Object.entries(P).map(([k,v])=>`<button type="button" data-pk="${k}" style="--c:${v.col}"><i>${v.ic}</i>${esc(v.nm)}<small>${Object.keys(v.sub).length} bidang</small></button>`).join('')}</div>`;
+    b.querySelectorAll('[data-pk]').forEach(x=>x.onclick=()=>{PF.pk=x.dataset.pk;sfx('tap');R.profesi()});return}
+  const v=P[PF.pk];const C=(K.CLUSTERS||[]).find(c=>c.k===v.cl);
+  b.innerHTML=`<p class="pfstep">Langkah 2 dari 2 · ${v.ic} ${esc(v.nm)}</p><p class="sub">Bidang kamu yang mana?${C?' Rumahmu nanti di <b>'+esc(C.nm)+'</b>.':''}</p>
+    <div class="pfgrid sub">${Object.entries(v.sub).map(([k,n])=>`<button type="button" data-ps="${k}" style="--c:${v.col}"><i>${SUBIC[k]||v.ic}</i>${esc(n)}</button>`).join('')}</div>
+    <button class="btn ghost" type="button" id="pfBack">← Ganti kategori</button>`;
+  $('pfBack').onclick=()=>{PF.pk=null;R.profesi()};
+  b.querySelectorAll('[data-ps]').forEach(x=>x.onclick=async()=>{b.querySelectorAll('button').forEach(y=>y.disabled=true);
+    try{const j=await api('prof',{pk:PF.pk,ps:x.dataset.ps});if(AK.p)AK.p.prof=j.prof;sfx('coin');
+      b.innerHTML=`<div class="zzcard" style="border-color:${v.col}"><span class="zi">${SUBIC[x.dataset.ps]||v.ic}</span><div><b>Resmi jadi ${esc(v.sub[x.dataset.ps])}!</b><small>Avatarmu ganti gaya & rumahmu pindah ke ${C?esc(C.nm):'cluster baru'}. Kota dimuat ulang…</small></div></div>`;
+      setTimeout(()=>location.reload(),2400)}
+    catch(e){toast('⚠️ '+e.message);b.querySelectorAll('button').forEach(y=>y.disabled=false)}})};
+setTimeout(()=>window.KOTA_ZZ_SYNC&&window.KOTA_ZZ_SYNC(),1200);
+
 })();
