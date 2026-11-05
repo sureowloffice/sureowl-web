@@ -43,17 +43,31 @@ const hashKey = k => crypto.createHash('sha256').update(k).digest('hex').slice(0
 
 // kebutuhan avatar: turun pelan tiap jam (juga saat offline)
 const NEED_DECAY = { l: 5, e: 2, b: 4, m: 3, i: 2 };
-const AKSI = { roti: { koin: 15, l: 25 }, nasi: { koin: 30, l: 50 }, kopi: { koin: 12, e: 15 }, esteh: { koin: 8, l: 8, m: 5 }, tidur: { e: 40, cd: 20 }, mandi: { b: 50, cd: 10 }, nongkrong: { m: 12, cd: 10 }, dengar: { i: 18, m: 4, cd: 15 } };
+const AKSI = { roti: { koin: 15, l: 25 }, nasi: { koin: 30, l: 50 }, kopi: { koin: 12, e: 15 }, esteh: { koin: 8, l: 8, m: 5 }, tidur: {}, bangun: {}, mandi: { b: 50, cd: 10 }, nongkrong: { m: 12, cd: 10 }, dengar: { i: 18, m: 4, cd: 15 } };
+// tidur = sesi panjang: energi naik pelan selama tidur, bangun otomatis kalau energi penuh
+const SLEEP_RATE = 60; // energi per jam (±1 per menit)
+// profesi warga dipilih sendiri saat masuk kota (bukan dari komentar IG)
+const PROF = {
+  musik: ['gitaris', 'vokalis', 'drummer', 'bassist', 'keyboard', 'produser', 'dj', 'tiup', 'penulis'],
+  ilustrator: ['digital', 'komik', 'karakter', 'pelukis', 'tattoo', 'mural'],
+  visual: ['fotografer', 'videografer', 'filmmaker', 'editor', 'desainer', 'animator', 'kreator'],
+  pahat: ['kayu', 'batu', 'patung', 'keramik', 'kriya', 'sculpt3d'],
+  lainnya: ['penari', 'sastra', 'teater', 'tarot', 'penikmat']
+};
 function needNow(raw) {
   let n = null; try { n = raw ? JSON.parse(raw) : null } catch (e) { n = null }
   const now = Date.now(); if (!n) n = { l: 80, e: 80, b: 80, m: 70, i: 50, t: now, kc: 0, cd: {} };
   const h = Math.max(0, (now - (n.t || now)) / 36e5);
-  for (const k in NEED_DECAY) n[k] = Math.max(0, Math.min(100, (n[k] == null ? 80 : n[k]) - NEED_DECAY[k] * h));
+  for (const k in NEED_DECAY) {
+    if (k === 'e' && n.zz) continue;
+    n[k] = Math.max(0, Math.min(100, (n[k] == null ? 80 : n[k]) - NEED_DECAY[k] * h * (n.zz && k !== 'l' ? 0.4 : 1)));
+  }
+  if (n.zz) { n.e = Math.min(100, (n.e == null ? 80 : n.e) + SLEEP_RATE * h); if (n.e >= 100) { n.zz = null; n.woke = now } }
   n.t = now; n.cd = n.cd || {}; return n;
 }
 const r1 = x => Math.round(x * 10) / 10;
 function needOut(n, koin) {
-  return { lapar: r1(n.l), energi: r1(n.e), bersih: r1(n.b), mood: r1(n.m), inspirasi: r1(n.i), lemas: ['l', 'e', 'b', 'm', 'i'].some(k => n[k] <= 0), kerja: n.kc || 0, karier: Math.min(5, Math.floor((n.kc || 0) / 10)), koin, cd: n.cd, now: Date.now() };
+  return { lapar: r1(n.l), energi: r1(n.e), bersih: r1(n.b), mood: r1(n.m), inspirasi: r1(n.i), lemas: ['l', 'e', 'b', 'm', 'i'].some(k => n[k] <= 0), kerja: n.kc || 0, karier: Math.min(5, Math.floor((n.kc || 0) / 10)), koin, cd: n.cd, now: Date.now(), tidur: n.zz || null, rate: SLEEP_RATE };
 }
 
 
@@ -79,15 +93,15 @@ function send(res, code, obj) {
 
 async function profil(u) {
   const d = today();
-  const [koin, exp, streak, last, done, ver, chatc] = await redis([
+  const [koin, exp, streak, last, done, ver, chatc, pr] = await redis([
     ['GET', 'koin:' + u], ['GET', 'exp:' + u], ['GET', 'streak:' + u], ['GET', 'absen:' + u],
-    ['SMEMBERS', 'misi:' + u + ':' + d], ['GET', 'ver:' + u], ['GET', 'chatc:' + u + ':' + d]
+    ['SMEMBERS', 'misi:' + u + ':' + d], ['GET', 'ver:' + u], ['GET', 'chatc:' + u + ':' + d], ['HGET', 'prof', u]
   ]);
   const e = +exp || 0, lv = level(e);
   return {
     u, koin: +koin || 0, exp: e, level: lv, nextExp: 25 * lv * lv, prevExp: 25 * (lv - 1) * (lv - 1),
     streak: last === d || last === yesterday() ? (+streak || 0) : 0, absenHariIni: last === d,
-    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d
+    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d, prof: pr || null
   };
 }
 
@@ -123,6 +137,20 @@ module.exports = async (req, res) => {
         res.setHeader('Cache-Control', 'public, max-age=10');
         let deco = null; try { deco = v ? JSON.parse(v) : null } catch (e) { deco = null }
         return send(res, 200, { deco });
+      }
+      if (q.get('a') === 'prof') { // profesi pilihan warga (publik): { u: 'musik:gitaris' }
+        const [rows] = await redis([['HGETALL', 'prof']]);
+        const map = {};
+        if (Array.isArray(rows)) for (let i = 0; i < rows.length; i += 2) map[rows[i]] = rows[i + 1];
+        else if (rows && typeof rows === 'object') Object.assign(map, rows);
+        res.setHeader('Cache-Control', 'public, max-age=20');
+        return send(res, 200, { prof: map });
+      }
+      if (q.get('a') === 'tidur') { // warga yang sedang tidur di rumahnya
+        const now = Date.now();
+        const [, us] = await redis([['ZREMRANGEBYSCORE', 'tidur', '-inf', String(now)], ['ZRANGEBYSCORE', 'tidur', String(now), '+inf']]);
+        res.setHeader('Cache-Control', 'public, max-age=15');
+        return send(res, 200, { tidur: us || [] });
       }
       if (q.get('a') === 'karya') { // daftar karya yang sudah disetujui (publik)
         const [ids] = await redis([['LRANGE', 'karya:ok', '0', '39']]);
@@ -213,6 +241,18 @@ module.exports = async (req, res) => {
 
     if (a === 'masuk' || a === 'profil') return send(res, 200, { ok: true, profil: await profil(u) });
 
+    if (a === 'prof') { // pilih / ganti profesi: kategori + bidang
+      const pk = String(body.pk || ''), ps = String(body.ps || '');
+      if (!PROF[pk] || !PROF[pk].includes(ps)) return send(res, 400, { error: 'Pilih profesi dan bidangnya dulu.' });
+      const [old, ch] = await redis([['HGET', 'prof', u], ['GET', 'profch:' + u]]);
+      if (old === pk + ':' + ps) return send(res, 200, { ok: true, prof: old });
+      if (old && ch) return send(res, 429, { error: 'Profesi baru bisa diganti lagi besok ya.' });
+      const cmds = [['HSET', 'prof', u, pk + ':' + ps]];
+      if (old) cmds.push(['SET', 'profch:' + u, '1', 'EX', '86400']);
+      await redis(cmds);
+      return send(res, 200, { ok: true, prof: pk + ':' + ps });
+    }
+
     if (a === 'karya') { // kirim karya ke Layar Raksasa: masuk antrean, tampil setelah disetujui
       const jenis = KARYA_JENIS[body.jenis] ? body.jenis : null;
       const judul = String(body.judul || '').replace(/[<>]/g, '').trim().slice(0, 60);
@@ -282,12 +322,25 @@ module.exports = async (req, res) => {
     if (a === 'status' || a === 'aksi' || a === 'kerja') {
       const [raw, koinS] = await redis([['GET', 'need:' + u], ['GET', 'koin:' + u]]);
       const n = needNow(raw); const now = Date.now(); let koin = +koinS || 0;
-      if (a === 'status') { await redis([['SET', 'need:' + u, JSON.stringify(n)]]); return send(res, 200, { ok: true, need: needOut(n, koin) }) }
+      if (a === 'status') { const c = [['SET', 'need:' + u, JSON.stringify(n)]]; if (!n.zz) c.push(['ZREM', 'tidur', u]); await redis(c); return send(res, 200, { ok: true, need: needOut(n, koin) }) }
       if (a === 'aksi') {
         const j = String(body.j || ''); const A = AKSI[j];
         if (!A) return send(res, 400, { error: 'Aksi tidak dikenal.' });
         const [rl] = await redis([['SET', 'rln:' + u, '1', 'NX', 'PX', '1200']]);
         if (!rl) return send(res, 429, { error: 'Pelan-pelan ya.', need: needOut(n, koin) });
+        if (j === 'tidur') {
+          if (n.zz) return send(res, 200, { ok: true, need: needOut(n, koin) });
+          if (n.e >= 95) return send(res, 400, { error: 'Belum ngantuk, energimu masih penuh.', need: needOut(n, koin) });
+          n.zz = now; const wake = now + Math.ceil((100 - n.e) / SLEEP_RATE * 36e5);
+          await redis([['SET', 'need:' + u, JSON.stringify(n)], ['ZADD', 'tidur', String(wake), u]]);
+          return send(res, 200, { ok: true, need: needOut(n, koin) });
+        }
+        if (j === 'bangun') {
+          n.zz = null; n.woke = now;
+          await redis([['SET', 'need:' + u, JSON.stringify(n)], ['ZREM', 'tidur', u]]);
+          return send(res, 200, { ok: true, need: needOut(n, koin) });
+        }
+        if (n.zz) return send(res, 400, { error: 'Avatarmu lagi tidur 😴 Bangun dulu.', need: needOut(n, koin) });
         if (A.cd && n.cd[j] && now < n.cd[j]) return send(res, 429, { error: 'Bisa lagi ' + Math.ceil((n.cd[j] - now) / 60000) + ' menit lagi.', need: needOut(n, koin) });
         if (A.koin && koin < A.koin) return send(res, 400, { error: 'Koin Nada kurang. Kerja dulu di Gedung Musik atau Kantor ISR.', need: needOut(n, koin) });
         for (const k of ['l', 'e', 'b', 'm', 'i']) if (A[k]) n[k] = Math.min(100, n[k] + A[k]);
@@ -298,6 +351,7 @@ module.exports = async (req, res) => {
       }
       // kerja: dipanggil setelah mini game selesai; gaji sesuai akurasi, jabatan & inspirasi
       const acc = Math.max(0, Math.min(1, +body.acc || 0));
+      if (n.zz) return send(res, 400, { error: 'Avatarmu lagi tidur 😴 Bangun dulu baru kerja.', need: needOut(n, koin) });
       if (['l', 'e', 'b', 'm', 'i'].some(k => n[k] <= 0)) return send(res, 400, { error: 'Avatarmu lemas. Rawat dulu (makan, tidur, mandi) baru bisa kerja.', need: needOut(n, koin) });
       if (n.e < 20) return send(res, 400, { error: 'Energi kurang. Tidur dulu di rumah.', need: needOut(n, koin) });
       const [rl] = await redis([['SET', 'rlk:' + u, '1', 'NX', 'PX', '25000']]);
