@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kota Seni · Kota Digital Para Seniman</title>
-<meta name="description" content="Kota digital tempat anak seni dan musik tinggal. Follow @viralindongid, komen NADA, dan kamu resmi jadi warga Kota Seni.">
+<meta name="description" content="Kota digital tempat anak seni dan musik tinggal. Follow @viralindongid, komen apa aja, kamu dapat rumah di Kota Seni.">
 <meta property="og:title" content="Kota Seni · Kota Digital Para Seniman">
-<meta property="og:description" content="Follow @viralindongid, komen NADA, cek namamu di sini dan ambil Kartu Wargamu.">
+<meta property="og:description" content="Follow @viralindongid, komen apa aja = dapat rumah. Pilih kawasan senimu, ambil Kartu Warga, ikut Lomba Kawasan.">
 <meta name="theme-color" content="#14102B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%236C2BFF'/%3E%3Cellipse cx='34' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Cellipse cx='67' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Ccircle cx='41' cy='42' r='8' fill='%2314102B'/%3E%3Ccircle cx='74' cy='42' r='8' fill='%2314102B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -146,6 +146,17 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 @keyframes eq{0%,100%{height:6px}50%{height:32px}}
 .play{width:64px;height:64px;border-radius:50%;border:0;background:var(--cream);color:var(--ink);font-size:24px;cursor:pointer}
 /* balai */
+.lbjuara{background:linear-gradient(90deg,#FFD23F,#FFE36B);color:#14102B;border-radius:14px;padding:10px 14px;font-size:14px;margin-bottom:12px}
+.lb{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:8px}
+.lb li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06);border:2px solid transparent}
+.lb li.me{border-color:var(--c);background:rgba(255,255,255,.1)}
+.lb .rk{width:30px;text-align:center;font:900 18px var(--brand)}
+.lb .nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.lb .nm b{font-size:15px}.lb .nm em{font-style:normal;font-size:11px;background:var(--c);color:#14102B;border-radius:8px;padding:1px 6px;margin-left:4px}
+.lb .nm small{font-size:12px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb .lbar{display:block;height:8px;border-radius:6px;background:rgba(255,255,255,.1);overflow:hidden}.lb .lbar i{display:block;height:100%;background:var(--c);border-radius:6px;min-width:4px}
+.lb .pt{font:900 20px var(--brand);text-align:right}.lb .pt small{display:block;font-size:10px;font-weight:700;opacity:.7}
+.lbc{list-style:none;padding:0;margin:6px 0 10px;display:grid;gap:6px;font-size:14px}
 .idcard{border-radius:16px;padding:14px;background:linear-gradient(135deg,#2B1B6B,#3B2398 55%,#6C2BFF);border:2px solid var(--yellow);margin-bottom:14px;position:relative;overflow:hidden}
 .idcard .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .idcard .hd b{font:900 16px var(--brand);letter-spacing:.02em}
@@ -527,6 +538,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
     <span>MULAI</span>
     <button class="sc hot" type="button" data-open="balai">🪪 Ambil Kartu Warga</button>
     <button class="sc" type="button" data-open="jadi">🎵 Jadi Warga</button>
+    <button class="sc hot" type="button" data-open="lomba">🏆 Lomba Kawasan</button>
     <button class="sc" type="button" data-open="voting">🗳️ Voting</button>
     <button class="sc x" type="button" id="startX" aria-label="Sembunyikan">×</button>
   </div>
@@ -587,7 +599,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <p class="sub">Gratis, cukup sekali seumur hidup.</p>
   <ol class="steps">
     <li><span>Follow <b>@viralindongid</b> di Instagram atau TikTok.</span></li>
-    <li><span>Komen <span class="kw">NADA</span> + profesimu di postingan terbaru. Contoh: <b>NADA drummer</b>.</span></li>
+    <li><span><b>Komen apa aja</b> di postingan @viralindongid, kamu dapat rumah. Lalu masuk ke kota & pilih kawasan senimu.</span></li>
     <li><span>Mobil jemputanmu tiba paling lama 24 jam. Cari username-mu di sini dan ambil Kartu Warga.</span></li>
   </ol>
   <p class="muted">Petugas kota tidak pernah minta password atau bayaran apa pun.</p>
@@ -736,6 +748,12 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 </div></div>
 
 <!-- Voting -->
+<div class="sheet" id="s-lomba" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-lomba">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-lomba">🏆 Lomba Kawasan</h2>
+  <p class="sub" id="lombaSub">Kawasan mana paling hidup minggu ini?</p>
+  <div id="lombaBody"></div>
+</div></div>
 <div class="sheet" id="s-voting" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-voting">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
   <h2 id="h-voting">Voting gedung berikutnya</h2>
@@ -757,7 +775,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=27';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=28';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
