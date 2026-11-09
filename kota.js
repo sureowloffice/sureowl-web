@@ -1046,10 +1046,12 @@ function fireworks(t){if(!FEST)return;for(let k=0;k<6;k++){const P=2.4+k*.41,ph=
 let LOMBA=null;
 function lombaDraw(t){if(!LOMBA)return;const C=CLUSTERS.find(c=>c.k===(LOMBA==='pusat'?'umum':LOMBA));if(!C)return;
   const y=6+Math.sin(t*1.6)*.25,x0=C.bx,z0=C.gz;const B=M.chain(M.T(x0,y,z0),M.RY(t*.8),M.S(1.5,1.5,1.5));const Wm=m=>M.mul(B,m);const gold='#FFD23F';
-  D(G.box,Wm(M.chain(M.T(0,-.95,0),M.S(1.1,.28,1.1))),'#14102B',{cast:false});D(G.cyl16,Wm(M.chain(M.T(0,-.85,0),M.S(.18,.55,.18))),gold,{em:.7,cast:false});
-  D(G.sphHi,Wm(M.chain(M.T(0,0,0),M.S(.75,.62,.75))),gold,{em:.8,cast:false});D(G.cyl16,Wm(M.chain(M.T(0,.32,0),M.S(.78,.06,.78))),'#FFF1A8',{em:1,cast:false});
-  for(const k of [-1,1])D(G.sph,Wm(M.chain(M.T(k*.78,.08,0),M.S(.22,.32,.1))),gold,{em:.7,cast:false});
-  D(G.sph,Wm(M.chain(M.T(0,.02,.62),M.S(.22,.22,.06))),C.col,{em:1,cast:false});
+  D(G.cyl16,Wm(M.chain(M.T(0,-1.3,0),M.S(.62,.22,.62))),'#14102B',{cast:false});D(G.cyl16,Wm(M.chain(M.T(0,-1.08,0),M.S(.48,.16,.48))),gold,{em:.6,cast:false});
+  D(G.cyl16,Wm(M.chain(M.T(0,-.92,0),M.S(.11,.42,.11))),gold,{em:.6,cast:false});D(G.sph,Wm(M.chain(M.T(0,-.5,0),M.S(.2,.12,.2))),gold,{em:.7,cast:false});
+  [[.22,-.48,.16],[.4,-.36,.16],[.53,-.22,.2],[.62,-.04,.26],[.68,.2,.3]].forEach(([r,y,h])=>D(G.cyl16,Wm(M.chain(M.T(0,y,0),M.S(r,h,r))),gold,{em:.8,cast:false}));
+  D(G.cyl16,Wm(M.chain(M.T(0,.48,0),M.S(.72,.06,.72))),'#FFF1A8',{em:1,cast:false});D(G.cyl16,Wm(M.chain(M.T(0,.5,0),M.S(.6,.03,.6))),'#B8860B',{em:.4,cast:false});
+  for(const k of [-1,1]){D(G.sph,Wm(M.chain(M.T(k*.78,.12,0),M.S(.09,.3,.09))),gold,{em:.7,cast:false});D(G.sph,Wm(M.chain(M.T(k*.7,.38,0),M.S(.16,.07,.07))),gold,{em:.7,cast:false});D(G.sph,Wm(M.chain(M.T(k*.7,-.14,0),M.S(.16,.07,.07))),gold,{em:.7,cast:false})}
+  D(G.sph,Wm(M.chain(M.T(0,.0,.66),M.S(.2,.2,.05))),C.col,{em:1,cast:false});D(G.sph,Wm(M.chain(M.T(0,.0,-.66),M.S(.2,.2,.05))),C.col,{em:1,cast:false});
   for(let i=0;i<8;i++){const a=t*1.2+i/8*Math.PI*2;D(G.sph,M.chain(M.T(x0+Math.cos(a)*1.5,y+Math.sin(t*3+i)*.4,z0+Math.sin(a)*1.5),M.S(.08,.08,.08)),i%2?gold:'#FFF7E8',{em:1,cast:false})}
   D(G.cyl16,M.chain(M.T(x0,3.3,z0),M.S(.05,1.1,.05)),gold,{em:.6,alpha:.5,cast:false})}
 // avatar 2D untuk Kartu Warga (warna + aksesori sesuai kawasan)
