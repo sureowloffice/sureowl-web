@@ -193,9 +193,9 @@ const BUILD=[15.4,16.5,17.6,18.7,19.6,20.6,21.6,22.6,23.6,24.6]; // piece times
 function stage(t){
   const [sx,sy,sz]=STAGE;let k=0;const T=(x,y,z)=>M.T(sx+x,sy+y,sz+z);
   const part=(idx,fn)=>{const q=stagePart(idx,t,BUILD[idx]);if(!q)return;fn(q.y)};
-  part(0,dy=>{D(G.box,M.chain(T(0,dy,0),M.S(8,.9,4.6)),C.wood);D(G.box,M.chain(T(0,dy+.9,0),M.S(8.1,.06,4.7)),C.woodD);
-    for(let i=-3;i<=3;i++)D(G.box,M.chain(T(i*1.1,dy+.2,2.31),M.S(.06,.5,.02)),C.woodD,{cast:false})});
-  part(1,dy=>{D(G.box,M.chain(T(0,dy,2.9),M.S(3,.45,1.2)),C.woodD);D(G.box,M.chain(T(0,dy,3.7),M.S(3,.22,.8)),C.woodD)});
+  part(0,dy=>{D(G.box,M.chain(T(0,dy,0),M.S(8,.9,4.6)),'#1C7A4A');D(G.box,M.chain(T(0,dy+.9,0),M.S(8.1,.06,4.7)),'#36C26E',{em:.22});
+    for(let i=-3;i<=3;i++)D(G.box,M.chain(T(i*1.1,dy+.2,2.31),M.S(.06,.5,.02)),'#9BE15D',{em:.5,cast:false});D(G.box,M.chain(T(0,dy+.93,2.33),M.S(8.1,.05,.06)),'#9BE15D',{em:.8,cast:false})});
+  part(1,dy=>{D(G.box,M.chain(T(0,dy,2.9),M.S(3,.45,1.2)),'#1C7A4A');D(G.box,M.chain(T(0,dy,3.7),M.S(3,.22,.8)),'#16663D')});
   part(2,dy=>{D(G.box,M.chain(T(0,dy+.9,-2.2),M.S(8,4.4,.3)),C.purpleD);D(G.plane,M.chain(T(0,dy+3.1,-2.04),M.S(7.6,3.8,1)),[1,1,1],{tex:wallTex,em:.35})});
   part(3,dy=>{for(const [x,z] of [[-3.8,-2.1],[3.8,-2.1],[-3.8,2.1],[3.8,2.1]])D(G.cyl8,M.chain(T(x,dy+.9,z),M.S(.16,4.6,.16)),C.cream)});
   part(4,dy=>{D(G.box,M.chain(T(0,dy+5.5,0),M.S(8.8,.35,5.2)),C.yellow);D(G.box,M.chain(T(0,dy+5.85,0),M.S(8.2,.25,4.6)),C.orange)});
