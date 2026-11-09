@@ -1,4 +1,4 @@
-// Kota Seni — Akun warga: masuk, Koin Nada, EXP/level, absen beruntun, misi harian, papan teraktif, verifikasi KTW via DM
+// Kota Seni — Akun warga: masuk, Koin Nada, EXP/level, absen beruntun, misi harian, papan teraktif, verifikasi Kartu Anak Seni via DM
 const crypto = require('crypto');
 
 const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -11,7 +11,7 @@ const MISI = {
   chat: { koin: 5, ket: 'Ngobrol di Pesan Warga', cek: 'chat' },
   radio: { koin: 5, ket: 'Dengerin Radio Kota' },
   koran: { koin: 3, ket: 'Baca Harian Kota Seni' },
-  kartu: { koin: 3, ket: 'Buka Kartu Warga-mu' },
+  kartu: { koin: 3, ket: 'Buka Kartu Anak Seni-mu' },
   ajak: { koin: 5, ket: 'Ajak teman pindah' },
   voting: { koin: 3, ket: 'Lihat voting gedung' }
 };
@@ -314,7 +314,7 @@ module.exports = async (req, res) => {
       await redis([['SET', 'kode:' + code, u + '|' + kh, 'EX', '172800'], ['SET', 'kodeu:' + u + ':' + kh, code, 'EX', '172800']]);
       return send(res, 200, { kode: code });
     }
-    if (!mine) return send(res, 403, { error: 'Username ini sudah dipakai di perangkat lain. Kalau ini akunmu, ambil KTW: kirim kode verifikasi lewat DM ke @viralindongid.', perluKTW: true });
+    if (!mine) return send(res, 403, { error: 'Username ini sudah dipakai di perangkat lain. Kalau ini akunmu, verifikasi Kartu Anak Seni: kirim kode verifikasi lewat DM ke @viralindongid.', perluKTW: true });
 
     if (a === 'masuk' || a === 'profil') return send(res, 200, { ok: true, profil: await profil(u) });
 

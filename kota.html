@@ -6,12 +6,12 @@
 <title>Kota Seni · Kota Digital Para Seniman</title>
 <meta name="description" content="Kota digital tempat anak seni dan musik tinggal. Follow @viralindongid, komen apa aja, kamu dapat rumah di Kota Seni.">
 <meta property="og:title" content="Kota Seni · Kota Digital Para Seniman">
-<meta property="og:description" content="Follow @viralindongid, komen apa aja = dapat rumah. Pilih kawasan senimu, ambil Kartu Warga, ikut Lomba Kawasan.">
+<meta property="og:description" content="Follow @viralindongid, komen apa aja = dapat rumah. Pilih kawasan senimu, ambil Kartu Anak Seni, ikut Lomba Kawasan.">
 <meta name="theme-color" content="#14102B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%236C2BFF'/%3E%3Cellipse cx='34' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Cellipse cx='67' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Ccircle cx='41' cy='42' r='8' fill='%2314102B'/%3E%3Ccircle cx='74' cy='42' r='8' fill='%2314102B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fraunces:opsz,wght@9..144,500;600;700&family=Space+Grotesk:wght@500;700&family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800&family=DM+Serif+Display&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,700&family=Space+Grotesk:wght@500;700&family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800&family=DM+Serif+Display&display=swap">
 <style>
 :root{--ink:#14102B;--ink2:#1E1645;--ink3:#2A2058;--purple:#6C2BFF;--violet:#8A57FF;--cream:#FFF7E8;--yellow:#FFD23F;--pink:#FF4FA3;--cyan:#38E1FF;--muted:#B9AEDF;--line:rgba(255,255,255,.12);
 --sans:Inter,system-ui,sans-serif;--brand:Poppins,Inter,system-ui,sans-serif}
@@ -518,7 +518,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <button type="button" class="needhud glass" id="needHud" hidden aria-label="Kondisi avatar"></button>
   <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></button><button type="button" id="zOut" aria-label="Zoom keluar"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button></div>
 </div>
-<button type="button" class="cta" id="cta" style="display:none"><small id="ctaN">Warga Kota Seni</small><b>🪪 AMBIL KARTU WARGA</b><span>Cek namamu di Balai Warga ›</span></button>
+<button type="button" class="cta" id="cta" style="display:none"><small id="ctaN">Warga Kota Seni</small><b>🪪 AMBIL KARTU ANAK SENI</b><span>Cek namamu di Balai Warga ›</span></button>
 <div class="mpill glass" id="mPill"><button type="button" id="mTitle" class="mt" aria-label="Buka daftar lagu">🎵 <span id="mTitleTx"></span></button><button type="button" id="mBtn" aria-label="Putar atau jeda musik">▶</button><button type="button" id="mNext" aria-label="Lagu berikutnya">⏭</button></div>
 <div class="pick glass" id="pick" hidden><div class="pk-t"><b id="pkName">@warga</b><small id="pkSub">Warga</small></div><button type="button" id="pkHome">🏠 Rumahnya</button><button type="button" id="pkX" aria-label="Tutup">✕</button></div>
 <div class="gomenu glass" id="goMenu" hidden>
@@ -548,7 +548,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <div class="festbar glass" id="festBar" hidden><span id="festTx"></span><button class="btn" type="button" id="festBtn" hidden></button></div>
   <div class="start glass" id="start">
     <span>MULAI</span>
-    <button class="sc hot" type="button" data-open="balai">🪪 Ambil Kartu Warga</button>
+    <button class="sc hot" type="button" data-open="balai">🪪 Ambil Kartu Anak Seni</button>
     <button class="sc" type="button" data-open="jadi">🎵 Jadi Warga</button>
     <button class="sc hot" type="button" data-open="lomba">🏆 Lomba Kawasan</button>
     <button class="sc" type="button" data-open="voting">🗳️ Voting</button>
@@ -584,7 +584,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 <div class="sheet" id="s-akun" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-akun">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
   <h2 id="h-akun">Akun Warga</h2>
-  <p class="sub">Dompet Koin Nada, level, dan verifikasi KTW</p>
+  <p class="sub">Dompet Koin Nada, level, dan verifikasi Kartu Anak Seni</p>
   <div id="akunBody"></div>
 </div></div>
 
@@ -612,7 +612,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <ol class="steps">
     <li><span>Follow <b>@viralindongid</b> di Instagram atau TikTok.</span></li>
     <li><span><b>Komen apa aja</b> di postingan @viralindongid, kamu dapat rumah. Lalu masuk ke kota & pilih kawasan senimu.</span></li>
-    <li><span>Mobil jemputanmu tiba paling lama 24 jam. Cari username-mu di sini dan ambil Kartu Warga.</span></li>
+    <li><span>Mobil jemputanmu tiba paling lama 24 jam. Cari username-mu di sini dan ambil Kartu Anak Seni.</span></li>
   </ol>
   <p class="muted">Petugas kota tidak pernah minta password atau bayaran apa pun.</p>
   <div class="row"><a class="btn" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">Buka Instagram</a><a class="btn dark" href="https://www.tiktok.com/@viralindongid" target="_blank" rel="noopener">Buka TikTok</a></div>
@@ -622,7 +622,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 <div class="sheet" id="s-balai" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-balai">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
   <h2 id="h-balai">Balai Warga</h2>
-  <p class="sub">Loket Kartu Warga Kota Seni</p>
+  <p class="sub">Loket Kartu Anak Seni Kota Seni</p>
   <div id="balaiBody"></div>
 </div></div>
 
