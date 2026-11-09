@@ -112,11 +112,27 @@ R.lomba=async()=>{const el=$('lombaBody');if(!LB.d)el.innerHTML='<p class="muted
   $('lombaSub').textContent='Minggu ini · berakhir Senin 00.00 WIB · sisa '+sisa(j.akhir);
   el.innerHTML=(j.juaraLalu?`<div class="lbjuara">🏆 Juara minggu lalu: <b>${esc((P[j.juaraLalu.k]||{}).ic||'')} ${esc((P[j.juaraLalu.k]||{}).nm||j.juaraLalu.k)}</b> · ${j.juaraLalu.poin} poin</div>`:'')+
   '<ol class="lb">'+j.kawasan.map((k,i)=>{const p=P[k.k]||{nm:k.k,ic:'',col:'#B69CFF'};return `<li class="${k.k===myK?'me':''}" style="--c:${p.col}"><span class="rk">${i===0&&k.poin>0?'👑':i+1}</span><span class="nm"><b>${esc(p.ic+' '+p.nm)}${k.k===myK?' <em>kawasanmu</em>':''}</b><span class="lbar"><i style="width:${Math.round(k.poin/max*100)}%"></i></span><small>${k.aktif} warga aktif · ${k.baru} warga baru${k.top.length?' · ⭐ @'+esc(k.top[0].u):''}</small></span><span class="pt">${k.poin}<small>poin</small></span></li>`}).join('')+'</ol>'+
-  `<h3>Cara nambah poin kawasanmu</h3><ul class="lbc"><li>🤝 <b>+${j.poin.baru}</b> tiap warga baru yang pilih kawasanmu</li><li>🗓️ <b>+${j.poin.absen}</b> tiap absen harian</li><li>✅ <b>+${j.poin.misi}</b> tiap misi harian selesai</li><li>🎨 <b>+${j.poin.karya}</b> tiap karya tayang di Layar Raksasa</li></ul>
+  `<h3>Cara nambah poin kawasanmu</h3><ul class="lbc"><li>🤝 <b>+${j.poin.baru}</b> tiap warga baru yang pilih kawasanmu</li><li>🗓️ <b>+${j.poin.absen}</b> tiap absen harian</li><li>✅ <b>+${j.poin.misi}</b> tiap misi harian selesai</li><li>🎨 <b>+${j.poin.karya}</b> tiap karya tayang di Layar Raksasa</li><li>🎆 <b>+${j.poin.fest||10}</b> hadir di Festival Malam Minggu (Sabtu 20.00 di alun-alun)</li></ul>
   <p class="muted">Kawasan juara dapat piala emas melayang di gerbangnya & diumumkan di Instagram @viralindongid tiap Senin.</p>
   <div class="row">${me?`<button class="btn" type="button" data-open="balai">🪪 Share kartu, ajak teman</button>`:`<button class="btn" type="button" data-open="jadi">🎵 Jadi warga & pilih kawasan</button>`}<button class="btn ghost" type="button" data-open="misi">✅ Kerjakan misi</button></div>`;
   el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>open(b.dataset.open))};
 setTimeout(()=>lombaLoad(true),2500);setInterval(()=>lombaLoad(true),180000);
+// ---------- Festival Malam Minggu (Sabtu 20.00–21.00 WIB) ----------
+const FS={d:null,pending:false,force:/[?&]fest=1\b/.test(location.search)};
+const festLive=()=>FS.force||(FS.d&&Date.now()>=FS.d.mulai&&Date.now()<FS.d.akhir);
+async function festLoad(){try{const r=await fetch('/api/akun?a=fest');const j=await r.json();if(j&&j.mulai)FS.d=j}catch(e){}festTick()}
+function festTick(){const bar=$('festBar');if(!bar)return;const live=festLive();K.setFest&&K.setFest(live);const d=FS.d;const now=Date.now();
+  const claimed=d&&store.get('festc','')===d.tgl;
+  if(live){bar.hidden=false;bar.classList.remove('soon');$('festTx').innerHTML=`🎆 <b>FESTIVAL LIVE</b> · ${d?d.n:0} warga hadir`;const b=$('festBtn');b.hidden=false;b.textContent=claimed?'✅ Kamu hadir':'🎟️ Hadir · +'+((d&&d.koin)||30)+' koin';b.disabled=!!claimed}
+  else if(d&&now<d.mulai&&d.mulai-now<20*36e5){bar.hidden=false;bar.classList.add('soon');$('festTx').innerHTML=`🎆 Festival Malam Minggu jam <b>20.00</b> · ${sisa(d.mulai)} lagi`;$('festBtn').hidden=true}
+  else bar.hidden=true}
+async function festClaim(){if(!festLive())return;const me=store.get('me','');if(!me){toast('🪪 Masuk dulu pakai username-mu ya');open('balai');return}
+  if(!K.near('plaza')){FS.pending=true;toast('🎆 Festival ada di alun-alun, yuk ke sana!');window.KOTA_GO&&window.KOTA_GO('plaza');return}
+  try{const j=await api('fest');if(FS.d){FS.d.n=j.n||FS.d.n;store.set('festc',FS.d.tgl)}if(j.profil){AK.p=j.profil;pillUpdate()}
+    toast(j.sudah?'✅ Kamu sudah tercatat hadir di festival':'🎆 Kamu hadir di Festival! +'+j.dapat+' koin & +10 poin buat kawasanmu');sfx&&sfx('chime')}catch(e){toast('⚠️ '+e.message)}festTick()}
+addEventListener('kota-arrive',e=>{if(e.detail==='plaza'&&FS.pending){FS.pending=false;setTimeout(festClaim,700)}});
+{const b=$('festBtn');if(b)b.onclick=festClaim}
+festLoad();setInterval(festLoad,45000);setInterval(festTick,15000);
 
 // ---------- rumahku ----------
 R.rumah=()=>{const me=K.byName.get(store.get('me',''));
