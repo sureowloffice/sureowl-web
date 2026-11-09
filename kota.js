@@ -692,7 +692,7 @@ function staff(t){const dt=Math.min(.05,t-(staff.lt||t));staff.lt=t;if(!WALK.N)r
     const b=s2.mv?Math.abs(Math.sin(t*10+s2.k))*.1:0;const B=M.chain(M.T(s2.x,b,s2.z),M.RY(s2.yaw),M.S(.44,.44,.44));const Wm=m=>M.mul(B,m);
     if(!s2.r)s2.r={u:'staf'+s2.k,col:['#3A3354','#5C4E8A','#2E5E74','#6B5A2E'][s2.k%4],pk:'pusat',jab:'Staf',ph:s2.k*1.7};
     const near=cam.dist<46&&Math.hypot(s2.x-cam.tx,s2.z-cam.tz)<Math.max(14,cam.dist*.55);AVA.body3D(s2.r,Wm,t,near,!!s2.mv);
-    D(G.box,Wm(M.chain(M.T(.42,.6,.05),M.S(.08,.36,.42))),'#2A1C4F',{cast:false})}}
+    D(G.box,Wm(M.chain(M.T(.42,.42,.05),M.S(.08,.36,.42))),'#2A1C4F',{cast:false})}}
 // bersihkan gedung & pohon yang menimpa cluster, mansion, kantor
 {const RS=[];for(const x of GX)for(const z of GZ)RS.push([x-11,x+11,z-11,z+11]);for(const [x,z] of RES_LOTS)RS.push([x-11,x+11,z-11,z+11]);
   const inR=(x,z,m)=>RS.some(([a,b,c,d])=>x>a-m&&x<b+m&&z>c-m&&z<d+m);

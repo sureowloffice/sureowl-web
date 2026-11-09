@@ -29,25 +29,25 @@ function mkLook(r){
 // Wm: matriks lokal warga (sudah termasuk posisi, arah, skala). near=false → versi ringan untuk warga jauh.
 function body3D(r,Wm,t,near,mv){const L=look(r);const ph=t*10+(r.ph||0);const sw=mv?Math.sin(ph)*.55:0;const NC={cast:false};
   // kaki + sepatu (warga jauh yang diam: satu potong saja)
-  if(!near&&!mv)D(G.box,Wm(M.chain(M.T(0,.21,0),M.S(.36,.42,.15))),L.pants,NC);
+  if(!near&&!mv)D(G.box,Wm(M.chain(M.T(0,0,0),M.S(.36,.42,.15))),L.pants,NC);
   else for(const sx of [-1,1]){const lg=M.chain(M.T(sx*.15,.42,0),M.RX(sx*sw));
     D(G.cyl8,Wm(M.chain(lg,M.T(0,-.42,0),M.S(.11,.42,.11))),L.pants,NC);
     if(near||L.role==='pendiri')D(G.sph,Wm(M.chain(lg,M.T(0,-.4,.05),M.S(L.role==='pendiri'?.15:.13,L.role==='pendiri'?.1:.07,.18))),L.shoe,NC)}
   // badan (satu-satunya bagian yang bikin bayangan selain kepala)
   D(G.sphHi,Wm(M.chain(M.T(0,.66,0),M.S(.34,.32,.27))),L.shirt);
-  if(L.role==='baru')D(G.box,Wm(M.chain(M.T(0,.7,-.27),M.S(.48,.46,.2))),'#7D8494',NC);
+  if(L.role==='baru')D(G.box,Wm(M.chain(M.T(0,.47,-.27),M.S(.48,.46,.2))),'#7D8494',NC);
   // tangan
   if(near){for(const sx of [-1,1]){const ar=M.chain(M.T(sx*.36,.88,0),M.RZ(sx*.22),M.RX(-sx*sw*.8));
     D(G.sph,Wm(M.chain(ar,M.T(0,-.2,0),M.S(.09,.22,.09))),L.arm,NC);D(G.sph,Wm(M.chain(ar,M.T(0,-.44,0),M.S(.085,.085,.085))),L.skin,NC)}}
   else for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.4,.68,0),M.S(.09,.2,.09))),L.arm,NC);
   // detail baju
   if(near){
-    if(L.role==='pres'){D(G.box,Wm(M.chain(M.T(0,.84,.23),M.S(.12,.16,.04))),'#FFFFFF',NC);D(G.box,Wm(M.chain(M.T(0,.74,.27),M.S(.05,.2,.03))),'#E0B341',{em:.3,cast:false})}
-    else if(L.role==='pendiri'){for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.19,.66,.17),M.S(.15,.5,.14))),'#6B4A2E',NC);D(G.sph,Wm(M.chain(M.T(.19,.8,.26),M.S(.06,.06,.03))),'#CD7F32',{em:.45,cast:false});
-      D(G.box,Wm(M.chain(M.T(-.48,.5,.16),M.RY(.3),M.S(.3,.22,.02))),'#F4E2C0',{em:.15,cast:false})}
-    else if(L.role==='donatur'){D(G.box,Wm(M.chain(M.T(0,.84,.23),M.S(.12,.16,.04))),'#222222',NC);for(let i=0;i<5;i++){const a=(i-2)*.32;D(G.sph,Wm(M.chain(M.T(Math.sin(a)*.12,.86-Math.cos(a)*.1,.26),M.S(.035,.035,.035))),'#E0B341',{em:.6,cast:false})}
+    if(L.role==='pres'){D(G.box,Wm(M.chain(M.T(0,.76,.23),M.S(.12,.16,.04))),'#FFFFFF',NC);D(G.box,Wm(M.chain(M.T(0,.64,.27),M.S(.05,.2,.03))),'#E0B341',{em:.3,cast:false})}
+    else if(L.role==='pendiri'){for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.19,.41,.17),M.S(.15,.5,.14))),'#6B4A2E',NC);D(G.sph,Wm(M.chain(M.T(.19,.8,.26),M.S(.06,.06,.03))),'#CD7F32',{em:.45,cast:false});
+      D(G.box,Wm(M.chain(M.T(-.48,.39,.16),M.RY(.3),M.S(.3,.22,.02))),'#F4E2C0',{em:.15,cast:false})}
+    else if(L.role==='donatur'){D(G.box,Wm(M.chain(M.T(0,.76,.23),M.S(.12,.16,.04))),'#222222',NC);for(let i=0;i<5;i++){const a=(i-2)*.32;D(G.sph,Wm(M.chain(M.T(Math.sin(a)*.12,.86-Math.cos(a)*.1,.26),M.S(.035,.035,.035))),'#E0B341',{em:.6,cast:false})}
       for(let k=0;k<3;k++){const a=t*1.4+k*2.1;D(G.cyl16,Wm(M.chain(M.T(Math.cos(a)*.75,1.15+Math.sin(t*2+k)*.15,Math.sin(a)*.4),M.RX(Math.PI/2),M.RZ(t*3+k),M.S(.12,.025,.12))),'#FFD23F',{em:.7,cast:false})}}
-    else if(L.role==='baru')for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.15,.74,.22),M.S(.05,.4,.03))),'#7D8494',NC)}
+    else if(L.role==='baru')for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.15,.54,.22),M.S(.05,.4,.03))),'#7D8494',NC)}
   // rambut belakang
   if(L.hair==='gondrong')D(G.sphHi,Wm(M.chain(M.T(0,1.22,-.2),M.S(.5,.5,.32))),L.hc,NC);
   if(L.hair==='diikat'&&near)D(G.sph,Wm(M.chain(M.T(0,1.86,-.18),M.S(.17,.17,.17))),L.hc,NC);
@@ -59,7 +59,7 @@ function body3D(r,Wm,t,near,mv){const L=look(r);const ph=t*10+(r.ph||0);const sw
   if(near){if(L.hair==='keriting')for(const [x,y,z] of [[-.34,1.62,0],[.34,1.62,0],[-.18,1.8,.12],[.18,1.8,.12],[0,1.84,-.1],[-.3,1.5,-.25],[.3,1.5,-.25]])D(G.sph,Wm(M.chain(M.T(x,y,z),M.S(.17,.17,.17))),L.hc,NC);
     if(L.hair==='poni')D(G.sph,Wm(M.chain(M.T(0,1.62,.3),M.S(.42,.12,.18))),L.hc,NC)}
   // wajah: mata besar krem khas Kota Seni (President pakai kacamata hitam)
-  if(L.role==='pres'){for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.19,1.37,.42),M.S(.25,.14,.06))),'#111111',{em:.1,cast:false});D(G.box,Wm(M.chain(M.T(0,1.39,.45),M.S(.14,.03,.03))),'#111111',NC)}
+  if(L.role==='pres'){for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.19,1.3,.42),M.S(.25,.14,.06))),'#111111',{em:.1,cast:false});D(G.box,Wm(M.chain(M.T(0,1.375,.45),M.S(.14,.03,.03))),'#111111',NC)}
   else for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.19,1.34,.36),M.S(.15,.18,.11))),CREAM,{em:.2,cast:false});D(G.sph,Wm(M.chain(M.T(sx*.19+.05,1.38,.45),M.S(.075,.075,.05))),INK,NC);
     if(near)D(G.sph,Wm(M.chain(M.T(sx*.19+.08,1.42,.49),M.S(.025,.025,.02))),'#FFFFFF',{em:1,cast:false})}
   if(near){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH,{em:.3,cast:false});D(G.sph,Wm(M.chain(M.T(0,1.12,.41),M.S(.055,.022,.03))),INK,NC)}
@@ -69,15 +69,15 @@ function body3D(r,Wm,t,near,mv){const L=look(r);const ph=t*10+(r.ph||0);const sw
 function acc3D(r,Wm,t,near,L){L=L||look(r);const NC={cast:false};
   if(L.role==='pres')return; // mahkota digambar ownerFx di kota.js
   if(L.role==='pendiri'){D(G.cyl16,Wm(M.chain(M.T(0,1.76,0),M.S(.68,.03,.68))),'#A88A5C',NC);D(G.sphHi,Wm(M.chain(M.T(0,1.82,0),M.S(.4,.24,.4))),'#C8A97E',NC);D(G.cyl16,Wm(M.chain(M.T(0,1.78,0),M.S(.41,.07,.41))),'#6B4A2E',NC);return}
-  if(L.role==='donatur'){if(near)for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.15,1.84,.22),M.RX(-.4),M.S(.2,.08,.04))),'#14102B',NC);return}
+  if(L.role==='donatur'){if(near)for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.15,1.8,.22),M.RX(-.4),M.S(.2,.08,.04))),'#14102B',NC);return}
   if(L.role==='baru')return;
   if(!near&&L.pk!=='cerita'&&L.pk!=='musik')return;
   const k=L.pk;
-  if(k==='musik'){D(G.box,Wm(M.chain(M.T(0,1.9,0),M.S(.5,.06,.12))),INK,NC);for(const s of [-1,1]){D(G.box,Wm(M.chain(M.T(s*.4,1.69,0),M.RZ(s*.65),M.S(.06,.48,.12))),INK,NC);D(G.sph,Wm(M.chain(M.T(s*.55,1.38,0),M.S(.1,.18,.18))),INK,NC);if(near)D(G.sph,Wm(M.chain(M.T(s*.62,1.38,0),M.S(.04,.12,.12))),'#FF4FA3',{em:.6,cast:false})}}
+  if(k==='musik'){D(G.box,Wm(M.chain(M.T(0,1.87,0),M.S(.5,.06,.12))),INK,NC);for(const s of [-1,1]){D(G.box,Wm(M.chain(M.T(s*.55,1.5,0),M.RZ(s*.64),M.S(.06,.5,.12))),INK,NC);D(G.sph,Wm(M.chain(M.T(s*.55,1.38,0),M.S(.1,.18,.18))),INK,NC);if(near)D(G.sph,Wm(M.chain(M.T(s*.62,1.38,0),M.S(.04,.12,.12))),'#FF4FA3',{em:.6,cast:false})}}
   else if(k==='visual'){D(G.sphHi,Wm(M.chain(M.T(.1,1.86,0),M.RZ(-.3),M.S(.5,.13,.48))),'#B5352C',NC);D(G.sph,Wm(M.chain(M.T(.06,1.99,0),M.S(.05,.05,.05))),'#B5352C',NC)}
-  else if(k==='film'){D(G.sphHi,Wm(M.chain(M.T(0,1.7,0),M.S(.5,.24,.48))),INK,NC);D(G.box,Wm(M.chain(M.T(0,1.68,.48),M.S(.4,.04,.3))),INK,NC);D(G.box,Wm(M.chain(M.T(0,1.84,.3),M.S(.16,.09,.04))),'#3FA9FF',{em:.6,cast:false})}
+  else if(k==='film'){D(G.sphHi,Wm(M.chain(M.T(0,1.7,0),M.S(.5,.24,.48))),'#3B7BD9',NC);D(G.box,Wm(M.chain(M.T(0,1.66,-.48),M.S(.4,.04,.3))),'#2A5AA8',NC)}
   else if(k==='cerita'){D(G.cyl16,Wm(M.chain(M.T(0,1.8,0),M.S(.48,.05,.48))),INK,NC);D(G.cyl16,Wm(M.chain(M.T(0,1.82,0),M.S(.32,.42,.32))),INK,NC);D(G.cyl16,Wm(M.chain(M.T(0,1.88,0),M.S(.33,.08,.33))),'#FF6FB5',{em:.5,cast:false})}
-  else if(k==='kriya'){D(G.cyl16,Wm(M.chain(M.T(0,1.54,0),M.S(.47,.12,.44))),'#E8B04B',{em:.2,cast:false});for(let i=0;i<4;i++)D(G.box,Wm(M.chain(M.T(-.24+i*.16,1.6,.43),M.S(.07,.1,.02))),['#B5352C',INK][i%2],NC);D(G.box,Wm(M.chain(M.T(-.42,1.56,-.28),M.RZ(.8),M.S(.24,.07,.07))),'#E8B04B',NC)}
+  else if(k==='kriya'){D(G.cyl16,Wm(M.chain(M.T(0,1.54,0),M.S(.47,.12,.44))),'#E8B04B',{em:.2,cast:false});for(let i=0;i<4;i++)D(G.box,Wm(M.chain(M.T(-.24+i*.16,1.55,.43),M.S(.07,.1,.02))),['#B5352C',INK][i%2],NC);D(G.box,Wm(M.chain(M.T(-.42,1.53,-.28),M.RZ(.8),M.S(.24,.07,.07))),'#E8B04B',NC)}
   else{D(G.sph,Wm(M.chain(M.T(.3,1.82,.14),M.S(.1,.1,.1))),'#FFD23F',{em:.5,cast:false});if(near)for(let i=0;i<5;i++){const a=i/5*Math.PI*2;D(G.sph,Wm(M.chain(M.T(.3+Math.cos(a)*.12,1.82+Math.sin(a)*.12,.14),M.S(.08,.08,.05))),BLUSH,{em:.4,cast:false})}}}
 
 // barang bawaan profesi digambar di depan badan manusia (lebih ramping dari badan telur)
@@ -119,7 +119,7 @@ function shapes(L){const S=[];const e=(cx,cy,rx,ry,f,o)=>S.push(['e',{cx,cy,rx,r
   const k=L.pk;
   if(k==='musik'){p('M-34 72 Q-34 28 0 28 Q34 28 34 72',null,{s:INK,sw:5});rc(-41,62,12,20,4,INK);rc(29,62,12,20,4,INK);rc(-38,66,6,12,3,'#FF4FA3');rc(32,66,6,12,3,'#FF4FA3')}
   else if(k==='visual'){e(-4,40,31,10,'#B5352C',{rot:-10});e(-4,29,3,3,'#B5352C')}
-  else if(k==='film'){p('M-31 54 Q-28 30 0 30 Q28 30 31 54Z',INK);e(0,54,33,5,INK);rc(-7,37,14,7,2,'#3FA9FF')}
+  else if(k==='film'){p('M-31 54 Q-28 32 0 32 Q28 32 31 54Z','#3B7BD9');rc(20,48,20,6,3,'#2A5AA8')}
   else if(k==='cerita'){rc(-16,8,32,32,0,INK);rc(-16,32,32,6,0,'#FF6FB5');rc(-27,38,54,6,3,INK)}
   else if(k==='kriya'){rc(-33,50,66,10,3,'#E8B04B');for(let i=0;i<4;i++)e(-20+i*14,55,2,2,['#B5352C',INK][i%2]);p('M31 52 L42 46 L40 56Z M31 58 L42 64 L38 56Z','#E8B04B')}
   else{for(const [x,y] of [[24,44],[30,48],[28,55],[20,55],[18,48]])e(x,y,4,4,BLUSH);e(24,50,3,3,'#FFD23F')}
