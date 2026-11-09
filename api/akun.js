@@ -48,11 +48,12 @@ const AKSI = { roti: { koin: 15, l: 25 }, nasi: { koin: 30, l: 50 }, kopi: { koi
 const SLEEP_RATE = 60; // energi per jam (±1 per menit)
 // profesi warga dipilih sendiri saat masuk kota (bukan dari komentar IG)
 const PROF = {
-  musik: ['gitaris', 'vokalis', 'drummer', 'bassist', 'keyboard', 'produser', 'dj', 'tiup', 'penulis'],
-  ilustrator: ['digital', 'komik', 'karakter', 'pelukis', 'tattoo', 'mural'],
-  visual: ['fotografer', 'videografer', 'filmmaker', 'editor', 'desainer', 'animator', 'kreator'],
-  pahat: ['kayu', 'batu', 'patung', 'keramik', 'kriya', 'sculpt3d'],
-  lainnya: ['penari', 'sastra', 'teater', 'tarot', 'penikmat']
+  musik: ['gitaris', 'vokalis', 'drummer', 'bassist', 'keyboard', 'komposer', 'penulis', 'produser', 'dj', 'tiup', 'sound'],
+  visual: ['pelukis', 'digital', 'komik', 'karakter', 'fotografer', 'desainer', 'tattoo', 'mural'],
+  film: ['filmmaker', 'videografer', 'editor', 'animator', 'gim', 'interaktif', 'sculpt3d', 'kreator'],
+  cerita: ['penari', 'teater', 'sastra', 'puisi', 'story'],
+  kriya: ['keramik', 'kayu', 'batu', 'patung', 'anyaman', 'batik', 'tekstil', 'fesyen', 'kriya'],
+  pusat: ['penikmat', 'warga', 'pengelola', 'komunitas', 'tarot']
 };
 function needNow(raw) {
   let n = null; try { n = raw ? JSON.parse(raw) : null } catch (e) { n = null }
@@ -276,7 +277,7 @@ module.exports = async (req, res) => {
 
     if (a === 'pos') { // posisi karakter saat mode main
       const num = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round((+v || 0) * 100) / 100));
-      const p = { x: num(body.x, -60, 60), z: num(body.z, -95, 46), yaw: num(body.yaw, -50, 50), emo: ['wave', 'dance', 'music'].includes(body.emo) ? body.emo : '' };
+      const p = { x: num(body.x, -60, 60), z: num(body.z, -400, 46), yaw: num(body.yaw, -50, 50), emo: ['wave', 'dance', 'music'].includes(body.emo) ? body.emo : '' };
       const [ok] = await redis([['SET', 'rlp:' + u, '1', 'NX', 'PX', '1800']]);
       if (!ok) return send(res, 200, { ok: true, skip: true });
       await redis([['SET', 'pos:' + u, JSON.stringify(p), 'EX', '40'], ['ZADD', 'online', String(Date.now()), u]]);
