@@ -42,7 +42,10 @@ const yesterday = () => new Date(Date.now() + 7 * 36e5 - 864e5).toISOString().sl
 const wkStart = (ms = Date.now()) => { const d = new Date(ms + 7 * 36e5); const dow = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - dow) - 7 * 36e5 };
 const wkId = (ms = Date.now()) => new Date(wkStart(ms) + 7 * 36e5).toISOString().slice(0, 10);
 const LOMBA_MULAI = '2026-11-09'; // minggu pertama Lomba Kawasan
-const LP = { absen: 5, misi: 1, karya: 15, baru: 10 };
+const LP = { absen: 5, misi: 1, karya: 15, baru: 10, fest: 10 };
+// Festival Malam Minggu: tiap Sabtu 20.00–21.00 WIB
+const festWin = (ms = Date.now()) => { const sat = wkStart(ms) + 5 * 864e5; const mulai = sat + 20 * 36e5; return { tgl: new Date(sat + 7 * 36e5).toISOString().slice(0, 10), mulai, akhir: mulai + 36e5 } };
+const FEST_KOIN = 30;
 const lpCmd = (u, n, ms) => [['HINCRBY', 'lp:' + wkId(ms), u, String(n)], ['EXPIRE', 'lp:' + wkId(ms), '3024000']];
 const KAWS = ['musik', 'visual', 'film', 'cerita', 'kriya', 'pusat'];
 let lombaCache = { at: 0, body: null };
@@ -193,6 +196,12 @@ module.exports = async (req, res) => {
         lombaCache = { at: Date.now(), body };
         return send(res, 200, body);
       }
+      if (q.get('a') === 'fest') { // status Festival Malam Minggu + warga yang hadir
+        const F = festWin(), now = Date.now();
+        const [n, us] = await redis([['SCARD', 'fest:' + F.tgl], ['SMEMBERS', 'fest:' + F.tgl]]);
+        res.setHeader('Cache-Control', 'public, max-age=10');
+        return send(res, 200, { tgl: F.tgl, mulai: F.mulai, akhir: F.akhir, aktif: now >= F.mulai && now < F.akhir, n: +n || 0, hadir: (us || []).slice(0, 40), koin: FEST_KOIN, poin: LP.fest });
+      }
       if (q.get('a') === 'karya') { // daftar karya yang sudah disetujui (publik)
         const [ids] = await redis([['LRANGE', 'karya:ok', '0', '39']]);
         const list = (await karyaMetas(ids)).map(k => ({ id: k.id, u: k.u, jenis: k.jenis, judul: k.judul, link: k.link || '', t: k.t, ok: k.ok }));
@@ -332,6 +341,16 @@ module.exports = async (req, res) => {
       if (!rl) return send(res, 429, { error: 'Tunggu sebentar sebelum simpan lagi.' });
       await redis([['SET', 'rumah:' + u, JSON.stringify(deco)]]);
       return send(res, 200, { ok: true, deco });
+    }
+    if (a === 'fest') { // hadir di Festival Malam Minggu (sekali per festival)
+      const F = festWin(), now = Date.now();
+      if (now < F.mulai) return send(res, 400, { error: 'Festival belum mulai. Datang Sabtu jam 20.00 WIB ya!' });
+      if (now >= F.akhir) return send(res, 400, { error: 'Festival minggu ini sudah selesai. Sampai jumpa Sabtu depan!' });
+      const [ok] = await redis([['SET', 'festh:' + F.tgl + ':' + u, '1', 'NX', 'EX', '604800']]);
+      if (!ok) { const [n] = await redis([['SCARD', 'fest:' + F.tgl]]); return send(res, 200, { ok: true, sudah: true, n: +n || 0 }) }
+      await redis([['SADD', 'fest:' + F.tgl, u], ['EXPIRE', 'fest:' + F.tgl, '1209600'], ['INCRBY', 'koin:' + u, String(FEST_KOIN)], ['INCRBY', 'exp:' + u, String(FEST_KOIN)], ['ZINCRBY', 'papan:exp', String(FEST_KOIN), u], ...lpCmd(u, LP.fest)]);
+      const [n] = await redis([['SCARD', 'fest:' + F.tgl]]);
+      return send(res, 200, { ok: true, dapat: FEST_KOIN, n: +n || 0, profil: await profil(u) });
     }
     if (a === 'keluar') { await redis([['ZREM', 'online', u], ['DEL', 'pos:' + u]]); return send(res, 200, { ok: true }) }
 
