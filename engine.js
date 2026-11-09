@@ -155,6 +155,7 @@ function world(t){
 }
 
 // ================== mascot (Wali Kota) ==================
+let SASH_TX=null;function sashTex(){if(!SASH_TX)SASH_TX=texFromCanvas(signCanvas(1024,200,(x,w,h)=>{x.fillStyle='#FFFFFF';x.fillRect(0,0,w,h);x.fillStyle='#4A1BC2';x.textAlign='center';x.textBaseline='middle';x.font='900 150px "Inter",sans-serif';x.fillText('WALI KOTA',w/2,h/2+6)}));return SASH_TX}
 function mascot(pos,yaw,t,o={}){ // o: wave(0..1), hop, squash, look
   const sq=o.squash||0;const by=pos[1];const base=M.chain(M.T(pos[0],by,pos[2]),M.RY(yaw));
   const sY=1-sq*0.25,sX=1+sq*0.18;
@@ -177,8 +178,12 @@ function mascot(pos,yaw,t,o={}){ // o: wave(0..1), hop, squash, look
   // beret
   D(G.sphHi,W(M.chain(M.T(.05,1.86*sY,0),M.RZ(-.18),M.S(.62,.16,.58))),C.ink);
   D(G.sph,W(M.chain(M.T(.08,2.02*sY,0),M.S(.07,.08,.07))),C.ink);
-  // sash (wali kota)
-  D(G.cyl16,W(M.chain(M.T(0,.62*sY,.74),M.RX(Math.PI/2),M.S(.17,.05,.17))),C.yellow,{em:.25});D(G.box,W(M.chain(M.T(-.09,.8*sY,.72),M.RZ(.35),M.S(.06,.28,.03))),C.pink,{cast:false});D(G.box,W(M.chain(M.T(.09,.8*sY,.72),M.RZ(-.35),M.S(.06,.28,.03))),C.pink,{cast:false});
+  // selempang Wali Kota: kain putih bergaris emas melingkari perut + tulisan, medali digantung di bawahnya
+  D(G.cyl16,W(M.chain(M.T(0,.66*sY,0),M.S(.835*sX,.19*sY,.795*sX))),'#FFFFFF',{em:.2,cast:false});
+  for(const yy of [.66,.83])D(G.cyl16,W(M.chain(M.T(0,yy*sY,0),M.S(.842*sX,.025,.802*sX))),C.yellow,{em:.45,cast:false});
+  D(G.plane,W(M.chain(M.T(0,.755*sY,.805*sX),M.S(.86,.17,1))),[1,1,1],{tex:sashTex(),em:.35,cast:false});
+  D(G.box,W(M.chain(M.T(-.06,.6*sY,.74),M.S(.05,.12,.03))),C.pink,{cast:false});D(G.box,W(M.chain(M.T(.06,.6*sY,.74),M.S(.05,.12,.03))),C.pink,{cast:false});
+  D(G.cyl16,W(M.chain(M.T(0,.5*sY,.72),M.RX(Math.PI/2),M.S(.13,.05,.13))),C.yellow,{em:.25});
   // arms
   const wave=o.wave||0;
   for(const s of [-1,1]){let ang=s*0.35;if(s==1&&wave>0)ang=-(2.2+Math.sin(t*14)*.35)*wave+(.35)*(1-wave);if(s==-1&&o.point)ang=-1.4*o.point-.35*(1-o.point);

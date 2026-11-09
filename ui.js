@@ -91,7 +91,7 @@ function bindCard(){const dl=$('dl');if(dl)dl.addEventListener('click',()=>done(
     const a=document.createElement('a');a.href=CARD.url;a.download='KartuWarga_KotaSeni_'+CARD.r.u+'.png';document.body.appendChild(a);a.click();a.remove();toast('⬇️ Kartu disimpan. Buka Instagram → Story → pilih gambarnya')};
   const cp=$('cpk');if(cp)cp.onclick=async()=>{try{await navigator.clipboard.writeText(cp.dataset.link);toast('🔗 Link kartumu disalin')}catch(e){toast(cp.dataset.link)}};
   document.querySelectorAll('[data-wfind]').forEach(b=>b.onclick=()=>{const r=K.byName.get(b.dataset.wfind.toLowerCase());closeAll();if(r){K.select(r);K.focusHouse&&K.focusHouse(r)}})}
-function idPreview(r){return `<div class="idcard${r&&r.own?' own':''}"><div class="hd"><b>KOTA SENI</b><span>${r?'★ '+esc(r.jab).toUpperCase():'★ WARGA'}</span></div><div class="bd"><div class="ph">${eyesSVG(r?r.col:'#6C2BFF')}</div><dl><dt>USERNAME</dt><dd>@${esc(r?r.u:'username.kamu')}</dd><dt>NO. WARGA</dt><dd>#${r?r.no:'0000'}</dd><dt>PROFESI · SEJAK</dt><dd>${esc(r?(r.p||'Belum pilih profesi'):'Profesimu')} · ${r?tglPendek(r.t):'hari ini'}</dd></dl></div>${r?'':'<div class="wm">CONTOH</div>'}</div>`}
+function idPreview(r){return `<div class="idcard${r&&r.own?' own':''}"><div class="hd"><b>KOTA SENI</b><span>${r?'★ '+esc(r.jab).toUpperCase():'★ WARGA'}</span></div><div class="bd"><div class="ph">${r?AVA.svg(r,{icon:1,size:72}):AVA.svgLook(AVA.look({u:'contoh',pk:'musik',col:'#FF4B4B',jab:'',lk:'1:0:0'}),{icon:1,size:72})}</div><dl><dt>USERNAME</dt><dd>@${esc(r?r.u:'username.kamu')}</dd><dt>NO. WARGA</dt><dd>#${r?r.no:'0000'}</dd><dt>PROFESI · SEJAK</dt><dd>${esc(r?(r.p||'Belum pilih profesi'):'Profesimu')} · ${r?tglPendek(r.t):'hari ini'}</dd></dl></div>${r?'':'<div class="wm">CONTOH</div>'}</div>`}
 function eyesSVG(c){return `<svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="${c}"/><ellipse cx="34" cy="52" rx="15" ry="19" fill="#FFF7E8"/><ellipse cx="66" cy="52" rx="15" ry="19" fill="#FFF7E8"/><circle cx="39" cy="45" r="7" fill="#14102B"/><circle cx="71" cy="45" r="7" fill="#14102B"/></svg>`}
 function balaiForm(){return `<form class="search" id="bf" autocomplete="off" style="margin-bottom:12px"><label for="bq"><span aria-hidden="true">@</span><input id="bq" placeholder="username-mu" aria-label="Username" autocapitalize="off" spellcheck="false"></label><button class="btn" type="submit">Ambil kartu</button></form>`}
 R.balai=()=>{const me=K.byName.get(store.get('me',''));
@@ -262,7 +262,7 @@ const QUICK=['👋 Halo warga!','🎵 Ada yang mau kolab?','🔥 Lagi garap lagu
 function chatKey(){let k=store.get('ck','');if(!k){const a=new Uint8Array(18);(crypto.getRandomValues?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*256|0));k=[...a].map(b=>b.toString(16).padStart(2,'0')).join('');store.set('ck',k)}return k}
 function jam(ts){const d=new Date(ts+7*36e5);return String(d.getUTCHours()).padStart(2,'0')+'.'+String(d.getUTCMinutes()).padStart(2,'0')}
 function hariOf(ts){return new Date(ts+7*36e5).toISOString().slice(0,10)}
-function avatar(u,s){const r=K.byName.get(u);const c=r?r.col:'#8A57FF';return `<svg class="av" width="${s||30}" height="${s||30}" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="${c}" stroke="#14102B" stroke-width="5"/><ellipse cx="35" cy="52" rx="14" ry="18" fill="#FFF7E8"/><ellipse cx="65" cy="52" rx="14" ry="18" fill="#FFF7E8"/><circle cx="40" cy="46" r="7" fill="#14102B"/><circle cx="70" cy="46" r="7" fill="#14102B"/></svg>`}
+function avatar(u,s){const r=K.byName.get(u);const L=r?AVA.look(r):AVA.look({u:String(u||'tamu'),baru:true,jab:''});return AVA.svgLook(L,{icon:1,size:s||30,cls:'av'})}
 function chatUnread(){return chatMsgs.filter(m=>m.ts>lastSeenChat&&m.u!==store.get('me','')).length}
 function setBadge(){const n=$('s-chat').hidden?chatUnread():0;const b=$('chatBadge');b.hidden=!n;b.textContent=n>9?'9+':n;document.querySelector('.chatbtn').classList.toggle('has',!!n);document.title=(n?'('+n+') ':'')+'Kota Seni · Kota Digital Para Seniman'}
 function ping(){if(!interacted)return;try{ac2=ac2||new (window.AudioContext||window.webkitAudioContext)();const t=ac2.currentTime;[880,1320].forEach((f,i)=>{const o=ac2.createOscillator(),g=ac2.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t+i*.09);g.gain.linearRampToValueAtTime(.06,t+i*.09+.01);g.gain.exponentialRampToValueAtTime(.0005,t+i*.09+.25);o.connect(g);g.connect(ac2.destination);o.start(t+i*.09);o.stop(t+i*.09+.3)})}catch(e){}}
@@ -459,7 +459,7 @@ jemput();setInterval(jemput,1000);
    const it=d.it.slice().sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));cx.textAlign='center';cx.textBaseline='alphabetic';
    for(const [i,j,e] of it){const [x,y]=iso(i,j);cx.fillStyle='rgba(0,0,0,.22)';cx.beginPath();cx.ellipse(x,y+4,34,14,0,0,7);cx.fill();cx.fillStyle='#000';cx.font='72px sans-serif';cx.fillText(e,x,y+12)}
    // pemilik rumah berdiri di tengah
-   const [mx,my]=iso(3.4,3.4);cx.fillStyle=RM.r.col||'#B69CFF';cx.beginPath();cx.ellipse(mx,my-30,26,32,0,0,7);cx.fill();cx.fillStyle='#FFF7E8';for(const s of [-1,1]){cx.beginPath();cx.ellipse(mx+s*9,my-38,8,10,0,0,7);cx.fill()}cx.fillStyle='#14102B';for(const s of [-1,1]){cx.beginPath();cx.arc(mx+s*9+2,my-36,4,0,7);cx.fill()}}
+   const [mx,my]=iso(3.4,3.4);AVA.draw2D(cx,RM.r,mx,my-66,.38)}
  function tileAt(e){const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*cv.height/r.height;const dx=(x-OX)/(TW/2),dy=(y-OY+TH/2)/(TH/2);const i=Math.floor((dy+dx)/2),j=Math.floor((dy-dx)/2);return i>=0&&j>=0&&i<N&&j<N?[i,j]:null}
  cv.addEventListener('pointermove',e=>{if(RM.edit)draw(tileAt(e))});
  cv.addEventListener('click',e=>{if(!RM.edit)return;const p=tileAt(e);if(!p)return;const d=RM.d;const k=d.it.findIndex(a=>a[0]===p[0]&&a[1]===p[1]);
@@ -527,11 +527,7 @@ jemput();setInterval(jemput,1000);
 
 // ---------- tombol AVATAR menampilkan karakter milik warga ----------
 {function avSvg(r){if(!r)return '<svg class="av me" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="15" fill="#2A2452" stroke="#7CF2FF" stroke-width="1.6" stroke-dasharray="3 3"/><text x="24" y="31.5" text-anchor="middle" font-size="15" font-weight="700" fill="#7CF2FF" font-family="Space Grotesk,sans-serif">?</text></svg>';
-   const c=r.col||'#B69CFF';const hat=r.hat&&!r.own?'<ellipse cx="25" cy="10.5" rx="10.5" ry="3" fill="#14102B" transform="rotate(-8 25 10.5)"/>':'';
-   const crown=r.own?'<path d="M15 12l3.5 4 5.5-6 5.5 6 3.5-4v5H15z" fill="#E8C27A" stroke="#7A5A1E" stroke-width=".8"/>':'';
-   return `<svg class="av me" viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="avb" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".45" stop-color="${c}"/><stop offset="1" stop-color="${c}" stop-opacity=".85"/></radialGradient></defs>`+
-     `<ellipse cx="24" cy="44" rx="11" ry="2.2" fill="#000" opacity=".35"/><ellipse cx="24" cy="27" rx="15" ry="16.5" fill="url(#avb)" stroke="rgba(0,0,0,.25)" stroke-width=".8"/>`+
-     `<ellipse cx="18.5" cy="23" rx="5" ry="6" fill="#FFF7E8"/><ellipse cx="29.5" cy="23" rx="5" ry="6" fill="#FFF7E8"/><circle cx="20.2" cy="24.4" r="2.5" fill="#14102B"/><circle cx="31.2" cy="24.4" r="2.5" fill="#14102B"/><circle cx="21" cy="23.4" r=".9" fill="#fff"/><circle cx="32" cy="23.4" r=".9" fill="#fff"/>`+hat+crown+'</svg>'}
+   return AVA.svg(r,{icon:1,cls:'av me'})}
  let last='\u0000',lp=null;function upd(){const me=store.get('me','');if(me===last&&lp===K.playing)return;last=me;lp=K.playing;const r=K.byName.get(me);const b=$('playRail');if(!b)return;b.querySelector('.pe').innerHTML=avSvg(r);
    b.querySelector('b').textContent='AVATAR';if(!K.playing)$('playSub').textContent=r?(r.own?'President':'@'+r.u).slice(0,12):'ketuk main';b.classList.toggle('has',!!r);b.setAttribute('aria-label',r?'Mainkan avatarmu':'Masuk lalu mainkan avatarmu')}
  upd();setInterval(upd,1000)}
@@ -583,12 +579,26 @@ jemput();setInterval(jemput,1000);
    try{const j=await api('kerja',{acc});setN(j.need);coinFx('+'+j.gaji);sfx('coin');if(j.naik)toast('🎖️ Naik jabatan jadi '+KAR[j.need.karier]+'! Gaji naik 10%');return `<b>💰 Gaji +${j.gaji} Koin Nada</b> · energi −20, lapar −10`}
    catch(e){if(e.j&&e.j.need)setN(e.j.need);return '<span>'+esc(e.message)+'</span>'}};
  const cdTxt=(n,j)=>{const t=n.cd&&n.cd[j];if(!t)return '';const m=Math.ceil((t-(n.now||Date.now())-(Date.now()-NS.at))/60000);return m>0?` · ${m} mnt lagi`:''};
+ // pilih tampilan avatar: warna kulit, model rambut, warna rambut (baju & aksesori tetap sesuai profesi)
+ let LKD=null;
+ function lookUI(me){const box=$('lookUI');if(!box||!me)return;const cur=AVA.look(me).lk;if(!LKD||LKD.u!==me.u)LKD={u:me.u,v:cur.slice()};const v=LKD.v;
+   const prev=Object.assign({},me,{lk:v.join(':'),_Lk:null,_L:null});const dirty=v.join(':')!==cur.join(':');
+   const sw=(arr,i,key,nm)=>`<button type="button" class="lksw${v[i]===key?' on':''}" data-lk="${i}:${key}" style="--c:${arr[key]}" aria-label="${nm}" aria-pressed="${v[i]===key}"></button>`;
+   box.innerHTML=`<div class="lkprev">${AVA.svg(prev,{size:96})}</div><div class="lkopt">
+     <small>Warna kulit</small><div class="lkrow">${AVA.SKIN.map((c,k)=>sw(AVA.SKIN,0,k,'Kulit '+(k+1))).join('')}</div>
+     <small>Model rambut</small><div class="lkrow hair">${AVA.HAIR.map((h,k)=>{const o=Object.assign({},prev,{lk:[v[0],k,v[2]].join(':'),_Lk:null,_L:null});return `<button type="button" class="lkhair${v[1]===k?' on':''}" data-lk="1:${k}" aria-pressed="${v[1]===k}">${AVA.svg(o,{icon:1,size:34})}<span>${AVA.HAIR_NM[k]}</span></button>`}).join('')}</div>
+     <small>Warna rambut</small><div class="lkrow">${AVA.HCOL.map((c,k)=>sw(AVA.HCOL,2,k,AVA.HCOL_NM[k])).join('')}</div>
+     <p class="muted">Baju, aksesori kepala & barang bawaan ikut kawasan dan profesimu.${me.own||me.jab==='Pendiri Kota'?' Tokoh kota tetap pakai kostum khususnya.':''}</p>
+     <button class="btn" type="button" id="lkSave"${dirty?'':' disabled'}>${dirty?'💾 Simpan tampilan':'✅ Tersimpan'}</button></div>`;
+   box.querySelectorAll('[data-lk]').forEach(x=>x.onclick=()=>{const [i,k]=x.dataset.lk.split(':').map(Number);LKD.v[i]=k;sfx('tap');lookUI(me)});
+   $('lkSave').onclick=async()=>{$('lkSave').disabled=true;try{const j=await api('look',{kl:v[0],rb:v[1],wr:v[2]});me.lk=j.look;if(AK.p)AK.p.look=j.look;sfx('coin');toast('🎨 Tampilan avatarmu sudah diganti');lookUI(me)}catch(e){toast('⚠️ '+e.message);$('lkSave').disabled=false}}}
  R.avatar=()=>{const me=K.byName.get(store.get('me',''));const n=now();const b=$('avBody');
    if(!me){b.innerHTML='<p>Masuk dulu pakai username warga-mu biar avatarmu punya kebutuhan, bisa kerja dan dapat Koin Nada.</p>'+balaiForm();$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)};return}
    if(!n){b.innerHTML='<p class="muted">Memuat kondisi avatar…</p>';load();return}
    const st=n.lemas?'<span class="avst bad">😵 Lemas · rawat dulu biar bisa kerja</span>':n.energi<20?'<span class="avst warn">🥱 Capek · tidur dulu</span>':'<span class="avst ok">🙂 Segar · siap kerja</span>';
    b.innerHTML=`<div class="avtop">${document.querySelector('.playbig .pe').innerHTML}<div><b>${me.own?'👑 President':'@'+esc(me.u)}</b><small>${me.pk&&K.PROF[me.pk]?K.PROF[me.pk].ic+' ':''}${esc(me.p||'Warga')} · ${KAR[n.karier||0]} (${n.kerja||0}× kerja) · <a href="#" data-pf="1" style="color:var(--yellow)">ganti profesi</a></small>${st}</div><div class="avkoin"><small>Koin Nada</small><b>${(AK.p&&AK.p.koin)||n.koin||0}</b></div></div>
    <div class="avbars">${NB.map(([k,ic,nm,c])=>`<div class="avb"><span>${ic} ${nm}</span><i><b style="width:${Math.round(n[k])}%;background:${c}"></b></i><em>${Math.round(n[k])}</em></div>`).join('')}</div>
+   <h3>Tampilanku</h3><div id="lookUI" class="lookui"></div>
    <h3>Kerja</h3><div class="avact"><button class="btn" type="button" data-av="kerja">🎙️ Sesi Rekaman<small>Gedung Musik · +20–60 koin</small></button><button class="btn" type="button" data-av="kantor">💼 Kerja Kantoran<small>Label Musik Office · +20–60 koin</small></button></div>
    ${n.tidur?`<div class="zzcard"><span class="zi">😴</span><div><b>Lagi tidur di rumah</b><small>Energi naik ±1 per menit · bangun sendiri kalau penuh</small></div><button class="btn" type="button" data-av="bangun">☀️ Bangun</button></div>`:''}
    <h3>Seni Mart</h3>${K.near('mart')?`<div class="avact"><button class="btn ghost" type="button" data-av="roti">🍞 Roti<small>−15 koin · +25 lapar</small></button><button class="btn ghost" type="button" data-av="nasi">🍚 Nasi<small>−30 koin · +50 lapar</small></button><button class="btn ghost" type="button" data-av="kopi">☕ Kopi<small>−12 koin · +15 energi</small></button><button class="btn ghost" type="button" data-av="esteh">🧋 Es Teh<small>−8 koin · +5 mood</small></button></div>`:`<div class="goto"><span>🛒 Makan & minum harus beli langsung di Seni Mart</span><button class="btn" type="button" data-goto="mart">🚶 Ke Seni Mart</button></div>`}
@@ -596,7 +606,7 @@ jemput();setInterval(jemput,1000);
    <h3>Main & cari inspirasi</h3>${K.near('plaza')?`<div class="avact"><button class="btn ghost" type="button" data-av="nongkrong">🎪 Nongkrong di alun-alun<small>+12 mood${cdTxt(n,'nongkrong')}</small></button></div>`:`<div class="goto"><span>🎪 Mood naik kalau nongkrong di alun-alun</span><button class="btn" type="button" data-goto="plaza">🚶 Ke alun-alun</button></div>`}
    ${K.near('studio')?`<div class="avact"><button class="btn ghost" type="button" data-av="dengar">🎧 Dengar sesi di Gedung Musik<small>+18 inspirasi${cdTxt(n,'dengar')}</small></button></div>`:`<div class="goto"><span>🎧 Inspirasi dari dengar sesi di Gedung Musik</span><button class="btn" type="button" data-goto="studio">🚶 Ke Gedung Musik</button></div>`}
    <p class="muted">Semua bar turun pelan, juga waktu kamu offline. Kalau ada yang habis, avatarmu lemas dan belum bisa kerja. Inspirasi di atas 70 = gaji +20%.</p>`;
-   b.querySelectorAll('[data-goto]').forEach(x=>x.onclick=()=>goPlace(x.dataset.goto));b.querySelectorAll('[data-pf]').forEach(x=>x.onclick=()=>{window.KOTA_PF.pk=null;open('profesi')});
+   lookUI(me);b.querySelectorAll('[data-goto]').forEach(x=>x.onclick=()=>goPlace(x.dataset.goto));b.querySelectorAll('[data-pf]').forEach(x=>x.onclick=()=>{window.KOTA_PF.pk=null;open('profesi')});
      b.querySelectorAll('[data-av]').forEach(x=>x.onclick=()=>{const j=x.dataset.av;if(j==='kerja'){open('studio');return}if(j==='kantor'){open('kantor');return}if(j==='bangun'){aksi('bangun','');return}
      const L={kopi:'☕ Energi +15',esteh:'🧋 Mood +5',roti:'🍞 Nyam! Lapar +25',nasi:'🍚 Kenyang! Lapar +50',tidur:'😴 Tidur',mandi:'🚿 Segar! Kebersihan +50',nongkrong:'🎪 Seru nongkrong, mood +12',dengar:'🎧 Dapat inspirasi baru, +18'};aksi(j,L[j])})};
  $('needHud').onclick=()=>open('avatar');

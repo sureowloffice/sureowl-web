@@ -138,15 +138,15 @@ function send(res, code, obj) {
 
 async function profil(u) {
   const d = today();
-  const [koin, exp, streak, last, done, ver, chatc, pr] = await redis([
+  const [koin, exp, streak, last, done, ver, chatc, pr, lk] = await redis([
     ['GET', 'koin:' + u], ['GET', 'exp:' + u], ['GET', 'streak:' + u], ['GET', 'absen:' + u],
-    ['SMEMBERS', 'misi:' + u + ':' + d], ['GET', 'ver:' + u], ['GET', 'chatc:' + u + ':' + d], ['HGET', 'prof', u]
+    ['SMEMBERS', 'misi:' + u + ':' + d], ['GET', 'ver:' + u], ['GET', 'chatc:' + u + ':' + d], ['HGET', 'prof', u], ['HGET', 'look', u]
   ]);
   const e = +exp || 0, lv = level(e);
   return {
     u, koin: +koin || 0, exp: e, level: lv, nextExp: 25 * lv * lv, prevExp: 25 * (lv - 1) * (lv - 1),
     streak: last === d || last === yesterday() ? (+streak || 0) : 0, absenHariIni: last === d,
-    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d, prof: pr || null
+    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d, prof: pr || null, look: lk || null
   };
 }
 
@@ -190,6 +190,14 @@ module.exports = async (req, res) => {
         else if (rows && typeof rows === 'object') Object.assign(map, rows);
         res.setHeader('Cache-Control', 'public, max-age=20');
         return send(res, 200, { prof: map });
+      }
+      if (q.get('a') === 'look') { // tampilan avatar pilihan warga (publik): { u: 'kulit:rambut:warnaRambut' }
+        const [rows] = await redis([['HGETALL', 'look']]);
+        const map = {};
+        if (Array.isArray(rows)) for (let i = 0; i < rows.length; i += 2) map[rows[i]] = rows[i + 1];
+        else if (rows && typeof rows === 'object') Object.assign(map, rows);
+        res.setHeader('Cache-Control', 'public, max-age=20');
+        return send(res, 200, { look: map });
       }
       if (q.get('a') === 'tidur') { // warga yang sedang tidur di rumahnya
         const now = Date.now();
@@ -328,6 +336,15 @@ module.exports = async (req, res) => {
       if (old) cmds.push(['SET', 'profch:' + u, '1', 'EX', '86400']);
       await redis(cmds);
       return send(res, 200, { ok: true, prof: pk + ':' + ps });
+    }
+
+    if (a === 'look') { // pilih tampilan avatar: warna kulit (0-4), model rambut (0-5), warna rambut (0-4)
+      const k = +body.kl, h = +body.rb, c = +body.wr; // bukan body.k (itu kunci sesi)
+      const ok = (n, max) => Number.isInteger(n) && n >= 0 && n <= max;
+      if (!ok(k, 4) || !ok(h, 5) || !ok(c, 4)) return send(res, 400, { error: 'Pilihan tampilan tidak valid.' });
+      const v = k + ':' + h + ':' + c;
+      await redis([['HSET', 'look', u, v]]);
+      return send(res, 200, { ok: true, look: v });
     }
 
     if (a === 'karya') { // kirim karya ke Layar Raksasa: masuk antrean, tampil setelah disetujui

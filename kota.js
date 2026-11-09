@@ -46,7 +46,7 @@ function legacyProf(P){if(/produser|producer|beatmaker/.test(P))return ['musik',
   if(/puisi|penyair/.test(P))return ['cerita','puisi'];if(/sastra|penulis|writer/.test(P))return ['cerita','sastra'];if(/tari|dancer/.test(P))return ['cerita','penari'];if(/teater|aktor|actor/.test(P))return ['cerita','teater'];return null}
 function shadeHex(c,k){const v=parseInt(c.slice(1),16);let r=v>>16,g=v>>8&255,b=v&255;const f=x=>Math.max(0,Math.min(255,Math.round(k>0?x+(255-x)*k:x*(1+k))));return '#'+[f(r),f(g),f(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function applyProf(r){const P=String(r.p||'').toLowerCase();const w=r.pick&&normProf(r.pick[0],r.pick[1]);const pp=w||legacyProf(P);
-  r.pk=pp?pp[0]:'pusat';r.ps=pp?pp[1]:'';r.chosen=!!w;if(r.chosen)r.p=PROF[r.pk].sub[r.ps];
+  r.pk=pp?pp[0]:'pusat';r.ps=pp?pp[1]:'';r.chosen=!!w;r.baru=!pp;if(r.chosen)r.p=PROF[r.pk].sub[r.ps];
   r.grp=PK2GRP[r.pk];r.prop=PROP_OF[r.ps]||'none';const h=hash(r.u.toLowerCase()+'warna');r.col=shadeHex(PROF[r.pk].col,[-.18,-.08,0,.12,.24][h%5])}
 for(const r of RES){if(r.i===0)continue;
   if(r.own){r.slot=[0,3.6,-25.2];r.fy=0;r.grp='owner';r.home=true;continue}
@@ -152,10 +152,10 @@ function resPos(r,t){if(r.i===0)return [VIL.x,0,VIL.z];if(PLAY.on&&r===PLAY.r)re
 function resident(r,t,hi){const p=resPos(r,t);const a=t*r.sp+r.ph;const fx=FXM.get(r.u.toLowerCase());const yaw=fx&&!(PLAY.on&&r===PLAY.r)?cam.yaw:r.hiT>t&&r.hiYaw!=null?r.hiYaw:(PLAY.on&&r===PLAY.r)?PLAY.yaw:r.net?r.net.yaw:(r.w&&!r.slot)?r.w.yaw+(r.w.mv?0:r.w.dance?t*6:Math.sin(t*.7+r.ph)*.35):hi?cam.yaw:(r.crowd?Math.atan2(-p[0]*.3,-2.4-p[2])+Math.sin(t*.6+r.ph)*.25:r.slot?r.fy+Math.sin(t*(r.grp==='musik'?2:.7)+r.ph)*(r.grp==='musik'?.15:.1):Math.atan2(-Math.sin(a),Math.cos(a)*.7)+Math.PI/2);
   const s=(PLAY.on&&r===PLAY.r)?.6:hi?.62:(r.own?.58:.48);const lm=LEMAS.on&&r.u.toLowerCase()===(window.KOTA_ME||'');const chew=fx?1+Math.sin(t*16)*.07:1;const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(yaw),lm?M.RX(.35):M.id(),M.S(s*(2-chew),s*(lm?.82:1)*chew,s));const Wm=m=>M.mul(B,m);
   if(fx&&fx.food){const q=Math.min(1,(t-fx.t0)/2.6);D(G.sph,Wm(M.chain(M.T(0,.95,.95),M.S(.32*(1-q*.8),.26*(1-q*.8),.26*(1-q*.8)))),fx.food,{em:.4,cast:false});for(let k2=0;k2<4;k2++){const qq=((t*2+k2/4)%1);D(G.box,Wm(M.chain(M.T(Math.sin(k2*2.1)*.4,.9-qq*.8,.95+qq*.3),M.S(.06,.06,.06))),fx.food,{em:.6,cast:false})}}
-  D(G.sphHi,Wm(M.chain(M.T(0,.95,0),M.S(.82,.98,.78))),r.col);
-  for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.3,1.22,.55),M.S(.3,.36,.24))),'#FFF7E8',{em:.2});D(G.sph,Wm(M.chain(M.T(sx*.3+.1,1.32,.74),M.S(.14,.14,.09))),'#14102B')}
-  if(r.own||!r.pk){if(r.hat)D(G.sphHi,Wm(M.chain(M.T(.05,1.86,0),M.RZ(-.18),M.S(.6,.16,.56))),'#14102B')}else accOf(r,Wm,t);
-  propOf(r,Wm,t);
+  // avatar manusia (avatar.js): detail penuh dekat kamera, versi ringan kalau jauh
+  const me=PLAY.on&&r===PLAY.r;const near=hi||me||r===selected||(cam.dist<46&&Math.hypot(p[0]-cam.tx,p[2]-cam.tz)<Math.max(14,cam.dist*.55));
+  const mv=!!(r.w&&!r.slot&&r.w.mv)||(me&&Math.hypot(PLAY.vx||0,PLAY.vz||0)>.05);const AL=AVA.body3D(r,Wm,t,near,mv);AVA.acc3D(r,Wm,t,near,AL);
+  if(AL.role==='seni'&&near)propOf(r,AVA.propWm(Wm),t);
   if(hi||(PLAY.on&&r===PLAY.r))D(G.cyl16,M.chain(M.T(p[0],.03,p[2]),M.S(.75,.02,.75)),'#FFD23F',{em:1,cast:false});if(r.net)D(G.cyl16,M.chain(M.T(p[0],.03,p[2]),M.S(.6,.02,.6)),'#9BE15D',{em:1,alpha:.8,cast:false});if(r.own)ownerFx(p,t)}
 function ownerFx(p,t){const B=M.chain(M.T(p[0],p[1],p[2]),M.S(.58,.58,.58));
   for(let k=0;k<5;k++){const a=k/5*Math.PI*2+t*.6;D(G.cone6,M.mul(B,M.chain(M.T(Math.cos(a)*.4,2.0,Math.sin(a)*.4),M.S(.14,.4,.14))),'#FFD23F',{em:.9,cast:false})}
@@ -690,8 +690,9 @@ function staff(t){const dt=Math.min(.05,t-(staff.lt||t));staff.lt=t;if(!WALK.N)r
   for(const s2 of STAFF){if(s2.wait>0){s2.wait-=dt;s2.mv=0}else{if(!s2.path||!s2.path.length){const tg=s2.k%2?(s2.toS?ISR_DOOR:STUDIO_DOOR):(s2.toS?ISR_DOOR:[ISR_DOOR[0]+3.4,ISR_DOOR[1]+3.4]);s2.toS=!s2.toS;s2.path=route([s2.x,s2.z],[tg[0]+(s2.k-1.5)*.4,tg[1]+.3]);if(!s2.path){s2.wait=3;continue}}
       walkTo(s2,dt,1.5);s2.mv=1;if(!s2.path.length){s2.path=null;s2.wait=4+s2.k*2}}
     const b=s2.mv?Math.abs(Math.sin(t*10+s2.k))*.1:0;const B=M.chain(M.T(s2.x,b,s2.z),M.RY(s2.yaw),M.S(.44,.44,.44));const Wm=m=>M.mul(B,m);
-    D(G.sphHi,Wm(M.chain(M.T(0,.95,0),M.S(.82,.98,.78))),s2.c);for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.3,1.22,.55),M.S(.3,.36,.24))),'#FFF7E8',{em:.2});D(G.sph,Wm(M.chain(M.T(sx*.3+.1,1.32,.74),M.S(.14,.14,.09))),'#14102B')}
-    if(s2.hat)D(G.sphHi,Wm(M.chain(M.T(0,1.85,0),M.S(.6,.14,.56))),'#FFD23F');D(G.box,Wm(M.chain(M.T(.55,.7,.2),M.S(.12,.5,.6))),'#2A1C4F')}}
+    if(!s2.r)s2.r={u:'staf'+s2.k,col:['#3A3354','#5C4E8A','#2E5E74','#6B5A2E'][s2.k%4],pk:'pusat',jab:'Staf',ph:s2.k*1.7};
+    const near=cam.dist<46&&Math.hypot(s2.x-cam.tx,s2.z-cam.tz)<Math.max(14,cam.dist*.55);AVA.body3D(s2.r,Wm,t,near,!!s2.mv);
+    D(G.box,Wm(M.chain(M.T(.42,.6,.05),M.S(.08,.36,.42))),'#2A1C4F',{cast:false})}}
 // bersihkan gedung & pohon yang menimpa cluster, mansion, kantor
 {const RS=[];for(const x of GX)for(const z of GZ)RS.push([x-11,x+11,z-11,z+11]);for(const [x,z] of RES_LOTS)RS.push([x-11,x+11,z-11,z+11]);
   const inR=(x,z,m)=>RS.some(([a,b,c,d])=>x>a-m&&x<b+m&&z>c-m&&z<d+m);
@@ -1054,24 +1055,7 @@ function lombaDraw(t){if(!LOMBA)return;const C=CLUSTERS.find(c=>c.k===(LOMBA==='
   D(G.sph,Wm(M.chain(M.T(0,.0,.66),M.S(.2,.2,.05))),C.col,{em:1,cast:false});D(G.sph,Wm(M.chain(M.T(0,.0,-.66),M.S(.2,.2,.05))),C.col,{em:1,cast:false});
   for(let i=0;i<8;i++){const a=t*1.2+i/8*Math.PI*2;D(G.sph,M.chain(M.T(x0+Math.cos(a)*1.5,y+Math.sin(t*3+i)*.4,z0+Math.sin(a)*1.5),M.S(.08,.08,.08)),i%2?gold:'#FFF7E8',{em:1,cast:false})}
   D(G.cyl16,M.chain(M.T(x0,3.3,z0),M.S(.05,1.1,.05)),gold,{em:.6,alpha:.5,cast:false})}
-// avatar 2D untuk Kartu Warga (warna + aksesori sesuai kawasan)
-function ava2D(x,cx,cy,s,col,pk){x.save();x.shadowColor='rgba(20,16,43,.45)';x.shadowBlur=s*.25;x.shadowOffsetY=s*.12;
-  x.fillStyle=col;x.beginPath();x.ellipse(cx,cy,s*.92,s,0,0,7);x.fill();x.restore();
-  const g=x.createRadialGradient(cx-s*.35,cy-s*.45,s*.1,cx,cy,s*1.05);g.addColorStop(0,'rgba(255,255,255,.35)');g.addColorStop(.6,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(20,16,43,.28)');x.fillStyle=g;x.beginPath();x.ellipse(cx,cy,s*.92,s,0,0,7);x.fill();
-  x.lineWidth=s*.06;x.strokeStyle='#14102B';x.beginPath();x.ellipse(cx,cy,s*.92,s,0,0,7);x.stroke();
-  for(const k of [-1,1]){x.fillStyle='#FFF7E8';x.beginPath();x.ellipse(cx+k*s*.34,cy-s*.08,s*.27,s*.33,0,0,7);x.fill();x.strokeStyle='#14102B';x.lineWidth=s*.035;x.stroke();
-    x.fillStyle='#14102B';x.beginPath();x.arc(cx+k*s*.34+s*.06,cy-s*.06,s*.14,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(cx+k*s*.34+s*.11,cy-s*.12,s*.045,0,7);x.fill()}
-  x.fillStyle='#14102B';x.beginPath();x.ellipse(cx,cy+s*.42,s*.2,s*.13,0,0,Math.PI);x.fill();x.fillStyle='#FF6F91';x.beginPath();x.ellipse(cx,cy+s*.49,s*.1,s*.05,0,0,7);x.fill();
-  for(const k of [-1,1]){x.fillStyle='rgba(255,111,145,.45)';x.beginPath();x.ellipse(cx+k*s*.6,cy+s*.3,s*.13,s*.08,0,0,7);x.fill()}
-  const top=cy-s;x.lineJoin='round';
-  if(pk==='musik'){x.strokeStyle='#14102B';x.lineWidth=s*.13;x.beginPath();x.arc(cx,cy-s*.05,s*1.0,Math.PI*1.08,Math.PI*1.92);x.stroke();
-    for(const k of [-1,1]){x.fillStyle='#14102B';rrp(x,cx+k*s*.98-s*.2,cy-s*.32,s*.4,s*.62,s*.16);x.fill();x.fillStyle='#FF4FA3';rrp(x,cx+k*s*.98-s*.11,cy-s*.22,s*.22,s*.42,s*.1);x.fill()}}
-  else if(pk==='visual'){x.fillStyle='#B5352C';x.strokeStyle='#14102B';x.lineWidth=s*.05;x.beginPath();x.ellipse(cx+s*.14,top+s*.12,s*.78,s*.24,-.18,0,7);x.fill();x.stroke();x.beginPath();x.arc(cx+s*.06,top-s*.12,s*.08,0,7);x.fill();x.stroke()}
-  else if(pk==='film'){x.fillStyle='#14102B';x.beginPath();x.ellipse(cx,top+s*.28,s*.8,s*.42,0,Math.PI,0);x.fill();x.beginPath();x.ellipse(cx-s*.25,top+s*.3,s*.85,s*.13,0,0,7);x.fill();x.fillStyle='#3FA9FF';rrp(x,cx-s*.17,top-s*.02,s*.34,s*.16,s*.05);x.fill()}
-  else if(pk==='cerita'){x.fillStyle='#14102B';x.beginPath();x.ellipse(cx,top+s*.16,s*.78,s*.12,0,0,7);x.fill();rrp(x,cx-s*.46,top-s*.62,s*.92,s*.8,s*.06);x.fill();x.fillStyle='#FF6FB5';x.fillRect(cx-s*.46,top-s*.06,s*.92,s*.14)}
-  else if(pk==='kriya'){x.save();x.beginPath();x.ellipse(cx,cy,s*.92,s,0,0,7);x.clip();x.fillStyle='#E8B04B';x.fillRect(cx-s,cy-s*.78,s*2,s*.24);for(let i=0;i<9;i++){x.fillStyle=i%2?'#B5352C':'#14102B';x.beginPath();x.arc(cx-s*.8+i*s*.2,cy-s*.66,s*.05,0,7);x.fill()}x.restore();
-    x.fillStyle='#E8B04B';x.strokeStyle='#14102B';x.lineWidth=s*.035;x.beginPath();x.moveTo(cx+s*.82,cy-s*.7);x.lineTo(cx+s*1.12,cy-s*.95);x.lineTo(cx+s*1.08,cy-s*.58);x.closePath();x.fill();x.stroke()}
-  else{const fx=cx+s*.5,fy=top+s*.12;for(let i=0;i<6;i++){const a=i/6*Math.PI*2;x.fillStyle='#FF8FB1';x.beginPath();x.arc(fx+Math.cos(a)*s*.17,fy+Math.sin(a)*s*.17,s*.13,0,7);x.fill()}x.fillStyle='#FFD23F';x.beginPath();x.arc(fx,fy,s*.12,0,7);x.fill()}}
+// avatar 2D Kartu Warga: lihat avatar.js (AVA.draw2D)
 function makeCard(r,ex){ex=ex||{};const c=document.createElement('canvas');c.width=1080;c.height=1920;const x=c.getContext('2d');
   const P=r.own?{nm:'Pemilik Kota',ic:'💎',col:'#FFD23F'}:(PROF[r.pk]||PROF.pusat);const col=r.own?'#FFD23F':P.col;
   const g=x.createLinearGradient(0,0,0,1920);g.addColorStop(0,'#14102B');g.addColorStop(.42,mixC(col,'#14102B',.45));g.addColorStop(1,col);x.fillStyle=g;x.fillRect(0,0,1080,1920);
@@ -1084,7 +1068,7 @@ function makeCard(r,ex){ex=ex||{};const c=document.createElement('canvas');c.wid
   x.textAlign='center';x.fillStyle='#FFF7E8';x.font='900 64px Inter';x.fillText('🏙️ KOTA SENI',540,150);x.font='700 32px Inter';x.fillStyle='rgba(255,247,232,.8)';x.fillText('kota virtual anak seni Indonesia',540,200);
   // label atas
   x.font='900 46px Inter';const lab=r.own?'💎 PEMILIK KOTA':P.ic+' ANAK '+P.nm.toUpperCase();const lw=Math.min(980,x.measureText(lab).width+80);rrp(x,540-lw/2,270,lw,96,48);x.fillStyle=col;x.fill();x.lineWidth=8;x.strokeStyle='#14102B';x.stroke();x.fillStyle='#14102B';fit(x,lab,lw-60,46,'900','Inter');x.fillText(lab,540,336);
-  ava2D(x,540,760,250,r.own?'#FFD23F':(r.col||col),r.own?'':r.pk);
+  AVA.draw2D(x,r,540,400,3.6);
   // nama
   x.fillStyle='#FFF7E8';fit(x,'@'+r.u,960,104,'900','Inter');x.save();x.shadowColor='#14102B';x.shadowOffsetY=8;x.fillText('@'+r.u,540,1160);x.restore();
   x.font='800 46px Inter';x.fillStyle='#FFE36B';fit(x,r.own?'President Kota Seni':(r.p&&r.p!=='Warga'?r.p:'Warga Kota Seni'),900,46,'800','Inter');x.fillText(r.own?'President Kota Seni':(r.p&&r.p!=='Warga'?r.p:'Warga Kota Seni'),540,1232);

@@ -233,6 +233,16 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .msg{display:flex;gap:8px;align-items:flex-end;max-width:92%}
 .msg.mine{align-self:flex-end;flex-direction:row-reverse}
 .av{flex:none;width:30px;height:30px}
+.lookui{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:12px}
+.lkprev{width:96px;height:96px;border-radius:14px;background:var(--ink3);display:grid;place-items:center}
+.lkopt{display:grid;gap:6px;min-width:0}.lkopt small{font:800 11px var(--sans);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.lkrow{display:flex;flex-wrap:wrap;gap:6px}
+.lksw{appearance:none;cursor:pointer;width:30px;height:30px;border-radius:50%;background:var(--c);border:2px solid var(--line)}
+.lksw.on{border-color:var(--yellow);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--yellow)}
+.lkhair{appearance:none;cursor:pointer;display:grid;justify-items:center;gap:2px;padding:4px 6px;border-radius:10px;border:1.5px solid var(--line);background:var(--ink3);color:var(--cream);font:700 10px var(--sans)}
+.lkhair.on{border-color:var(--yellow);background:var(--ink)}
+.lookui .btn{justify-self:start;margin-top:4px}
+@media (max-width:420px){.lookui{grid-template-columns:1fr}.lkprev{justify-self:center}}
 .bub{background:#221A4D;border:1px solid rgba(255,255,255,.1);border-radius:16px 16px 16px 4px;padding:7px 11px;min-width:0}
 .msg.mine .bub{background:linear-gradient(135deg,var(--purple),var(--pink));border:0;border-radius:16px 16px 4px 16px}
 .who{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font:800 12.5px var(--sans);margin-bottom:2px}
@@ -778,15 +788,15 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   try{await Promise.all([document.fonts.load('900 40px Inter'),document.fonts.load('800 40px Inter'),document.fonts.load('700 40px Poppins')])}catch(e){}
   let data={day:1,warga:[]},info={};
   const ft=(u,o)=>fetch(u,o).then(r=>r.json()).catch(()=>null);
-  const [d0,i0,pf,zz]=await Promise.all([ft('warga.json',{cache:'no-store'}),ft('kota.json?v='+Date.now(),{cache:'no-store'}),ft('/api/akun?a=prof'),ft('/api/akun?a=tidur')]);
+  const [d0,i0,pf,zz,lk]=await Promise.all([ft('warga.json',{cache:'no-store'}),ft('kota.json?v='+Date.now(),{cache:'no-store'}),ft('/api/akun?a=prof'),ft('/api/akun?a=tidur'),ft('/api/akun?a=look')]);
   if(d0)data=d0;if(i0)info=i0;
   // profesi pilihan warga sendiri (bukan dari komentar) + siapa yang lagi tidur
-  const PM=(pf&&pf.prof)||{};for(const w of data.warga||[]){const v=PM[String(w.u).toLowerCase()];if(v){const [a,b]=String(v).split(':');w.pk=a;w.ps=b}}
+  const PM=(pf&&pf.prof)||{};for(const w of data.warga||[]){const v=PM[String(w.u).toLowerCase()];if(v){const [a,b]=String(v).split(':');w.pk=a;w.ps=b}const l=((lk&&lk.look)||{})[String(w.u).toLowerCase()];if(l)w.lk=l}
   window.KOTA_TIDUR=(zz&&zz.tidur)||[];
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=31';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','avatar.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=32';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
