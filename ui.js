@@ -112,7 +112,7 @@ R.lomba=async()=>{const el=$('lombaBody');if(!LB.d)el.innerHTML='<p class="muted
   $('lombaSub').textContent='Minggu ini · berakhir Senin 00.00 WIB · sisa '+sisa(j.akhir);
   el.innerHTML=(j.juaraLalu?`<div class="lbjuara">🏆 Juara minggu lalu: <b>${esc((P[j.juaraLalu.k]||{}).ic||'')} ${esc((P[j.juaraLalu.k]||{}).nm||j.juaraLalu.k)}</b> · ${j.juaraLalu.poin} poin</div>`:'')+
   '<ol class="lb">'+j.kawasan.map((k,i)=>{const p=P[k.k]||{nm:k.k,ic:'',col:'#B69CFF'};return `<li class="${k.k===myK?'me':''}" style="--c:${p.col}"><span class="rk">${i===0&&k.poin>0?'👑':i+1}</span><span class="nm"><b>${esc(p.ic+' '+p.nm)}${k.k===myK?' <em>kawasanmu</em>':''}</b><span class="lbar"><i style="width:${Math.round(k.poin/max*100)}%"></i></span><small>${k.aktif} warga aktif · ${k.baru} warga baru${k.top.length?' · ⭐ @'+esc(k.top[0].u):''}</small></span><span class="pt">${k.poin}<small>poin</small></span></li>`}).join('')+'</ol>'+
-  `<h3>Cara nambah poin kawasanmu</h3><ul class="lbc"><li>🤝 <b>+${j.poin.baru}</b> tiap warga baru yang pilih kawasanmu</li><li>🗓️ <b>+${j.poin.absen}</b> tiap absen harian</li><li>✅ <b>+${j.poin.misi}</b> tiap misi harian selesai</li><li>🎨 <b>+${j.poin.karya}</b> tiap karya tayang di Layar Raksasa</li><li>🎆 <b>+${j.poin.fest||10}</b> hadir di Festival Malam Minggu (Sabtu 20.00 di alun-alun)</li></ul>
+  `<h3>Cara nambah poin kawasanmu</h3><ul class="lbc"><li>🤝 <b>+${j.poin.baru}</b> tiap warga baru yang pilih kawasanmu</li><li>🗓️ <b>+${j.poin.absen}</b> tiap absen harian</li><li>✅ <b>+${j.poin.misi}</b> tiap misi harian selesai</li><li>🎨 <b>+${j.poin.karya}</b> tiap karya tayang di Layar Raksasa</li><li>🗳️ <b>+${j.poin.vote||3}</b> ikut Voting Gedung (Rabu–Sabtu)</li><li>🎆 <b>+${j.poin.fest||10}</b> hadir di Festival Malam Minggu (Sabtu 20.00 di alun-alun)</li></ul>
   <p class="muted">Kawasan juara dapat piala emas melayang di gerbangnya & diumumkan di Instagram @viralindongid tiap Senin.</p>
   <div class="row">${me?`<button class="btn" type="button" data-open="balai">🪪 Share kartu, ajak teman</button>`:`<button class="btn" type="button" data-open="jadi">🎵 Jadi warga & pilih kawasan</button>`}<button class="btn ghost" type="button" data-open="misi">✅ Kerjakan misi</button></div>`;
   el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>open(b.dataset.open))};
@@ -238,8 +238,22 @@ R.info=()=>{const s=store.get('ann',0);$('infoList').innerHTML=ANN.map(a=>`<div 
   store.set('ann',Math.max(0,...ANN.map(a=>a.id)));$('infoBadge').hidden=true};
 
 // ---------- voting ----------
-R.voting=()=>{done('voting');const V=data.vote||[];const tot=V.reduce((a,b)=>a+(b.v||0),0);const icOf=n=>/studio/i.test(n)?'🎙️':/galeri/i.test(n)?'🎨':/bioskop/i.test(n)?'🎬':/kafe/i.test(n)?'☕':'🏗️';
-  $('vote').innerHTML=V.map((o,i)=>`<li class="item"><span class="ic">${icOf(o.n||"")}</span><span><b>${esc(o.n)}</b><small>${tot?Math.round(o.v/tot*100)+'% suara':'Voting dibuka setelah DAY 1 tayang'}</small></span><span class="r">${tot?o.v+' suara':''}</span></li>`).join('')||'<li class="item"><span><b>Voting belum dibuka</b></span></li>'};
+const VT={d:null};
+async function voteLoad(){try{const me=store.get('me','');const r=await fetch('/api/akun?a=vote'+(me?'&u='+encodeURIComponent(me):''));const j=await r.json();if(j&&j.opsi)VT.d=j}catch(e){}return VT.d}
+R.voting=async()=>{done('voting');const el=$('voteBody');if(!VT.d)el.innerHTML='<p class="muted">Memuat voting…</p>';const j=await voteLoad();if(!j){el.innerHTML='<p>Voting belum bisa dimuat, coba lagi sebentar.</p>';return}
+  const P=K.PROF||{};const me=store.get('me','');const st=j.status;const max=Math.max(1,...j.opsi.map(o=>o.v));
+  $('voteSub').textContent=st==='buka'?'🟢 Voting BUKA · tutup Sabtu 23.59 WIB · sisa '+sisa(j.tutup):st==='belum'?'⏳ Voting dibuka Rabu 00.00 WIB · '+sisa(j.buka)+' lagi':'🔒 Voting ditutup · pemenang dibangun & diumumkan Minggu';
+  const lead=j.total?j.opsi.slice().sort((a,b)=>b.v-a.v)[0]:null;
+  el.innerHTML=(j.lalu?`<div class="lbjuara">🏗️ Pemenang minggu lalu: <b>${esc(j.lalu.ic+' '+j.lalu.nm)}</b> · ${j.lalu.v} dari ${j.lalu.total} suara</div>`:'')+
+  '<ul class="vg">'+j.opsi.map(o=>{const p=P[o.kaw]||{col:'#B69CFF',nm:''};const mine=j.pilihan===o.id;const pct=j.total?Math.round(o.v/j.total*100):0;
+    return `<li class="${mine?'me':''}" style="--c:${p.col}"><span class="gi">${esc(o.ic)}</span><span class="gb"><b>${esc(o.nm)}${lead&&lead.id===o.id&&o.v>0?' <em>terdepan</em>':''}</b><small>${esc(o.ds)} · Kawasan ${esc(p.nm)}</small><span class="lbar"><i style="width:${Math.round(o.v/max*100)}%"></i></span><small>${o.v} suara · ${pct}%</small></span>`+
+    (st==='buka'?`<button class="btn${mine?'':' ghost'}" type="button" data-vote="${esc(o.id)}"${mine?' disabled':''}>${mine?'✅ Pilihanmu':'Pilih'}</button>`:'')+'</li>'}).join('')+'</ul>'+
+  `<p class="muted">${j.total} warga sudah memilih. Satu warga satu suara (boleh ganti selama voting buka). Suara pertamamu +${j.poin||3} poin Lomba Kawasan. Gedung pemenang dibangun di kota & tayang di Instagram @viralindongid tiap Minggu.</p>`+
+  (me?'':`<div class="row"><button class="btn" type="button" data-open="balai">🪪 Masuk dulu biar bisa voting</button></div>`);
+  el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>open(b.dataset.open));
+  el.querySelectorAll('[data-vote]').forEach(b=>b.onclick=async()=>{if(!store.get('me','')){toast('🪪 Masuk dulu pakai username-mu ya');open('balai');return}
+    b.disabled=true;try{const r=await api('vote',{id:b.dataset.vote});toast(r.baru?'🗳️ Suaramu masuk! +'+(j.poin||3)+' poin buat kawasanmu':'🗳️ Pilihanmu diganti');VT.d=null;R.voting()}catch(e){toast('⚠️ '+e.message);b.disabled=false}})};
+setTimeout(voteLoad,3000);
 
 // ---------- chat / pesan warga (panel live) ----------
 let chatMsgs=[],chatTimer=0,chatBusy=false,lastSeenChat=store.get('chatSeen',0),popT=0,firstLoad=true,interacted=false,ac2=null;
@@ -491,7 +505,7 @@ jemput();setInterval(jemput,1000);
    if(k==='halte'){const d=nowWIB();return `<p class="pnow">Jemputan berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00 · ${(K.QUEUE||[]).filter(r=>r.q).length} warga antre</p>`}
    if(k==='papan')return chips(K.FOUND||[]);
    if(k==='mansion')return '<p class="pnow">👑 President lagi di rumah</p>';
-   if(k==='lot'){const V=(data.vote||[]).slice().sort((a,b)=>(b.v||0)-(a.v||0));return `<p class="pnow">${V.length?'Terdepan: '+esc(V[0].n)+' ('+(V[0].v||0)+' suara)':'Voting segera dibuka'}</p>`}return ''}
+   if(k==='lot'){const d=VT.d;const V=d?d.opsi.slice().sort((a,b)=>b.v-a.v):[];return `<p class="pnow">${d&&d.total?'Terdepan: '+esc(V[0].ic+' '+V[0].nm)+' ('+V[0].v+' suara)':d&&d.status==='belum'?'Voting gedung dibuka Rabu':'Ikut voting gedung berikutnya'}</p>`}return ''}
  function show(k){let P=PL[String(k).startsWith('mart')?'mart':k];let body='';
    if(String(k).startsWith('kav:')){const n=k.slice(4);P={cat:'Lahan',ic:'📐',bg:'#E8C27A',nm:'Kavling Kosong No. '+n,al:'Kota Seni · siap dibangun',ds:'Petak ini masih kosong. Gedung baru di Kota Seni dipilih lewat voting warga, ikut voting biar kotamu makin ramai.',sec:'STATUS',act:[['🗳️ Ikut voting','voting'],['🎵 Ajak teman jadi warga','jadi']]};body='<p class="pnow">🟡 Tersedia</p>'}
    else if(String(k).startsWith('cluster:')){const C=(K.CLUSTERS||[]).find(c=>'cluster:'+c.k===k);if(!C)return;const L=K.HOUSES.filter(h=>h.seg===C).map(h=>h.r);
