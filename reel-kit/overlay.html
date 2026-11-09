@@ -1,0 +1,70 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Mesin teks/kartu reel Kota Seni. render(t) menggambar lapisan transparan di atas video kota.
+const C=document.getElementById('c'),X=C.getContext('2d');const W=1080,H=1920;
+const GOLD='#FFD23F',INK='#14102B',CREAM='#FFF7E8',F='Inter, "Noto Color Emoji", sans-serif';
+let SPEC={scenes:[]};window.setSpec=s=>{SPEC=s;let t=0;for(const sc of s.scenes){sc.t0=t;t+=sc.dur}};
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));const eo=u=>1-Math.pow(1-cl(u),3);
+const back=u=>{u=cl(u);const c1=1.7,c3=c1+1;return 1+c3*Math.pow(u-1,3)+c1*Math.pow(u-1,2)};
+function rr(x,y,w,h,r){X.beginPath();X.moveTo(x+r,y);X.arcTo(x+w,y,x+w,y+h,r);X.arcTo(x+w,y+h,x,y+h,r);X.arcTo(x,y+h,x,y,r);X.arcTo(x,y,x+w,y,r);X.closePath()}
+// teks dengan *sorotan emas*; baris dipisah \n
+function parts(line){const out=[];line.split(/(\*[^*]+\*)/).forEach(s=>{if(!s)return;if(s[0]=='*')out.push([s.slice(1,-1),1]);else out.push([s,0])});return out}
+function fit(lines,size,maxW,w8=900){let s=size;for(;s>28;s-=2){X.font=`${w8} ${s}px ${F}`;if(lines.every(l=>X.measureText(l.replace(/\*/g,'')).width<=maxW))break}return s}
+function rich(text,cx,y,size,o={}){const lines=text.split('\n');const s=fit(lines,size,o.maxW||980,o.w8||900);X.font=`${o.w8||900} ${s}px ${F}`;X.textBaseline='middle';X.textAlign='left';const lh=s*(o.lh||1.12);
+  lines.forEach((ln,i)=>{const ps=parts(ln);const tw=ps.reduce((a,[t])=>a+X.measureText(t).width,0);let x=cx-tw/2;const yy=y+i*lh;
+    for(const [t,hl] of ps){X.lineJoin='round';X.lineWidth=s*.2;X.strokeStyle='rgba(20,16,43,.92)';X.strokeText(t,x,yy);
+      X.fillStyle=hl?(o.hl||GOLD):(o.col||'#fff');X.fillText(t,x,yy);x+=X.measureText(t).width}});return lines.length*lh}
+function pop(u,fn,cx,cy){const k=back(u*1.0),a=cl(u*3);X.save();X.globalAlpha*=a;X.translate(cx,cy);X.scale(.75+.25*k,.75+.25*k);X.translate(-cx,-cy);fn();X.restore()}
+function pill(t,col,cx,cy,size=46){X.font=`900 ${size}px ${F}`;const w=X.measureText(t).width+size*1.3,h=size*1.75;
+  X.save();X.translate(cx,cy);X.rotate(-.025);rr(-w/2+8,-h/2+10,w,h,h*.32);X.fillStyle='rgba(20,16,43,.85)';X.fill();rr(-w/2,-h/2,w,h,h*.32);X.fillStyle=col||'#FF4B5C';X.fill();
+  X.strokeStyle='rgba(255,255,255,.25)';X.lineWidth=4;X.stroke();X.fillStyle=(col==GOLD||col=='#FFC233')?INK:'#fff';X.textAlign='left';X.textBaseline='middle';X.fillText(t,-w/2+size*.65,4);X.restore()}
+function panel(x,y,w,h,col){X.save();X.shadowColor='rgba(0,0,0,.45)';X.shadowBlur=40;X.shadowOffsetY=12;rr(x,y,w,h,36);X.fillStyle='rgba(20,16,43,.9)';X.fill();X.restore();
+  rr(x,y,w,h,36);X.lineWidth=6;X.strokeStyle=col||GOLD;X.stroke()}
+// ---------- kartu ----------
+const CARDS={
+ klasemen(k,u,lt){const rows=k.baris;const rh=92,w=900,h=150+rows.length*rh,x=(W-w)/2,y=k.y||(H-h)/2+120;panel(x,y,w,h,k.col);
+  X.textAlign='center';X.fillStyle=GOLD;X.font=`900 50px ${F}`;X.textBaseline='middle';X.fillText(k.judul||'🏆 KLASEMEN',W/2,y+72);
+  const mx=Math.max(1,...rows.map(r=>r.v));rows.forEach((r,i)=>{const uu=eo((lt-.15-i*.12)/.6);const yy=y+150+i*rh+rh/2-10;X.globalAlpha=cl(uu*2);
+   X.textAlign='left';X.font=`900 40px ${F}`;X.fillStyle=i==0?GOLD:CREAM;X.fillText(i==0?'👑':String(i+1),x+40,yy);
+   X.font=`800 40px ${F}`;X.fillStyle='#fff';X.fillText(r.nm,x+110,yy);
+   const bx=x+430,bw=330;rr(bx,yy-15,bw,30,15);X.fillStyle='rgba(255,255,255,.1)';X.fill();if(r.v>0){rr(bx,yy-15,Math.max(30,bw*r.v/mx*uu),30,15);X.fillStyle=r.col||GOLD;X.fill()}
+   X.textAlign='right';X.font=`900 42px ${F}`;X.fillStyle=i==0?GOLD:'#fff';X.fillText(String(Math.round(r.v*uu))+(k.unit||''),x+w-40,yy);X.globalAlpha=1})},
+ voting(k,u,lt){CARDS.klasemen(Object.assign({unit:'%'},k),u,lt)},
+ daftar(k,u,lt){const rows=k.baris.slice(0,k.max||7);const rh=96,w=900,h=150+rows.length*rh+(k.lagi?70:0),x=(W-w)/2,y=k.y||(H-h)/2+80;panel(x,y,w,h,k.col);
+  X.textAlign='center';X.fillStyle=GOLD;X.font=`900 50px ${F}`;X.textBaseline='middle';X.fillText(k.judul,W/2,y+72);
+  rows.forEach((r,i)=>{const t0=.25+i*(k.jeda||.35);const uu=eo((lt-t0)/.35);if(uu<=0)return;const yy=y+150+i*rh+rh/2-8;X.save();X.globalAlpha=uu;X.translate((1-uu)*120,0);
+   X.textAlign='left';X.font=`700 46px ${F}`;X.fillText(r.ic||k.ic||'✈️',x+40,yy);X.font=`900 46px ${F}`;X.fillStyle='#fff';let s=46;while(X.measureText(r.nm).width>560&&s>28){s-=2;X.font=`900 ${s}px ${F}`}X.fillText(r.nm,x+120,yy);
+   if(r.ket){X.textAlign='right';X.font=`800 34px ${F}`;X.fillStyle=GOLD;X.fillText(r.ket,x+w-40,yy)}X.restore()});
+  if(k.lagi){const uu=eo((lt-.3-rows.length*(k.jeda||.35))/.4);X.globalAlpha=uu;X.textAlign='center';X.font=`800 38px ${F}`;X.fillStyle=CREAM;X.fillText(k.lagi,W/2,y+h-60);X.globalAlpha=1}},
+ angka(k,u,lt){const v=Math.round(k.v*eo(lt/1.0));const cy=k.y||H*.5;pop(u,()=>{X.textAlign='center';X.textBaseline='middle';X.font=`900 260px ${F}`;X.lineWidth=40;X.lineJoin='round';X.strokeStyle='rgba(20,16,43,.92)';
+   const t=(k.pre||'')+v.toLocaleString('id-ID')+(k.suf||'');X.strokeText(t,W/2,cy);X.fillStyle=GOLD;X.fillText(t,W/2,cy);rich(k.label||'',W/2,cy+190,64)},W/2,cy)},
+ hitung(k,u,lt){const cy=k.y||H*.52;pop(u,()=>{panel(130,cy-230,820,460,k.col);X.textAlign='center';X.textBaseline='middle';X.fillStyle=CREAM;X.font=`800 48px ${F}`;X.fillText(k.atas||'',W/2,cy-140);
+   X.fillStyle=GOLD;X.font=`900 150px ${F}`;X.fillText(k.besar,W/2,cy+10);X.fillStyle='#fff';X.font=`800 44px ${F}`;X.fillText(k.bawah||'',W/2,cy+150)},W/2,cy)},
+ langkah(k,u,lt){const rows=k.baris;const rh=130,w=900,h=140+rows.length*rh,x=(W-w)/2,y=k.y||(H-h)/2+120;panel(x,y,w,h,k.col);X.textAlign='center';X.fillStyle=GOLD;X.font=`900 50px ${F}`;X.textBaseline='middle';X.fillText(k.judul||'',W/2,y+70);
+  rows.forEach((r,i)=>{const uu=eo((lt-.2-i*.4)/.4);if(uu<=0)return;const yy=y+140+i*rh+rh/2-10;X.globalAlpha=uu;X.beginPath();X.arc(x+90,yy,40,0,7);X.fillStyle=GOLD;X.fill();X.fillStyle=INK;X.font=`900 46px ${F}`;X.fillText(String(i+1),x+90,yy+2);
+   X.textAlign='left';X.fillStyle='#fff';X.font=`800 42px ${F}`;let s=42;while(X.measureText(r).width>680&&s>26){s-=2;X.font=`800 ${s}px ${F}`}X.fillText(r,x+160,yy);X.textAlign='center';X.globalAlpha=1})},
+ chips(k,u,lt){const n=k.baris.length,sz=150,g=18,tw=n*sz+(n-1)*g,x0=(W-tw)/2,cy=k.y||H*.78;k.baris.forEach((r,i)=>{const uu=back((lt-.1-i*.08)/.4);if(uu<=0)return;const cx=x0+i*(sz+g)+sz/2;
+   X.save();X.translate(cx,cy);X.scale(uu,uu);X.beginPath();X.arc(0,0,sz/2,0,7);X.fillStyle=INK;X.fill();X.beginPath();X.arc(0,0,sz/2-8,0,7);X.fillStyle=r.col;X.fill();X.textAlign='center';X.textBaseline='middle';X.font=`70px ${F}`;X.fillText(r.ic,0,-8);
+   if(r.v!=null){rr(-42,sz/2-44,84,52,26);X.fillStyle=INK;X.fill();X.fillStyle='#fff';X.font=`900 36px ${F}`;X.fillText(String(r.v),0,sz/2-17)}X.restore()})},
+};
+function footer(a){X.globalAlpha=a;X.textAlign='center';X.textBaseline='middle';X.font=`900 46px ${F}`;X.lineWidth=10;X.strokeStyle='rgba(20,16,43,.85)';X.strokeText('🏙️ KOTA SENI · @viralindongid',W/2,H-130);X.fillStyle='#fff';X.fillText('🏙️ KOTA SENI · @viralindongid',W/2,H-130);X.globalAlpha=1}
+function drawScene(sc,lt,full){const u=lt/.45;
+  if(sc.gelap){X.fillStyle=`rgba(14,8,40,${sc.gelap})`;X.fillRect(0,0,W,H)}
+  // gradasi atas supaya teks terbaca
+  const g=X.createLinearGradient(0,0,0,560);g.addColorStop(0,'rgba(14,8,40,.55)');g.addColorStop(1,'rgba(14,8,40,0)');X.fillStyle=g;X.fillRect(0,0,W,560);
+  let y=sc.yAtas||250;
+  if(sc.pill){pop(u,()=>pill(sc.pill.t,sc.pill.c,W/2,y,sc.pill.s||46),W/2,y);y+=125}
+  if(sc.atas){pop((lt-.08)/.45,()=>rich(sc.atas,W/2,y,sc.ukuran||76),W/2,y)}
+  if(sc.besar){const cy=sc.yBesar||H*.36;pop((lt-.05)/.5,()=>rich(sc.besar,W/2,cy,sc.ukuranBesar||190,{lh:1.0}),W/2,cy)}
+  if(sc.kartu){const k=sc.kartu;const kt=lt-(k.mulai||.25);if(kt>0)CARDS[k.tipe](k,kt/.45,kt)}
+  if(sc.bawah){const by=sc.yBawah||H-330;pop((lt-.3)/.45,()=>rich(sc.bawah,W/2,by,sc.ukuranBawah||54,{w8:800}),W/2,by)}
+  if(sc.footer!==false&&(sc.cta||sc.footer))footer(cl(lt*3))}
+window.render=t=>{X.clearRect(0,0,W,H);const S=SPEC.scenes;let i=S.findIndex(s=>t>=s.t0&&t<s.t0+s.dur);if(i<0)i=S.length-1;const sc=S[i];if(!sc)return;drawScene(sc,t-sc.t0)};
+// cover: judul besar di atas foto kota
+window.renderCover=cv=>{X.clearRect(0,0,W,H);const g=X.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(14,8,40,.55)');g.addColorStop(.45,'rgba(14,8,40,.15)');g.addColorStop(.75,'rgba(14,8,40,.35)');g.addColorStop(1,'rgba(14,8,40,.85)');X.fillStyle=g;X.fillRect(0,0,W,H);
+  if(cv.pill)pill(cv.pill.t,cv.pill.c||'#FF4B5C',W/2,330,52);
+  if(cv.judul1)rich(cv.judul1,W/2,500,190,{lh:1});if(cv.judul2)rich('*'+cv.judul2+'*',W/2,660,210,{lh:1});
+  if(cv.sub)rich(cv.sub,W/2,cv.ySub||1400,74);if(cv.chips)CARDS.chips({baris:cv.chips,y:1560},1,9);footer(1)};
+</script></body></html>
