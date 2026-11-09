@@ -42,10 +42,26 @@ const yesterday = () => new Date(Date.now() + 7 * 36e5 - 864e5).toISOString().sl
 const wkStart = (ms = Date.now()) => { const d = new Date(ms + 7 * 36e5); const dow = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - dow) - 7 * 36e5 };
 const wkId = (ms = Date.now()) => new Date(wkStart(ms) + 7 * 36e5).toISOString().slice(0, 10);
 const LOMBA_MULAI = '2026-11-09'; // minggu pertama Lomba Kawasan
-const LP = { absen: 5, misi: 1, karya: 15, baru: 10, fest: 10 };
+const LP = { absen: 5, misi: 1, karya: 15, baru: 10, fest: 10, vote: 3 };
 // Festival Malam Minggu: tiap Sabtu 20.00–21.00 WIB
 const festWin = (ms = Date.now()) => { const sat = wkStart(ms) + 5 * 864e5; const mulai = sat + 20 * 36e5; return { tgl: new Date(sat + 7 * 36e5).toISOString().slice(0, 10), mulai, akhir: mulai + 36e5 } };
 const FEST_KOIN = 30;
+// Voting Gedung: buka Rabu 00.00 – Sabtu 23.59 WIB, pemenang dibangun & diumumkan Minggu
+const GEDUNG = [
+  { id: 'galeri', nm: 'Galeri & Studio Visual', ic: '🎨', kaw: 'visual', ds: 'Pameran lukisan, ilustrasi, komik & foto warga' },
+  { id: 'bioskop', nm: 'Bioskop Mini & Studio Digital', ic: '🎬', kaw: 'film', ds: 'Nonton film pendek, animasi & video karya warga' },
+  { id: 'teater', nm: 'Teater & Ruang Baca', ic: '🎭', kaw: 'cerita', ds: 'Panggung tari, teater, puisi & pojok baca' },
+  { id: 'bengkel', nm: 'Bengkel Karya & Ruang Pamer', ic: '🧵', kaw: 'kriya', ds: 'Tempat bikin & pamer keramik, ukiran, batik & fesyen' },
+  { id: 'balai', nm: 'Balai Kota & Papan Peluang', ic: '🏛️', kaw: 'pusat', ds: 'Info lowongan, kolaborasi & kegiatan komunitas' }
+];
+const voteWin = (ms = Date.now()) => { const ws = wkStart(ms); return { wk: wkId(ms), buka: ws + 2 * 864e5, tutup: ws + 6 * 864e5 } };
+async function voteHasil(wk) {
+  const [rows] = await redis([['HGETALL', 'vote:' + wk]]);
+  const c = {}; let total = 0; const add = (u, id) => { if (GEDUNG.some(g => g.id === id)) { c[id] = (c[id] || 0) + 1; total++ } };
+  if (Array.isArray(rows)) for (let i = 0; i < rows.length; i += 2) add(rows[i], rows[i + 1]);
+  else if (rows && typeof rows === 'object') for (const k in rows) add(k, rows[k]);
+  return { opsi: GEDUNG.map(g => Object.assign({}, g, { v: c[g.id] || 0 })), total };
+}
 const lpCmd = (u, n, ms) => [['HINCRBY', 'lp:' + wkId(ms), u, String(n)], ['EXPIRE', 'lp:' + wkId(ms), '3024000']];
 const KAWS = ['musik', 'visual', 'film', 'cerita', 'kriya', 'pusat'];
 let lombaCache = { at: 0, body: null };
@@ -196,6 +212,17 @@ module.exports = async (req, res) => {
         lombaCache = { at: Date.now(), body };
         return send(res, 200, body);
       }
+      if (q.get('a') === 'vote') { // Voting Gedung minggu ini + pemenang minggu lalu
+        const W = voteWin(), now = Date.now();
+        const hasil = await voteHasil(W.wk);
+        const lw = wkId(wkStart() - 7 * 864e5);
+        const lalu = await voteHasil(lw);
+        const top = lalu.total ? lalu.opsi.slice().sort((a, b) => b.v - a.v)[0] : null;
+        const vu = String(q.get('u') || '').toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 40);
+        let pilihan = null; if (vu) { const [m] = await redis([['HGET', 'vote:' + W.wk, vu]]); pilihan = m || null }
+        res.setHeader('Cache-Control', 'private, max-age=5');
+        return send(res, 200, { wk: W.wk, buka: W.buka, tutup: W.tutup, status: now < W.buka ? 'belum' : now < W.tutup ? 'buka' : 'selesai', opsi: hasil.opsi, total: hasil.total, pilihan, lalu: top ? { id: top.id, nm: top.nm, ic: top.ic, v: top.v, total: lalu.total } : null, poin: LP.vote });
+      }
       if (q.get('a') === 'fest') { // status Festival Malam Minggu + warga yang hadir
         const F = festWin(), now = Date.now();
         const [n, us] = await redis([['SCARD', 'fest:' + F.tgl], ['SMEMBERS', 'fest:' + F.tgl]]);
@@ -341,6 +368,18 @@ module.exports = async (req, res) => {
       if (!rl) return send(res, 429, { error: 'Tunggu sebentar sebelum simpan lagi.' });
       await redis([['SET', 'rumah:' + u, JSON.stringify(deco)]]);
       return send(res, 200, { ok: true, deco });
+    }
+    if (a === 'vote') { // pilih gedung (boleh ganti pilihan selama voting buka)
+      const W = voteWin(), now = Date.now(), id = String(body.id || '');
+      if (!GEDUNG.some(g => g.id === id)) return send(res, 400, { error: 'Pilihan gedung tidak dikenal.' });
+      if (now < W.buka) return send(res, 400, { error: 'Voting dibuka hari Rabu jam 00.00 WIB.' });
+      if (now >= W.tutup) return send(res, 400, { error: 'Voting minggu ini sudah ditutup. Pemenangnya diumumkan & dibangun hari Minggu!' });
+      const [rl, old] = await redis([['SET', 'rlv:' + u, '1', 'NX', 'PX', '2000'], ['HGET', 'vote:' + W.wk, u]]);
+      if (!rl) return send(res, 429, { error: 'Pelan-pelan ya.' });
+      const cmds = [['HSET', 'vote:' + W.wk, u, id], ['EXPIRE', 'vote:' + W.wk, '3024000']];
+      if (!old) cmds.push(...lpCmd(u, LP.vote));
+      await redis(cmds);
+      return send(res, 200, { ok: true, pilihan: id, baru: !old });
     }
     if (a === 'fest') { // hadir di Festival Malam Minggu (sekali per festival)
       const F = festWin(), now = Date.now();
