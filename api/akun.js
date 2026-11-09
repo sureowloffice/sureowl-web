@@ -32,12 +32,37 @@ async function warga(host) {
   if (wargaCache.set && Date.now() - wargaCache.at < 60000) return wargaCache.set;
   const r = await fetch('https://' + host + '/warga.json?nc=' + Date.now());
   const d = await r.json();
-  wargaCache = { at: Date.now(), set: new Set(d.warga.map(w => String(w.u).toLowerCase())) };
+  wargaCache = { at: Date.now(), set: new Set(d.warga.map(w => String(w.u).toLowerCase())), list: d.warga };
   return wargaCache.set;
 }
 
 const today = () => new Date(Date.now() + 7 * 36e5).toISOString().slice(0, 10);
 const yesterday = () => new Date(Date.now() + 7 * 36e5 - 864e5).toISOString().slice(0, 10);
+// Lomba Kawasan: minggu dihitung Senin 00.00 – Minggu 23.59 WIB
+const wkStart = (ms = Date.now()) => { const d = new Date(ms + 7 * 36e5); const dow = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - dow) - 7 * 36e5 };
+const wkId = (ms = Date.now()) => new Date(wkStart(ms) + 7 * 36e5).toISOString().slice(0, 10);
+const LOMBA_MULAI = '2026-11-09'; // minggu pertama Lomba Kawasan
+const LP = { absen: 5, misi: 1, karya: 15, baru: 10 };
+const lpCmd = (u, n, ms) => [['HINCRBY', 'lp:' + wkId(ms), u, String(n)], ['EXPIRE', 'lp:' + wkId(ms), '3024000']];
+const KAWS = ['musik', 'visual', 'film', 'cerita', 'kriya', 'pusat'];
+let lombaCache = { at: 0, body: null };
+async function lombaWeek(ws, list, prof) {
+  const we = ws + 7 * 864e5, id = wkId(ws);
+  const [rows] = await redis([['HGETALL', 'lp:' + id]]);
+  const pts = {};
+  if (Array.isArray(rows)) for (let i = 0; i < rows.length; i += 2) pts[rows[i]] = +rows[i + 1] || 0;
+  else if (rows && typeof rows === 'object') for (const k in rows) pts[k] = +rows[k] || 0;
+  const K = {}; for (const k of KAWS) K[k] = { k, poin: 0, aktif: 0, baru: 0, top: [] };
+  const kawOf = u => { const v = prof[u]; const pk = v ? String(v).split(':')[0] : 'pusat'; return K[pk] ? pk : 'pusat' };
+  for (const w of list) { // warga baru minggu ini yang sudah memilih kawasan
+    const u = String(w.u).toLowerCase(); if (!prof[u]) continue;
+    const t = Date.parse(String(w.t || '') + 'T' + (w.j || '12:00') + ':00+07:00');
+    if (t >= ws && t < we) { const k = kawOf(u); K[k].baru++; K[k].poin += LP.baru; pts[u] = (pts[u] || 0) }
+  }
+  for (const u in pts) { if (!pts[u]) continue; const k = kawOf(u); K[k].aktif++; K[k].poin += pts[u]; K[k].top.push({ u, p: pts[u] }) }
+  const out = KAWS.map(k => { const c = K[k]; c.top = c.top.sort((a, b) => b.p - a.p).slice(0, 3); return c }).sort((a, b) => b.poin - a.poin || b.aktif - a.aktif);
+  return out;
+}
 const level = exp => Math.floor(Math.sqrt((exp || 0) / 25)) + 1;
 const hashKey = k => crypto.createHash('sha256').update(k).digest('hex').slice(0, 32);
 
@@ -153,6 +178,21 @@ module.exports = async (req, res) => {
         res.setHeader('Cache-Control', 'public, max-age=15');
         return send(res, 200, { tidur: us || [] });
       }
+      if (q.get('a') === 'lomba') { // klasemen Lomba Kawasan minggu ini + juara minggu lalu
+        res.setHeader('Cache-Control', 'public, max-age=30');
+        if (lombaCache.body && Date.now() - lombaCache.at < 45000) return send(res, 200, lombaCache.body);
+        const host = req.headers['x-forwarded-host'] || req.headers.host || 'kotaseni.vercel.app';
+        await warga(host);
+        const [prow] = await redis([['HGETALL', 'prof']]);
+        const prof = {};
+        if (Array.isArray(prow)) for (let i = 0; i < prow.length; i += 2) prof[prow[i]] = prow[i + 1];
+        else if (prow && typeof prow === 'object') Object.assign(prof, prow);
+        const ws = wkStart(), list = wargaCache.list || [];
+        const kini = await lombaWeek(ws, list, prof), lalu = await lombaWeek(ws - 7 * 864e5, list, prof);
+        const body = { wk: wkId(), mulai: ws, akhir: ws + 7 * 864e5, poin: LP, kawasan: kini, juaraLalu: wkId(ws - 7 * 864e5) >= LOMBA_MULAI && lalu[0] && lalu[0].poin > 0 ? { k: lalu[0].k, poin: lalu[0].poin } : null };
+        lombaCache = { at: Date.now(), body };
+        return send(res, 200, body);
+      }
       if (q.get('a') === 'karya') { // daftar karya yang sudah disetujui (publik)
         const [ids] = await redis([['LRANGE', 'karya:ok', '0', '39']]);
         const list = (await karyaMetas(ids)).map(k => ({ id: k.id, u: k.u, jenis: k.jenis, judul: k.judul, link: k.link || '', t: k.t, ok: k.ok }));
@@ -209,7 +249,7 @@ module.exports = async (req, res) => {
         if (meta.st === 'ok') return send(res, 200, { ok: true });
         meta.st = 'ok'; meta.ok = Date.now();
         await redis([['SET', 'karya:' + id, JSON.stringify(meta)], ['LREM', 'karya:pending', '0', id], ['LPUSH', 'karya:ok', id], ['LTRIM', 'karya:ok', '0', '39'],
-          ['INCRBY', 'koin:' + meta.u, '100'], ['INCRBY', 'exp:' + meta.u, '100'], ['ZINCRBY', 'papan:exp', '100', meta.u]]);
+          ['INCRBY', 'koin:' + meta.u, '100'], ['INCRBY', 'exp:' + meta.u, '100'], ['ZINCRBY', 'papan:exp', '100', meta.u], ...lpCmd(meta.u, LP.karya)]);
         return send(res, 200, { ok: true });
       }
       if (op === 'tolak' || op === 'hapus') {
@@ -316,7 +356,7 @@ module.exports = async (req, res) => {
         await redis([['SET', 'absen:' + u, d], ['SET', 'streak:' + u, String(s)]]);
       }
       koin += bonus;
-      await redis([['INCRBY', 'koin:' + u, String(koin)], ['INCRBY', 'exp:' + u, String(koin)], ['ZINCRBY', 'papan:exp', String(koin), u]]);
+      await redis([['INCRBY', 'koin:' + u, String(koin)], ['INCRBY', 'exp:' + u, String(koin)], ['ZINCRBY', 'papan:exp', String(koin), u], ...lpCmd(u, id === 'absen' ? LP.absen : LP.misi)]);
       return send(res, 200, { ok: true, dapat: koin, bonus, profil: await profil(u) });
     }
     // ---- kebutuhan avatar (game): lapar, energi, kebersihan, mood, inspirasi ----
