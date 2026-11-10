@@ -396,7 +396,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .playbig small{max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chatbtn i{background:none!important;box-shadow:none!important;border-radius:0!important}
 @media (max-width:720px){.playbig{width:68px!important;height:78px!important}}
-.needhud{appearance:none;cursor:pointer;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:74px;padding:6px 5px;border-radius:14px;border:1px solid var(--line2)}
+.needhud{appearance:none;cursor:pointer;display:grid;grid-auto-flow:column;grid-auto-columns:14px;gap:4px;width:max-content;box-sizing:border-box;padding:6px 7px;border-radius:14px;border:1px solid var(--line2)}
 .needhud[hidden]{display:none}.needhud .nb2{display:grid;justify-items:center;gap:2px}.needhud i{font-style:normal;font-size:10px;line-height:1}
 .needhud b{display:block;width:6px;height:26px;border-radius:3px;background:linear-gradient(to top,var(--c) var(--v),rgba(255,255,255,.1) var(--v))}
 .needhud .low b{box-shadow:0 0 6px #FF6B6B}.needhud.lemas{border-color:#FF6B6B!important;animation:lem 1.2s ease-in-out infinite}
