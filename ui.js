@@ -27,10 +27,10 @@ const FOOD={roti:{ic:'🍞',nm:'Lapar',k:'lapar',c:'#E8B04B',bc:'#F2C94C',koin:1
 let VLK=0;function vilLine(){const me=K.byName.get(store.get('me',''));const N=window.KOTA_NEED&&window.KOTA_NEED.n;const u=me?(me.own?'President':'@'+me.u):'';
   if(!me)return 'Halo! Aku Vilindo, Wali Kota Seni 🦉 Follow @viralindongid biar jadi warga, terus komen biar dapat rumah 🏠';
   if(N){const low=[['lapar',35,'Perutmu bunyi tuh, '+u+' 😆 Mampir Seni Mart, roti cuma 15 koin!'],['energi',30,u+', kamu kelihatan capek. Tidur dulu di rumah ya 🛏️'],['bersih',30,'Hmm… '+u+', mandi dulu yuk 🚿'],['mood',30,'Senyum dong '+u+'! Nongkrong di alun-alun bikin mood naik 🎪'],['inspirasi',30,'Lagi buntu ide? Dengerin sesi di Gedung Musik 🎧']].find(([k,v])=>N[k]<v);if(low&&VLK%2===0){VLK++;return low[2]}}
-  const band=K.band();const L=['Halo '+u+'! Kota kita sekarang punya '+K.RES.length+' warga 🎉',band.length?'Di panggung lagi tampil @'+band[0].u+'. Yuk nonton di alun-alun! 🎸':'Panggung lagi istirahat. Kamu mau tampil? 🎤','Label Musik Office lagi '+K.isrMsg()+'. Butuh orang buat kerja kantoran lho 💼','Kerja di Gedung Musik atau Label Musik Office buat dapat Koin Nada 💰','Pesawat spanduk lewat tiap 2 menit bawa kabar kota ✈️','Ajak temanmu follow @viralindongid, nanti mobil jemputan antar dia sampai rumah 🚘','Jangan lupa ikut voting gedung berikutnya ya 🗳️'];return L[(VLK++)%L.length]}
+  const band=K.band();const L=['Halo '+u+'! Kota kita sekarang punya '+K.RES.length+' warga 🎉',band.length?'Di panggung lagi tampil @'+band[0].u+'. Yuk nonton di alun-alun! 🎸':'Panggung lagi istirahat. Kamu mau tampil? 🎤','Label Musik Office lagi '+K.isrMsg()+'. Butuh orang buat kerja kantoran lho 💼','Kerja di Gedung Musik atau Label Musik Office buat dapat Koin Nada 💰','Panggung Debut tiap jam 10, 14, 19 & 21. Aku sendiri yang umumkan nama seniman baru 🎤','Ajak temanmu follow @viralindongid, nanti dia debut di Panggung Debut 🎤','Jangan lupa ikut voting gedung berikutnya ya 🗳️'];return L[(VLK++)%L.length]}
 const ACT2={tidur:{ic:'🛏️',nm:'Energi',k:'energi',bc:'#7CF2FF',h:'Zzz… avatarmu tidur nyenyak'},mandi:{ic:'🚿',nm:'Kebersihan',k:'bersih',bc:'#9BD8FF',h:'Segar! Avatarmu habis mandi'},nongkrong:{ic:'🎪',nm:'Mood',k:'mood',bc:'#FF7AC8',h:'Seru! Avatarmu nongkrong di alun-alun'},dengar:{ic:'🎧',nm:'Inspirasi',k:'inspirasi',bc:'#C9B8FF',h:'Avatarmu dapat inspirasi baru'}};
 let tT=0;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),3800)}
-window.toastArr=r=>{if(!document.querySelector('.sheet:not([hidden])'))toast('🚘 @'+r.u+' baru tiba di Kota Seni')};
+window.toastArr=r=>{if(!document.querySelector('.sheet:not([hidden])'))toast('🎤 @'+r.u+' debut di Kota Seni')};
 window.toastMsg=m=>{if(!document.querySelector('.sheet:not([hidden])'))toast(m)};
 
 // ---------- jam ----------
@@ -41,8 +41,7 @@ tick();setInterval(tick,15000);
 
 // ---------- warga tiba ----------
 const nArr=ARR.length;
-$('arr').innerHTML=nArr?'🚘 <b>'+nArr+'</b> tiba hari ini':'';
-$('arrM').innerHTML=nArr?'🚘 <b>'+nArr+' warga</b> tiba hari ini':'';
+
 
 // ---------- mulai bar ----------
 if(store.get('hideStart',false))$('start').remove();else $('startX').onclick=()=>{store.set('hideStart',true);$('start').remove()};
@@ -60,7 +59,7 @@ R.misi=()=>{const s=misiState();const n=misiCount();$('misiSub').textContent=tgl
   MISI.map(m=>{const on=s.done.includes(m.id);return `<li class="item${on?' done':''}"><button class="chk" type="button" aria-pressed="${on}" data-m="${esc(m.id)}" aria-label="Tandai selesai: ${esc(m.judul)}">${on?'✓':''}</button><span class="ic">${esc(m.ikon)}</span><span style="min-width:0"><b>${esc(m.judul)}</b><small>${esc(m.ket)}</small></span>${m.aksi||m.link?`<button class="btn dark" type="button" data-go="${esc(m.id)}" style="margin-left:auto;min-height:36px;padding:0 12px;font-size:13px">Ayo</button>`:''}</li>`}).join('');
   $('misiList').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{setMisi(b.dataset.m,b.getAttribute('aria-pressed')!=='true');R.misi()});
   $('misiList').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const m=MISI.find(x=>x.id===b.dataset.go);if(m.link){window.open(m.link,'_blank','noopener')}else if(m.aksi==='share'){share()}else open(m.aksi)})};
-async function share(){const url=location.origin+'/kota';const text='Gua udah jadi warga Kota Seni, kota virtual buat anak seni. Pindah juga yuk: follow @viralindongid terus komen apa aja di postingannya, langsung dapat rumah. Bantu kawasanku menang Lomba Kawasan!';
+async function share(){const url=location.origin+'/kota';const text='Gua udah jadi warga Kota Seni, kota virtual buat anak seni. Pindah juga yuk: follow @viralindongid terus komen apa aja di postingannya, langsung dapat rumah. Ayo debut bareng aku di Kota Seni!';
   try{if(navigator.share){await navigator.share({title:'Kota Seni',text,url});done('ajak');return}}catch(e){return}
   try{await navigator.clipboard.writeText(text+' '+url);toast('🔗 Link kota disalin, tinggal kirim ke temanmu');done('ajak')}catch(e){toast(url)}}
 
@@ -81,14 +80,14 @@ $('calNext').onclick=()=>{calM=calM[1]<11?[calM[0],calM[1]+1]:[calM[0]+1,0];draw
 // ---------- kartu / balai ----------
 function cardHTML(r,view){const me=K.byName.get(store.get('me',''));const lv=me===r&&AK.p?AK.p.level:0;const c=K.makeCard(r,{lv});const url=c.toDataURL('image/png');CARD={r,c,url};
   const link=location.origin+'/kota?w='+encodeURIComponent(r.u);
-  if(view)return `<p>Ini Kartu Warga <b>@${esc(r.u)}</b>, ${r.own?'pemilik':'warga'} Kota Seni.</p><img id="ktw" alt="Kartu Warga @${esc(r.u)}" src="${url}"><div class="row"><button class="btn" type="button" data-wfind="${esc(r.u)}">🏠 Lihat rumahnya</button><button class="btn ghost" type="button" data-open="jadi">✨ Mau kartu kayak gini?</button></div><p class="muted">Follow <b>@viralindongid</b> + komen apa aja di postingannya, kamu dapat rumah & kartu sendiri.</p>`;
-  return `<p>Selamat, <b>@${esc(r.u)}</b> resmi warga Kota Seni! Share kartunya ke Story, tag <b>@viralindongid</b>, biar temanmu ikut pindah ke kawasanmu.</p><img id="ktw" alt="Kartu Warga @${esc(r.u)}" src="${url}"><div class="row"><button class="btn" type="button" id="shk">📲 Share ke Story</button><a class="btn ghost" id="dl" download="KartuWarga_KotaSeni_${esc(r.u)}.png" href="${url}">⬇️ Simpan</a><button class="btn ghost" type="button" id="cpk" data-link="${esc(link)}">🔗 Salin link</button></div><p class="muted">Di Story, tambahkan stiker <b>Link</b> pakai link kartumu biar temanmu bisa langsung lihat. Kalau tombol simpan tidak jalan, tahan gambar kartunya lalu pilih Simpan.</p>`}
+  if(view)return `<p>Ini Kartu Seniman <b>@${esc(r.u)}</b>, ${r.own?'pemilik':'seniman'} Kota Seni.</p><img id="ktw" alt="Kartu Seniman @${esc(r.u)}" src="${url}"><div class="row"><button class="btn" type="button" data-wfind="${esc(r.u)}">🏠 Lihat rumahnya</button><button class="btn ghost" type="button" data-open="jadi">✨ Mau kartu kayak gini?</button></div><p class="muted">Follow <b>@viralindongid</b> = debut & dapat Kartu Seniman. Komen apa aja di postingannya = dapat rumah.</p>`;
+  return `<p>Selamat, <b>@${esc(r.u)}</b> resmi seniman Kota Seni! Share Kartu Seniman-mu ke Story, tag <b>@viralindongid</b>, biar temanmu ikut debut.</p><img id="ktw" alt="Kartu Seniman @${esc(r.u)}" src="${url}"><div class="row"><button class="btn" type="button" id="shk">📲 Share ke Story</button><a class="btn ghost" id="dl" download="KartuSeniman_KotaSeni_${esc(r.u)}.png" href="${url}">⬇️ Simpan</a><button class="btn ghost" type="button" id="cpk" data-link="${esc(link)}">🔗 Salin link</button></div><p class="muted">Di Story, tambahkan stiker <b>Link</b> pakai link kartumu biar temanmu bisa langsung lihat. Kalau tombol simpan tidak jalan, tahan gambar kartunya lalu pilih Simpan.</p>`}
 let CARD=null;
 function bindCard(){const dl=$('dl');if(dl)dl.addEventListener('click',()=>done('kartu'));
   const sh=$('shk');if(sh)sh.onclick=async()=>{if(!CARD)return;done('kartu');const link=location.origin+'/kota?w='+encodeURIComponent(CARD.r.u);
-    try{const blob=await new Promise(res=>CARD.c.toBlob(res,'image/png'));const f=new File([blob],'KartuWarga_KotaSeni_'+CARD.r.u+'.png',{type:'image/png'});
-      if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Kartu Warga Kota Seni',text:'Aku anak '+((K.PROF[CARD.r.pk]||{}).nm||'Kota Seni')+' di Kota Seni 🏙️ '+link});return}}catch(e){if(e&&e.name==='AbortError')return}
-    const a=document.createElement('a');a.href=CARD.url;a.download='KartuWarga_KotaSeni_'+CARD.r.u+'.png';document.body.appendChild(a);a.click();a.remove();toast('⬇️ Kartu disimpan. Buka Instagram → Story → pilih gambarnya')};
+    try{const blob=await new Promise(res=>CARD.c.toBlob(res,'image/png'));const f=new File([blob],'KartuSeniman_KotaSeni_'+CARD.r.u+'.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Kartu Seniman Kota Seni',text:'Aku anak '+((K.PROF[CARD.r.pk]||{}).nm||'Kota Seni')+' di Kota Seni 🏙️ '+link});return}}catch(e){if(e&&e.name==='AbortError')return}
+    const a=document.createElement('a');a.href=CARD.url;a.download='KartuSeniman_KotaSeni_'+CARD.r.u+'.png';document.body.appendChild(a);a.click();a.remove();toast('⬇️ Kartu disimpan. Buka Instagram → Story → pilih gambarnya')};
   const cp=$('cpk');if(cp)cp.onclick=async()=>{try{await navigator.clipboard.writeText(cp.dataset.link);toast('🔗 Link kartumu disalin')}catch(e){toast(cp.dataset.link)}};
   document.querySelectorAll('[data-wfind]').forEach(b=>b.onclick=()=>{const r=K.byName.get(b.dataset.wfind.toLowerCase());closeAll();if(r){K.select(r);K.focusHouse&&K.focusHouse(r)}})}
 function idPreview(r){return `<div class="idcard${r&&r.own?' own':''}"><div class="hd"><b>KOTA SENI</b><span>${r?'★ '+esc(r.jab).toUpperCase():'★ WARGA'}</span></div><div class="bd"><div class="ph">${r?AVA.svg(r,{icon:1,size:72}):AVA.svgLook(AVA.look({u:'contoh',pk:'musik',col:'#FF4B4B',jab:'',lk:'1:0:0'}),{icon:1,size:72})}</div><dl><dt>USERNAME</dt><dd>@${esc(r?r.u:'username.kamu')}</dd><dt>NO. WARGA</dt><dd>#${r?r.no:'0000'}</dd><dt>PROFESI · SEJAK</dt><dd>${esc(r?(r.p||'Belum pilih profesi'):'Profesimu')} · ${r?tglPendek(r.t):'hari ini'}</dd></dl></div>${r?'':'<div class="wm">CONTOH</div>'}</div>`}
@@ -96,11 +95,11 @@ function eyesSVG(c){return `<svg width="64" height="64" viewBox="0 0 100 100" ar
 function balaiForm(){return `<form class="search" id="bf" autocomplete="off" style="margin-bottom:12px"><label for="bq"><span aria-hidden="true">@</span><input id="bq" placeholder="username-mu" aria-label="Username" autocapitalize="off" spellcheck="false"></label><button class="btn" type="submit">Ambil kartu</button></form>`}
 R.balai=()=>{const me=K.byName.get(store.get('me',''));
   if(me){$('balaiBody').innerHTML=idPreview(me)+cardHTML(me);bindCard();return}
-  $('balaiBody').innerHTML=idPreview(null)+`<div class="perks"><div><b>🏅 Gelar warga</b><small>Pendiri Kota sampai Bintang Festival</small></div><div><b>🪪 Kartu buat Story</b><small>Pamerin, tag @viralindongid</small></div><div><b>🗳️ Hak voting</b><small>Ikut pilih gedung berikutnya</small></div><div><b>💬 Pesan Warga</b><small>Ngobrol bareng warga lain</small></div></div>`+balaiForm()+`<h3>Belum jadi warga?</h3><ol class="steps"><li><span><b>Follow @viralindongid</b> di Instagram atau TikTok, kamu langsung jadi warga.</span></li><li><span><b>Komen</b> di postingan mana aja, kamu dapat <b>rumah</b> di Kampung Warga.</span></li><li><span>Masuk ke kota pakai username-mu, lalu <b>pilih kawasan & profesimu</b>.</span></li><li><span>Namamu muncul di kota paling lama 1 jam kemudian.</span></li></ol>`;
+  $('balaiBody').innerHTML=idPreview(null)+`<div class="perks"><div><b>⭐ Jalur Ketenaran</b><small>Mulai dari Amatir sampai Bintang Kota</small></div><div><b>🪪 Kartu buat Story</b><small>Pamerin, tag @viralindongid</small></div><div><b>🗳️ Hak voting</b><small>Ikut pilih gedung berikutnya</small></div><div><b>💬 Pesan Warga</b><small>Ngobrol bareng warga lain</small></div></div>`+balaiForm()+`<h3>Belum jadi warga?</h3><ol class="steps"><li><span><b>Follow @viralindongid</b> di Instagram atau TikTok, kamu langsung jadi warga.</span></li><li><span><b>Komen</b> di postingan mana aja, kamu dapat <b>rumah</b> di Blok Rumah Gratis.</span></li><li><span>Namamu diumumkan Wali Kota Vilindo di <b>Panggung Debut</b> (jam 10, 14, 19 & 21 WIB).</span></li><li><span>Masuk ke kota pakai username-mu, lalu <b>pilih bidang seni & profesimu</b>.</span></li></ol>`;
   $('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)}};
 function find(raw){const q=String(raw||'').trim().replace(/^@/,'').toLowerCase();if(!q)return;const r=K.byName.get(q);
   if(r){store.set('me',r.u.toLowerCase());K.select(r);open('balai')}
-  else{K.select(null);open('balai');$('balaiBody').innerHTML=`<p><b>@${esc(q)}</b> belum terdaftar di Kota Seni.</p>`+balaiForm()+`<ol class="steps"><li><span><b>Follow @viralindongid</b>, kamu langsung jadi warga.</span></li><li><span><b>Komen</b> di postingan mana aja, kamu dapat <b>rumah</b>.</span></li><li><span>Cek lagi di sini paling lama 1 jam kemudian.</span></li></ol><div class="row"><a class="btn dark" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">Buka Instagram</a></div>`;$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)}}}
+  else{K.select(null);open('balai');$('balaiBody').innerHTML=`<p><b>@${esc(q)}</b> belum terdaftar di Kota Seni.</p>`+balaiForm()+`<ol class="steps"><li><span><b>Follow @viralindongid</b>, kamu langsung jadi warga.</span></li><li><span><b>Komen</b> di postingan mana aja, kamu dapat <b>rumah</b>.</span></li><li><span>Kamu debut di sesi Panggung Debut berikutnya, cek lagi di sini.</span></li></ol><div class="row"><a class="btn dark" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">Buka Instagram</a></div>`;$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)}}}
 $('sf').addEventListener('submit',e=>{e.preventDefault();const v=$('q').value;$('q').blur();find(v)});
 
 // ---------- Lomba Kawasan ----------
@@ -111,10 +110,10 @@ R.lomba=async()=>{const el=$('lombaBody');if(!LB.d)el.innerHTML='<p class="muted
   const P=K.PROF||{};const me=K.byName.get(store.get('me',''));const myK=me&&!me.own?me.pk:null;const max=Math.max(1,...j.kawasan.map(k=>k.poin));
   $('lombaSub').textContent='Minggu ini · berakhir Senin 00.00 WIB · sisa '+sisa(j.akhir);
   el.innerHTML=(j.juaraLalu?`<div class="lbjuara">🏆 Juara minggu lalu: <b>${esc((P[j.juaraLalu.k]||{}).ic||'')} ${esc((P[j.juaraLalu.k]||{}).nm||j.juaraLalu.k)}</b> · ${j.juaraLalu.poin} poin</div>`:'')+
-  '<ol class="lb">'+j.kawasan.map((k,i)=>{const p=P[k.k]||{nm:k.k,ic:'',col:'#B69CFF'};return `<li class="${k.k===myK?'me':''}" style="--c:${p.col}"><span class="rk">${i===0&&k.poin>0?'👑':i+1}</span><span class="nm"><b>${esc(p.ic+' '+p.nm)}${k.k===myK?' <em>kawasanmu</em>':''}</b><span class="lbar"><i style="width:${Math.round(k.poin/max*100)}%"></i></span><small>${k.aktif} warga aktif · ${k.baru} warga baru${k.top.length?' · ⭐ @'+esc(k.top[0].u):''}</small></span><span class="pt">${k.poin}<small>poin</small></span></li>`}).join('')+'</ol>'+
-  `<h3>Cara nambah poin kawasanmu</h3><ul class="lbc"><li>🤝 <b>+${j.poin.baru}</b> tiap warga baru yang pilih kawasanmu</li><li>🗓️ <b>+${j.poin.absen}</b> tiap absen harian</li><li>✅ <b>+${j.poin.misi}</b> tiap misi harian selesai</li><li>🎨 <b>+${j.poin.karya}</b> tiap karya tayang di Layar Raksasa</li><li>🗳️ <b>+${j.poin.vote||3}</b> ikut Voting Gedung (Rabu–Sabtu)</li><li>🎆 <b>+${j.poin.fest||10}</b> hadir di Festival Malam Minggu (Sabtu 20.00 di alun-alun)</li></ul>
-  <p class="muted">Kawasan juara dapat piala emas melayang di gerbangnya & diumumkan di Instagram @viralindongid tiap Senin.</p>
-  <div class="row">${me?`<button class="btn" type="button" data-open="balai">🪪 Share kartu, ajak teman</button>`:`<button class="btn" type="button" data-open="jadi">🎵 Jadi warga & pilih kawasan</button>`}<button class="btn ghost" type="button" data-open="misi">✅ Kerjakan misi</button></div>`;
+  '<ol class="lb">'+j.kawasan.map((k,i)=>{const p=P[k.k]||{nm:k.k,ic:'',col:'#B69CFF'};return `<li class="${k.k===myK?'me':''}" style="--c:${p.col}"><span class="rk">${i===0&&k.poin>0?'👑':i+1}</span><span class="nm"><b>${esc(p.ic+' '+p.nm)}${k.k===myK?' <em>bidangmu</em>':''}</b><span class="lbar"><i style="width:${Math.round(k.poin/max*100)}%"></i></span><small>${k.aktif} warga aktif · ${k.baru} warga baru${k.top.length?' · ⭐ @'+esc(k.top[0].u):''}</small></span><span class="pt">${k.poin}<small>poin</small></span></li>`}).join('')+'</ol>'+
+  `<h3>Cara nambah poin bidangmu</h3><ul class="lbc"><li>🤝 <b>+${j.poin.baru}</b> tiap warga baru yang pilih bidangmu</li><li>🗓️ <b>+${j.poin.absen}</b> tiap absen harian</li><li>✅ <b>+${j.poin.misi}</b> tiap misi harian selesai</li><li>🎨 <b>+${j.poin.karya}</b> tiap karya tayang di Layar Raksasa</li><li>🗳️ <b>+${j.poin.vote||3}</b> ikut Voting Gedung (Rabu–Sabtu)</li><li>🎆 <b>+${j.poin.fest||10}</b> hadir di Festival Malam Minggu (Sabtu 20.00 di alun-alun)</li></ul>
+  <p class="muted">Bidang juara dapat piala emas melayang di gerbang distriknya & diumumkan di Instagram @viralindongid tiap Senin.</p>
+  <div class="row">${me?`<button class="btn" type="button" data-open="balai">🪪 Share kartu, ajak teman</button>`:`<button class="btn" type="button" data-open="jadi">🎤 Jadi seniman & pilih bidang</button>`}<button class="btn ghost" type="button" data-open="misi">✅ Kerjakan misi</button></div>`;
   el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>open(b.dataset.open))};
 setTimeout(()=>lombaLoad(true),2500);setInterval(()=>lombaLoad(true),180000);
 // ---------- Festival Malam Minggu (Sabtu 20.00–21.00 WIB) ----------
@@ -129,7 +128,7 @@ function festTick(){const bar=$('festBar');if(!bar)return;const live=festLive();
 async function festClaim(){if(!festLive())return;const me=store.get('me','');if(!me){toast('🪪 Masuk dulu pakai username-mu ya');open('balai');return}
   if(!K.near('plaza')){FS.pending=true;toast('🎆 Festival ada di alun-alun, yuk ke sana!');window.KOTA_GO&&window.KOTA_GO('plaza');return}
   try{const j=await api('fest');if(FS.d){FS.d.n=j.n||FS.d.n;store.set('festc',FS.d.tgl)}if(j.profil){AK.p=j.profil;pillUpdate()}
-    toast(j.sudah?'✅ Kamu sudah tercatat hadir di festival':'🎆 Kamu hadir di Festival! +'+j.dapat+' koin & +10 poin buat kawasanmu');sfx&&sfx('chime')}catch(e){toast('⚠️ '+e.message)}festTick()}
+    toast(j.sudah?'✅ Kamu sudah tercatat hadir di festival':'🎆 Kamu hadir di Festival! +'+j.dapat+' koin & +10 poin buat bidangmu');sfx&&sfx('chime')}catch(e){toast('⚠️ '+e.message)}festTick()}
 addEventListener('kota-arrive',e=>{if(e.detail==='plaza'&&FS.pending){FS.pending=false;setTimeout(festClaim,700)}});
 {const b=$('festBtn');if(b)b.onclick=festClaim}
 festLoad();setInterval(festLoad,45000);setInterval(festTick,15000);
@@ -138,8 +137,8 @@ festLoad();setInterval(festLoad,45000);setInterval(festTick,15000);
 R.rumah=()=>{const me=K.byName.get(store.get('me',''));
   if(!me){$('rumahBody').innerHTML=`<p>Kamu belum masuk sebagai warga. Ketik username-mu, nanti kota ingat rumahmu di perangkat ini.</p>`+balaiForm();$('bf').onsubmit=e=>{e.preventDefault();find($('bq').value)};return}
   K.select(me);const days=Math.max(0,Math.floor((Date.parse(TODAY)-Date.parse(me.t))/864e5));
-  if(me.nohouse){$('rumahBody').innerHTML=idPreview(me)+`<ul class="list"><li class="item"><span class="ic">🏗️</span><span><b>Kamu belum punya rumah</b><small>Komen di postingan @viralindongid mana aja, rumahmu dibangun paling lama 1 jam kemudian</small></span></li><li class="item"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>${esc(me.p||'Warga')}</small></span></li></ul><div class="row"><a class="btn" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">💬 Komen sekarang</a><button class="btn" type="button" data-open="balai">Kartu Warga</button><button class="btn ghost" type="button" id="playHome">🎮 Main jalan-jalan</button></div>`;$('playHome').onclick=()=>{closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()};return}
-  $('rumahBody').innerHTML=idPreview(me)+`<ul class="list"><li class="item"><span class="ic">🏠</span><span><b>Rumah No. ${me.no}</b><small>${esc((me.house&&me.house.seg&&me.house.seg.nm)||'Kampung Warga')} · masuk buat dekor sendiri</small></span></li><li class="item"><span class="ic">📆</span><span><b>Tinggal ${days?days+' hari':'sejak hari ini'}</b><small>Warga sejak ${tglPendek(me.t)}</small></span></li><li class="item"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>${esc(me.p||'Belum pilih profesi')}</small></span></li></ul><div class="row"><button class="btn" type="button" data-open="balai">Kartu Warga</button><button class="btn" type="button" id="inHome">🚪 Masuk & dekor rumah</button><button class="btn ghost" type="button" id="seeHome">🏠 Lihat rumahku</button><button class="btn" type="button" id="playHome">🎮 Main dari rumah</button><button class="btn ghost" type="button" id="logout">Bukan aku</button></div>`;
+  if(me.nohouse){$('rumahBody').innerHTML=idPreview(me)+`<ul class="list"><li class="item"><span class="ic">🏗️</span><span><b>Kamu belum punya rumah</b><small>Komen di postingan @viralindongid mana aja, rumahmu dibangun paling lama 1 jam kemudian</small></span></li><li class="item"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>${esc(me.p||'Warga')}</small></span></li></ul><div class="row"><a class="btn" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">💬 Komen sekarang</a><button class="btn" type="button" data-open="balai">🪪 Kartu Seniman</button><button class="btn ghost" type="button" id="playHome">🎮 Main jalan-jalan</button></div>`;$('playHome').onclick=()=>{closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()};return}
+  $('rumahBody').innerHTML=idPreview(me)+`<ul class="list"><li class="item"><span class="ic">🏠</span><span><b>Rumah No. ${me.no}</b><small>${esc((me.house&&me.house.seg&&me.house.seg.nm)||'Blok Rumah Gratis')+(me.house&&me.house.blk?' '+me.house.blk.abc:'')} · masuk buat dekor sendiri</small></span></li><li class="item"><span class="ic">📆</span><span><b>Tinggal ${days?days+' hari':'sejak hari ini'}</b><small>Warga sejak ${tglPendek(me.t)}</small></span></li><li class="item"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>${esc(me.p||'Belum pilih profesi')}</small></span></li></ul><div class="row"><button class="btn" type="button" data-open="balai">🪪 Kartu Seniman</button><button class="btn" type="button" id="inHome">🚪 Masuk & dekor rumah</button><button class="btn ghost" type="button" id="seeHome">🏠 Lihat rumahku</button><button class="btn" type="button" id="playHome">🎮 Main dari rumah</button><button class="btn ghost" type="button" id="logout">Bukan aku</button></div>`;
   $('seeHome').onclick=()=>{closeAll();K.focusHouse(me)};$('inHome').onclick=()=>window.KOTA_ROOM(me);$('playHome').onclick=()=>{closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()};
   $('logout').onclick=()=>{store.set('me','');K.select(null);R.rumah()}};
 
@@ -216,25 +215,32 @@ const edisi=Math.max(1,Math.floor((Date.parse(TODAY)-Date.parse(info.mulai||TODA
 const lastKoran=store.get('koran','');if(lastKoran!==TODAY)$('koranDot').hidden=false;
 function topProf(){const m=new Map();RES.slice(1).forEach(r=>{const k=(r.p||'').trim();if(!k||/belum/i.test(k))return;const key=k.toLowerCase().replace(/^drumer$/,'drummer');const e=m.get(key)||{n:k.replace(/^Drumer$/,'Drummer'),c:0};e.c++;m.set(key,e)});return [...m.values()].sort((a,b)=>b.c-a.c)}
 R.koran=()=>{store.set('koran',TODAY);$('koranDot').hidden=true;done('koran');const art=info.koran||[];const tp=topProf();
-  $('paper').innerHTML=`<div class="mast"><small>EDISI KE-${edisi} · GRATIS</small><b>Harian Kota Seni</b><i>Suara warga, irama kota</i></div><div class="meta"><span>${tglPanjang(TODAY)}</span><span>${$('clkIc').textContent} Jam kota ${$('clk').textContent}</span></div>
-  <div class="stats"><div><b>${RES.length}</b><small>POPULASI</small></div><div><b>${ARR.length}</b><small>TIBA HARI INI</small></div><div><b>${tp[0]?esc(tp[0].n):'-'}</b><small>PROFESI TERBANYAK</small></div></div>`+
+  $('paper').innerHTML=`<div class="mast"><small>EDISI KE-${edisi} · GRATIS</small><b>Majalah Kota Seni</b><i>Pemenang, seniman naik daun, kabar distrik</i></div><div class="meta"><span>${tglPanjang(TODAY)}</span><span>${$('clkIc').textContent} Jam kota ${$('clk').textContent}</span></div>
+  <div class="stats"><div><b>${RES.length}</b><small>POPULASI</small></div><div><b>${ARR.length}</b><small>DEBUT HARI INI</small></div><div><b>${tp[0]?esc(tp[0].n):'-'}</b><small>PROFESI TERBANYAK</small></div></div>`+
   art.map((a,i)=>`<div class="art${i?' small':''}">${a.tag?`<span class="tg">${esc(a.tag)}</span>`:''}<h4>${esc(a.judul)}</h4><p>${esc(a.isi)}</p></div>`).join('')+
-  (ARR.length?`<div class="art small"><span class="tg">KEDATANGAN</span><h4>Selamat datang, warga baru!</h4><p>${ARR.slice(0,30).map(r=>'@'+esc(r.u)+(r.p?' ('+esc(r.p)+')':'')).join(', ')}${ARR.length>30?' dan '+(ARR.length-30)+' lainnya':''}.</p></div>`:'')};
+  (ARR.length?`<div class="art small"><span class="tg">PANGGUNG DEBUT</span><h4>Seniman baru debut hari ini</h4><p>${ARR.slice(0,30).map(r=>'@'+esc(r.u)+(r.p?' ('+esc(r.p)+')':'')).join(', ')}${ARR.length>30?' dan '+(ARR.length-30)+' lainnya':''}.</p></div>`:'')};
 
 // ---------- kerja ----------
 const LADDER=[['🌱','Seniman Magang','Hari 0–6'],['🎒','Seniman Jalanan','Hari 7–13'],['🎤','Musisi Panggung','Hari 14–29'],['🌟','Bintang Festival','Hari 30+']];
-R.kerja=()=>{const me=K.byName.get(store.get('me',''));const tp=topProf();const max=tp[0]?tp[0].c:1;
-  $('kerjaBody').innerHTML=(me?`<ul class="list"><li class="item feat"><span class="ic">💼</span><span><b>${esc(me.jab)}</b><small>@${esc(me.u)} · ${esc(me.p||'Belum pilih profesi')}</small></span></li></ul>`:'')+
-  `<h3>Jenjang jabatan</h3><div class="ladder">`+
-  `<div class="item${me&&me.i>=2&&me.i<=11&&!me.own?' cur':''}"><span class="ic">👑</span><span><b>Pendiri Kota</b><small>Khusus 10 warga pertama, permanen</small></span></div>`+
-  LADDER.map(([ic,n,k])=>`<div class="item${me&&me.jab===n?' cur':''}"><span class="ic">${ic}</span><span><b>${n}</b><small>${k} tinggal di kota</small></span></div>`).join('')+
+const FAME=[['⭐','Amatir','Debut di Panggung Debut'],['🎒','Seniman Jalanan','20 sesi kerja bidang seni'],['🏠','Seniman Lokal','60 sesi kerja & ikut 3 event'],['📰','Seniman Kota','Masuk 10 besar Karya Pilihan'],['🌟','Bintang Kota','Juara Karya Pilihan atau Festival']];
+R.kerja=()=>{const me=K.byName.get(store.get('me',''));const tp=topProf();const max=tp[0]?tp[0].c:1;const P=me&&K.PROF[me.pk];
+  $('kerjaBody').innerHTML=(me?`<ul class="list"><li class="item feat"><span class="ic">${P?P.ic:'✨'}</span><span><b>@${esc(me.u)} · ${esc(me.p||'Belum pilih profesi')}</b><small>${P?'Distrik '+esc(P.nm):'Pilih bidang senimu dulu di Avatarku'} · Level ⭐ Amatir</small></span></li></ul>`:'')+
+  `<h3>Kerja lewat mini game</h3><ul class="list"><li class="item"><span class="ic">🎙️</span><span><b>Studio Rekaman · Distrik Musik</b><small>Ketuk not pas di garis · bayaran sesuai skor</small></span><button class="btn" type="button" data-open="studio">Main</button></li><li class="item"><span class="ic">💼</span><span><b>Label Musik Office</b><small>Kerja kantoran 25 detik · cocok buat semua bidang</small></span><button class="btn" type="button" data-open="kantor">Main</button></li></ul>
+  <p class="muted">Mini game distrik lain dibangun satu per satu sesuai voting warga.</p>
+  <h3>Jalur Ketenaran</h3><div class="ladder">`+FAME.map(([ic,n,k],i)=>`<div class="item${me&&i===0?' cur':''}"><span class="ic">${ic}</span><span><b>${i+1}. ${n}</b><small>${k}${i?' · segera dibuka':''}</small></span></div>`).join('')+
   `</div><h3>Bursa profesi warga</h3><div class="bars">`+(tp.slice(0,8).map(p=>`<div><span>${esc(p.n)}</span><span>${p.c} warga</span><i><em style="width:${p.c/max*100}%"></em></i></div>`).join('')||'<p class="muted">Belum ada data profesi.</p>')+
-  `</div><p class="muted">Ganti kawasan/profesi lewat <b>Avatarku → ganti profesi</b> (1x sehari).</p>`};
+  `</div><p class="muted">Ganti bidang/profesi lewat <b>Avatarku → ganti profesi</b> (1x sehari).</p>`;
+  $('kerjaBody').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>open(b.dataset.open))};
 
 // ---------- info ----------
 const ANN=info.pengumuman||[];const seen=store.get('ann',0);const unread=ANN.filter(a=>a.id>seen).length;
 if(unread){$('infoBadge').hidden=false;$('infoBadge').textContent=unread}
-R.info=()=>{const s=store.get('ann',0);$('infoList').innerHTML=ANN.map(a=>`<div class="ann${a.id>s?' new':''}"><small>${tglPanjang(a.tgl)}${a.id>s?' · BARU':''}</small><b>${esc(a.judul)}</b><p>${esc(a.isi)}</p></div>`).join('')||'<p>Belum ada pengumuman.</p>';
+const ATURAN=['Follow @viralindongid = jadi warga & debut di Panggung Debut.','Komen minimal 1 kata di postingan @viralindongid = dapat rumah gratis.','Kirim hanya karya milik sendiri, aman untuk semua umur.','Petugas kota tidak pernah minta password atau bayaran.'];
+function kotaTop(){const DS=K.DISTRIK||[];const P=K.PROF||{};const don=(info.donatur||[]).map(d=>String(d.u||d.n||'').replace(/^@/,'')).filter(Boolean);
+  return `<h3>🗺️ Peta distrik seni</h3><div class="pfgrid">${DS.map(d=>{const p=P[d.k];return `<button type="button" data-dk="${d.k}" style="--c:${p.col}"><i>${p.ic}</i>${esc(p.nm)}<small>${esc(d.main)}</small></button>`}).join('')}<button type="button" data-dk="rumah" style="--c:#B69CFF"><i>🏠</i>Blok Rumah Gratis<small>Pusat kota · ${(K.HOUSES||[]).length} rumah</small></button></div>
+  <h3>💛 Donatur kota</h3><p class="muted">${don.length?don.map(u=>'@'+esc(u)).join(', '):'Belum ada donatur. Nama donatur tampil di pesawat spanduk, billboard & Taman Donatur.'}</p>
+  <h3>📜 Aturan kota</h3><ul class="lbc">${ATURAN.map(a=>'<li>'+esc(a)+'</li>').join('')}</ul><h3>📢 Pengumuman Wali Kota</h3>`}
+R.info=()=>{const s=store.get('ann',0);$('infoTop').innerHTML=kotaTop();$('infoTop').querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>{closeAll();if(b.dataset.dk==='rumah'){K.focusPlace('kampung');return}window.KOTA_onPlaceInfo('distrik:'+b.dataset.dk)});$('infoList').innerHTML=ANN.map(a=>`<div class="ann${a.id>s?' new':''}"><small>${tglPanjang(a.tgl)}${a.id>s?' · BARU':''}</small><b>${esc(a.judul)}</b><p>${esc(a.isi)}</p></div>`).join('')||'<p>Belum ada pengumuman.</p>';
   store.set('ann',Math.max(0,...ANN.map(a=>a.id)));$('infoBadge').hidden=true};
 
 // ---------- voting ----------
@@ -246,13 +252,13 @@ R.voting=async()=>{done('voting');const el=$('voteBody');if(!VT.d)el.innerHTML='
   const lead=j.total?j.opsi.slice().sort((a,b)=>b.v-a.v)[0]:null;
   el.innerHTML=(j.lalu?`<div class="lbjuara">🏗️ Pemenang minggu lalu: <b>${esc(j.lalu.ic+' '+j.lalu.nm)}</b> · ${j.lalu.v} dari ${j.lalu.total} suara</div>`:'')+
   '<ul class="vg">'+j.opsi.map(o=>{const p=P[o.kaw]||{col:'#B69CFF',nm:''};const mine=j.pilihan===o.id;const pct=j.total?Math.round(o.v/j.total*100):0;
-    return `<li class="${mine?'me':''}" style="--c:${p.col}"><span class="gi">${esc(o.ic)}</span><span class="gb"><b>${esc(o.nm)}${lead&&lead.id===o.id&&o.v>0?' <em>terdepan</em>':''}</b><small>${esc(o.ds)} · Kawasan ${esc(p.nm)}</small><span class="lbar"><i style="width:${Math.round(o.v/max*100)}%"></i></span><small>${o.v} suara · ${pct}%</small></span>`+
+    return `<li class="${mine?'me':''}" style="--c:${p.col}"><span class="gi">${esc(o.ic)}</span><span class="gb"><b>${esc(o.nm)}${lead&&lead.id===o.id&&o.v>0?' <em>terdepan</em>':''}</b><small>${esc(o.ds)} · ${o.kaw==='pusat'?'Pusat Kota':'Distrik '+esc(p.nm)}</small><span class="lbar"><i style="width:${Math.round(o.v/max*100)}%"></i></span><small>${o.v} suara · ${pct}%</small></span>`+
     (st==='buka'?`<button class="btn${mine?'':' ghost'}" type="button" data-vote="${esc(o.id)}"${mine?' disabled':''}>${mine?'✅ Pilihanmu':'Pilih'}</button>`:'')+'</li>'}).join('')+'</ul>'+
-  `<p class="muted">${j.total} warga sudah memilih. Satu warga satu suara (boleh ganti selama voting buka). Suara pertamamu +${j.poin||3} poin Lomba Kawasan. Gedung pemenang dibangun di kota & tayang di Instagram @viralindongid tiap Minggu.</p>`+
+  `<p class="muted">${j.total} warga sudah memilih. Satu warga satu suara (boleh ganti selama voting buka). Suara pertamamu +${j.poin||3} poin Lomba Kawasan untuk bidangmu. Gedung pemenang dibangun di kota & tayang di Instagram @viralindongid tiap Minggu.</p>`+
   (me?'':`<div class="row"><button class="btn" type="button" data-open="balai">🪪 Masuk dulu biar bisa voting</button></div>`);
   el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>open(b.dataset.open));
   el.querySelectorAll('[data-vote]').forEach(b=>b.onclick=async()=>{if(!store.get('me','')){toast('🪪 Masuk dulu pakai username-mu ya');open('balai');return}
-    b.disabled=true;try{const r=await api('vote',{id:b.dataset.vote});toast(r.baru?'🗳️ Suaramu masuk! +'+(j.poin||3)+' poin buat kawasanmu':'🗳️ Pilihanmu diganti');VT.d=null;R.voting()}catch(e){toast('⚠️ '+e.message);b.disabled=false}})};
+    b.disabled=true;try{const r=await api('vote',{id:b.dataset.vote});toast(r.baru?'🗳️ Suaramu masuk! +'+(j.poin||3)+' poin buat bidangmu':'🗳️ Pilihanmu diganti');VT.d=null;R.voting()}catch(e){toast('⚠️ '+e.message);b.disabled=false}})};
 setTimeout(voteLoad,3000);
 
 // ---------- chat / pesan warga (panel live) ----------
@@ -305,7 +311,7 @@ loadChat();chatTimer=setInterval(loadChat,15000);
 // ---------- AKUN WARGA: Koin Nada, level, misi berhadiah, absen, papan teraktif, KTW ----------
 const MISI2=[{id:'absen',ikon:'🗓️',judul:'Absen harian',ket:'+10 koin · bonus kalau beruntun'},{id:'chat',ikon:'💬',judul:'Ngobrol di Pesan Warga',ket:'Kirim 1 pesan · +5 koin',aksi:'chat'},
  {id:'radio',ikon:'📻',judul:'Dengerin Radio Kota',ket:'Putar radio · +5 koin',aksi:'radio'},{id:'koran',ikon:'📰',judul:'Baca Harian Kota Seni',ket:'+3 koin',aksi:'koran'},
- {id:'voting',ikon:'🗳️',judul:'Lihat voting gedung',ket:'+3 koin',aksi:'voting'},{id:'kartu',ikon:'🪪',judul:'Simpan Kartu Warga-mu',ket:'Download kartu di Balai · +3 koin',aksi:'balai'},
+ {id:'voting',ikon:'🗳️',judul:'Lihat voting gedung',ket:'+3 koin',aksi:'voting'},{id:'kartu',ikon:'🪪',judul:'Simpan Kartu Seniman-mu',ket:'Download kartu di Balai · +3 koin',aksi:'balai'},
  {id:'ajak',ikon:'🤝',judul:'Ajak 1 teman pindah',ket:'Bagikan link kota · +5 koin',aksi:'share'}];
 const AK={p:null,busy:false};
 async function api(a,extra){const me=store.get('me','');const r=await fetch('/api/akun',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({a,u:me,k:chatKey()},extra||{}))});
@@ -351,13 +357,35 @@ R.misi=()=>{const p=AK.p,me=store.get('me','');const n=p?p.misi.filter(id=>MISI2
 pillUpdate();if(store.get('me',''))refresh().then(()=>claim('absen'));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 
-// ---------- JEMPUTAN TERJADWAL (tiap jam tepat) ----------
-function jemput(){const d=nowWIB();const sisa=(59-d.getUTCMinutes())*60+(60-d.getUTCSeconds());const mm=Math.floor(sisa/60),ss=sisa%60;const cd=mm+':'+String(ss).padStart(2,'0');
-  const Q=(K.QUEUE||[]).filter(r=>r.q);const jamBer=String((d.getUTCHours()+1)%24).padStart(2,'0')+'.00';
-  const html=Q.length?`🚘 <b>${Q.length} warga</b> dijemput ${jamBer} · <b>${cd}</b>`:`🚘 Jemputan berikutnya ${jamBer} · <b>${cd}</b>`;
-  $('arr').innerHTML=`🚘 ${jamBer} · <b>${cd}</b>`;const m=$('arrM');if(m){m.innerHTML=html+(Q.length?'':' · komen apa aja biar dapat rumah');m.style.display=''}
-  if(K.arrive){const got=K.arrive();if(got.length){toast('🚘 '+got.length+' warga baru tiba: '+got.slice(0,3).map(r=>'@'+r.u).join(', ')+(got.length>3?' …':''))}}}
-jemput();setInterval(jemput,1000);
+// ---------- PANGGUNG DEBUT: 4 sesi sehari, hitung mundur di kolom cari ----------
+const jamOf=S=>String(new Date(S+7*36e5).getUTCHours()).padStart(2,'0')+'.00';
+const cdOf=ms=>{const d=Math.max(0,Math.floor(ms/1000));const h=Math.floor(d/3600),m=Math.floor(d%3600/60),x=d%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
+function debutTick(){if(!K.debutInfo)return;const D=K.debutInfo();let html,short;
+  if(D.on){const r=D.idx>=0&&D.L[D.idx];html=`🎤 <b>LIVE</b> Panggung Debut ${jamOf(D.S)}${r?' · @'+esc(r.u):''}`;short=`🎤 <b>LIVE</b> · ${D.L.length} seniman`}
+  else{const n=D.nextL.length;html=`🎤 Debut ${jamOf(D.next)} · <b>${cdOf(D.next-Date.now())}</b>${n?' · '+n+' antre':''}`;short=`🎤 ${jamOf(D.next)} · <b>${cdOf(D.next-Date.now())}</b>`}
+  $('arr').innerHTML=short;const m=$('arrM');if(m){m.innerHTML=html+(D.on||D.nextL.length?'':' · follow = debut');m.style.display=''}}
+debutTick();setInterval(debutTick,1000);
+window.KOTA_DEBUT_EV=(ev,d)=>{const busy=document.querySelector('.sheet:not([hidden])');
+  if(ev==='start'){toast('🎤 Panggung Debut '+jamOf(d.S)+' dimulai! '+d.n+' seniman baru tampil');if(!busy&&!K.playing&&!K.selected){K.focusPlace('debut')}}
+  else if(ev==='name'&&!busy){toast('🎤 @'+d.r.u+' debut di Kota Seni! ('+(d.i+1)+'/'+d.n+')')}
+  else if(ev==='end'&&!busy){toast('🦉 Panggung Debut selesai. Sampai jumpa sesi berikutnya!')}};
+// ---------- PANGGUNG: jadwal event kota (Debut, Festival, Lomba) ----------
+R.panggung=()=>{const D=K.debutInfo?K.debutInfo():null;const day=TODAY;const ses=K.debutDay?K.debutDay(day):[];const now=Date.now();
+  const nm=L=>L.length?L.slice(0,20).map(r=>'@'+esc(r.u)).join(', ')+(L.length>20?' +'+(L.length-20)+' lainnya':''):'';
+  const rows=ses.map(x=>{const st=D&&D.on&&D.S===x.S?'<em class="live">LIVE</em>':x.S<now?'selesai':x.S===(D&&D.next)?'berikutnya · '+cdOf(x.S-now):'nanti';
+    return `<li class="item${D&&D.next===x.S?' feat':''}"><span class="ic">🎤</span><span><b>${jamOf(x.S)} WIB · ${x.L.length} seniman <small style="display:inline">${st}</small></b><small>${x.L.length?nm(x.L):x.S<now?'Tidak ada debut di sesi ini':'Follow @viralindongid sebelum jam ini = ikut debut'}</small></span></li>`}).join('');
+  const d=nowWIB(),dw=d.getUTCDay();const sab=dw===6?'hari ini':'Sabtu ini ('+(6-dw)+' hari lagi)';
+  $('panggungBody').innerHTML=`<h3>🎤 Panggung Debut hari ini</h3><p class="muted">Warga baru tampil di gerbang kota, diumumkan langsung oleh Wali Kota Vilindo.</p><ul class="list">${rows}</ul>
+  <div class="row"><button class="btn" type="button" id="pgGo">🎤 Lihat Panggung Debut</button><button class="btn ghost" type="button" data-open="jadi">✨ Cara ikut debut</button></div>
+  <h3>Jadwal mingguan</h3><ul class="list"><li class="item"><span class="ic">🎆</span><span><b>Festival Malam Minggu</b><small>Sabtu 20.00–21.00 WIB di alun-alun · ${sab}</small></span></li><li class="item"><span class="ic">🏆</span><span><b>Lomba Kawasan (7 bidang)</b><small>Senin–Minggu · klasemen live</small></span></li><li class="item"><span class="ic">🗳️</span><span><b>Voting Gedung</b><small>Rabu 00.00 – Sabtu 23.59 WIB · pemenang dibangun Minggu</small></span></li></ul>
+  <div class="row"><button class="btn" type="button" data-open="lomba">🏆 Lomba Kawasan</button><button class="btn ghost" type="button" data-open="voting">🗳️ Voting</button><button class="btn ghost" type="button" data-open="kalender">📅 Kalender</button></div>`;
+  $('pgGo').onclick=()=>{closeAll();K.focusPlace('debut')}};
+// ---------- GALERI: karya warga + voting ----------
+R.galeri=()=>{const L=window.KOTA_KARYA||[];
+  $('galeriBody').innerHTML=(L.length?'<div class="kgrid">'+L.slice(0,24).map(kr=>`<button type="button" class="kthumb" data-karya="${esc(kr.id)}"><img src="/api/akun?a=karyaImg&id=${encodeURIComponent(kr.id)}" alt="${esc(kr.judul)}" loading="lazy"><small>${esc(kr.judul)}<br>@${esc(kr.u)}</small></button>`).join('')+'</div>':'<p class="muted">Belum ada karya yang tayang. Jadilah yang pertama!</p>')+
+  `<div class="row"><button class="btn" type="button" data-open="kirim">🎨 Kirim karyamu</button><button class="btn ghost" type="button" data-open="voting">🗳️ Voting gedung</button></div><p class="muted">Karya yang disetujui tayang di Layar Raksasa alun-alun & dapat +100 Koin Nada. Hanya karya milik sendiri dan aman untuk semua umur.</p>`;
+  $('galeriBody').querySelectorAll('[data-karya]').forEach(b=>b.onclick=()=>window.KOTA_KARYA_VIEW(b.dataset.karya))};
+
 
 
 // ---------- MAIN KARAKTER, JELAJAH KOTA & WARGA ONLINE ----------
@@ -390,7 +418,7 @@ jemput();setInterval(jemput,1000);
  $('goMenu').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{$('goMenu').hidden=true;const g=b.dataset.go;
    if(g==='rumahku'){const me=K.byName.get(store.get('me',''));if(me){K.focusHouse(me);toast('🏠 Ini rumahmu, @'+me.u+'!')}else open('rumah');return}
    window.KOTA_onPlace(g)});
- function placeGo(g){K.focusPlace(g);const T={home:'🗺️ Seluruh Kota Seni',plaza:'🎪 Panggung Festival · musisi tampil, ilustrator, booth kamera & tarot di sekitarnya',kampung:'🏘️ Kampung Warga · ketuk rumah buat lihat pemiliknya',studio:'🎙️ Studio Rekaman lagi ON AIR · coba game rekam lagu!',isr:'🏢 Label Musik Office · '+K.isrMsg()};if(T[g])toast(T[g]);if(g==='studio')setTimeout(()=>open('studio'),900)}
+ function placeGo(g){K.focusPlace(g);const T={home:'🗺️ Seluruh Kota Seni',plaza:'🎪 Panggung Festival · musisi tampil, ilustrator, booth kamera & tarot di sekitarnya',kampung:'🏠 Blok Rumah Gratis · ketuk rumah buat lihat pemiliknya',debut:'🎤 Panggung Debut · gerbang kota',studio:'🎙️ Studio Rekaman lagi ON AIR · coba game rekam lagu!',isr:'🏢 Label Musik Office · '+K.isrMsg()};if(T[g])toast(T[g]);if(g==='studio')setTimeout(()=>open('studio'),900)}
  window.KOTA_onPlace=placeGo;/* diganti kartu info di bawah */
  $('zIn').onclick=()=>K.zoomStep(.6);$('zOut').onclick=()=>K.zoomStep(1.65);
  window.KOTA_onCluster=C=>toast(C.nm+' · '+C.n+' rumah · ketuk rumah buat lihat pemiliknya');
@@ -485,15 +513,14 @@ jemput();setInterval(jemput,1000);
 // ---------- KARTU INFO GEDUNG (ketuk gedung di peta) ----------
 {const PL={
   plaza:{cat:'Pusat Kota',ic:'🎪',bg:'#FF4FA3',nm:'Alun-alun Kota Seni',al:'Jl. Nada No. 1 · Pusat Kota',ds:'Pusat kota dengan Panggung Festival, bazar seni, layar raksasa, tribun dan panggung busking. Band warga tampil bergantian tiap 2,5 menit.',sec:'LAGI TAMPIL',act:[['💬 Ngobrol sama warga','chat'],['🎮 Main ke panggung','play']]},
-  studio:{cat:'Musik',ic:'🎵',bg:'#FF4FA3',nm:'Gedung Musik',al:'Jl. Raya Kota Seni · depan kanan',ds:'Gedung pemenang voting DAY 2: speaker raksasa, tuts piano dan piringan hitam di atap. Di dalamnya studio rekaman yang lagi ON AIR.',sec:'KERJA',act:[['🎙️ Kerja: sesi rekaman','studio']]},
+  studio:{cat:'Distrik Musik',ic:'🎵',bg:'#FF4B4B',nm:'Gedung Musik',al:'Distrik Musik · depan kanan',ds:'Gedung pemenang voting DAY 2: speaker raksasa, tuts piano dan piringan hitam di atap. Di dalamnya studio rekaman yang lagi ON AIR.',sec:'KERJA',act:[['🎙️ Kerja: sesi rekaman','studio'],['📻 Radio Kota Seni','radio']]},
   isr:{cat:'Perkantoran',ic:'🏢',bg:'#B69CFF',nm:'Label Musik Office',al:'Jl. Label No. 9 · Distrik Barat',ds:'Kantor label musik Kota Seni. Warga bisa kerja kantoran di sini: balas email, cek kontrak, dengar demo.',sec:'KEGIATAN SEKARANG',act:[['💼 Kerja kantoran','kantor'],['📻 Dengerin lagu kota','radio']]},
   mansion:{cat:'Pemerintahan',ic:'👑',bg:'#FFD23F',nm:'Istana Seni President',al:'Jl. Utama No. 1 · Belakang Panggung',ds:'Istana Seni, rumah President Kota Seni. President lagi ada di dalam.',sec:'ISTANA',act:[['🚪 Masuk istana','mansion']]},
-  halte:{cat:'Transportasi',ic:'🚘',bg:'#9BE15D',nm:'Halte Jemputan',al:'Jl. Raya Kota Seni',ds:'Warga baru dijemput mobil tiap jam tepat, lalu turun di sini.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
+  debut:{cat:'Gerbang Kota',ic:'🎤',bg:'#FF4FA3',nm:'Panggung Debut',al:'Gerbang Kota Seni · depan alun-alun',ds:'Warga baru tidak datang naik pesawat, tapi tampil di sini. 4 sesi sehari (10.00, 14.00, 19.00, 21.00 WIB): lampu sorot menyala dan Wali Kota Vilindo mengumumkan nama seniman baru satu per satu.',sec:'JADWAL DEBUT',act:[['🎤 Jadwal lengkap','panggung'],['✨ Cara ikut debut','jadi']]},
   papan:{cat:'Sejarah',ic:'🏛️',bg:'#FFD23F',nm:'Papan Pendiri Kota',al:'Plaza Panggung Festival',ds:'10 warga pertama yang ikut membangun Kota Seni.',sec:'PENDIRI',act:[['🪪 Lihat kartu warga','balai']]},
   layar:{cat:'Karya Warga',ic:'📺',bg:'#FF4FA3',nm:'Layar Raksasa Kota',al:'Alun-alun Kota Seni · sayap kiri',ds:'Lagu, gambar, foto dan video asli warga tayang bergantian di sini. Kirim karyamu, setelah disetujui Wali Kota langsung tayang dan kamu dapat 100 Koin Nada.',sec:'SEDANG TAYANG',act:[['🎨 Kirim karyamu','kirim']]},
-  bandara:{cat:'Transportasi',ic:'✈️',bg:'#38E1FF',nm:'Bandara Kota Seni',al:'Seberang Jl. Raya Kota Seni',ds:'Warga baru mendarat di sini, lalu mobil jemputan mengantar mereka sampai rumah di cluster masing-masing. Pesawat lepas landas dan mendarat bergantian.',sec:'JADWAL',act:[['🎵 Cara jadi warga','jadi']]},
-  billboard:{cat:'Iklan',ic:'📣',bg:'#FF4FA3',nm:'Billboard Kota',al:'Jl. Raya, bandara & pinggir kota',ds:'Layar digital yang gantian menampilkan kabar kota: warga baru, donatur, Seni Mart, Indo Semar Records. Nanti bisa dipasangi iklan brand.',sec:'TAMPIL SEKARANG',act:[['🎵 Cara jadi warga','jadi']]},
-  mart:{cat:'Belanja',ic:'🛒',bg:'#8A57FF',nm:'Seni Mart',al:'Minimarket warga · buka 24 jam',ds:'Belanja makan & minum biar avatar tetap segar. Bayar pakai Koin Nada hasil kerja. Ada di dekat Halte, di Alun-alun dan di gerbang barat kota.',sec:'BELANJA',act:[['🍞 Roti · 15','roti'],['🍚 Nasi · 30','nasi'],['☕ Kopi · 12','kopi'],['🧋 Es Teh · 8','esteh']]},
+  billboard:{cat:'Iklan',ic:'📣',bg:'#FF4FA3',nm:'Billboard Kota',al:'Jl. Raya & pinggir kota',ds:'Layar digital yang gantian menampilkan kabar kota: warga baru, donatur, Seni Mart, Indo Semar Records. Nanti bisa dipasangi iklan brand.',sec:'TAMPIL SEKARANG',act:[['🎵 Cara jadi warga','jadi']]},
+  mart:{cat:'Belanja',ic:'🛒',bg:'#8A57FF',nm:'Seni Mart',al:'Minimarket warga · buka 24 jam',ds:'Belanja makan & minum biar avatar tetap segar. Bayar pakai Koin Nada hasil kerja. Ada di dekat Panggung Debut, di Alun-alun dan di gerbang barat kota.',sec:'BELANJA',act:[['🍞 Roti · 15','roti'],['🍚 Nasi · 30','nasi'],['☕ Kopi · 12','kopi'],['🧋 Es Teh · 8','esteh']]},
   taman:{cat:'Ruang publik',ic:'🌳',bg:'#5FBF8A',nm:'Taman Kota',al:'Blok depan kiri · dekat Jl. Raya',ds:'Taman dengan air mancur, pohon, dan bangku. Nanti jadi Taman Donatur berisi nama-nama donatur kota.',sec:'SEGERA',act:[['😊 Cek kondisi avatar','avatar']]},
   lot:{cat:'Lahan',ic:'🗳️',bg:'#B69CFF',nm:'Lahan Kosong',al:'Jl. Nada No. 9 · Distrik Timur',ds:'Gedung berikutnya di sini kalian yang pilih lewat voting.',sec:'VOTING',act:[['🗳️ Lihat voting','voting']]}};
  function chips(list){return '<div class="pchips">'+list.map(r=>`<button type="button" class="pchip" data-u="${esc(r.u)}">${r.own?'👑 President':'@'+esc(r.u)}</button>`).join('')+'</div>'}
@@ -501,24 +528,25 @@ jemput();setInterval(jemput,1000);
    if(k==='isr')return `<p class="pnow">🎧 ${esc(K.isrMsg())}</p>`;if(String(k).startsWith('mart')){const n=window.KOTA_NEED&&window.KOTA_NEED.n;return `<p class="pnow">${n?'🍞 Lapar '+Math.round(n.lapar)+' · ⚡ Energi '+Math.round(n.energi):'Masuk dulu biar bisa belanja'}</p>`}
    if(k==='studio'){const b=store.get('sgBest',0);return `<p class="pnow">${b?'🏆 Skor terbaikmu: '+b:'Belum pernah rekam. Coba 30 detik aja!'}</p>`}
    if(k==='layar'){const L=window.KOTA_KARYA||[];return L.length?'<div class="kgrid">'+L.slice(0,12).map(kr=>`<button type="button" class="kthumb" data-karya="${esc(kr.id)}"><img src="/api/akun?a=karyaImg&id=${encodeURIComponent(kr.id)}" alt="${esc(kr.judul)}" loading="lazy"><small>${esc(kr.judul)}<br>@${esc(kr.u)}</small></button>`).join('')+'</div>':'<p class="muted">Belum ada karya. Jadilah yang pertama tayang di layar kota!</p>'}
-   if(k==='bandara'){const d=nowWIB();return `<p class="pnow">✈️ Penerbangan warga baru berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00</p>`}
-   if(k==='halte'){const d=nowWIB();return `<p class="pnow">Jemputan berikutnya ${String((d.getUTCHours()+1)%24).padStart(2,'0')}.00 · ${(K.QUEUE||[]).filter(r=>r.q).length} warga antre</p>`}
+   if(k==='debut'){const D=K.debutInfo();if(D.on){const r=D.idx>=0&&D.L[D.idx];return `<p class="pnow">🔴 LIVE sesi ${jamOf(D.S)}${r?' · lagi tampil @'+esc(r.u):''}</p>`+chips(D.L)}return `<p class="pnow">Sesi berikutnya ${jamOf(D.next)} WIB · ${cdOf(D.next-Date.now())} lagi · ${D.nextL.length} seniman antre</p>`+(D.nextL.length?chips(D.nextL):'')}
    if(k==='papan')return chips(K.FOUND||[]);
    if(k==='mansion')return '<p class="pnow">👑 President lagi di rumah</p>';
    if(k==='lot'){const d=VT.d;const V=d?d.opsi.slice().sort((a,b)=>b.v-a.v):[];return `<p class="pnow">${d&&d.total?'Terdepan: '+esc(V[0].ic+' '+V[0].nm)+' ('+V[0].v+' suara)':d&&d.status==='belum'?'Voting gedung dibuka Rabu':'Ikut voting gedung berikutnya'}</p>`}return ''}
  function show(k){let P=PL[String(k).startsWith('mart')?'mart':k];let body='';
    if(String(k).startsWith('kav:')){const n=k.slice(4);P={cat:'Lahan',ic:'📐',bg:'#E8C27A',nm:'Kavling Kosong No. '+n,al:'Kota Seni · siap dibangun',ds:'Petak ini masih kosong. Gedung baru di Kota Seni dipilih lewat voting warga, ikut voting biar kotamu makin ramai.',sec:'STATUS',act:[['🗳️ Ikut voting','voting'],['🎵 Ajak teman jadi warga','jadi']]};body='<p class="pnow">🟡 Tersedia</p>'}
-   else if(String(k).startsWith('cluster:')){const C=(K.CLUSTERS||[]).find(c=>'cluster:'+c.k===k);if(!C)return;const L=K.HOUSES.filter(h=>h.seg===C).map(h=>h.r);
-     P={cat:'Kawasan Seni',ic:C.nm.split(' ')[0],bg:C.col,nm:C.nm.replace(/^\S+\s/,''),al:(C.bid||'')+' · '+C.n+' rumah',ds:'Tempat utama: '+(C.main||'-')+(C.ada?' · ✅ '+C.ada:' · 🏗️ gedungnya segera dibangun'),sec:'WARGA',act:[['🏆 Lomba Kawasan','lomba'],['🪪 Kartu Warga','balai']]};body=chips(L)}else if(P)body=extra(k);if(!P)return;
+   else if(String(k).startsWith('cluster:')){const L=K.HOUSES.map(h=>h.r);
+     P={cat:'Pusat Kota',ic:'🏠',bg:'#B69CFF',nm:'Blok Rumah Gratis',al:'Pusat kota · '+L.length+' rumah',ds:'Semua warga yang komen di @viralindongid dapat rumah gratis di sini. Warna atap ikut bidang seni pemiliknya. Distrik seni jadi tempat berkarya.',sec:'PENGHUNI TERBARU',act:[['🏠 Rumahku','rumah'],['🪪 Kartu Seniman','balai']]};body=chips(L.slice(-24).reverse())}
+   else if(String(k).startsWith('distrik:')){const Dd=(K.DISTRIK||[]).find(d=>'distrik:'+d.k===k);if(!Dd)return;const Pf=K.PROF[Dd.k];const L=K.RES.filter(r=>r.pk===Dd.k&&r.chosen);
+     P={cat:'Distrik Seni',ic:Pf.ic,bg:Pf.col,nm:'Distrik '+Pf.nm,al:Object.values(Pf.sub).join(', '),ds:'Bangunan utama: '+Dd.main+'. Suasana: '+Dd.sua+'.'+(Dd.ada?' ✅ '+Dd.ada+'.':' 🏗️ Gedung utama dibangun bertahap lewat voting warga.'),sec:L.length+' SENIMAN DISTRIK INI',act:Dd.musik?[['🎙️ Kerja: sesi rekaman','studio'],['📻 Radio Kota Seni','radio'],['🏆 Lomba Kawasan','lomba']]:[['🗳️ Voting gedung','voting'],['🏆 Lomba Kawasan','lomba'],['🎭 Pilih bidang ini','profesi']]};body=L.length?chips(L.slice(-24).reverse()):'<p class="muted">Belum ada seniman di distrik ini. Jadilah yang pertama!</p>'}else if(P)body=extra(k);if(!P)return;
    $('plCat').textContent=P.cat;$('plIll').style.setProperty('--c',P.bg);$('plIc').textContent=P.ic;$('plNm').textContent=P.nm;$('plAl').textContent=P.al;$('plDs').textContent=P.ds;$('plSec').textContent=P.sec;$('plX').innerHTML=body;
    $('plAct').innerHTML=P.act.map(([t,a],i)=>`<button class="btn${i?' ghost':''}" type="button" data-a="${a}">${t}</button>`).join('');
    $('plAct').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='play'){closeAll();window.KOTA_PLAY&&window.KOTA_PLAY.enter()}else if(FOOD[a]){window.KOTA_AKSI(a,FOOD[a].t)}else if(a==='mansion'){const o=K.RES.find(r=>r.own);if(o)window.KOTA_ROOM(o)}else open(a)});
    $('plX').querySelectorAll('[data-karya]').forEach(b=>b.onclick=()=>window.KOTA_KARYA_VIEW(b.dataset.karya));
    $('plX').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const r=K.byName.get(b.dataset.u.toLowerCase());if(r){closeAll();if(r.house){K.focusHouse(r);window.KOTA_onPick(r)}else{K.select(r);window.KOTA_onPick(r)}}});
    K.focusPlace(k);open('place')}
- window.KOTA_onPlaceInfo=show;window.KOTA_onPlace=g=>{if(g==='home'||g==='kampung'){K.focusPlace(g);toast(g==='home'?'🗺️ Seluruh Kota Seni':'🏘️ Kampung Warga');return}show(g)};
+ window.KOTA_onPlaceInfo=show;window.KOTA_onPlace=g=>{if(g==='home'||g==='kampung'){K.focusPlace(g);toast(g==='home'?'🗺️ Seluruh Kota Seni':'🏠 Blok Rumah Gratis');return}show(g)};
  $('cta').onclick=()=>open('balai');$('ctaN').textContent=(RES.length||0).toLocaleString('id-ID')+' Warga Kota Seni';
- $('q').placeholder=(RES.length||0).toLocaleString('id-ID')+' Warga · Cari @username';
+ $('q').placeholder='Cari seniman @username';
  // menu samping bisa diciutkan
  $('railT').onclick=()=>{const m=document.querySelector('.rail').classList.toggle('min');$('railT').textContent=m?'⌄':'⌃';store.set('railMin',m?1:0)};
  if(store.get('railMin',0)){document.querySelector('.rail').classList.add('min');$('railT').textContent='⌄'}
@@ -588,7 +616,7 @@ jemput();setInterval(jemput,1000);
      <small>Warna kulit</small><div class="lkrow">${AVA.SKIN.map((c,k)=>sw(AVA.SKIN,0,k,'Kulit '+(k+1))).join('')}</div>
      <small>Model rambut</small><div class="lkrow hair">${AVA.HAIR.map((h,k)=>{const o=Object.assign({},prev,{lk:[v[0],k,v[2]].join(':'),_Lk:null,_L:null});return `<button type="button" class="lkhair${v[1]===k?' on':''}" data-lk="1:${k}" aria-pressed="${v[1]===k}">${AVA.svg(o,{icon:1,size:34})}<span>${AVA.HAIR_NM[k]}</span></button>`}).join('')}</div>
      <small>Warna rambut</small><div class="lkrow">${AVA.HCOL.map((c,k)=>sw(AVA.HCOL,2,k,AVA.HCOL_NM[k])).join('')}</div>
-     <p class="muted">Baju, aksesori kepala & barang bawaan ikut kawasan dan profesimu.${me.own||me.jab==='Pendiri Kota'?' Tokoh kota tetap pakai kostum khususnya.':''}</p>
+     <p class="muted">Baju, aksesori kepala & barang bawaan ikut bidang dan profesimu.${me.own||me.jab==='Pendiri Kota'?' Tokoh kota tetap pakai kostum khususnya.':''}</p>
      <button class="btn" type="button" id="lkSave"${dirty?'':' disabled'}>${dirty?'💾 Simpan tampilan':'✅ Tersimpan'}</button></div>`;
    box.querySelectorAll('[data-lk]').forEach(x=>x.onclick=()=>{const [i,k]=x.dataset.lk.split(':').map(Number);LKD.v[i]=k;sfx('tap');lookUI(me)});
    $('lkSave').onclick=async()=>{$('lkSave').disabled=true;try{const j=await api('look',{kl:v[0],rb:v[1],wr:v[2]});me.lk=j.look;if(AK.p)AK.p.look=j.look;sfx('coin');toast('🎨 Tampilan avatarmu sudah diganti');lookUI(me)}catch(e){toast('⚠️ '+e.message);$('lkSave').disabled=false}}}
@@ -668,23 +696,23 @@ if(qp.get('w')){const w=String(qp.get('w')).replace(/^@/,'').toLowerCase();const
 if(qp.get('lomba')!==null)setTimeout(()=>open('lomba'),400);
 else if(qp.get('buka'))open(qp.get('buka'));
 // ---------- PILIH PROFESI: kategori lalu bidang (dipilih sendiri waktu masuk kota) ----------
-const SUBIC={komposer:'🎼',sound:'🎚️',gim:'🎮',interaktif:'🕹️',puisi:'✒️',story:'📜',anyaman:'🧺',batik:'🖌️',tekstil:'🧶',fesyen:'👗',warga:'🙋',pengelola:'📋',komunitas:'🤝',gitaris:'🎸',vokalis:'🎤',drummer:'🥁',bassist:'🎸',keyboard:'🎹',produser:'🎛️',dj:'🎧',tiup:'🎺',penulis:'📝',digital:'💻',komik:'💬',karakter:'🧸',pelukis:'🖼️',tattoo:'🖋️',mural:'🎨',
+const SUBIC={penyiar:'📻',sutradara:'🎬',editorbuku:'📚',dalang:'🎭',gamelan:'🪘',tradisi:'🪔',komposer:'🎼',sound:'🎚️',gim:'🎮',interaktif:'🕹️',puisi:'✒️',story:'📜',anyaman:'🧺',batik:'🖌️',tekstil:'🧶',fesyen:'👗',warga:'🙋',pengelola:'📋',komunitas:'🤝',gitaris:'🎸',vokalis:'🎤',drummer:'🥁',bassist:'🎸',keyboard:'🎹',produser:'🎛️',dj:'🎧',tiup:'🎺',penulis:'📝',digital:'💻',komik:'💬',karakter:'🧸',pelukis:'🖼️',tattoo:'🖋️',mural:'🎨',
   fotografer:'📸',videografer:'🎥',filmmaker:'🎬',editor:'🎞️',desainer:'📐',animator:'🌀',kreator:'📱',kayu:'🪵',batu:'🪨',patung:'🗿',keramik:'🏺',kriya:'🧺',sculpt3d:'🧊',penari:'💃',sastra:'📖',teater:'🎭',tarot:'🔮',penikmat:'👀'};
 window.KOTA_PF={pk:null};let PROF_ASKED=false;
 function profCheck(){const P=AK.p;if(!P||P.prof||PROF_ASKED)return;PROF_ASKED=true;window.KOTA_PF.pk=null;setTimeout(()=>{if(!AK.p||AK.p.prof)return;open('profesi')},900)}
 R.profesi=()=>{const P=K.PROF,PF=window.KOTA_PF,b=$('profBody');const me=K.byName.get(store.get('me',''));
   if(!me){b.innerHTML='<p>Masuk dulu pakai username warga-mu, baru pilih profesi.</p>';return}
-  if(!PF.pk){b.innerHTML=`<p class="pfstep">Langkah 1 dari 2</p><p class="sub">Kamu masuk kawasan seni yang mana? Pilihanmu menentukan warna & barang bawaan avatar, juga kawasan rumahmu.</p>
+  if(!PF.pk){b.innerHTML=`<p class="pfstep">Langkah 1 dari 2</p><p class="sub">Bidang seni utamamu apa? Pilihanmu menentukan warna & barang bawaan avatar, distrik tempatmu berkarya, dan isi Kartu Seniman-mu.</p>
     <div class="pfgrid">${Object.entries(P).map(([k,v])=>`<button type="button" data-pk="${k}" style="--c:${v.col}"><i>${v.ic}</i>${esc(v.nm)}<small>${Object.values(v.sub).slice(0,3).join(', ')}…</small></button>`).join('')}</div>`;
     b.querySelectorAll('[data-pk]').forEach(x=>x.onclick=()=>{PF.pk=x.dataset.pk;sfx('tap');R.profesi()});return}
-  const v=P[PF.pk];const C=(K.CLUSTERS||[]).find(c=>c.k===v.cl);
-  b.innerHTML=`<p class="pfstep">Langkah 2 dari 2 · ${v.ic} ${esc(v.nm)}</p><p class="sub">Bidang kamu yang mana?${C?' Rumahmu nanti di <b>'+esc(C.nm)+'</b>.':''}</p>
+  const v=P[PF.pk];const C={nm:'Distrik '+v.nm};
+  b.innerHTML=`<p class="pfstep">Langkah 2 dari 2 · ${v.ic} ${esc(v.nm)}</p><p class="sub">Profesimu yang mana? Kamu berkarya di <b>${esc(C.nm)}</b>, rumahmu tetap di Blok Rumah Gratis.</p>
     <div class="pfgrid sub">${Object.entries(v.sub).map(([k,n])=>`<button type="button" data-ps="${k}" style="--c:${v.col}"><i>${SUBIC[k]||v.ic}</i>${esc(n)}</button>`).join('')}</div>
-    <button class="btn ghost" type="button" id="pfBack">← Ganti kategori</button>`;
+    <button class="btn ghost" type="button" id="pfBack">← Ganti bidang</button>`;
   $('pfBack').onclick=()=>{PF.pk=null;R.profesi()};
   b.querySelectorAll('[data-ps]').forEach(x=>x.onclick=async()=>{b.querySelectorAll('button').forEach(y=>y.disabled=true);
     try{const j=await api('prof',{pk:PF.pk,ps:x.dataset.ps});if(AK.p)AK.p.prof=j.prof;sfx('coin');
-      b.innerHTML=`<div class="zzcard" style="border-color:${v.col}"><span class="zi">${SUBIC[x.dataset.ps]||v.ic}</span><div><b>Resmi jadi ${esc(v.sub[x.dataset.ps])}!</b><small>Avatarmu ganti gaya & rumahmu pindah ke ${C?esc(C.nm):'kawasan baru'}. Kota dimuat ulang…</small></div></div>`;
+      b.innerHTML=`<div class="zzcard" style="border-color:${v.col}"><span class="zi">${SUBIC[x.dataset.ps]||v.ic}</span><div><b>Resmi jadi ${esc(v.sub[x.dataset.ps])}!</b><small>Avatarmu ganti gaya & kamu resmi berkarya di ${esc(C.nm)}. Kota dimuat ulang…</small></div></div>`;
       setTimeout(()=>location.reload(),2400)}
     catch(e){toast('⚠️ '+e.message);b.querySelectorAll('button').forEach(y=>y.disabled=false)}})};
 setTimeout(()=>window.KOTA_ZZ_SYNC&&window.KOTA_ZZ_SYNC(),1200);

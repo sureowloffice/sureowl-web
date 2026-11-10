@@ -1,4 +1,6 @@
 // Kota Seni — avatar manusia chibi (3D di kota + 2D di Kartu Warga & ikon)
+// 7 bidang -> gaya aksesori kepala (Rupa baret, Tari & Teater topi tinggi, Tradisi ikat batik, Kriya & Fashion topi bucket, Sastra pena bulu)
+const ACCK={rupa:'visual',tari:'cerita',tradisi:'kriya',kriya:'kriya2',sastra:'sastra'};
 // Dipakai kota.js & ui.js. Butuh engine.js (D, G, M) sudah dimuat.
 (function(){
 const SKIN=['#F5D3B0','#E8B68A','#C98F62','#A06A43','#6E4630'];
@@ -17,7 +19,7 @@ function look(r){if(!r)return null;if(!DON)DON=donaturSet();
 function mkLook(r){
   const u=String(r.u||'').toLowerCase();const h=hsh(u+'look');const lk=parseLk(r.lk)||[h%5,(h>>>3)%6,(h>>>7)%5];
   const role=r.own?'pres':r.jab==='Pendiri Kota'?'pendiri':DON.has(u)?'donatur':r.baru?'baru':'seni';
-  const L={role,pk:r.pk||'pusat',skin:SKIN[lk[0]],hair:HAIR[lk[1]],hc:HCOL[lk[2]],lk,prop:r.prop};
+  const L={role,pk:ACCK[r.pk]||r.pk||'pusat',skin:SKIN[lk[0]],hair:HAIR[lk[1]],hc:HCOL[lk[2]],lk,prop:r.prop};
   if(role==='pres'){Object.assign(L,{shirt:'#1E2A44',arm:'#1E2A44',pants:'#1E2A44',shoe:'#111111',hair:'pendek',hc:'#1F1F1F'})}
   else if(role==='pendiri')Object.assign(L,{shirt:'#F4F1EA',arm:'#C8A97E',pants:'#C8A97E',shoe:'#4A3020'});
   else if(role==='donatur')Object.assign(L,{shirt:'#F4F1EA',arm:'#F4F1EA',pants:'#F4F1EA',shoe:'#8B4A2B'});
@@ -78,6 +80,8 @@ function acc3D(r,Wm,t,near,L){L=L||look(r);const NC={cast:false};
   else if(k==='film'){D(G.sphHi,Wm(M.chain(M.T(0,1.7,0),M.S(.5,.24,.48))),'#3B7BD9',NC);D(G.box,Wm(M.chain(M.T(0,1.66,-.48),M.S(.4,.04,.3))),'#2A5AA8',NC)}
   else if(k==='cerita'){D(G.cyl16,Wm(M.chain(M.T(0,1.8,0),M.S(.48,.05,.48))),INK,NC);D(G.cyl16,Wm(M.chain(M.T(0,1.82,0),M.S(.32,.42,.32))),INK,NC);D(G.cyl16,Wm(M.chain(M.T(0,1.88,0),M.S(.33,.08,.33))),'#FF6FB5',{em:.5,cast:false})}
   else if(k==='kriya'){D(G.cyl16,Wm(M.chain(M.T(0,1.54,0),M.S(.47,.12,.44))),'#E8B04B',{em:.2,cast:false});for(let i=0;i<4;i++)D(G.box,Wm(M.chain(M.T(-.24+i*.16,1.55,.43),M.S(.07,.1,.02))),['#B5352C',INK][i%2],NC);D(G.box,Wm(M.chain(M.T(-.42,1.53,-.28),M.RZ(.8),M.S(.24,.07,.07))),'#E8B04B',NC)}
+  else if(k==='kriya2'){D(G.cyl16,Wm(M.chain(M.T(0,1.72,0),M.S(.6,.04,.58))),'#2FA866',NC);D(G.cyl16,Wm(M.chain(M.T(0,1.74,0),M.S(.43,.2,.42))),'#3FD37A',{em:.2,cast:false})}
+  else if(k==='sastra'){D(G.box,Wm(M.chain(M.T(.36,1.62,-.08),M.RZ(-.55),M.S(.07,.6,.13))),'#FFF7E8',{em:.3,cast:false});D(G.box,Wm(M.chain(M.T(.2,1.38,-.08),M.RZ(-.55),M.S(.03,.16,.03))),INK,NC)}
   else{D(G.sph,Wm(M.chain(M.T(.3,1.82,.14),M.S(.1,.1,.1))),'#FFD23F',{em:.5,cast:false});if(near)for(let i=0;i<5;i++){const a=i/5*Math.PI*2;D(G.sph,Wm(M.chain(M.T(.3+Math.cos(a)*.12,1.82+Math.sin(a)*.12,.14),M.S(.08,.08,.05))),BLUSH,{em:.4,cast:false})}}}
 
 // barang bawaan profesi digambar di depan badan manusia (lebih ramping dari badan telur)
@@ -122,6 +126,8 @@ function shapes(L){const S=[];const e=(cx,cy,rx,ry,f,o)=>S.push(['e',{cx,cy,rx,r
   else if(k==='film'){p('M-31 54 Q-28 32 0 32 Q28 32 31 54Z','#3B7BD9');rc(20,48,20,6,3,'#2A5AA8')}
   else if(k==='cerita'){rc(-16,8,32,32,0,INK);rc(-16,32,32,6,0,'#FF6FB5');rc(-27,38,54,6,3,INK)}
   else if(k==='kriya'){rc(-33,50,66,10,3,'#E8B04B');for(let i=0;i<4;i++)e(-20+i*14,55,2,2,['#B5352C',INK][i%2]);p('M31 52 L42 46 L40 56Z M31 58 L42 64 L38 56Z','#E8B04B')}
+  else if(k==='kriya2'){p('M-38 52 Q0 42 38 52 L32 44 Q0 36 -32 44Z','#2FA866');rc(-24,24,48,22,10,'#3FD37A')}
+  else if(k==='sastra'){p('M20 66 L42 18 Q48 22 46 30 L26 68Z','#FFF7E8',{s:INK,sw:2});p('M20 66 L24 72',null,{s:INK,sw:3,lc:1})}
   else{for(const [x,y] of [[24,44],[30,48],[28,55],[20,55],[18,48]])e(x,y,4,4,BLUSH);e(24,50,3,3,'#FFD23F')}
   return S}
 function svgOf(L,o){o=o||{};const vb=o.icon?'-40 24 80 80':'-50 4 100 184';let s=`<svg${o.cls?' class="'+o.cls+'"':''}${o.size?` width="${o.size}" height="${o.size}"`:''} viewBox="${vb}" aria-hidden="true">`;

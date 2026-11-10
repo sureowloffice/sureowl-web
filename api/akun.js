@@ -48,11 +48,13 @@ const festWin = (ms = Date.now()) => { const sat = wkStart(ms) + 5 * 864e5; cons
 const FEST_KOIN = 30;
 // Voting Gedung: buka Rabu 00.00 – Sabtu 23.59 WIB, pemenang dibangun & diumumkan Minggu
 const GEDUNG = [
-  { id: 'galeri', nm: 'Galeri & Studio Visual', ic: '🎨', kaw: 'visual', ds: 'Pameran lukisan, ilustrasi, komik & foto warga' },
-  { id: 'bioskop', nm: 'Bioskop Mini & Studio Digital', ic: '🎬', kaw: 'film', ds: 'Nonton film pendek, animasi & video karya warga' },
-  { id: 'teater', nm: 'Teater & Ruang Baca', ic: '🎭', kaw: 'cerita', ds: 'Panggung tari, teater, puisi & pojok baca' },
-  { id: 'bengkel', nm: 'Bengkel Karya & Ruang Pamer', ic: '🧵', kaw: 'kriya', ds: 'Tempat bikin & pamer keramik, ukiran, batik & fesyen' },
-  { id: 'balai', nm: 'Balai Kota & Papan Peluang', ic: '🏛️', kaw: 'pusat', ds: 'Info lowongan, kolaborasi & kegiatan komunitas' }
+  { id: 'galeri', nm: 'Galeri & Studio Lukis', ic: '🎨', kaw: 'rupa', ds: 'Pameran lukisan, ilustrasi & mural warga' },
+  { id: 'pertunjukan', nm: 'Gedung Pertunjukan & Sanggar Latihan', ic: '💃', kaw: 'tari', ds: 'Panggung tari & teater, ruang latihan' },
+  { id: 'bioskop', nm: 'Bioskop & Studio Foto', ic: '🎬', kaw: 'film', ds: 'Nonton film pendek & pameran foto warga' },
+  { id: 'perpustakaan', nm: 'Perpustakaan & Kedai Puisi', ic: '📖', kaw: 'sastra', ds: 'Rak buku warga, malam puisi & toko buku' },
+  { id: 'pasarkriya', nm: 'Pasar Kriya & Butik', ic: '🧵', kaw: 'kriya', ds: 'Lapak keramik, ukiran, anyaman & fesyen warga' },
+  { id: 'pendopo', nm: 'Pendopo Gamelan & Sanggar Batik', ic: '🪘', kaw: 'tradisi', ds: 'Latihan gamelan, wayang & membatik' },
+  { id: 'balai', nm: 'Balai Warga & Majalah Kota', ic: '🏛️', kaw: 'pusat', ds: 'Info kota, papan peluang & redaksi Majalah Kota Seni' }
 ];
 const voteWin = (ms = Date.now()) => { const ws = wkStart(ms); return { wk: wkId(ms), buka: ws + 2 * 864e5, tutup: ws + 6 * 864e5 } };
 async function voteHasil(wk) {
@@ -63,7 +65,7 @@ async function voteHasil(wk) {
   return { opsi: GEDUNG.map(g => Object.assign({}, g, { v: c[g.id] || 0 })), total };
 }
 const lpCmd = (u, n, ms) => [['HINCRBY', 'lp:' + wkId(ms), u, String(n)], ['EXPIRE', 'lp:' + wkId(ms), '3024000']];
-const KAWS = ['musik', 'visual', 'film', 'cerita', 'kriya', 'pusat'];
+const KAWS = ['musik', 'rupa', 'tari', 'film', 'sastra', 'kriya', 'tradisi'];
 let lombaCache = { at: 0, body: null };
 async function lombaWeek(ws, list, prof) {
   const we = ws + 7 * 864e5, id = wkId(ws);
@@ -72,13 +74,13 @@ async function lombaWeek(ws, list, prof) {
   if (Array.isArray(rows)) for (let i = 0; i < rows.length; i += 2) pts[rows[i]] = +rows[i + 1] || 0;
   else if (rows && typeof rows === 'object') for (const k in rows) pts[k] = +rows[k] || 0;
   const K = {}; for (const k of KAWS) K[k] = { k, poin: 0, aktif: 0, baru: 0, top: [] };
-  const kawOf = u => { const v = prof[u]; const pk = v ? String(v).split(':')[0] : 'pusat'; return K[pk] ? pk : 'pusat' };
+  const kawOf = u => { const v = normProf(prof[u]); return v ? v.split(':')[0] : null };
   for (const w of list) { // warga baru minggu ini yang sudah memilih kawasan
     const u = String(w.u).toLowerCase(); if (!prof[u]) continue;
     const t = Date.parse(String(w.t || '') + 'T' + (w.j || '12:00') + ':00+07:00');
-    if (t >= ws && t < we) { const k = kawOf(u); K[k].baru++; K[k].poin += LP.baru; pts[u] = (pts[u] || 0) }
+    if (t >= ws && t < we) { const k = kawOf(u); if (!k) continue; K[k].baru++; K[k].poin += LP.baru; pts[u] = (pts[u] || 0) }
   }
-  for (const u in pts) { if (!pts[u]) continue; const k = kawOf(u); K[k].aktif++; K[k].poin += pts[u]; K[k].top.push({ u, p: pts[u] }) }
+  for (const u in pts) { if (!pts[u]) continue; const k = kawOf(u); if (!k) continue; K[k].aktif++; K[k].poin += pts[u]; K[k].top.push({ u, p: pts[u] }) }
   const out = KAWS.map(k => { const c = K[k]; c.top = c.top.sort((a, b) => b.p - a.p).slice(0, 3); return c }).sort((a, b) => b.poin - a.poin || b.aktif - a.aktif);
   return out;
 }
@@ -92,13 +94,24 @@ const AKSI = { roti: { koin: 15, l: 25 }, nasi: { koin: 30, l: 50 }, kopi: { koi
 const SLEEP_RATE = 60; // energi per jam (±1 per menit)
 // profesi warga dipilih sendiri saat masuk kota (bukan dari komentar IG)
 const PROF = {
-  musik: ['gitaris', 'vokalis', 'drummer', 'bassist', 'keyboard', 'komposer', 'penulis', 'produser', 'dj', 'tiup', 'sound'],
-  visual: ['pelukis', 'digital', 'komik', 'karakter', 'fotografer', 'desainer', 'tattoo', 'mural'],
-  film: ['filmmaker', 'videografer', 'editor', 'animator', 'gim', 'interaktif', 'sculpt3d', 'kreator'],
-  cerita: ['penari', 'teater', 'sastra', 'puisi', 'story'],
-  kriya: ['keramik', 'kayu', 'batu', 'patung', 'anyaman', 'batik', 'tekstil', 'fesyen', 'kriya'],
-  pusat: ['penikmat', 'warga', 'pengelola', 'komunitas', 'tarot']
+  musik: ['gitaris', 'vokalis', 'drummer', 'bassist', 'keyboard', 'komposer', 'penulis', 'produser', 'dj', 'tiup', 'sound', 'penyiar'],
+  rupa: ['pelukis', 'digital', 'komik', 'karakter', 'desainer', 'tattoo', 'mural'],
+  tari: ['penari', 'teater', 'sutradara'],
+  film: ['fotografer', 'filmmaker', 'videografer', 'editor', 'animator', 'gim', 'interaktif', 'sculpt3d', 'kreator'],
+  sastra: ['sastra', 'puisi', 'story', 'editorbuku'],
+  kriya: ['keramik', 'kayu', 'batu', 'patung', 'anyaman', 'tekstil', 'fesyen', 'kriya'],
+  tradisi: ['batik', 'dalang', 'gamelan', 'tradisi']
 };
+// pilihan lama (6 kawasan) -> 7 bidang Tahap 1. Pusat Kota = belum pilih bidang (null)
+function normProf(v) {
+  if (!v) return null; const [pk, ps] = String(v).split(':'); if (!pk || !ps) return null;
+  if (PROF[pk] && PROF[pk].includes(ps)) return pk + ':' + ps;
+  if (ps === 'batik') return 'tradisi:batik'; if (ps === 'fotografer' || ps === 'sculpt3d') return 'film:' + ps;
+  if (pk === 'visual' || pk === 'ilustrator') return PROF.rupa.includes(ps) ? 'rupa:' + ps : PROF.film.includes(ps) ? 'film:' + ps : null;
+  if (pk === 'cerita' || pk === 'lainnya') return PROF.tari.includes(ps) ? 'tari:' + ps : PROF.sastra.includes(ps) ? 'sastra:' + ps : null;
+  if (pk === 'kriya' || pk === 'pahat') return PROF.kriya.includes(ps) ? 'kriya:' + ps : null;
+  return null;
+}
 function needNow(raw) {
   let n = null; try { n = raw ? JSON.parse(raw) : null } catch (e) { n = null }
   const now = Date.now(); if (!n) n = { l: 80, e: 80, b: 80, m: 70, i: 50, t: now, kc: 0, cd: {} };
@@ -146,7 +159,7 @@ async function profil(u) {
   return {
     u, koin: +koin || 0, exp: e, level: lv, nextExp: 25 * lv * lv, prevExp: 25 * (lv - 1) * (lv - 1),
     streak: last === d || last === yesterday() ? (+streak || 0) : 0, absenHariIni: last === d,
-    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d, prof: pr || null, look: lk || null
+    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d, prof: normProf(pr), look: lk || null
   };
 }
 
@@ -331,9 +344,9 @@ module.exports = async (req, res) => {
       if (!PROF[pk] || !PROF[pk].includes(ps)) return send(res, 400, { error: 'Pilih profesi dan bidangnya dulu.' });
       const [old, ch] = await redis([['HGET', 'prof', u], ['GET', 'profch:' + u]]);
       if (old === pk + ':' + ps) return send(res, 200, { ok: true, prof: old });
-      if (old && ch) return send(res, 429, { error: 'Profesi baru bisa diganti lagi besok ya.' });
+      if (old && ch && normProf(old)) return send(res, 429, { error: 'Profesi baru bisa diganti lagi besok ya.' });
       const cmds = [['HSET', 'prof', u, pk + ':' + ps]];
-      if (old) cmds.push(['SET', 'profch:' + u, '1', 'EX', '86400']);
+      if (old && normProf(old)) cmds.push(['SET', 'profch:' + u, '1', 'EX', '86400']);
       await redis(cmds);
       return send(res, 200, { ok: true, prof: pk + ':' + ps });
     }

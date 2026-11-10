@@ -6,7 +6,7 @@
 <title>Kota Seni · Kota Digital Para Seniman</title>
 <meta name="description" content="Kota digital tempat anak seni dan musik tinggal. Follow @viralindongid, komen apa aja, kamu dapat rumah di Kota Seni.">
 <meta property="og:title" content="Kota Seni · Kota Digital Para Seniman">
-<meta property="og:description" content="Follow @viralindongid, komen apa aja = dapat rumah. Pilih kawasan senimu, ambil Kartu Warga, ikut Lomba Kawasan.">
+<meta property="og:description" content="Follow @viralindongid = debut di Panggung Debut. Komen apa aja = dapat rumah. Pilih bidang senimu &amp; ambil Kartu Seniman.">
 <meta name="theme-color" content="#14102B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%236C2BFF'/%3E%3Cellipse cx='34' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Cellipse cx='67' cy='52' rx='17' ry='21' fill='%23FFF7E8'/%3E%3Ccircle cx='41' cy='42' r='8' fill='%2314102B'/%3E%3Ccircle cx='74' cy='42' r='8' fill='%2314102B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -528,13 +528,14 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <button type="button" class="needhud glass" id="needHud" hidden aria-label="Kondisi avatar"></button>
   <div class="zoomctl glass"><button type="button" id="zIn" aria-label="Zoom masuk"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></button><button type="button" id="zOut" aria-label="Zoom keluar"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button></div>
 </div>
-<button type="button" class="cta" id="cta" style="display:none"><small id="ctaN">Warga Kota Seni</small><b>🪪 AMBIL KARTU WARGA</b><span>Cek namamu di Balai Warga ›</span></button>
+<button type="button" class="cta" id="cta" style="display:none"><small id="ctaN">Warga Kota Seni</small><b>🪪 AMBIL KARTU SENIMAN</b><span>Cek namamu di Balai Warga ›</span></button>
 <div class="mpill glass" id="mPill"><button type="button" id="mTitle" class="mt" aria-label="Buka daftar lagu">🎵 <span id="mTitleTx"></span></button><button type="button" id="mBtn" aria-label="Putar atau jeda musik">▶</button><button type="button" id="mNext" aria-label="Lagu berikutnya">⏭</button></div>
 <div class="pick glass" id="pick" hidden><div class="pk-t"><b id="pkName">@warga</b><small id="pkSub">Warga</small></div><button type="button" id="pkHome">🏠 Rumahnya</button><button type="button" id="pkX" aria-label="Tutup">✕</button></div>
 <div class="gomenu glass" id="goMenu" hidden>
   <button type="button" data-go="home">🗺️ Lihat seluruh kota</button>
   <button type="button" data-go="plaza">🎪 Panggung Festival</button>
-  <button type="button" data-go="kampung">🏘️ Kampung Warga</button>
+  <button type="button" data-go="debut">🎤 Panggung Debut</button>
+  <button type="button" data-go="kampung">🏠 Blok Rumah Gratis</button>
   <button type="button" data-go="studio">🏗️ Studio Rekaman</button>
   <button type="button" data-go="isr">🏢 Indo Semar Records</button>
   <button type="button" data-go="rumahku">🏠 Rumahku</button>
@@ -558,24 +559,24 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   <div class="festbar glass" id="festBar" hidden><span id="festTx"></span><button class="btn" type="button" id="festBtn" hidden></button></div>
   <div class="start glass" id="start">
     <span>MULAI</span>
-    <button class="sc hot" type="button" data-open="balai">🪪 Ambil Kartu Warga</button>
-    <button class="sc" type="button" data-open="jadi">🎵 Jadi Warga</button>
+    <button class="sc hot" type="button" data-open="balai">🪪 Kartu Seniman</button>
+    <button class="sc" type="button" data-open="panggung">🎤 Panggung Debut</button>
     <button class="sc hot" type="button" data-open="lomba">🏆 Lomba Kawasan</button>
     <button class="sc" type="button" data-open="voting">🗳️ Voting</button>
     <button class="sc x" type="button" id="startX" aria-label="Sembunyikan">×</button>
   </div>
   <div class="bar glass">
     <form class="search" id="sf" autocomplete="off" role="search">
-      <label for="q"><span aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input id="q" name="q" placeholder="Cari warga: @username" aria-label="Cari warga" autocapitalize="off" spellcheck="false"><span class="arr" id="arr"></span></label>
+      <label for="q"><span aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input id="q" name="q" placeholder="Cari seniman @username" aria-label="Cari seniman" autocapitalize="off" spellcheck="false"><span class="arr" id="arr"></span></label>
       <button class="btn" type="submit">Cari</button>
     </form>
     <nav class="nav" aria-label="Fasilitas kota">
       <button class="nb chatbtn" type="button" data-open="chat" aria-label="Chat warga"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18.5V7a2.5 2.5 0 0 1 2.5-2.5h9A2.5 2.5 0 0 1 19 7v6a2.5 2.5 0 0 1-2.5 2.5H9z"/></svg></i>Chat<span class="badge pulse" id="chatBadge" hidden>0</span></button>
-      <button class="nb" type="button" data-open="radio"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8" width="17" height="12" rx="2.5"/><path d="m7 8 9-4.5"/><circle cx="15.5" cy="14" r="2.5"/><path d="M7 12.5h3M7 15.5h3"/></svg></i>Radio</button>
-      <button class="nb" type="button" data-open="koran"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h11v14H6.5A1.5 1.5 0 0 1 5 17.5z"/><path d="M16 9h3v8.5a1.5 1.5 0 0 1-3 0"/><path d="M8 9h5M8 12h5M8 15h3"/></svg></i>Koran<span class="dot" id="koranDot" hidden></span></button>
-      <button class="nb" type="button" data-open="balai"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9.5 12 4.5l8.5 5"/><path d="M5.5 10v7M10 10v7M14 10v7M18.5 10v7M3.5 19.5h17"/></svg></i>Balai</button>
-      <button class="nb" type="button" data-open="kerja"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 13h17"/></svg></i>Kerja</button>
-      <button class="nb" type="button" data-open="info"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9.5a3.5 3.5 0 0 1 0 5"/></svg></i>Info<span class="badge" id="infoBadge" hidden>0</span></button>
+      <button class="nb" type="button" data-open="panggung"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 19.5h17"/><path d="M5 19.5V15h14v4.5"/><path d="M9 11.5a3 3 0 1 1 6 0V15H9z"/><path d="M12 4.5V6M6.5 6.5l1 1M17.5 6.5l-1 1"/></svg></i>Panggung</button>
+      <button class="nb" type="button" data-open="koran"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 7.5h7M8.5 11h7M8.5 14.5h4"/></svg></i>Majalah<span class="dot" id="koranDot" hidden></span></button>
+      <button class="nb" type="button" data-open="galeri"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="m3.5 16 5-5 4 4 3-3 5 5"/><circle cx="15.5" cy="9" r="1.5"/></svg></i>Galeri</button>
+      <button class="nb" type="button" data-open="kerja"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="11" rx="2.5"/><path d="M9 12.5h2M10 11.5v2"/><circle cx="15" cy="12" r=".9"/><circle cx="16.8" cy="13.8" r=".9"/></svg></i>Studio</button>
+      <button class="nb" type="button" data-open="info"><i><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 19.5h17"/><path d="M5.5 19.5V9l4-3 4 3v10.5"/><path d="M13.5 19.5V12h5v7.5"/><path d="M8 12h3M8 15h3"/></svg></i>Kota<span class="badge" id="infoBadge" hidden>0</span></button>
     </nav>
   </div>
 </div>
@@ -617,12 +618,12 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 <!-- Jadi warga -->
 <div class="sheet" id="s-jadi" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-jadi">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
-  <h2 id="h-jadi">Cara pindah ke Kota Seni</h2>
+  <h2 id="h-jadi">Cara debut di Kota Seni</h2>
   <p class="sub">Gratis, cukup sekali seumur hidup.</p>
   <ol class="steps">
-    <li><span>Follow <b>@viralindongid</b> di Instagram atau TikTok.</span></li>
-    <li><span><b>Komen apa aja</b> di postingan @viralindongid, kamu dapat rumah. Lalu masuk ke kota & pilih kawasan senimu.</span></li>
-    <li><span>Mobil jemputanmu tiba paling lama 24 jam. Cari username-mu di sini dan ambil Kartu Warga.</span></li>
+    <li><span>Follow <b>@viralindongid</b> di Instagram atau TikTok. Namamu masuk antrean <b>Debut</b>.</span></li>
+    <li><span>Di sesi berikutnya (10.00, 14.00, 19.00 atau 21.00 WIB) Wali Kota Vilindo mengumumkan namamu di <b>Panggung Debut</b>.</span></li>
+    <li><span><b>Komen apa aja</b> di postingan @viralindongid = dapat rumah gratis. Masuk ke kota, pilih bidang senimu & ambil <b>Kartu Seniman</b>.</span></li>
   </ol>
   <p class="muted">Petugas kota tidak pernah minta password atau bayaran apa pun.</p>
   <div class="row"><a class="btn" href="https://instagram.com/viralindongid" target="_blank" rel="noopener">Buka Instagram</a><a class="btn dark" href="https://www.tiktok.com/@viralindongid" target="_blank" rel="noopener">Buka TikTok</a></div>
@@ -632,7 +633,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 <div class="sheet" id="s-balai" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-balai">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
   <h2 id="h-balai">Balai Warga</h2>
-  <p class="sub">Loket Kartu Warga Kota Seni</p>
+  <p class="sub">Loket Kartu Seniman Kota Seni</p>
   <div id="balaiBody"></div>
 </div></div>
 
@@ -694,7 +695,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 </div></div>
 <div class="sheet" id="s-profesi" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-prof">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
-  <h2 id="h-prof">🎭 Pilih Profesimu</h2>
+  <h2 id="h-prof">🎭 Pilih Bidang Senimu</h2>
   <div id="profBody"></div>
 </div></div>
 <div class="sheet" id="s-mart" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-mart">
@@ -749,26 +750,41 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
 <!-- Koran -->
 <div class="sheet" id="s-koran" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-koran">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
-  <h2 id="h-koran" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Harian Kota Seni</h2>
+  <h2 id="h-koran" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Majalah Kota Seni</h2>
   <div class="paper" id="paper"></div>
 </div></div>
 
 <!-- Kerja -->
 <div class="sheet" id="s-kerja" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-kerja">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
-  <h2 id="h-kerja">Kerja &amp; Jabatan</h2>
-  <p class="sub">Makin lama tinggal, jabatanmu makin naik</p>
+  <h2 id="h-kerja">🎛️ Studio</h2>
+  <p class="sub">Kerja lewat mini game & naik di Jalur Ketenaran</p>
   <div id="kerjaBody"></div>
 </div></div>
 
 <!-- Info / pengumuman -->
 <div class="sheet" id="s-info" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-info">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
-  <h2 id="h-info">Pengumuman Wali Kota</h2>
-  <p class="sub">Kabar resmi dari balai kota</p>
+  <h2 id="h-info">🏙️ Kota Seni</h2>
+  <p class="sub">Peta distrik, donatur, aturan & pengumuman Wali Kota</p>
+  <div id="infoTop"></div>
   <div id="infoList"></div>
 </div></div>
 
+<!-- Panggung -->
+<div class="sheet" id="s-panggung" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-panggung">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-panggung">🎤 Panggung</h2>
+  <p class="sub">Jadwal Panggung Debut & event kota</p>
+  <div id="panggungBody"></div>
+</div></div>
+<!-- Galeri -->
+<div class="sheet" id="s-galeri" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-galeri">
+  <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
+  <h2 id="h-galeri">🖼️ Galeri Warga</h2>
+  <p class="sub">Karya asli seniman Kota Seni</p>
+  <div id="galeriBody"></div>
+</div></div>
 <!-- Voting -->
 <div class="sheet" id="s-lomba" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="h-lomba">
   <button class="xbtn" type="button" data-close aria-label="Tutup">×</button>
@@ -796,7 +812,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  for(const src of ['engine.js','avatar.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=32';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
+  for(const src of ['engine.js','avatar.js','kota.js','ui.js']){await new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=33';s.onload=res;s.onerror=rej;document.body.appendChild(s)})}
 })();
 </script>
 </body>
