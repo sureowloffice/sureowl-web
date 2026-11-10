@@ -27,7 +27,7 @@ if(opt('--naskah')){console.log(fs.readFileSync(path.join(OUT,'naskah_vo.txt'),'
 const sh=(c,a,o={})=>execFileSync(c,a,Object.assign({cwd:DIR,stdio:['ignore','pipe','inherit']},o)).toString();
 let VO=opt('--vo');if(VO===true)VO=null;if(!VO&&fs.existsSync(path.join(OUT,'vo.wav')))VO=path.join(OUT,'vo.wav');
 const voScenes=R.scenes.map((s,i)=>s.vo?i:-1).filter(i=>i>=0);let potong=[];
-if(VO){const sp=JSON.parse(sh('python3',['audio_mix.py','split',VO,String(voScenes.length)]));
+if(VO){const sp=R.voSegs?{segs:R.voSegs,n:R.voSegs.length}:JSON.parse(sh('python3',['audio_mix.py','split',VO,String(voScenes.length)]));
   if(sp.n!==voScenes.length)console.log(`⚠️ VO kebaca ${sp.n} potong, adegan ber-VO ${voScenes.length}. Cek jeda antar baris.`);
   voScenes.forEach((si,k)=>{const sg=sp.segs[k];if(!sg)return;const L=sg[1]-sg[0];const sc=R.scenes[si];sc.dur=Math.max(sc.min||1.6,+(L+(sc.ekor??.45)).toFixed(2));sc._vo=sg})}
 let t=0;for(const s of R.scenes){s.t0=t;if(s._vo)potong.push([s._vo,t+.12]);t+=s.dur}const DUR=+t.toFixed(2);

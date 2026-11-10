@@ -45,6 +45,11 @@ const CARDS={
  langkah(k,u,lt){const rows=k.baris;const rh=130,w=900,h=140+rows.length*rh,x=(W-w)/2,y=k.y||(H-h)/2+120;panel(x,y,w,h,k.col);X.textAlign='center';X.fillStyle=GOLD;X.font=`900 50px ${F}`;X.textBaseline='middle';X.fillText(k.judul||'',W/2,y+70);
   rows.forEach((r,i)=>{const uu=eo((lt-.2-i*.4)/.4);if(uu<=0)return;const yy=y+140+i*rh+rh/2-10;X.globalAlpha=uu;X.beginPath();X.arc(x+90,yy,40,0,7);X.fillStyle=GOLD;X.fill();X.fillStyle=INK;X.font=`900 46px ${F}`;X.fillText(String(i+1),x+90,yy+2);
    X.textAlign='left';X.fillStyle='#fff';X.font=`800 42px ${F}`;let s=42;while(X.measureText(r).width>680&&s>26){s-=2;X.font=`800 ${s}px ${F}`}X.fillText(r,x+160,yy);X.textAlign='center';X.globalAlpha=1})},
+ komen(k,u,lt){const w=920,x=(W-w)/2,y=k.y||470;X.font=`700 44px ${F}`;const words=k.teks.split(' ');const lines=[];let cur='';for(const wd of words){const t=cur?cur+' '+wd:wd;if(X.measureText(t).width>w-230&&cur){lines.push(cur);cur=wd}else cur=t}lines.push(cur);
+  const h=150+lines.length*58;pop(u,()=>{X.save();X.shadowColor='rgba(0,0,0,.4)';X.shadowBlur=36;X.shadowOffsetY=10;rr(x,y,w,h,44);X.fillStyle='#fff';X.fill();X.restore();
+   X.beginPath();X.arc(x+90,y+90,52,0,7);X.fillStyle=k.col||'#FF6FB5';X.fill();X.fillStyle='#fff';X.font=`900 54px ${F}`;X.textAlign='center';X.textBaseline='middle';X.fillText((k.user[0]||'?').toUpperCase(),x+90,y+94);
+   X.textAlign='left';X.fillStyle='#14102B';X.font=`900 40px ${F}`;X.fillText('@'+k.user,x+170,y+70);const nw=X.measureText('@'+k.user).width;X.fillStyle='#8a8699';X.font=`700 32px ${F}`;X.fillText('· kemarin',x+190+nw,y+72);
+   X.fillStyle='#14102B';X.font=`700 44px ${F}`;lines.forEach((l,i)=>X.fillText(l,x+170,y+130+i*58))},W/2,y+h/2)},
  chips(k,u,lt){const n=k.baris.length,sz=150,g=18,tw=n*sz+(n-1)*g,x0=(W-tw)/2,cy=k.y||H*.78;k.baris.forEach((r,i)=>{const uu=back((lt-.1-i*.08)/.4);if(uu<=0)return;const cx=x0+i*(sz+g)+sz/2;
    X.save();X.translate(cx,cy);X.scale(uu,uu);X.beginPath();X.arc(0,0,sz/2,0,7);X.fillStyle=INK;X.fill();X.beginPath();X.arc(0,0,sz/2-8,0,7);X.fillStyle=r.col;X.fill();X.textAlign='center';X.textBaseline='middle';X.font=`70px ${F}`;X.fillText(r.ic,0,-8);
    if(r.v!=null){rr(-42,sz/2-44,84,52,26);X.fillStyle=INK;X.fill();X.fillStyle='#fff';X.font=`900 36px ${F}`;X.fillText(String(r.v),0,sz/2-17)}X.restore()})},
@@ -57,7 +62,7 @@ function drawScene(sc,lt,full){const u=lt/.45;
   let y=sc.yAtas||250;
   if(sc.pill){pop(u,()=>pill(sc.pill.t,sc.pill.c,W/2,y,sc.pill.s||46),W/2,y);y+=125}
   if(sc.atas){pop((lt-.08)/.45,()=>rich(sc.atas,W/2,y,sc.ukuran||76),W/2,y)}
-  if(sc.besar){const cy=sc.yBesar||H*.36;pop((lt-.05)/.5,()=>rich(sc.besar,W/2,cy,sc.ukuranBesar||190,{lh:1.0}),W/2,cy)}
+  if(sc.besar){const cy=sc.yBesar||H*.36;pop((lt-(sc.tBesar||.05))/.5,()=>rich(sc.besar,W/2,cy,sc.ukuranBesar||190,{lh:1.0}),W/2,cy)}
   if(sc.kartu){const k=sc.kartu;const kt=lt-(k.mulai||.25);if(kt>0)CARDS[k.tipe](k,kt/.45,kt)}
   if(sc.bawah){const by=sc.yBawah||H-330;pop((lt-.3)/.45,()=>rich(sc.bawah,W/2,by,sc.ukuranBawah||54,{w8:800}),W/2,by)}
   if(sc.footer!==false&&(sc.cta||sc.footer))footer(cl(lt*3))}
