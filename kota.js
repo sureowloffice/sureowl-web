@@ -156,7 +156,7 @@ let hintHidden=false;function hideHint(){if(hintHidden)return;hintHidden=true;co
 // ---------- residents ----------
 function resPos(r,t){if(r.i===0)return [VIL.x,0,VIL.z];if(PLAY.on&&r===PLAY.r)return [PLAY.x,PLAY.y,PLAY.z];if(r.net)return [r.net.x,r.net.y||0,r.net.z];if(r.w&&!r.slot){const w=r.w;const b=w.mv?Math.abs(Math.sin(t*10+r.ph))*.1:w.dance?Math.abs(Math.sin(t*7+r.ph))*.2:(r.prop&&r.prop!=='none'?Math.abs(Math.sin(t*5+r.ph))*.05:0);return [w.x,b+(r.hiT>t?Math.abs(Math.sin(t*9))*.3:0)+(FXM.has(r.u.toLowerCase())?Math.abs(Math.sin(t*14))*.06:0),w.z]}if(r.slot){const b=r.grp==='musik'?Math.abs(Math.sin(t*6.2+r.ph))*.12:Math.abs(Math.sin(t*2.5+r.ph))*.04;return [r.slot[0],r.slot[1]+b,r.slot[2]]}const a=t*r.sp+r.ph;const cheer=Math.max(0,Math.sin(t*.9+r.ph*3)-.82)*5;return [r.cx+Math.sin(a)*.22,Math.abs(Math.sin(t*(3+cheer*3)+r.ph))*(.06+cheer*.25),r.cz+Math.cos(a*.7)*.12]}
 function resident(r,t,hi){const p=resPos(r,t);const a=t*r.sp+r.ph;const fx=FXM.get(r.u.toLowerCase());const yaw=fx&&!(PLAY.on&&r===PLAY.r)?cam.yaw:r.hiT>t&&r.hiYaw!=null?r.hiYaw:(PLAY.on&&r===PLAY.r)?PLAY.yaw:r.net?r.net.yaw:(r.w&&!r.slot)?r.w.yaw+(r.w.mv?0:r.w.dance?t*6:Math.sin(t*.7+r.ph)*.35):hi?cam.yaw:(r.crowd?Math.atan2(-p[0]*.3,-2.4-p[2])+Math.sin(t*.6+r.ph)*.25:r.slot?r.fy+Math.sin(t*(r.grp==='musik'?2:.7)+r.ph)*(r.grp==='musik'?.15:.1):Math.atan2(-Math.sin(a),Math.cos(a)*.7)+Math.PI/2);
-  const s=(PLAY.on&&r===PLAY.r)?.6:hi?.62:(r.own?.58:.48);const lm=LEMAS.on&&r.u.toLowerCase()===(window.KOTA_ME||'');const chew=fx?1+Math.sin(t*16)*.07:1;const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(yaw),lm?M.RX(.35):M.id(),M.S(s*(2-chew),s*(lm?.82:1)*chew,s));const Wm=m=>M.mul(B,m);
+  const s=(PLAY.on&&r===PLAY.r)?.6:hi?.62:(r.own?.58:.48);const lu=r.u.toLowerCase();const lm=(LEMAS.on&&lu===(window.KOTA_ME||''))||(LEMAS.set.has(lu)&&!(PLAY.on&&r===PLAY.r));const chew=fx?1+Math.sin(t*16)*.07:1;const B=M.chain(M.T(p[0],p[1],p[2]),M.RY(yaw),lm?M.RX(.35):M.id(),M.S(s*(2-chew),s*(lm?.82:1)*chew,s));const Wm=m=>M.mul(B,m);
   if(fx&&fx.food){const q=Math.min(1,(t-fx.t0)/2.6);D(G.sph,Wm(M.chain(M.T(0,.95,.95),M.S(.32*(1-q*.8),.26*(1-q*.8),.26*(1-q*.8)))),fx.food,{em:.4,cast:false});for(let k2=0;k2<4;k2++){const qq=((t*2+k2/4)%1);D(G.box,Wm(M.chain(M.T(Math.sin(k2*2.1)*.4,.9-qq*.8,.95+qq*.3),M.S(.06,.06,.06))),fx.food,{em:.6,cast:false})}}
   // avatar manusia (avatar.js): detail penuh dekat kamera, versi ringan kalau jauh
   const me=PLAY.on&&r===PLAY.r;const near=hi||me||r===selected||(cam.dist<46&&Math.hypot(p[0]-cam.tx,p[2]-cam.tz)<Math.max(14,cam.dist*.55));
@@ -566,7 +566,14 @@ function musikDistrikStatic(Dd){const col=Dd.col;const px=13.3,pz=33.2;D(G.cyl8,
   const rx=RADIO[0],rz=RADIO[1];D(G.box,M.chain(M.T(rx,0,rz),M.S(2.6,2.2,2.2)),'#2A2448',{});D(G.box,M.chain(M.T(rx,2.2,rz),M.S(2.8,.15,2.4)),col,{em:.6,cast:false});D(G.box,M.chain(M.T(rx,.9,rz+1.12),M.S(1.8,.7,.04)),'#FFD23F',{em:.9,cast:false});
   for(const [a,h] of [[0,7],[-.25,6],[.25,6]])D(G.cyl8,M.chain(M.T(rx+a,2.3,rz),M.RZ(a*.12),M.S(.05,h-2.3,.05)),'#C9C4D6',{cast:false})}
 const RADIO=[33.6,31.2];
-function districtDyn(t){for(const Dd of DISTRIK){if(Dd.musik){D(G.sph,M.chain(M.T(RADIO[0],7.1,RADIO[1]),M.S(.22,.22,.22)),(t%1.2)<.6?'#FF3B5C':'#3A0010',{em:1,cast:false});continue}
+// warga lemas: duduk lesu di depan rumah + awan mendung kecil di atas kepala
+function lemasDraw(t){if(!LEMAS.set.size)return;for(const H of HOUSES){if(!LEMAS.set.has(H.r.u.toLowerCase())||H.r.q)continue;const x=H.door[0],z=H.door[2]+.9,y=1.35+Math.sin(t*1.5+x)*.05;
+  for(const [a,b,c] of [[0,0,.26],[-.2,-.04,.18],[.2,-.03,.2]])D(G.sph,M.chain(M.T(x+a,y+b,z),M.S(c,c*.8,c)),'#5C5A75',{alpha:.9,cast:false});
+  for(let k=0;k<3;k++){const q=(t*1.4+k/3)%1;D(G.box,M.chain(M.T(x-.15+k*.15,y-.2-q*.5,z),M.S(.03,.09,.03)),'#7FC8FF',{em:.6,alpha:1-q,cast:false})}}}
+// Tahap 2: masuk area distrik saat main = cari inspirasi (UI memanggil server, ada jeda 30 menit per distrik)
+function distrikTick(){if(!PLAY.on)return;let k=null;for(const Dd of DISTRIK){const bx=Dd.musik?24:Dd.bx,bz=Dd.musik?24:Dd.bz;if(Math.abs(PLAY.x-bx)<10.5&&Math.abs(PLAY.z-bz)<10.5){k=Dd.k;break}}
+  if(k!==PLAY.distrik){PLAY.distrik=k;if(k)window.dispatchEvent(new CustomEvent('kota-distrik',{detail:k}))}}
+function districtDyn(t){lemasDraw(t);distrikTick();for(const Dd of DISTRIK){if(Dd.musik){D(G.sph,M.chain(M.T(RADIO[0],7.1,RADIO[1]),M.S(.22,.22,.22)),(t%1.2)<.6?'#FF3B5C':'#3A0010',{em:1,cast:false});continue}
   const q=.5+.5*Math.sin(t*2+Dd.bx*.1+Dd.bz*.07);D(G.cyl16,M.chain(M.T(Dd.bx,.04,Dd.bz-.8),M.S(3.3+q*.3,.01,3.3+q*.3)),Dd.col,{em:1,alpha:.18+.12*q,cast:false})}}
 function houseWin(H,night){const B=M.chain(M.T(H.x,0,H.z),M.RY(-Math.PI/2));for(const s of [-1,1])D(G.box,M.mul(B,M.chain(M.T(1.07,.82,s*.64),M.S(.03,.42,.42))),night?'#FFD23F':'#8FD8FF',{em:night?1:.45,cast:false})}
 function houses(t,cp){const night=(()=>{const h=hourWIB();return h>=18||h<6})();
@@ -602,7 +609,8 @@ function tamanStatic(){const [x,z]=TAMAN;D(G.box,M.chain(M.T(x,.03,z),M.S(19,.05
   for(const [a,b] of [[-9,-9],[9,-9],[-9,9],[9,9]]){D(G.cyl8,M.chain(M.T(x+a,0,z+b),M.S(.06,2.2,.06)),'#3A3354',{cast:false});D(G.sph,M.chain(M.T(x+a,2.25,z+b),M.S(.2,.2,.2)),'#FFE9A8',{em:1,cast:false})}}
 function tamanDyn(t){const [x,z]=TAMAN;D(G.sph,M.chain(M.T(x,1+Math.abs(Math.sin(t*3))*.3,z),M.S(.3,.5,.3)),'#BDF4FF',{em:.8,alpha:.7,cast:false})}
 // ---------- Seni Mart: minimarket warga di beberapa titik kota ----------
-const MARTS=[[-5.6,18.2],[29.2,3.6],[-48,24]];
+// Seni Mart: alun-alun kanan & gerbang barat (yang di gerbang depan dihapus, blok itu khusus Panggung Debut)
+const MARTS=[[29.2,3.6],[-48,24]];
 let martTex=null;function martSign(){return martTex||(martTex=texFromCanvas(signCanvas(1024,160,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,'#5B21E0');g.addColorStop(1,'#8A57FF');x.fillStyle=g;x.fillRect(0,0,w,h);
   x.fillStyle='#FFD23F';x.fillRect(0,h-14,w,14);x.textAlign='center';x.textBaseline='middle';x.fillStyle='#FFF7E8';x.font='900 92px Inter';x.fillText('🛒 SENI MART',w/2-60,h/2-2);
   x.fillStyle='#FFD23F';x.font='900 40px Inter';x.fillText('24 JAM',w-120,h/2-2)})))}
@@ -656,28 +664,32 @@ function plazaLayout(){
   for(const [a,b] of [[-33,-9],[33,-9],[-33,9],[33,9],[-12.6,9],[12.6,9]]){D(G.cyl16,M.chain(M.T(a,0,b),M.S(.85,.5,.85)),'#2A2448',{});treeR(a,b,.9,'#2EC4B6')}
   ['#FF4B4B','#FFC233','#3FA9FF','#3FD37A','#B69CFF','#FF4FA3'].forEach((c,i)=>{flag(-12+i*1.2,-9.6,c);flag(5.6+i*1.2,-9.6,c)})}
 // ---------- Panggung Debut (gerbang kota, blok depan tengah): warga baru tampil & diumumkan Wali Kota Vilindo ----------
-const DSX=4.6,DSZ=18.4,DSH=.7,DSTAIR=[4.6,22.4];
+const DSX=0,DSZ=18.6,DSH=.8,DSTAIR=[0,23.6];
 let debSignTex=null;function debSign(){return debSignTex||(debSignTex=texFromCanvas(signCanvas(1024,200,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,'#FF4FA3');g.addColorStop(.5,'#FFD23F');g.addColorStop(1,'#38E1FF');x.fillStyle='#14102B';x.fillRect(0,0,w,h);x.fillStyle=g;x.fillRect(0,h-16,w,16);x.fillRect(0,0,w,10);
   x.textAlign='center';x.textBaseline='middle';x.fillStyle='#FFF7E8';x.font='900 96px Inter';x.fillText('🎤 PANGGUNG DEBUT',w/2,h/2+2)})))}
-function halteBlok(){const x=0,z=24;D(G.box,M.chain(M.T(x,.03,z),M.S(19,.05,19)),'#2A2448',{cast:false});
-  // karpet merah dari tangga panggung ke jalan
-  D(G.box,M.chain(M.T(DSX,.06,27.8),M.S(2,.03,11)),'#C8243A',{em:.3,cast:false});for(const s2 of [-1,1])D(G.box,M.chain(M.T(DSX+s2*1.05,.07,27.8),M.S(.08,.02,11)),'#FFD23F',{em:.8,cast:false});
-  // panggung + tangga
-  D(G.box,M.chain(M.T(DSX,0,DSZ),M.S(8.6,DSH,4.6)),'#2A2448',{});D(G.box,M.chain(M.T(DSX,DSH,DSZ),M.S(8.4,.04,4.4)),'#3A2F66',{cast:false});
-  D(G.box,M.chain(M.T(DSX,DSH-.12,DSZ+2.31),M.S(8.6,.1,.04)),'#FFD23F',{em:1,cast:false});
-  for(let i=0;i<3;i++)D(G.box,M.chain(M.T(DSX,0,DSZ+2.6+i*.42),M.S(2.2,DSH*(3-i)/3,.42)),'#3A3354',{});
-  // dinding belakang, rangka & papan nama
-  for(const s2 of [-1,1]){D(G.box,M.chain(M.T(DSX+s2*4.2,0,DSZ-2.1),M.S(.3,5.2,.3)),'#C9C4D6',{em:.15});D(G.box,M.chain(M.T(DSX+s2*4.9,0,DSZ+.6),M.S(.9,2.4,.9)),'#14102B',{});
-    for(const y of [.6,1.5])D(G.cyl16,M.chain(M.T(DSX+s2*4.9,y,DSZ+1.06),M.RX(Math.PI/2),M.S(.3,.02,.3)),'#3A3354',{cast:false})}
-  D(G.box,M.chain(M.T(DSX,5.0,DSZ-2.1),M.S(8.8,.3,.3)),'#C9C4D6',{em:.15});D(G.box,M.chain(M.T(DSX,4.6,DSZ),M.S(.2,.2,4.4)),'#C9C4D6',{em:.15,cast:false});
-  D(G.box,M.chain(M.T(DSX,DSH,DSZ-2.05),M.S(8.1,3.5,.12)),'#14102B',{});D(G.plane,M.chain(M.T(DSX,3.75,DSZ-1.97),M.S(7.6,1.48,1)),[1,1,1],{tex:debSign(),em:1,cast:false});
-  // tiang lampu sorot di depan
-  for(const s2 of [-1,1]){D(G.cyl8,M.chain(M.T(DSX+s2*5.6,0,DSZ+4.2),M.S(.08,4.4,.08)),'#3A3354',{cast:false});D(G.box,M.chain(M.T(DSX+s2*5.6,4.4,DSZ+4.2),M.RX(-.6),M.S(.45,.45,.6)),'#14102B',{cast:false})}
-  // bangku penonton, warung, taman kecil
-  for(const bx of [.6,8.6]){D(G.box,M.chain(M.T(bx,0,27.2),M.S(2.6,.5,1)),'#38E1FF',{em:.3});D(G.box,M.chain(M.T(bx,.5,26.8),M.S(2.6,.8,.15)),'#2E2A55',{})}
-  for(const [a,b] of [[-8,-8],[8,-8],[-8,8],[8,8]]){D(G.cyl8,M.chain(M.T(x+a,0,z+b),M.S(.06,2.2,.06)),'#3A3354',{cast:false});D(G.sph,M.chain(M.T(x+a,2.25,z+b),M.S(.2,.2,.2)),'#BDF4FF',{em:1,cast:false})}
-  D(G.box,M.chain(M.T(-6.2,.065,z+1.6),M.S(7,.02,4.2)),'#4A3A5E',{cast:false});umbrella(-8,z+1.4,'#F2994A');umbrella(-4.3,z+1.9,'#FFF7E8');
-  flower(8.4,z+8.2,1,['#FF4FA3','#FFC233','#FFF7E8']);flower(-8.8,z-8.2,1,['#3FA9FF','#FFF7E8','#FF8FB1']);bush(-1.6,z+8.4,.8);bush(-8.6,z+.5,.9)}
+// blok gerbang depan = KHUSUS Panggung Debut (tanpa warung/Seni Mart): panggung lebar, karpet merah VIP, menara LED, lampu sorot
+function halteBlok(){const x=0,z=24;D(G.box,M.chain(M.T(x,.03,z),M.S(19,.05,19)),'#1A1530',{cast:false});
+  for(const [a,b,w,d] of [[0,-9.3,19,.4],[0,9.3,19,.4],[-9.3,0,.4,19],[9.3,0,.4,19]])D(G.box,M.chain(M.T(x+a,.06,z+b),M.S(w,.02,d)),'#FFD23F',{em:.8,cast:false});
+  for(let i=0;i<5;i++)for(let j=0;j<3;j++)if((i+j)%2===0)D(G.box,M.chain(M.T(-7.2+i*3.6,.055,26.6+j*2.6),M.S(1.2,.01,1.2)),'#2E2652',{cast:false});
+  // karpet merah + tiang VIP berpita
+  D(G.box,M.chain(M.T(DSX,.07,28.2),M.S(2.4,.03,9.6)),'#C8243A',{em:.3,cast:false});for(const s2 of [-1,1])D(G.box,M.chain(M.T(DSX+s2*1.25,.08,28.2),M.S(.08,.02,9.6)),'#FFD23F',{em:.9,cast:false});
+  for(const s2 of [-1,1]){for(let k=0;k<5;k++){const pz=DSZ+4.6+k*2.1;D(G.cyl8,M.chain(M.T(DSX+s2*1.35,0,pz),M.S(.07,.95,.07)),'#E8C24A',{em:.5,cast:false});D(G.sph,M.chain(M.T(DSX+s2*1.35,.98,pz),M.S(.11,.11,.11)),'#FFD23F',{em:.8,cast:false});
+    if(k<4)D(G.box,M.chain(M.T(DSX+s2*1.35,.78,pz+1.05),M.S(.05,.05,2)),'#B5122E',{em:.4,cast:false})}}
+  // panggung lebar + tangga
+  D(G.box,M.chain(M.T(DSX,0,DSZ),M.S(14,DSH,5.6)),'#241C44',{});D(G.box,M.chain(M.T(DSX,DSH,DSZ),M.S(13.8,.04,5.4)),'#3A2F66',{cast:false});
+  D(G.box,M.chain(M.T(DSX,DSH-.12,DSZ+2.81),M.S(14,.1,.04)),'#FFD23F',{em:1,cast:false});
+  for(let i=0;i<3;i++)D(G.box,M.chain(M.T(DSX,0,DSZ+3.05+i*.42),M.S(3,DSH*(3-i)/3,.42)),'#3A3354',{});
+  // gapura rangka + dinding belakang + papan nama
+  for(const s2 of [-1,1]){D(G.box,M.chain(M.T(DSX+s2*6.6,0,DSZ-2.4),M.S(.45,6.4,.45)),'#C9C4D6',{em:.15});D(G.sph,M.chain(M.T(DSX+s2*6.6,6.6,DSZ-2.4),M.S(.45,.45,.45)),'#FFD23F',{em:1,cast:false})}
+  D(G.box,M.chain(M.T(DSX,6.1,DSZ-2.4),M.S(13.6,.4,.4)),'#C9C4D6',{em:.15});D(G.box,M.chain(M.T(DSX,5.5,DSZ),M.S(.25,.25,5.2)),'#C9C4D6',{em:.15,cast:false});
+  D(G.box,M.chain(M.T(DSX,DSH,DSZ-2.35),M.S(12.6,4.4,.14)),'#14102B',{});D(G.plane,M.chain(M.T(DSX,4.35,DSZ-2.26),M.S(10.4,2.03,1)),[1,1,1],{tex:debSign(),em:1,cast:false});
+  for(let i=0;i<9;i++)for(const y of [1.3,2.2])D(G.sph,M.chain(M.T(DSX-5.6+i*1.4,y,DSZ-2.25),M.S(.12,.12,.04)),'#FFE9A8',{em:1,cast:false});
+  // menara LED kiri-kanan
+  for(const s2 of [-1,1]){D(G.box,M.chain(M.T(s2*8.3,0,DSZ+.4),M.S(1.6,5.4,1.6)),'#14102B',{});D(G.box,M.chain(M.T(s2*8.3,5.4,DSZ+.4),M.S(1.8,.18,1.8)),'#FFD23F',{em:.8,cast:false})}
+  // tiang lampu sorot
+  for(const s2 of [-1,1]){D(G.cyl8,M.chain(M.T(DSX+s2*6.8,0,DSZ+5.6),M.S(.09,5,.09)),'#3A3354',{cast:false});D(G.box,M.chain(M.T(DSX+s2*6.8,5,DSZ+5.6),M.RX(-.6),M.S(.5,.5,.65)),'#14102B',{cast:false})}
+  for(const [a,b] of [[-8.4,8.4],[8.4,8.4]]){D(G.cyl8,M.chain(M.T(x+a,0,z+b),M.S(.06,2.4,.06)),'#3A3354',{cast:false});D(G.sph,M.chain(M.T(x+a,2.45,z+b),M.S(.22,.22,.22)),'#FFE9A8',{em:1,cast:false})}
+  flower(-6.4,z+8,1.1,['#FF4FA3','#FFC233','#FFF7E8']);flower(6.4,z+8,1.1,['#3FA9FF','#FFF7E8','#FF8FB1']);flower(-8.2,z-1.2,.9,['#FFD23F','#FF4FA3']);flower(8.2,z-1.2,.9,['#FFD23F','#3FA9FF'])}
 // taman gerbang di seberang jalan raya (dulu bandara)
 function gerbangLawn(){D(G.box,M.chain(M.T(0,.015,60),M.S(128,.02,40)),'#1E3A33',{cast:false});let sd=5;const rn=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646};
   for(let x=-58;x<=58;x+=6)for(let z=44;z<=78;z+=6){if(rn()<.45)continue;const px=x+(rn()-.5)*3,pz=z+(rn()-.5)*3;treeR(px,pz,.8+rn()*.6,['#2EC4B6','#4FAF7A','#7B4DFF','#3E9E6A'][Math.floor(rn()*4)])}
@@ -712,15 +724,16 @@ function debutStep(t){const now=Date.now();
   if(e>=DEBUT.dur){for(const r of L)if(r.q||r.onStage)debRelease(r,r.onStage);DEBUT.on=false;DEBUT.tex=null;if(window.KOTA_DEBUT_EV)window.KOTA_DEBUT_EV('end',{S:DEBUT.S})}}
 function debutDraw(t){const on=DEBUT.on;
   // lampu sorot: menyala penuh saat sesi, redup saat menunggu
+  for(const s2 of [-1,1])for(let k=0;k<6;k++)D(G.box,M.chain(M.T(s2*8.3,.6+k*.78,DSZ+1.21),M.S(1.3,.6,.02)),FCOL[(k+Math.floor(t*(on?6:2))+(s2>0?3:0))%FCOL.length],{em:on?1:.55,cast:false});
   for(const s2 of [-1,1]){const a=on?.2+.06*Math.sin(t*3+s2):.05;const sx=DSX+.6+Math.sin(t*1.3+s2)*(on?1.2:.4);
     D(G.cone8,M.chain(M.T(sx,DSH,DSZ+.7),M.S(1.3,4.6-DSH,1.3)),on?(s2<0?'#FFE9A8':'#FFB3E0'):'#BDF4FF',{em:1,alpha:a,cast:false});
     D(G.cyl16,M.chain(M.T(sx,DSH+.03,DSZ+.7),M.S(1.25,.01,1.25)),'#FFF7E8',{em:1,alpha:on?.35:.12,cast:false})}
-  for(let i=0;i<9;i++)D(G.box,M.chain(M.T(DSX-4+i,DSH-.12,DSZ+2.34),M.S(.7,.08,.02)),on?FCOL[(i+Math.floor(t*4))%FCOL.length]:'#6C2BFF',{em:1,cast:false});
+  for(let i=0;i<13;i++)D(G.box,M.chain(M.T(DSX-6+i,DSH-.12,DSZ+2.84),M.S(.7,.08,.02)),on?FCOL[(i+Math.floor(t*4))%FCOL.length]:'#6C2BFF',{em:1,cast:false});
   if(on&&DEBUT.tex){const q=Math.min(1,((Date.now()-DEBUT.S)/1000-DEBUT.intro-DEBUT.idx*DEBUT.per)/.5);D(G.plane,M.chain(M.T(DSX,6.9+Math.sin(t*2)*.12,DSZ+.4),M.RY(cam.yaw),M.S(9.4*q,2.64*q,1)),[1,1,1],{tex:DEBUT.tex,em:1,cast:false})}
   if(on&&Math.floor(t*6)%2===0)SPARK.push([DSX+(Math.random()-.5)*7,DSH+4.2,DSZ+(Math.random()-.5)*2,t]);
   // papan LED: sesi berikutnya
   if(!on){const nx=debNext(Date.now());const jam=String(new Date(nx.S+7*36e5).getUTCHours()).padStart(2,'0')+'.00';const txt='SESI BERIKUTNYA '+jam+' · '+(nx.L.length?nx.L.length+' SENIMAN ANTRE':'FOLLOW = DEBUT');
-    if(txt!==DEBUT.nextFor){DEBUT.nextFor=txt;DEBUT.nextTex=debNextTex(txt)}D(G.plane,M.chain(M.T(DSX,1.9,DSZ-1.97),M.S(7.2,1.12,1)),[1,1,1],{tex:DEBUT.nextTex,em:1,cast:false})}}
+    if(txt!==DEBUT.nextFor){DEBUT.nextFor=txt;DEBUT.nextTex=debNextTex(txt)}D(G.plane,M.chain(M.T(DSX,2.0,DSZ-2.26),M.S(8.6,1.34,1)),[1,1,1],{tex:DEBUT.nextTex,em:1,cast:false})}}
 // layout khusus blok Panggung, Studio dan Label Musik Office (lantai, taman, parkir, patung)
 function blockLayouts(){
   // Gedung Musik: jalan masuk, parkir + mobil, lounge payung, deret pohon belakang
@@ -984,7 +997,7 @@ const OBST=[];{const box=(x0,x1,z0,z1)=>OBST.push({b:[x0,x1,z0,z1]}),circ=(x,z,r
   box(SITE[0]-4.7,SITE[0]+4.7,SITE[2]-4.1,SITE[2]+4.1);box(-6.6,6.6,MZ-4.75,MZ+4.75);for(const [x,z] of MARTS)box(x-3.6,x+3.6,z-2.7,z+2.1);box(ISR[0]-3.75,ISR[0]+3.75,ISR[2]-3.25,ISR[2]+3.25);circ(ISR[0]+3.4,ISR[2]+5.2,1.6);
   for(const H of HOUSES){box(H.x-1.15,H.x+1.1,H.z-1.05,H.z+1.05)}
   for(const B of CBLK){box(B.bx-9.7,B.bx-8.9,B.bz-9.4,B.bz+7);box(B.bx+8.9,B.bx+9.7,B.bz-9.4,B.bz+7);box(B.bx-9,B.bx+9,B.bz-9.7,B.bz-8.9);circ(B.bx-6,B.gz-.1,1.1);circ(B.bx+6,B.gz-.1,1.1);if(B.rows<=3)circ(B.bx,B.bz-6.8,2.9)}
-  box(SITE[0]+5.4,SITE[0]+9.4,SITE[2]-7.5,SITE[2]+4.5);circ(SITE[0]-6.8,SITE[2]+6.2,1.5);box(ISR[0]-7.7,ISR[0]-3.3,ISR[2]+5.7,ISR[2]+7.1);box(DSX-4.4,DSX+4.4,DSZ-2.4,DSZ+2.35);for(const s2 of [-1,1])circ(DSX+s2*5.6,DSZ+4.2,.3);box(-.7,1.9,26.6,27.8);box(7.3,9.9,26.6,27.8);circ(-8,25.4,1.4);circ(-4.3,25.9,1.4);
+  box(SITE[0]+5.4,SITE[0]+9.4,SITE[2]-7.5,SITE[2]+4.5);circ(SITE[0]-6.8,SITE[2]+6.2,1.5);box(ISR[0]-7.7,ISR[0]-3.3,ISR[2]+5.7,ISR[2]+7.1);box(DSX-4.4,DSX+4.4,DSZ-2.4,DSZ+2.35);for(const s2 of [-1,1])circ(DSX+s2*6.8,DSZ+5.6,.35);for(const s2 of [-1,1]){circ(s2*8.3,DSZ+.4,1.1);box(DSX+s2*1.35-.12,DSX+s2*1.35+.12,DSZ+4.4,32.6)}box(-9.4,-1.6,DSZ+2.9,33.2);box(1.6,9.4,DSZ+2.9,33.2);box(-9.4,-7.1,14.6,DSZ+2.9);box(7.1,9.4,14.6,DSZ+2.9);
   for(const [x,z] of [[-30,-3.4],[-24.5,-3.4],[-19,-3.4],[-30,3.6],[-24.5,3.6],[-19,3.6]])circ(x,z,1.6);box(15.5,26.5,-9.2,-5.2);circ(19.5,2.4,2.7);box(-30,-19,-9.7,-8.5);for(const s of [-1,1])circ(s*7.6,9.4,.6)
   for(const Dd of DISTRIK){const {bx,bz,gz}=Dd;if(Dd.musik){circ(RADIO[0],RADIO[1],1.8);circ(13.3,33.2,.4);continue}box(bx-9.7,bx-8.9,bz-9.4,bz+7);box(bx+8.9,bx+9.7,bz-9.4,bz+7);circ(bx-6,gz-.1,1.1);circ(bx+6,gz-.1,1.1);
     circ(bx,bz-.8,Dd.k==='tradisi'?3.9:3);box(bx-7.4,bx+7.4,bz-9.6,bz-6.4);for(const a of [-5.5,5.5])circ(bx+a,bz+3,1.1);if(Dd.k==='rupa')for(const [a,b] of [[-3.6,2.6],[3.6,2.6],[-4,-2],[4,-2]])circ(bx+a,bz-.8+b,.7)}
@@ -1023,6 +1036,7 @@ function wanderStep(t,dt){if(!WALK.N){buildNodes();if(!WALK.N.length)return}
   const band=bandAt(t);for(const [r] of BAND)if(!band.has(r)){r.slot=null;if(r.w){r.w.x=STG[BAND.get(r)][0];r.w.z=2.2;r.w.path=null;r.w.wait=0}}BAND=band;
   let plans=0;
   for(const r of RES){if(r.i===0||r.own||r.q)continue;const w=r.w||(r.w=initW(r));if(r.onStage){w.x=DSTAIR[0];w.z=DSTAIR[1];w.path=null;continue}
+    if(LEMAS.set.has(r.u.toLowerCase())&&r.house&&!r.house.big){w.x=r.house.door[0];w.z=r.house.door[2]+.9;w.path=null;w.mv=0;w.wait=5;continue}
     if(PLAY.on&&r===PLAY.r){w.x=PLAY.x;w.z=PLAY.z;w.yaw=PLAY.yaw;w.path=null;w.wait=3;w.mv=0;continue}
     if(r.net){w.x=r.net.x;w.z=r.net.z;w.path=null;w.wait=2;continue}
     const bk=band.get(r);if(bk!==undefined){r.slot=[STG[bk][0],.9*PS,STG[bk][1]];r.fy=0;w.mv=0;continue}
@@ -1061,7 +1075,7 @@ function vilDraw(t){const v=VIL;const hop=v.hopT>t?Math.abs(Math.sin((v.hopT-t)*
   D(G.cyl16,M.chain(M.T(p[0],2.55+bob+Math.sin(t*2)*.08,p[2]),M.RY(t),M.S(.7,.04,.7)),'#FFF3B0',{em:1,alpha:.9,cast:false});
   for(let k=0;k<8;k++){const a=k/8*Math.PI*2+t*1.1;const y=.3+((t*.5+k/8)%1)*2.6;D(G.box,M.chain(M.T(p[0]+Math.cos(a)*1.05,y,p[2]+Math.sin(a)*1.05),M.RY(t*3+k),M.S(.1,.1,.1)),k%2?'#FFF7C2':'#B69CFF',{em:1,cast:false})}
   if(talking)for(let k=0;k<3;k++){const qq=((t*1.5+k/3)%1);D(G.sph,M.chain(M.T(p[0]+Math.sin(v.yaw)*.6,2.2+qq*1.2,p[2]+Math.cos(v.yaw)*.6),M.S(.09,.09,.09)),'#FFF7C2',{em:1,alpha:1-qq,cast:false})}}
-const LEMAS={on:false};const FXM=new Map();
+const LEMAS={on:false,set:new Set()};const FXM=new Map();
 let lastT=0;
 function playStep(t){const dt=Math.min(.05,t-lastT||0);lastT=t;if(!PLAY.on)return;
   let ix=PLAY.joy[0],iz=PLAY.joy[1];const K=PLAY.keys;if(K.has('w')||K.has('arrowup'))iz-=1;if(K.has('s')||K.has('arrowdown'))iz+=1;if(K.has('a')||K.has('arrowleft'))ix-=1;if(K.has('d')||K.has('arrowright'))ix+=1;
@@ -1210,7 +1224,7 @@ function makeCard(r,ex){ex=ex||{};const c=document.createElement('canvas');c.wid
   x.font='800 32px Inter';x.fillText((location.host||'kotaseni.vercel.app')+'/kota?w='+r.u,540,1790);
   return c}
 // ---------- API for ui.js ----------
-window.KOTA={setLomba(k){LOMBA=k||null},setFest(v){FEST=!!v},get fest(){return FEST},setKarya,goTo,setSleep,PROF,near(k){if(!PLAY.on)return false;return k==='mart'?PLAY.nearMart>=0:k==='home'?!!PLAY.nearHome:k==='plaza'?!!PLAY.nearPlaza:k==='studio'?!!PLAY.nearStudio:false},get autoK(){return PLAY.autoK},get car(){return CAR},intro(){cam.dist=150;focus=null;selected=null},vilSay,fx(u,e,food,msg){FXM.set(String(u).toLowerCase(),{e,food,msg,t0:performance.now()/1000});const r=byName.get(String(u).toLowerCase());if(r){for(let i=0;i<8;i++){const p=resPos(r,performance.now()/1000);SPARK.push([p[0]+(i-4)*.2,1.4,p[2],performance.now()/1000+i*.05])}}},vilTos(){const t=performance.now()/1000;VIL.hopT=t+1.2;VIL.waveT=t+2;VIL.wait=Math.max(VIL.wait,4);for(let i=0;i<10;i++)SPARK.push([VIL.x+(i-5)*.25,1.8,VIL.z,t+i*.04])},get VIL(){return VIL},MARTS,plane:planeSay,get planeU(){return PLANE.cur?(performance.now()/1000-PLANE.t0)/PL_DUR:-1},setLemas(v){LEMAS.on=!!v},KAV,RES,byName,makeCard,DISTRIK,debutInfo(){const nx=debNext(Date.now());return {on:DEBUT.on,S:DEBUT.S,L:DEBUT.L,idx:DEBUT.idx,next:nx.S,nextL:nx.L,ses:DEB_SES}},debutDay(d){return DEB_SES.map(h=>{const S=wibMs(d,h);return {h,S,L:debList(S)}})},jabatan,tgl,arrive,QUEUE,HOUSES,CLUSTERS,band(){return [...BAND.keys()]},FOUND,isrMsg(){return ISR_MSG[Math.floor(performance.now()/5000)%ISR_MSG.length].replace(/^\S+\s/,'').toLowerCase()},select(r){selected=r;if(r)focus=null},zoomStep(k){zoomTo(null,null,k)},get selected(){return selected},
+window.KOTA={setLomba(k){LOMBA=k||null},setFest(v){FEST=!!v},get fest(){return FEST},setKarya,goTo,setSleep,PROF,near(k){if(!PLAY.on)return false;return k==='mart'?PLAY.nearMart>=0:k==='home'?!!PLAY.nearHome:k==='plaza'?!!PLAY.nearPlaza:k==='studio'?!!PLAY.nearStudio:false},get autoK(){return PLAY.autoK},get car(){return CAR},intro(){cam.dist=150;focus=null;selected=null},vilSay,fx(u,e,food,msg){FXM.set(String(u).toLowerCase(),{e,food,msg,t0:performance.now()/1000});const r=byName.get(String(u).toLowerCase());if(r){for(let i=0;i<8;i++){const p=resPos(r,performance.now()/1000);SPARK.push([p[0]+(i-4)*.2,1.4,p[2],performance.now()/1000+i*.05])}}},vilTos(){const t=performance.now()/1000;VIL.hopT=t+1.2;VIL.waveT=t+2;VIL.wait=Math.max(VIL.wait,4);for(let i=0;i<10;i++)SPARK.push([VIL.x+(i-5)*.25,1.8,VIL.z,t+i*.04])},get VIL(){return VIL},MARTS,plane:planeSay,get planeU(){return PLANE.cur?(performance.now()/1000-PLANE.t0)/PL_DUR:-1},setLemas(v){LEMAS.on=!!v},setLemasList(L){LEMAS.set=new Set((L||[]).map(x=>String(x).toLowerCase()))},isLemas(r){return !!r&&LEMAS.set.has(String(r.u).toLowerCase())},KAV,RES,byName,makeCard,DISTRIK,debutInfo(){const nx=debNext(Date.now());return {on:DEBUT.on,S:DEBUT.S,L:DEBUT.L,idx:DEBUT.idx,next:nx.S,nextL:nx.L,ses:DEB_SES}},debutDay(d){return DEB_SES.map(h=>{const S=wibMs(d,h);return {h,S,L:debList(S)}})},jabatan,tgl,arrive,QUEUE,HOUSES,CLUSTERS,band(){return [...BAND.keys()]},FOUND,isrMsg(){return ISR_MSG[Math.floor(performance.now()/5000)%ISR_MSG.length].replace(/^\S+\s/,'').toLowerCase()},select(r){selected=r;if(r)focus=null},zoomStep(k){zoomTo(null,null,k)},get selected(){return selected},
   startPlay,stopPlay,get playing(){return PLAY.on},get me(){return PLAY.r},joy(x,z){PLAY.joy=[x,z]},emote(e){PLAY.emo=e;PLAY.emoT=performance.now()/1000+(e==='dance'?3:e==='music'?3:1.4)},
   pos(){return PLAY.on?{x:+PLAY.x.toFixed(2),z:+PLAY.z.toFixed(2),yaw:+PLAY.yaw.toFixed(2),emo:PLAY.emoT>performance.now()/1000?PLAY.emo:'',moved:PLAY.moved}:null},resetMoved(){PLAY.moved=0},
   setOnline,focusAt,focusHouse(r){if(r&&r.house){const mn=r.house.mansion;focusAt(r.house.x,r.house.z+(mn?1:0),mn?34:18);cam.yaw=mn?.15:.3;cam.pitch=mn?.68:.55}},focusPlace(k){if(String(k).startsWith('mart')){const m=MARTS[+String(k).split(':')[1]||0];focusAt(m[0],m[1]+1,22);cam.yaw=0;cam.pitch=.6;return}if(String(k).startsWith('kav:')){const K=KAV.find(q=>'kav:'+q.n===k);if(K)focusAt(K.x,K.z,32);return}if(String(k).startsWith('distrik:')){const Dd=DISTRIK.find(d=>'distrik:'+d.k===k);if(Dd){if(Dd.musik){focusAt(24,26,34);cam.yaw=.45;cam.pitch=.5}else focusAt(Dd.bx,Dd.bz,30)}return}if(String(k).startsWith('cluster:')){const C=CLUSTERS.find(c=>'cluster:'+c.k===k);if(C){focusAt(C.cx,C.cz,Math.max(30,C.rows*6+16))}return}const P={plaza:[0,-1,44,.3,.55],kampung:[KAMP_C[0],KAMP_C[1],60,0,.88],studio:[24,24,30,.45,.5],bandara:[20,58,56,.5,.62],layar:[-24.5,-2,26,0,.42],billboard:[-28,40,34,0,.5],isr:[-23,-22,34,-.3,.5],mansion:[0,-23,32,0,.6],halte:[0,26,28,0,.6],debut:[DSX,DSZ+3,24,.35,.5],taman:[-24,24,28,0,.6],papan:[-6,-1,22,0,.6]}[k];if(k==='home'){focus=null;selected=null;cam.yaw=HOME.yaw;cam.pitch=HOME.pitch;return}if(P){focusAt(P[0],P[1],P[2]);cam.yaw=P[3];cam.pitch=P[4]}},clearFocus(){focus=null}};
