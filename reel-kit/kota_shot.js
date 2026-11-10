@@ -22,7 +22,7 @@ const SHOTS={
   halte:     {f:u=>({yaw:ISO,pitch:.6,dist:L(44,34,E(u)),tx:L(-6,6,u),tz:26})},
   lahan:     {f:u=>({yaw:ISO+L(.15,-.15,u),pitch:.64,dist:L(64,50,E(u)),tx:0,tz:L(-60,-66,u)})},
   // Reel evolusi: warga telur menetas jadi manusia (efek hanya di reel, web asli tidak berubah)
-  'evo':       {f:u=>({yaw:L(.12,.32,u),pitch:L(.3,.44,E(u)),dist:L(8.5,15,E(u)),tx:4.6,tz:L(24.2,24.2,u)}),jam:16,evo:{t0:1.8,spread:1.5,R:4.2,jit:.3,cx:4.6,cz:24.2,grid:1}},
+  'evo':       {f:u=>({yaw:L(.12,.32,u),pitch:L(.3,.44,E(u)),dist:L(8.5,15,E(u)),tx:4.6,tz:L(24.2,24.2,u)}),jam:16,evo:{t0:2.9,spread:1.5,R:4.2,jit:.3,cx:4.6,cz:24.2,grid:1}},
   'evo-ulang': {f:u=>({yaw:L(.26,.16,u),pitch:.32,dist:L(11,8.5,E(u)),tx:4.6,tz:24.2}),jam:16,evo:{t0:999,spread:0,R:1,jit:0,cx:4.6,cz:24.2,grid:1,idle:1}},
   'debut-live':{f:u=>({yaw:ISO+L(-.25,-.1,u),pitch:.42,dist:L(19,15,E(u)),tx:4.6,tz:20.5}),jam:19.5,q:'debut=1',warm:12},
 };
