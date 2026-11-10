@@ -29,8 +29,8 @@ let VO=opt('--vo');if(VO===true)VO=null;if(!VO&&fs.existsSync(path.join(OUT,'vo.
 const voScenes=R.scenes.map((s,i)=>s.vo?i:-1).filter(i=>i>=0);let potong=[];
 if(VO){const sp=R.voSegs?{segs:R.voSegs,n:R.voSegs.length}:JSON.parse(sh('python3',['audio_mix.py','split',VO,String(voScenes.length)]));
   if(sp.n!==voScenes.length)console.log(`⚠️ VO kebaca ${sp.n} potong, adegan ber-VO ${voScenes.length}. Cek jeda antar baris.`);
-  voScenes.forEach((si,k)=>{const sg=sp.segs[k];if(!sg)return;const L=sg[1]-sg[0];const sc=R.scenes[si];sc.dur=Math.max(sc.min||1.6,+(L+(sc.ekor??.45)).toFixed(2));sc._vo=sg})}
-let t=0;for(const s of R.scenes){s.t0=t;if(s._vo)potong.push([s._vo,t+.12]);t+=s.dur}const DUR=+t.toFixed(2);
+  voScenes.forEach((si,k)=>{const sg=sp.segs[k];if(!sg)return;const L=sg[1]-sg[0];const sc=R.scenes[si];if(!sc.kunci)sc.dur=Math.max(sc.min||1.6,+(L+(sc.ekor??.45)).toFixed(2));sc._vo=sg})}
+let t=0;const sfx=[];for(const s of R.scenes){s.t0=t;if(s._vo)potong.push([s._vo,t+(s.voAt??.12)]);for(const [a,k] of (s.sfx||[]))sfx.push([t+a,k]);t+=s.dur}const DUR=+t.toFixed(2);
 console.log(`▶ ${SERI} · ${R.scenes.length} adegan · ${DUR} dtk${VO?' · pakai VO':' · tanpa VO'}`);
 // ---------- shot kota (adegan berurutan dengan shot sama = satu klip) ----------
 const groups=[];for(const s of R.scenes){const g=groups[groups.length-1];if(g&&g.shot===s.shot&&!s.potong)g.dur+=s.dur;else groups.push({shot:s.shot,dur:s.dur})}
@@ -47,7 +47,7 @@ const wver=wj.update||'';const jobs=groups.map((g,i)=>{const f=path.join(DIR,'ca
   // audio
   const gaya=R.gaya||'ceria';sh('python3',['musik.py',String(DUR+.5),path.join(OUT,'_musik.wav'),gaya,String(R.seed||3)]);
   const cuts=[];{let tt=0;for(const g of groups.slice(0,-1)){tt+=g.dur;cuts.push(tt)}}
-  fs.writeFileSync(path.join(OUT,'_audio.json'),JSON.stringify({dur:DUR,musik:path.join(OUT,'_musik.wav'),vo:VO,potong,cuts}));
+  fs.writeFileSync(path.join(OUT,'_audio.json'),JSON.stringify({dur:DUR,musik:path.join(OUT,'_musik.wav'),vo:VO,potong,cuts:R.noWhoosh?[]:cuts,sfx}));
   sh('python3',['audio_mix.py','mix',path.join(OUT,'_audio.json'),path.join(OUT,'_audio.wav')]);
   // overlay teks/kartu
   console.log('✍️  render teks…');const b=await chromium.launch();const p=await b.newPage({viewport:{width:1080,height:1920}});

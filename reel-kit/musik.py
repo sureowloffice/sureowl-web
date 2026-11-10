@@ -1,5 +1,5 @@
 # Musik latar orisinal (disintesis, bebas hak cipta). Pakai: python3 musik.py <detik> <out.wav> [gaya] [seed]
-# gaya: ceria (default) | megah | santai
+# gaya: ceria (default) | megah | santai | heboh (128bpm, langsung beat)
 import sys,numpy as np
 from scipy.io import wavfile
 from scipy.signal import butter,sosfilt
@@ -27,12 +27,13 @@ def bass(m,d,g=1):
     t=T(d);s=np.sin(2*np.pi*midi(m)*t)+.3*np.sin(2*np.pi*midi(m)*2*t);return s*np.minimum(1,t/.01)*np.minimum(1,(d-t)/.05).clip(0)*.22*g
 G={'ceria':dict(bpm=112,prog=[(60,[60,64,67,72]),(57,[57,60,64,69]),(53,[53,57,60,65]),(55,[55,59,62,67])],mel=[72,76,79,76,74,72,74,76,72,69,72,76,74,71,72,74]),
    'megah':dict(bpm=120,prog=[(57,[57,60,64,69]),(53,[53,57,60,65]),(60,[60,64,67,72]),(55,[55,59,62,67])],mel=[69,72,76,81,79,76,72,74,76,79,81,84,83,79,76,74]),
+   'heboh':dict(bpm=128,prog=[(57,[57,60,64,69]),(53,[53,57,60,65]),(60,[60,64,67,72]),(55,[55,59,62,67])],mel=[69,76,72,76,81,76,72,76,69,76,72,79,83,79,76,74]),
    'santai':dict(bpm=92,prog=[(62,[62,65,69,72]),(55,[55,59,62,65]),(60,[60,64,67,71]),(57,[57,60,64,67])],mel=[74,72,69,72,74,77,76,72,71,72,74,76,74,72,69,67])}[GAYA]
 B=60/G['bpm'];nb=int(DUR/B)
 for k in range(nb):
     t0=k*B
     if t0>DUR-2.4:break
-    root,ch=G['prog'][(k//4)%4];pos=k%4;intro=t0<1.2;build=(k//16)%2==1
+    root,ch=G['prog'][(k//4)%4];pos=k%4;intro=t0<1.2 and GAYA!='heboh';build=GAYA=='heboh' or (k//16)%2==1
     if not intro:
         if pos in (0,2):put(kick(.85 if build else .6),t0)
         if pos in (1,3):put(snap(.9 if build else .6),t0,1,.1)

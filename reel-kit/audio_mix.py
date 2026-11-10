@@ -27,6 +27,14 @@ def whoosh(d=.45):
     for i in range(0,len(t),seg):
         p=i/len(t);fc=400+4500*p;o[i:i+seg]=sosfilt(butter(2,[fc*.7,min(fc*1.4,18000)],'band',fs=SR,output='sos'),n[i:i+seg])
     return o*np.sin(np.pi*t/d)**2*.25
+def krak(d=.5):
+    rng=np.random.default_rng(7);t=np.arange(int(d*SR))/SR;n=rng.standard_normal(len(t))
+    hi=sosfilt(butter(2,2500,'high',fs=SR,output='sos'),n)*np.exp(-t*28)*.9
+    th=np.sin(2*np.pi*(140*np.exp(-t*9))*t)*np.exp(-t*10)*1.1
+    pop=np.sin(2*np.pi*(900-600*t/d)*t)*np.exp(-t*30)*.35
+    return hi+th+pop
+def boom(d=1.2):
+    t=np.arange(int(d*SR))/SR;return np.sin(2*np.pi*(70*np.exp(-t*2.5))*t)*np.exp(-t*3)*1.2
 if sys.argv[1]=='split':
     segs,k=split(sys.argv[2],int(sys.argv[3]));print(json.dumps({'segs':segs,'n':k}))
 else:
@@ -44,6 +52,9 @@ else:
     for c in R.get('cuts',[]):
         i=int((c-.3)*SR)
         if 0<=i<N-len(w):out[i:i+len(w)]+=w[:,None]*np.array([.8,1.0])
+    for tt,kind in R.get('sfx',[]):
+        z=krak() if kind=='krak' else boom();i=int(tt*SR)
+        if 0<=i<N:z=z[:N-i];out[i:i+len(z)]+=z[:,None]*.55
     fade=int(.6*SR);out[-fade:]*=np.linspace(1,0,fade)[:,None]
     out/=max(1e-6,np.abs(out).max())/.89
     wavfile.write(sys.argv[3],SR,(out*32767).astype(np.int16))

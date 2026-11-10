@@ -55,7 +55,7 @@ const CARDS={
    if(r.v!=null){rr(-42,sz/2-44,84,52,26);X.fillStyle=INK;X.fill();X.fillStyle='#fff';X.font=`900 36px ${F}`;X.fillText(String(r.v),0,sz/2-17)}X.restore()})},
 };
 function footer(a){X.globalAlpha=a;X.textAlign='center';X.textBaseline='middle';X.font=`900 46px ${F}`;X.lineWidth=10;X.strokeStyle='rgba(20,16,43,.85)';X.strokeText('🏙️ KOTA SENI · @viralindongid',W/2,H-130);X.fillStyle='#fff';X.fillText('🏙️ KOTA SENI · @viralindongid',W/2,H-130);X.globalAlpha=1}
-function drawScene(sc,lt,full){const u=lt/.45;
+function drawScene(sc,lt,full){const u=lt/.45;if(sc.flash!=null&&!full){const q=lt-sc.flash;if(q>=0&&q<.35){X.fillStyle=`rgba(255,250,235,${.85*(1-q/.35)})`;X.fillRect(0,0,W,H)}}
   if(sc.gelap){X.fillStyle=`rgba(14,8,40,${sc.gelap})`;X.fillRect(0,0,W,H)}
   // gradasi atas supaya teks terbaca
   const g=X.createLinearGradient(0,0,0,560);g.addColorStop(0,'rgba(14,8,40,.55)');g.addColorStop(1,'rgba(14,8,40,0)');X.fillStyle=g;X.fillRect(0,0,W,560);

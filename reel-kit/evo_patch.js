@@ -3,7 +3,7 @@
 const __EVK=['rupa','tari','tradisi','film','musik','sastra','kriya'];let __evoN=0;
 function __evoPos(r){const E=window.__EVO;if(!E||!E.grid||r.own||r.i<12)return null;if(r.__evoP===undefined){if(__evoN>=20){r.__evoP=null;return null}const i=__evoN++;
   const k=__EVK[i%7];const P=PROF[k];const K2=Object.keys(P.sub);const PREF={tradisi:'dalang',sastra:'puisi',kriya:'fesyen',musik:'gitaris',rupa:'pelukis',tari:'penari',film:'fotografer'};const ps=i<7&&P.sub[PREF[k]]?PREF[k]:K2[Math.floor(i/7)%K2.length];r.pk=k;r.ps=ps;r.p=P.sub[ps];r.chosen=true;r.grp=PK2GRP[k];r.prop=PROP_OF[ps]||'none';r.col=shadeHex(P.col,((hash(r.u)%7)-3)*.04);r.q=false;r.zz=false;r.slot=null;
-  if(E.solo!=null){if(i===E.solo&&E.k){const P2=PROF[E.k];r.pk=E.k;r.ps=E.ps;r.p=P2.sub[E.ps];r.grp=PK2GRP[E.k];r.prop=PROP_OF[E.ps]||'none';r.col=shadeHex(P2.col,((hash(r.u)%7)-3)*.04)}r.__evoP=i===E.solo?[DSX,DSH,DSZ+.5]:null;r.__evoY=E.face??0;return r.__evoP}
+  if(E.solo!=null){if(i===E.solo&&E.k){const P2=PROF[E.k];r.pk=E.k;r.ps=E.ps;r.p=P2.sub[E.ps];r.grp=PK2GRP[E.k];r.prop=PROP_OF[E.ps]||'none';r.col=shadeHex(P2.col,((hash(r.u)%7)-3)*.04)}r.__evoP=i===E.solo?(E.pos||[DSX,DSH,DSZ+.5]):null;r.__evoY=E.face??0;return r.__evoP}
   const c=i%5,w=Math.floor(i/5);r.__evoP=[E.cx+(c-2)*1.3+(w%2)*.35,0,E.cz+1.6-w*1.15];r.__evoY=(E.face??Math.PI/4)+((hash(r.u)%9)-4)*.05}
   return r.__evoP}
 
