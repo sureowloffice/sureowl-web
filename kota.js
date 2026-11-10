@@ -587,7 +587,7 @@ let zTex=null;function zzz(x,y,z,t,r){if(!zTex)zTex=texFromCanvas(signCanvas(128
   D(G.sph,M.chain(M.T(x-.9,y+.9+Math.sin(t*1.2+r.ph)*.08,z+.3),M.S(.3,.3,.12)),'#FFE9A8',{em:1,cast:false});D(G.sph,M.chain(M.T(x-.78,y+.98+Math.sin(t*1.2+r.ph)*.08,z+.36),M.S(.25,.25,.12)),'#14102B',{cast:false})}
 // kavling kosong: petak siap bangun di seluruh peta, biar kelihatan kota masih bisa diisi
 const KAV=[];function initKav(){if(initKav.done)return;initKav.done=1;const used=(x,z,m)=>(window.KOTA_RS||[]).some(([a,b,c,d])=>x>a-m&&x<b+m&&z>c-m&&z<d+m)||BUILDINGS.some(B=>Math.hypot(B.x-x,B.z-z)<Math.max(B.w,B.d)*.7+3)||OBST.some(o=>o.c?Math.hypot(x-o.c[0],z-o.c[1])<o.c[2]+3:(x>o.b[0]-3&&x<o.b[1]+3&&z>o.b[2]-3&&z<o.b[3]+3));
-  let n=1;for(const [x,z] of [[24,-24]])KAV.push({x,z,n:n++});
+  let n=1;for(const [x,z] of [])KAV.push({x,z,n:n++});
   for(const [x,z] of [[48,24],[-48,-6],[48,-6]])if(!used(x,z,1))KAV.push({x,z,n:n++})}
 let kavTex=null;function kavSign(){return kavTex||(kavTex=texFromCanvas(signCanvas(512,192,(x,w,h)=>{x.fillStyle='#F4EFE6';x.fillRect(0,0,w,h);x.strokeStyle='#14102B';x.lineWidth=10;x.strokeRect(5,5,w-10,h-10);x.textAlign='center';x.textBaseline='middle';
   x.fillStyle='#14102B';x.font='900 58px Inter';x.fillText('KAVLING',w/2,h/2-22);x.fillStyle='#8A6A2E';x.font='800 34px Inter';x.fillText('siap dibangun',w/2,h/2+34)})))}
@@ -610,7 +610,8 @@ function tamanStatic(){const [x,z]=TAMAN;D(G.box,M.chain(M.T(x,.03,z),M.S(19,.05
 function tamanDyn(t){const [x,z]=TAMAN;D(G.sph,M.chain(M.T(x,1+Math.abs(Math.sin(t*3))*.3,z),M.S(.3,.5,.3)),'#BDF4FF',{em:.8,alpha:.7,cast:false})}
 // ---------- Seni Mart: minimarket warga di beberapa titik kota ----------
 // Seni Mart: alun-alun kanan & gerbang barat (yang di gerbang depan dihapus, blok itu khusus Panggung Debut)
-const MARTS=[[29.2,3.6],[-48,24]];
+// + Seni Mart dekat Blok Rumah Gratis (bekas kavling 24,-24 dan dua di belakang distrik) supaya warga tidak jalan terlalu jauh
+const MARTS=[[29.2,3.6],[-48,24],[24,-24],[-48,-96],[48,-96]];
 let martTex=null;function martSign(){return martTex||(martTex=texFromCanvas(signCanvas(1024,160,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,'#5B21E0');g.addColorStop(1,'#8A57FF');x.fillStyle=g;x.fillRect(0,0,w,h);
   x.fillStyle='#FFD23F';x.fillRect(0,h-14,w,14);x.textAlign='center';x.textBaseline='middle';x.fillStyle='#FFF7E8';x.font='900 92px Inter';x.fillText('🛒 SENI MART',w/2-60,h/2-2);
   x.fillStyle='#FFD23F';x.font='900 40px Inter';x.fillText('24 JAM',w-120,h/2-2)})))}
@@ -830,7 +831,7 @@ function staff(t){const dt=Math.min(.05,t-(staff.lt||t));staff.lt=t;if(!WALK.N)r
     const near=cam.dist<46&&Math.hypot(s2.x-cam.tx,s2.z-cam.tz)<Math.max(14,cam.dist*.55);AVA.body3D(s2.r,Wm,t,near,!!s2.mv);
     D(G.box,Wm(M.chain(M.T(.42,.42,.05),M.S(.08,.36,.42))),'#2A1C4F',{cast:false})}}
 // bersihkan gedung & pohon yang menimpa cluster, mansion, kantor
-{const RS=[];for(const x of GX)for(const z of GZ)RS.push([x-11,x+11,z-11,z+11]);for(const [x,z] of RES_LOTS)RS.push([x-11,x+11,z-11,z+11]);for(const Dd of DISTRIK)if(!Dd.musik)RS.push([Dd.bx-13,Dd.bx+13,Dd.bz-13,Dd.bz+13]);
+{const RS=[];for(const x of GX)for(const z of GZ)RS.push([x-11,x+11,z-11,z+11]);for(const [x,z] of RES_LOTS)RS.push([x-11,x+11,z-11,z+11]);for(const [x,z] of [[-48,-96],[48,-96]])RS.push([x-7,x+7,z-6,z+7]);for(const Dd of DISTRIK)if(!Dd.musik)RS.push([Dd.bx-13,Dd.bx+13,Dd.bz-13,Dd.bz+13]);
   const inR=(x,z,m)=>RS.some(([a,b,c,d])=>x>a-m&&x<b+m&&z>c-m&&z<d+m);
   for(let i=BUILDINGS.length-1;i>=0;i--){const B=BUILDINGS[i];if(inR(B.x,B.z,Math.max(B.w,B.d)*.6))BUILDINGS.splice(i,1)}
   for(let i=TREES.length-1;i>=0;i--)if(inR(TREES[i][0],TREES[i][1],.8))TREES.splice(i,1);
@@ -1096,7 +1097,7 @@ function playStep(t){const dt=Math.min(.05,t-lastT||0);lastT=t;if(!PLAY.on)retur
   {const np=Math.abs(PLAY.x)<12&&PLAY.z>-11&&PLAY.z<11;if(np!==PLAY.nearPlaza){PLAY.nearPlaza=np;window.dispatchEvent(new CustomEvent('kota-plaza',{detail:np}))}}}
 // tujuan jalan otomatis (warga harus datang ke tempatnya dulu)
 function placePt(k){if(k==='mart'){let b=null,bd=1e9;for(const [x,z] of MARTS){const d=Math.hypot(PLAY.x-x,PLAY.z-z-3);if(d<bd){bd=d;b=[x,z+3]}}return b}
-  if(k==='home'){const H=PLAY.r&&PLAY.r.house;return H?[H.door[0],H.door[2]+.9]:null}if(k==='plaza')return [0,5.2];if(k==='studio')return [STUDIO_DOOR[0],STUDIO_DOOR[1]+1];if(k==='kantor')return [ISR_DOOR[0],ISR_DOOR[1]+1];if(k==='blok'){const B=RUMAH.blocks&&RUMAH.blocks[0];return B?[B.bx,B.gz+1.2]:null}return null}
+  if(k==='home'){const H=PLAY.r&&PLAY.r.house;return H?[H.door[0],H.door[2]+.9]:null}if(k==='plaza')return [0,5.2];if(k==='studio')return [STUDIO_DOOR[0],STUDIO_DOOR[1]+1];if(k==='kantor')return [ISR_DOOR[0],ISR_DOOR[1]+1];if(k==='blok'){let b=null,bd=1e9;for(const B of (RUMAH.blocks||[])){const d=Math.hypot(PLAY.x-B.bx,PLAY.z-B.gz-1.2);if(d<bd){bd=d;b=[B.bx,B.gz+1.2]}}return b}return null}
 function nearPt(k){const b=placePt(k);return !!b&&Math.hypot(PLAY.x-b[0],PLAY.z-b[1])<2.8}
 function goTo(k){if(!PLAY.on)return false;const b=placePt(k);if(!b)return false;const near={mart:PLAY.nearMart>=0,home:PLAY.nearHome,plaza:PLAY.nearPlaza,studio:PLAY.nearStudio,kantor:nearPt('kantor'),blok:nearPt('blok')}[k];
   if(near){window.dispatchEvent(new CustomEvent('kota-arrive',{detail:k}));return true}if(!WALK.N)buildNodes();const P=route([PLAY.x,PLAY.z],b);if(!P)return false;PLAY.auto=P.slice();PLAY.autoK=k;lastInput=performance.now();return true}
