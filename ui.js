@@ -455,7 +455,7 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
    if(G.score>best)store.set('sgBest',G.score);G.done=(st?'⭐'.repeat(st)+' ':'')+(st>=2?'Rekaman jadi! Mantap':'Rekaman selesai')+' · '+G.score;$('sgStart').textContent='▶ Rekam lagi';
    $('sgBest').textContent='Akurasi '+Math.round(acc*100)+'% · skor terbaikmu '+Math.max(best,G.score);if(G.score>best&&best)toast('🏆 Rekor baru di Studio Rekaman: '+G.score);draw()}
  function stop(){if(G.run){G.run=false;duck(1);G.done='Rekaman dihentikan';$('sgStart').textContent='▶ Mulai rekam';cancelAnimationFrame(G.raf);draw()}}
- $('sgStart').onclick=()=>G.run?stop():start();
+ $('sgStart').onclick=()=>{if(G.run){stop();return}if(window.KOTA_KERJADI('studio',()=>open('studio')))start()};
  [...$('sgPads').children].forEach((b,i)=>b.addEventListener('pointerdown',e=>{e.preventDefault();press(i)}));
  addEventListener('keydown',e=>{if($('s-studio').hidden)return;const i=KEYS.indexOf(e.key.toLowerCase());if(i>=0){e.preventDefault();press(i)}});
  R.studio=()=>{const b=store.get('sgBest',0);$('sgBest').textContent=b?'Skor terbaikmu: '+b:'Belum pernah rekam. Coba dulu, 30 detik aja!';G.done='';draw()};
@@ -569,13 +569,16 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
  // tidur: avatar masuk rumah, Zzz kelihatan oleh semua warga
  window.KOTA_ZZ_SYNC=()=>{const me=store.get('me','');const n=now();const L=(window.KOTA_TIDUR||[]).map(x=>String(x).toLowerCase()).filter(x=>x!==me);if(n&&n.tidur&&me)L.push(me);K.setSleep&&K.setSleep(L)};
  const WHERE={roti:'mart',nasi:'mart',kopi:'mart',esteh:'mart',tidur:'home',mandi:'home',nongkrong:'plaza',dengar:'studio'};
- const PLACE={mart:['🛒','Seni Mart','Makanan & minuman cuma bisa dibeli di Seni Mart'],home:['🏠','rumahmu','Tidur & mandi harus di rumahmu sendiri'],plaza:['🎪','alun-alun','Nongkrong buat naikin mood harus di alun-alun'],studio:['🎧','Gedung Musik','Dengar sesi musik ada di Gedung Musik']};
+ const PLACE={mart:['🛒','Seni Mart','Makanan & minuman cuma bisa dibeli di Seni Mart'],home:['🏠','rumahmu','Tidur & mandi harus di rumahmu sendiri'],plaza:['🎪','alun-alun','Nongkrong buat naikin mood harus di alun-alun'],studio:['🎧','Gedung Musik','Dengar sesi musik ada di Gedung Musik'],kantor:['💼','Label Musik Office','Kerja kantoran harus di Label Musik Office'],blok:['📦','Blok Rumah Gratis','Kurir ambil paket di gerbang Blok Rumah Gratis']};
+ // kerja harus di tempat kerjanya: avatar jalan dulu, sampai baru mini game dibuka
+ const JOBPLACE={studio:'studio',beat:'studio',kantor:'kantor',kasir:'mart',warung:'plaza',bersih:'plaza',kurir:'blok'};const JOBNM={studio:'Studio Rekaman',beat:'Susun Beat',kantor:'Label Musik Office',kasir:'Kasir Pasar',warung:'Penjaga Warung',bersih:'Petugas Kebersihan',kurir:'Kurir Kota'};let PEND=null;
+ window.KOTA_KERJADI=(job,fn)=>{const k=JOBPLACE[job];if(!k||!store.get('me','')||K.near(k)){fn();return true}PEND={k,fn};toast('🚶 '+JOBNM[job]+' kerjanya di '+PLACE[k][1]+'. Avatarmu jalan ke sana dulu…');goPlace(k);return false};
  function goPlace(k){const P=PLACE[k];const N=now();if(N&&N.tidur){toast('😴 Avatarmu lagi tidur. Bangun dulu ya');return}
    const go=()=>{if(K.goTo&&K.goTo(k))toast(P[0]+' Avatarmu jalan ke '+P[1]+'… (geser joystick buat jalan sendiri)');else toast('Jalannya ketutup. Coba jalan sedikit pakai joystick dulu')};
    if(!K.playing){closeAll();const ok=window.KOTA_PLAY&&window.KOTA_PLAY.enter();if(ok===false)return;setTimeout(go,400)}else{closeAll();go()}}
  window.KOTA_GO=goPlace;
  addEventListener('kota-arrive',e=>{const k=e.detail;sfx('place');setTimeout(()=>arrived(k),250)});
- function arrived(k){if(k==='mart')open('mart');else if(k==='home'){const me=K.byName.get(store.get('me',''));if(me)window.KOTA_ROOM(me)}
+ function arrived(k){if(PEND&&PEND.k===k){const f=PEND.fn;PEND=null;toast('📍 Sampai di '+PLACE[k][1]+'. Selamat kerja!');f();return}if(k==='mart')open('mart');else if(k==='home'){const me=K.byName.get(store.get('me',''));if(me)window.KOTA_ROOM(me)}
    else if(k==='plaza')toast('🎪 Sampai di alun-alun! Ketuk tombol Nongkrong');else if(k==='studio')toast('🎧 Sampai di Gedung Musik! Ketuk Dengar sesi musik')}
  addEventListener('kota-mart',e=>{$('martIn').hidden=!(e.detail>=0)});$('martIn').onclick=()=>open('mart');
  addEventListener('kota-plaza',e=>{$('plazaIn').hidden=!e.detail});$('plazaIn').onclick=()=>aksi('nongkrong','🎪 Seru nongkrong, mood +12');
@@ -626,7 +629,6 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
    const st=n.lemas?'<span class="avst bad">😩 Lemas ('+(n.lapar<=0?'kelaparan':'kehabisan energi')+') · makan / tidur dulu</span>':n.inspirasi<5?'<span class="avst warn">✨ Inspirasi habis · kerja seni belum bisa, jelajah distrik lain</span>':n.energi<20?'<span class="avst warn">🥱 Capek · tidur dulu</span>':'<span class="avst ok">🙂 Segar · siap kerja</span>';
    b.innerHTML=`<div class="avtop">${document.querySelector('.playbig .pe').innerHTML}<div><b>${me.own?'👑 President':'@'+esc(me.u)}</b><small>${me.pk&&K.PROF[me.pk]?K.PROF[me.pk].ic+' ':''}${esc(me.p||'Warga')} · ${KAR[n.karier||0]} (${n.kerja||0}× kerja) · <a href="#" data-pf="1" style="color:var(--yellow)">ganti profesi</a></small>${st}</div><div class="avkoin"><small>Koin Nada</small><b>${(AK.p&&AK.p.koin)||n.koin||0}</b></div></div>
    <div class="avbars">${NB.map(([k,ic,nm,c])=>`<div class="avb"><span>${ic} ${nm}</span><i><b style="width:${Math.round(n[k])}%;background:${c}"></b></i><em>${Math.round(n[k])}</em></div>`).join('')}</div>
-   <h3>Tampilanku</h3><div id="lookUI" class="lookui"></div>
    <h3>Kerja</h3><div class="avact"><button class="btn" type="button" data-av="kerja">🎙️ Sesi Rekaman<small>Distrik Musik · seni · +20–60 koin</small></button><button class="btn" type="button" data-av="pusat">🏙️ Kerja Pusat Kota<small>non-seni · +10–36 koin · tanpa inspirasi</small></button><button class="btn" type="button" data-av="kantor">💼 Kerja Kantoran<small>Label Musik Office · non-seni</small></button></div>
    ${n.tidur?`<div class="zzcard"><span class="zi">😴</span><div><b>Lagi tidur di rumah</b><small>Energi naik ±1 per menit · bangun sendiri kalau penuh</small></div><button class="btn" type="button" data-av="bangun">☀️ Bangun</button></div>`:''}
    <h3>Seni Mart</h3>${K.near('mart')?`<div class="avact"><button class="btn ghost" type="button" data-av="roti">🍞 Roti<small>−15 koin · +25 lapar</small></button><button class="btn ghost" type="button" data-av="nasi">🍚 Nasi<small>−30 koin · +50 lapar</small></button><button class="btn ghost" type="button" data-av="kopi">☕ Kopi<small>−12 koin · +15 energi</small></button><button class="btn ghost" type="button" data-av="esteh">🧋 Es Teh<small>−8 koin · +5 mood</small></button></div>`:`<div class="goto"><span>🛒 Makan & minum harus beli langsung di Seni Mart</span><button class="btn" type="button" data-goto="mart">🚶 Ke Seni Mart</button></div>`}
@@ -635,9 +637,10 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
    ${K.near('studio')?`<div class="avact"><button class="btn ghost" type="button" data-av="dengar">🎧 Dengar sesi di Gedung Musik<small>+18 inspirasi${cdTxt(n,'dengar')}</small></button></div>`:`<div class="goto"><span>🎧 Inspirasi dari dengar sesi di Gedung Musik</span><button class="btn" type="button" data-goto="studio">🚶 Ke Gedung Musik</button></div>`}
    <h3>✨ Jelajah distrik</h3><p class="muted">Inspirasi naik paling banyak (+25) kalau kamu jalan ke distrik <b>di luar</b> bidangmu (distrik sendiri +8, tiap distrik sekali per 30 menit). Mainkan avatarmu lalu jalan masuk ke distrik mana saja.</p>
    <ul class="lbc"><li>🍞 Lapar / ⚡ Energi habis = <b>lemas</b>: duduk lesu di depan rumah, belum bisa kerja. Warga lain bisa menyemangati.</li><li>🫧 Kebersihan habis = mood turun 2x lebih cepat.</li><li>😊 Mood habis = gaji kerja dipotong 40%.</li><li>✨ Inspirasi habis = kerja seni belum bisa (kerja Pusat Kota tetap bisa). Inspirasi di atas 70 = gaji seni +20%.</li></ul>
-   <p class="muted">Semua bar turun pelan, juga waktu kamu offline.</p>`;
-   lookUI(me);b.querySelectorAll('[data-goto]').forEach(x=>x.onclick=()=>goPlace(x.dataset.goto));b.querySelectorAll('[data-pf]').forEach(x=>x.onclick=()=>{window.KOTA_PF.pk=null;open('profesi')});
-     b.querySelectorAll('[data-av]').forEach(x=>x.onclick=()=>{const j=x.dataset.av;if(j==='kerja'){open('studio');return}if(j==='kantor'){open('kantor');return}if(j==='pusat'){open('pusat');return}if(j==='bangun'){aksi('bangun','');return}
+   <p class="muted">Semua bar turun pelan, juga waktu kamu offline.</p>
+   <details class="lkdet" id="lkDet"${store.get('lkOpen',0)?' open':''}><summary>🎨 Tampilanku <small>warna kulit & rambut · ketuk buka/tutup</small></summary><div id="lookUI" class="lookui"></div></details>`;
+   lookUI(me);$('lkDet').ontoggle=()=>store.set('lkOpen',$('lkDet').open?1:0);b.querySelectorAll('[data-goto]').forEach(x=>x.onclick=()=>goPlace(x.dataset.goto));b.querySelectorAll('[data-pf]').forEach(x=>x.onclick=()=>{window.KOTA_PF.pk=null;open('profesi')});
+     b.querySelectorAll('[data-av]').forEach(x=>x.onclick=()=>{const j=x.dataset.av;if(j==='kerja'){window.KOTA_KERJADI('studio',()=>open('studio'));return}if(j==='kantor'){window.KOTA_KERJADI('kantor',()=>open('kantor'));return}if(j==='pusat'){open('pusat');return}if(j==='bangun'){aksi('bangun','');return}
      const L={kopi:'☕ Energi +15',esteh:'🧋 Mood +5',roti:'🍞 Nyam! Lapar +25',nasi:'🍚 Kenyang! Lapar +50',tidur:'😴 Tidur',mandi:'🚿 Segar! Kebersihan +50',nongkrong:'🎪 Seru nongkrong, mood +12',dengar:'🎧 Dapat inspirasi baru, +18'};aksi(j,L[j])})};
  $('needHud').onclick=()=>open('avatar');
  // Tahap 2: masuk distrik saat main = inspirasi
@@ -667,7 +670,7 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
   window.KOTA_BEAT=()=>{open('pusat');setTimeout(()=>choose('beat'),50)};
   R.pusat=()=>{if(G.run)return;if(G.job==='beat'&&window.__beatOpen){window.__beatOpen=0;return}G.job=null;$('h-pusat').textContent='🏙️ Kerja Pusat Kota';$('pjSub').textContent='Profesi non-seni: bayaran lebih kecil, tapi tidak butuh inspirasi. Cocok buat warga baru!';$('pjJobs').hidden=false;$('pjGame').hidden=true;$('pjStart').hidden=true;$('pjBack').hidden=true;$('pjPay').innerHTML='';
     $('pjJobs').innerHTML=Object.entries(JOBS).map(([k,[ic,nm,ds]])=>`<button type="button" data-pj="${k}"><i>${ic}</i><b>${nm}</b><small>${ds}</small></button>`).join('');$('pjJobs').querySelectorAll('[data-pj]').forEach(b=>b.onclick=()=>choose(b.dataset.pj))};
-  $('pjStart').onclick=()=>{if(G.run)finish();else start()};$('pjBack').onclick=()=>R.pusat()}
+  $('pjStart').onclick=()=>{if(G.run)finish();else{const jb=G.job;if(window.KOTA_KERJADI(jb,()=>{open('pusat');setTimeout(()=>choose(jb),80)}))start()}};$('pjBack').onclick=()=>R.pusat()}
  let lastMe=null;setInterval(()=>{const me=store.get('me','');if(me!==lastMe){lastMe=me;NS.n=null;draw();load()}else draw()},5000);
  setInterval(load,90000);setTimeout(load,1500)}
 
@@ -684,7 +687,7 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
  function finish(){if(!KG.run)return;KG.run=false;clearTimeout(KG.timer);for(let i=0;i<9;i++)setCell(i,false);$('kgStart').textContent='▶ Kerja lagi';const acc=Math.max(0,Math.min(1,KG.tot?(KG.hit-KG.miss*.5)/KG.tot:0));
    $('kgPay').innerHTML='Menghitung gaji…';if(window.KOTA_KERJA)window.KOTA_KERJA(acc,'kantor').then(h=>{$('kgPay').innerHTML=`<span>✅ ${KG.hit} dari ${KG.tot} tugas (${Math.round(acc*100)}%)</span><br>`+h});const best=store.get('kgBest',0);if(KG.hit>best)store.set('kgBest',KG.hit)}
  R.kantor=()=>{grid();if(!KG.run){for(let i=0;i<9;i++)setCell(i,false);const b=store.get('kgBest',0);$('kgBest').textContent=b?'Rekor tugasmu: '+b:'Belum pernah kerja kantoran. Cuma 25 detik!';KG.end=performance.now();$('kgScore').textContent='Siap kerja';$('kgTime').textContent='25 dtk'}};
- if($('kgStart'))$('kgStart').onclick=()=>{if(KG.run)finish();else start()}}
+ if($('kgStart'))$('kgStart').onclick=()=>{if(KG.run)finish();else if(window.KOTA_KERJADI('kantor',()=>open('kantor')))start()}}
 // ---------- KARYA WARGA: kirim, lihat, moderasi ----------
 {const JN={gambar:'🎨 Gambar / ilustrasi',foto:'📷 Foto',lagu:'🎵 Lagu',video:'🎬 Video'};
  async function loadKarya(){try{const j=await fetch('/api/akun?a=karya').then(r=>r.json());window.KOTA_KARYA=j.karya||[];if(K.setKarya)K.setKarya(window.KOTA_KARYA)}catch(e){}}
