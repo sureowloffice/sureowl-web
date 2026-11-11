@@ -44,6 +44,26 @@ const DTS=(x,z,y=.07)=>({x,y,z});
 // Reel KTW: Vilindo mengumumkan dari Panggung Debut, kamera agak jauh di antara warga
 SHOTS['vilindo-umum-a']={f:(u,ts=0)=>({yaw:.08+L(-.06,.04,u),pitch:L(.2,.24,u),dist:L(15,12.5,E(u)),tx:-2.2,ty:1.6,tz:19.6}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_ktw1.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:Math.PI}};
 SHOTS['vilindo-umum-b']={f:(u,ts=0)=>({yaw:-.1+L(0,.1,u),pitch:L(.24,.2,u),dist:L(12.5,14.5,E(u)),tx:-2.2,ty:1.6,tz:19.6}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_ktw8.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:Math.PI}};
+// ===== Reel DAY 3 "8 Menit Sebelum Debut" — tokoh @daffaaa_39 (rumah Blok N, gerbang -24,-134.9) =====
+const D3U='daffaaa_39',GX=-24,GZ=-134.9,PI=Math.PI;
+const D3H=(keys,o={})=>Object.assign({u:D3U,k:'musik',ps:'gitaris',keys},o);
+SHOTS['d3-gerbang']={f:(u,ts=0)=>({yaw:L(.3,.12,u),pitch:L(.32,.36,u),dist:L(5.2,4.4,E(u)),tx:GX-.2,ty:.9,tz:GZ-.6}),jam:18.8,
+  hero:D3H([[0,GX+.4,GZ+1.8,PI,1],[1.5,GX,GZ-.8,PI,1],[1.7,GX,GZ-.8,0,0],[3.5,GX,GZ-.8,0,0]],{lemas:[[1.75,99]]}),
+  vilp:{x:GX-1.7,z:GZ-1.6,yaw:.7,wave:1}};
+SHOTS['d3-lemas']={f:(u,ts=0)=>({yaw:.05+L(0,-.08,u),pitch:L(.3,.34,u),dist:L(3.3,2.7,E(u)),tx:GX,ty:.8,tz:GZ-.8}),jam:18.8,
+  hero:D3H([[0,GX,GZ-.8,0,0]],{lemas:[[0,99]]}),vilp:{x:GX-1.7,z:GZ-1.6,yaw:.7}};
+SHOTS['d3-kantong']={f:(u,ts=0)=>({yaw:-.3+L(0,.08,u),pitch:L(.42,.38,u),dist:L(3.6,3.1,E(u)),tx:GX,ty:.75,tz:GZ-.8}),jam:18.8,
+  hero:D3H([[0,GX,GZ-.8,0,0]],{lemas:[[0,99]]}),vilp:{x:GX-1.7,z:GZ-1.6,yaw:.7}};
+SHOTS['d3-atas']={f:(u,ts=0)=>({yaw:0,pitch:1.45,dist:22,tx:GX,ty:0,tz:GZ}),jam:15,hero:D3H([[0,GX,GZ,0,0]]),vilp:{x:GX+3,z:GZ,yaw:0}};
+const MX=-49.5,MZ0=-94.2,DEBL3=['cherrys_fully','freezzzwy','rasyaaa77155','zaaa_114467','daffaaa_39'];
+SHOTS['d3-kasir']={f:(u,ts=0)=>({yaw:.15+L(-.05,.05,u),pitch:L(.34,.3,u),dist:L(5.6,4.4,E(u)),tx:MX,ty:1,tz:MZ0}),jam:18.8,
+  hero:D3H([[0,MX,MZ0,0,0]],{lemas:[[0,.25]],coins:[.3,.7,1.1,1.5,1.9]})};
+SHOTS['d3-makan']={f:(u,ts=0)=>({yaw:.35+L(0,.2,u),pitch:L(.3,.28,u),dist:L(4.4,5.6,E(u)),tx:MX+L(0,1.2,u),ty:1,tz:MZ0}),jam:18.8,
+  hero:D3H([[0,MX,MZ0,0,0],[1.1,MX,MZ0,0,0],[1.25,MX,MZ0,1.57,1],[2.6,MX+4.5,MZ0+.3,1.57,1]],{eat:.05})};
+SHOTS['d3-panggung-a']={f:(u,ts=0)=>({yaw:.08+L(-.06,.04,u),pitch:L(.2,.24,u),dist:L(15,12,E(u)),tx:-1.2,ty:1.6,tz:19.6}),jam:19.2,q:'debut=1',warm:16.53,debl:DEBL3,debPer:5,talk:'data/talk_d3a.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:PI}};
+SHOTS['d3-panggung-b']={f:(u,ts=0)=>({yaw:-.12+L(0,.1,u),pitch:L(.16,.12,u),dist:L(10,7.5,E(u)),tx:-.6,ty:2,tz:19.2}),jam:19.2,q:'debut=1',warm:22.13,debl:DEBL3,debPer:5,talk:'data/talk_d3b.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:PI}};
+SHOTS['d3-penutup']={f:(u,ts=0)=>({yaw:-.05+L(0,.08,u),pitch:L(.22,.2,u),dist:L(12.5,11,E(u)),tx:-1.8,ty:1.6,tz:19.6}),jam:19.2,q:'debut=1',warm:24.93,debl:DEBL3,debPer:5,talk:'data/talk_d3c.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:PI}};
+SHOTS['d3-mart-uji']={f:(u,ts=0)=>({yaw:.15,pitch:.38,dist:6,tx:-49.5,ty:1,tz:-94.2}),jam:18.8,hero:D3H([[0,-49.5,-94.2,0,0]])};
 SHOTS['evo-cepat']={f:(u,ts=0)=>PUNCH({yaw:L(.12,.3,u),pitch:L(.3,.4,E(u)),dist:L(8,12,E(u)),tx:0,tz:24.2},ts,.55),jam:16,evo:{t0:.5,spread:.9,R:4.2,jit:.25,cx:0,cz:24.2,grid:1}};
 SHOTS['vilindo-punch']={f:(u,ts=0)=>({yaw:.1+L(-.06,.06,u)+Math.sin(ts*1.7)*.02,pitch:.12+Math.sin(ts*2.3)*.01,dist:L(5.2,3.3,E(Math.min(1,u*2.2))),tx:-2.7,ty:1.55,tz:19.2}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_day2.json'};
 SHOTS['telur-sapu']={f:(u,ts=0)=>({yaw:L(-.35,.45,E(u)),pitch:L(.22,.4,u),dist:L(6.5,13,E(u)),tx:0,tz:24.2}),jam:16,evo:{t0:999,spread:0,R:1,jit:0,cx:0,cz:24.2,grid:1,idle:1}};
@@ -61,6 +81,15 @@ if(S.talk){const V0="mascot([p[0],p[1],p[2]],yaw,t,{squash:";if(!patched.include
 let engineP=null;if(S.talk){engineP=fs.readFileSync(path.join(REPO,'engine.js'),'utf8');const M0="const base=M.chain(M.T(pos[0],by,pos[2]),M.RY(yaw));",SM="D(G.sph,W(M.chain(M.T(0,ey-.33,.7),M.S(.12,.05,.05))),C.ink);";
   if(!engineP.includes(M0)||!engineP.includes(SM))throw new Error('patch mulut gagal');
   engineP=engineP.replace(M0,"const base=M.chain(M.T(pos[0],by,pos[2]),M.RY(yaw),M.RZ(o.tilt||0));").replace(SM,"if((o.mouth||0)>.06){const mo=o.mouth;D(G.sph,W(M.chain(M.T(0,ey-.27-mo*.03,.8),M.S(.12+mo*.04,.035+mo*.1,.07))),'#2A0F1F');D(G.sph,W(M.chain(M.T(0,ey-.3-mo*.07,.83),M.S(.07+mo*.03,.02+mo*.035,.05))),'#FF6F91',{cast:false})}else "+SM)}
+if(S.hero){const R0='function resident(r,t,hi){const p=resPos(r,t);',Y0='M.RY(yaw),lm?M.RX(.35)',MV='const mv=!!(r.w&&!r.slot&&r.w.mv)';
+  for(const k of [R0,Y0,MV,'function ownerFx(p,t){'])if(!patched.includes(k))throw new Error('patch hero gagal: '+k);
+  const DL='for(const r of DEBUT.L)if(r.onStage&&r.i>=260&&r!==selected)resident(r,t,true);';if(!patched.includes(DL))throw new Error('patch hero draw gagal');
+  patched=patched.replace(DL,DL+'if(window.__HERO){const h=RES.find(r=>r.u.toLowerCase()===window.__HERO.u);if(h&&h.i>=260&&!h.onStage)resident(h,t,false)}');
+  patched=patched.replace(R0,'function resident(r,t,hi){const p=(window.__HERO&&__heroPos(r,t))||resPos(r,t);').replace(Y0,'M.RY(r.__hy!=null&&window.__HERO&&r.u.toLowerCase()===window.__HERO.u?r.__hy:yaw),lm?M.RX(.35)').replace(MV,'const mv=!!(window.__HERO&&r.u.toLowerCase()===window.__HERO.u&&r.__hmv)||!!(r.w&&!r.slot&&r.w.mv)').replace('function ownerFx(p,t){',fs.readFileSync(path.join(__dirname,'hero_patch.js'),'utf8')+'\nfunction ownerFx(p,t){')}
+if(S.vilp){const V0="mascot([p[0],p[1],p[2]],yaw,t,{squash:";if(!patched.includes(V0))throw new Error('patch vilp gagal');
+  patched=patched.replace(V0,"if(window.__VILP){const V=window.__VILP;mascot([V.x,V.y||0,V.z],V.yaw,t,{squash:0,look:[0,.08],wave:V.wave?Math.max(0,Math.sin(t*5)):0,point:V.point||0});return}"+V0)}
+if(S.debl){const D0='const L=RES.filter(r=>r.i>11&&!r.own&&!r.q).slice(-5)';if(!patched.includes(D0))throw new Error('patch debl gagal');
+  patched=patched.replace(D0,'const L=(window.__DEBL||[]).map(u=>RES.find(r=>r.u===u)).filter(Boolean)').replace('per:7,intro:9','per:'+(S.debPer||5)+',intro:2').replace('const per=L.length>60?4:L.length>30?5.5:7','const per=DEBUT.per')}
 if(S.evo){const A='M.S(s*(2-chew),s*(lm?.82:1)*chew,s));const Wm=m=>M.mul(B,m);';const R0='function resident(r,t,hi){const p=resPos(r,t);';const Y0='M.RY(yaw),lm?M.RX(.35)';if(!patched.includes(A)||!patched.includes(R0)||!patched.includes(Y0))throw new Error('patch evo gagal');
   patched=patched.replace(A,'M.S(s*(2-chew),s*(lm?.82:1)*chew,s));let Wm=m=>M.mul(B,m);if(window.__EVO&&__evoDraw(r,p,t,B,f=>{Wm=f}))return;').replace(R0,'function resident(r,t,hi){const p=(window.__EVO&&__evoPos(r))||resPos(r,t);').replace(Y0,'M.RY(r.__evoP?r.__evoY:yaw),lm?M.RX(.35)').replace('function ownerFx(p,t){',fs.readFileSync(path.join(__dirname,'evo_patch.js'),'utf8')+'\nfunction ownerFx(p,t){')}
 const CT={'.js':'text/javascript','.html':'text/html','.json':'application/json','.png':'image/png'};
@@ -75,6 +104,7 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const p=await b.newPage({viewport:{width:W,height:H},deviceScaleFactor:DPR});
   await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
   await p.addInitScript(()=>{let T=0;const q=[];const B0=Date.now();Date.now=()=>B0+T;window.__adv=ms=>{T+=ms;q.splice(0).forEach(f=>f(T))};performance.now=()=>T;window.requestAnimationFrame=f=>{q.push(f);return q.length}});
+  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl},{hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null});
   await p.addStyleTag({content:''}).catch(()=>{});
   await p.goto(`http://localhost:${port}/kota.html?nowl=1&jam=${S.jam||21}${S.fest?'&fest=1':''}${S.q?'&'+S.q:''}`);
   await p.addStyleTag({content:'body *{visibility:hidden!important;animation:none!important}#gl{visibility:visible!important}'});
@@ -85,6 +115,6 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const WF=20+Math.round((process.env.WARM!=null?+process.env.WARM:(S.warm||0))*30);for(let i=0;i<WF;i++)await p.evaluate(c=>{window.__CAM=c;__adv(33.33)},cam0); // pemanasan
   const ff=spawn('ffmpeg',['-y','-loglevel','error','-f','image2pipe','-framerate',String(FPS),'-c:v','mjpeg','-i','-','-c:v','libx264','-preset','veryfast','-crf','16','-pix_fmt','yuv420p',out]);
   const done=new Promise((res,rej)=>ff.on('close',c=>c===0?res():rej(new Error('ffmpeg '+c))));
-  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
+  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__HERO)window.__HERO.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
     if(!ff.stdin.write(Buffer.from(d,'base64')))await new Promise(r=>ff.stdin.once('drain',r));if(i%45==0)console.log(name,i,'/',NF)}
   ff.stdin.end();await done;await b.close();srv.close();console.log('selesai',out)});
