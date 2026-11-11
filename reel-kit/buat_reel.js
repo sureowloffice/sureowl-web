@@ -33,8 +33,8 @@ if(VO){const sp=R.voSegs?{segs:R.voSegs,n:R.voSegs.length}:JSON.parse(sh('python
 let t=0;const sfx=[];for(const s of R.scenes){s.t0=t;if(s._vo)potong.push([s._vo,t+(s.voAt??.12)]);for(const [a,k] of (s.sfx||[]))sfx.push([t+a,k]);t+=s.dur}const DUR=+t.toFixed(2);
 console.log(`▶ ${SERI} · ${R.scenes.length} adegan · ${DUR} dtk${VO?' · pakai VO':' · tanpa VO'}`);
 // ---------- shot kota (adegan berurutan dengan shot sama = satu klip) ----------
-const groups=[];for(const s of R.scenes){const g=groups[groups.length-1];if(g&&g.shot===s.shot&&!s.potong)g.dur+=s.dur;else groups.push({shot:s.shot,dur:s.dur})}
-const wver=wj.update||'';const jobs=groups.map((g,i)=>{const f=path.join(DIR,'cache',`${g.shot}_${g.dur.toFixed(2)}_${wver}_${live._diambil||''}.mp4`.replace(/[: +]/g,'-'));return {g,f}});
+const groups=[];for(const s of R.scenes){const g=groups[groups.length-1];if(!s.klip&&g&&!g.klip&&g.shot===s.shot&&!s.potong)g.dur+=s.dur;else groups.push({shot:s.shot||'klip',dur:s.dur,klip:s.klip})}
+const wver=wj.update||'';const jobs=groups.map((g,i)=>{if(g.klip)return {g,f:g.klip};const f=path.join(DIR,'cache',`${g.shot}_${g.dur.toFixed(2)}_${wver}_${live._diambil||''}.mp4`.replace(/[: +]/g,'-'));return {g,f}});
 (async()=>{
   const CEPAT=!!opt('--cepat');if(CEPAT)jobs.length=0;
   const todo=jobs.filter(j=>!fs.existsSync(j.f));const uniq=[...new Map(todo.map(j=>[j.f,j])).values()];
