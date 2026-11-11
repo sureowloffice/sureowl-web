@@ -66,7 +66,9 @@ function drawScene(sc,lt,full){const u=lt/.45;if(sc.flash!=null&&!full){const q=
   if(sc.kartu){const k=sc.kartu;const kt=lt-(k.mulai||.25);if(kt>0)CARDS[k.tipe](k,kt/.45,kt)}
   if(sc.bawah){const by=sc.yBawah||H-330;pop((lt-.3)/.45,()=>rich(sc.bawah,W/2,by,sc.ukuranBawah||54,{w8:800}),W/2,by)}
   if(sc.footer!==false&&(sc.cta||sc.footer))footer(cl(lt*3))}
-window.render=t=>{X.clearRect(0,0,W,H);const S=SPEC.scenes;let i=S.findIndex(s=>t>=s.t0&&t<s.t0+s.dur);if(i<0)i=S.length-1;const sc=S[i];if(!sc)return;drawScene(sc,t-sc.t0)};
+function subDraw(t){const L=(SPEC.subs||[]).find(s=>t>=s[0]&&t<s[1]+.05);if(!L||!L[2])return;X.save();X.font=`800 50px ${F}`;X.textAlign='center';X.textBaseline='middle';const w=Math.min(W-80,X.measureText(L[2]).width+64),y=H*.805;
+  X.globalAlpha=Math.min(1,(t-L[0])/.08);rr(W/2-w/2,y-42,w,84,22);X.fillStyle='rgba(12,9,28,.78)';X.fill();X.fillStyle='#FFFFFF';X.fillText(L[2],W/2,y+2);X.restore()}
+window.render=t=>{X.clearRect(0,0,W,H);const S=SPEC.scenes;let i=S.findIndex(s=>t>=s.t0&&t<s.t0+s.dur);if(i<0)i=S.length-1;const sc=S[i];if(!sc)return;drawScene(sc,t-sc.t0);subDraw(t)};
 // cover: judul besar di atas foto kota
 window.renderCover=cv=>{X.clearRect(0,0,W,H);const g=X.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(14,8,40,.55)');g.addColorStop(.45,'rgba(14,8,40,.15)');g.addColorStop(.75,'rgba(14,8,40,.35)');g.addColorStop(1,'rgba(14,8,40,.85)');X.fillStyle=g;X.fillRect(0,0,W,H);
   if(cv.pill)pill(cv.pill.t,cv.pill.c||'#FF4B5C',W/2,330,52);

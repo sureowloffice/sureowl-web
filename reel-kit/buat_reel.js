@@ -31,6 +31,11 @@ if(VO){const sp=R.voSegs?{segs:R.voSegs,n:R.voSegs.length}:JSON.parse(sh('python
   if(sp.n!==voScenes.length)console.log(`⚠️ VO kebaca ${sp.n} potong, adegan ber-VO ${voScenes.length}. Cek jeda antar baris.`);
   voScenes.forEach((si,k)=>{const sg=sp.segs[k];if(!sg)return;const L=sg[1]-sg[0];const sc=R.scenes[si];if(!sc.kunci)sc.dur=Math.max(sc.min||1.6,+(L+(sc.ekor??.45)).toFixed(2));sc._vo=sg})}
 let t=0;const sfx=[];for(const s of R.scenes){s.t0=t;if(s._vo)potong.push([s._vo,t+(s.voAt??.12)]);for(const [a,k] of (s.sfx||[]))sfx.push([t+a,k]);t+=s.dur}const DUR=+t.toFixed(2);
+// subtitle: potongan 2–4 kata mengikuti VO (R.subtitle=true); sc.subs=[[detik,teks],...] untuk timing manual
+const SUBS=[];if(R.subtitle)for(const s of R.scenes){if(!s._vo||!s.vo)continue;const st=s.t0+(s.voAt??.12),L=s._vo[1]-s._vo[0];
+  const man=s.subs;if(man){man.forEach(([a,tx],k)=>{const b=k+1<man.length?man[k+1][0]:L;SUBS.push([st+a,st+b,tx])});continue}
+  const w=s.vo.replace(/\s+/g,' ').trim().split(' ');const ch=[];let cur=[];for(const x of w){cur.push(x);if(cur.length>=4||/[.!?…,]$/.test(x)&&cur.length>=2){ch.push(cur.join(' '));cur=[]}}if(cur.length)ch.push(cur.join(' '));
+  const tot=ch.reduce((a,c)=>a+c.length,0);let a=0;for(const c of ch){const d=L*c.length/tot;SUBS.push([st+a,st+a+d,c]);a+=d}}
 console.log(`▶ ${SERI} · ${R.scenes.length} adegan · ${DUR} dtk${VO?' · pakai VO':' · tanpa VO'}`);
 // ---------- shot kota (adegan berurutan dengan shot sama = satu klip) ----------
 const groups=[];for(const s of R.scenes){const g=groups[groups.length-1];if(!s.klip&&g&&!g.klip&&g.shot===s.shot&&!s.potong)g.dur+=s.dur;else groups.push({shot:s.shot||'klip',dur:s.dur,klip:s.klip})}
@@ -51,7 +56,7 @@ const wver=wj.update||'';const jobs=groups.map((g,i)=>{if(g.klip)return {g,f:g.k
   sh('python3',['audio_mix.py','mix',path.join(OUT,'_audio.json'),path.join(OUT,'_audio.wav')]);
   // overlay teks/kartu
   console.log('✍️  render teks…');const b=await chromium.launch();const p=await b.newPage({viewport:{width:1080,height:1920}});
-  await p.goto('file://'+path.join(DIR,'overlay.html'));await p.evaluate(()=>document.fonts.ready);await p.evaluate(s=>setSpec(s),{scenes:R.scenes});
+  await p.goto('file://'+path.join(DIR,'overlay.html'));await p.evaluate(()=>document.fonts.ready);await p.evaluate(s=>setSpec(s),{scenes:R.scenes,subs:SUBS});
   const final=path.join(OUT,`KotaSeni_${TGL}_${SERI}.mp4`);const NF=Math.round(DUR*30);
   const ff=spawn('ffmpeg',['-y','-loglevel','error','-i',path.join(OUT,'_bg.mp4'),'-f','image2pipe','-framerate','30','-c:v','png','-i','-','-i',path.join(OUT,'_audio.wav'),
     '-filter_complex','[0:v][1:v]overlay=0:0:shortest=1,format=yuv420p[v]','-map','[v]','-map','2:a','-c:v','libx264','-preset','veryfast','-crf','18','-c:a','aac','-b:a','192k','-r','30','-t',String(DUR),'-movflags','+faststart',final]);
