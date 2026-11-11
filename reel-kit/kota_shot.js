@@ -58,8 +58,8 @@ SHOTS['d3-atas']={f:(u,ts=0)=>({yaw:0,pitch:1.45,dist:22,tx:GX,ty:0,tz:GZ}),jam:
 const MX=-50.9,MZ0=-93.6,DEBL3=['cherrys_fully','freezzzwy','rasyaaa77155','zaaa_114467','daffaaa_39'];
 SHOTS['d3-kasir']={f:(u,ts=0)=>({yaw:-.2+L(-.05,.05,u),pitch:L(.55,.5,u),dist:L(6,4.8,E(u)),tx:MX,ty:.7,tz:MZ0}),jam:18.8,
   hero:D3H([[0,MX,MZ0,0,0]],{lemas:[[0,.25]],coins:[.3,.7,1.1,1.5,1.9]})};
-SHOTS['d3-makan']={f:(u,ts=0)=>({yaw:-.4+L(0,.2,u),pitch:L(.5,.45,u),dist:L(5,6.5,E(u)),tx:MX+L(0,2.2,u),ty:.7,tz:MZ0}),jam:18.8,
-  hero:D3H([[0,MX,MZ0,0,0],[1.1,MX,MZ0,0,0],[1.25,MX,MZ0,1.57,1],[2.6,MX+4.5,MZ0+.3,1.57,1]],{eat:.05})};
+SHOTS['d3-makan']={f:(u,ts=0)=>({yaw:-.2,pitch:L(.45,.4,u),dist:L(5,6.2,E(u)),tx:MX-L(0,.8,u),ty:.7,tz:MZ0+L(0,1.8,u)}),jam:18.8,
+  hero:D3H([[0,MX,MZ0,0,0],[1.1,MX,MZ0,0,0],[1.2,MX,MZ0,-.35,1],[2.6,MX-1.3,MZ0+3.4,-.35,1]],{eat:.05})};
 SHOTS['d3-panggung-a']={f:(u,ts=0)=>({yaw:.08+L(-.06,.04,u),pitch:L(.2,.24,u),dist:L(15,12,E(u)),tx:-1.2,ty:1.6,tz:19.6}),jam:19.2,q:'debut=1',warm:16.53,debl:DEBL3,debPer:5,talk:'data/talk_d3a.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:PI}};
 SHOTS['d3-panggung-b']={f:(u,ts=0)=>({yaw:-.12+L(0,.1,u),pitch:L(.16,.12,u),dist:L(10,7.5,E(u)),tx:-.6,ty:2,tz:19.2}),jam:19.2,q:'debut=1',warm:22.13,debl:DEBL3,debPer:5,talk:'data/talk_d3b.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:PI}};
 SHOTS['d3-penutup']={f:(u,ts=0)=>({yaw:-.05+L(0,.08,u),pitch:L(.22,.2,u),dist:L(12.5,11,E(u)),tx:-1.8,ty:1.6,tz:19.6}),jam:19.2,q:'debut=1',warm:24.93,debl:DEBL3,debPer:5,talk:'data/talk_d3c.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:PI}};

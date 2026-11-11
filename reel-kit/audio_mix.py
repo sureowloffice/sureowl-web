@@ -33,6 +33,10 @@ def krak(d=.5):
     th=np.sin(2*np.pi*(140*np.exp(-t*9))*t)*np.exp(-t*10)*1.1
     pop=np.sin(2*np.pi*(900-600*t/d)*t)*np.exp(-t*30)*.35
     return hi+th+pop
+def ting(d=.6,f=1760):
+    t=np.arange(int(d*SR))/SR;return (np.sin(2*np.pi*f*t)+.4*np.sin(2*np.pi*f*2.01*t))*np.exp(-t*7)*.5
+def koin():
+    a=ting(.35,2093);b=ting(.45,2637);z=np.zeros(int(.5*SR));z[:len(a)]+=a;z[int(.07*SR):int(.07*SR)+len(b)]+=b[:len(z)-int(.07*SR)];return z
 def boom(d=1.2):
     t=np.arange(int(d*SR))/SR;return np.sin(2*np.pi*(70*np.exp(-t*2.5))*t)*np.exp(-t*3)*1.2
 if sys.argv[1]=='split':
@@ -53,7 +57,7 @@ else:
         i=int((c-.3)*SR)
         if 0<=i<N-len(w):out[i:i+len(w)]+=w[:,None]*np.array([.8,1.0])
     for tt,kind in R.get('sfx',[]):
-        z=krak() if kind=='krak' else boom();i=int(tt*SR)
+        z={'krak':krak,'boom':boom,'ting':ting,'koin':koin}.get(kind,boom)();i=int(tt*SR)
         if 0<=i<N:z=z[:N-i];out[i:i+len(z)]+=z[:,None]*.55
     fade=int(.6*SR);out[-fade:]*=np.linspace(1,0,fade)[:,None]
     out/=max(1e-6,np.abs(out).max())/.89

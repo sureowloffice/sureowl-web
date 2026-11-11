@@ -61,7 +61,7 @@ function drawScene(sc,lt,full){const u=lt/.45;if(sc.flash!=null&&!full){const q=
   const g=X.createLinearGradient(0,0,0,560);g.addColorStop(0,'rgba(14,8,40,.55)');g.addColorStop(1,'rgba(14,8,40,0)');X.fillStyle=g;X.fillRect(0,0,W,560);
   let y=sc.yAtas||250;
   if(sc.pill){pop(u,()=>pill(sc.pill.t,sc.pill.c,W/2,y,sc.pill.s||46),W/2,y);y+=125}
-  if(sc.atas){pop((lt-.08)/.45,()=>rich(sc.atas,W/2,y,sc.ukuran||76),W/2,y)}
+  if(sc.atas){pop((lt-(sc.tAtas??.08))/.45,()=>rich(sc.atas,W/2,y,sc.ukuran||76),W/2,y)}
   if(sc.besar){const cy=sc.yBesar||H*.36;pop((lt-(sc.tBesar||.05))/.5,()=>rich(sc.besar,W/2,cy,sc.ukuranBesar||190,{lh:1.0}),W/2,cy)}
   if(sc.kartu){const k=sc.kartu;const kt=lt-(k.mulai||.25);if(kt>0)CARDS[k.tipe](k,kt/.45,kt)}
   if(sc.bawah){const by=sc.yBawah||H-330;pop((lt-.3)/.45,()=>rich(sc.bawah,W/2,by,sc.ukuranBawah||54,{w8:800}),W/2,by)}
