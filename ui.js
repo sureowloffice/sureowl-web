@@ -328,6 +328,13 @@ function coinFx(t){const b=$('walletBtn');const f=document.createElement('span')
 function lvBar(p){const span=p.nextExp-p.prevExp||1,pr=Math.max(0,Math.min(1,(p.exp-p.prevExp)/span));return `<div class="lvl"><b>Lv ${p.level}</b><div class="prog"><i style="width:${pr*100}%"></i></div><small>${p.exp}/${p.nextExp} EXP</small></div>`}
 async function topHTML(){try{const j=await (await fetch('/api/akun?a=top')).json();if(!j.top||!j.top.length)return '<p class="muted">Belum ada. Jadilah yang pertama absen!</p>';
   return '<ol class="papan">'+j.top.map((t,i)=>`<li${t.u===store.get('me','')?' class="me"':''}><span class="rk">${['🥇','🥈','🥉'][i]||(i+1)}</span>${avatar(t.u,26)}<b>@${esc(t.u)}</b><small>Lv ${t.level} · ${t.exp} EXP</small></li>`).join('')+'</ol>'}catch(e){return ''}}
+const PERABOT_GRATIS=['🛋️','🛏️','🪑','📺','🪴','💡','📚','🖼️','☕'];
+const TOKO=[['🕯️','Lilin Aroma',20],['🌵','Kaktus Mini',25],['🧸','Boneka Beruang',30],['🎤','Mic Panggung',40],['🎧','Headphone Studio',40],['🎨','Palet Lukis',40],['🎸','Gitar',60],['🥁','Drum',60],['🎥','Kamera Film',60],['🪕','Banjo',70],['🎹','Keyboard',80],['🎮','Konsol Game',90],['🔮','Bola Kristal',90],['🪩','Disco Ball',100],['🐠','Akuarium Ikan',120],['🏆','Piala Emas',150],['🐱','Kucing',200],['🐶','Anjing',200]];
+function tokoHTML(p){const inv=(p&&p.inv)||[];return `<div class="toko"><b>🛋️ Toko Perabot</b><small>Beli sekali, taruh di rumahmu sepuasnya. Perabot dasar (sofa, kasur, kursi, TV, tanaman, lampu, buku, lukisan, kopi) gratis.</small><div class="tokoGrid">${TOKO.map(([e,nm,h])=>{const ada=inv.includes(e),kurang=p&&p.koin<h;return `<button type="button" class="tk${ada?' ada':''}" data-beli="${e}" ${ada?'disabled':''}><span class="e">${e}</span><span class="nm">${esc(nm)}</span><span class="h">${ada?'✓ Punya':(kurang?'🔒 ':'🪙 ')+h}</span></button>`}).join('')}</div></div>`}
+function bindToko(){document.querySelectorAll('[data-beli]').forEach(b=>b.onclick=async()=>{const e=b.dataset.beli,t=TOKO.find(x=>x[0]===e);if(!t)return;
+  if(AK.p&&AK.p.koin<t[2]){toast('🪙 Koin Nada kurang. '+t[1]+' harganya '+t[2]+', punyamu '+AK.p.koin+'. Kerja atau kerjain misi dulu!');return}
+  if(!confirmBeli(b,t))return;b.disabled=true;try{const j=await api('beli',{e});AK.p=j.profil;pillUpdate();sfx('coin');coinFx('−'+t[2]);toast('🛍️ '+t[1]+' '+e+' masuk ke rumahmu! Masuk rumah → pilih '+e+' → ketuk lantai');R.akun()}catch(err){b.disabled=false;toast(err.message)}})}
+function confirmBeli(b,t){if(b.dataset.ok)return true;document.querySelectorAll('[data-beli].tanya').forEach(x=>{x.classList.remove('tanya');delete x.dataset.ok;x.querySelector('.h').textContent='🪙 '+TOKO.find(y=>y[0]===x.dataset.beli)[2]});b.classList.add('tanya');b.dataset.ok='1';b.querySelector('.h').textContent='Beli '+t[2]+'?';return false}
 R.akun=async()=>{const me=store.get('me',''),b=$('akunBody');
   if(!me){b.innerHTML=`<p class="muted" style="margin:0 0 10px">Masuk pakai username Instagram yang udah jadi warga. Kumpulin <b>Koin Nada</b> dari misi harian, naik level, dan nanti belanja perabot rumah & kostum.</p>`+balaiForm().replace('Ambil kartu','Masuk')+`<h3 class="h3">🏆 Warga Teraktif</h3><div id="topBox"></div>`;
     $('bf').onsubmit=async e=>{e.preventDefault();const q=$('bq').value.trim().replace(/^@/,'').toLowerCase();if(!K.byName.get(q)){$('bq').value='';$('bq').placeholder='@'+q+' belum terdaftar';return}
@@ -339,9 +346,9 @@ R.akun=async()=>{const me=store.get('me',''),b=$('akunBody');
   b.innerHTML=`<div class="wallet">${avatar(me,54)}<div><b>@${esc(me)}${p.verified?' <span class="ver" title="Terverifikasi KTW">✓</span>':''}</b><small>${esc(r?r.jab:'Warga')} · ${esc(r?r.p||'':'')}</small></div><div class="coin"><span>🪙</span><b>${p.koin}</b><small>Koin Nada</small></div></div>`+
     lvBar(p)+`<div class="streak">🔥 Absen beruntun <b>${p.streak} hari</b>${p.absenHariIni?' · sudah absen hari ini':''}</div>`+
     (p.verified?ktwDone(r):ktwHTML())+
-    `<div class="item soon"><span class="ic">🛋️</span><span><b>Toko Perabot & Kostum</b><small>Segera buka. Koin Nada-mu bisa dipakai beli perabot rumah, topi, alat musik, dan hewan peliharaan.</small></span></div>`+
+    tokoHTML(p)+
     `<h3 class="h3">🏆 Warga Teraktif</h3><div id="topBox"></div><p style="margin-top:12px"><button class="btn dark" type="button" id="akOut">Keluar</button></p>`;
-  $('akOut').onclick=()=>{store.set('me','');AK.p=null;pillUpdate();R.akun()};bindKTW();$('topBox').innerHTML=await topHTML()};
+  $('akOut').onclick=()=>{store.set('me','');AK.p=null;pillUpdate();R.akun()};bindKTW();bindToko();$('topBox').innerHTML=await topHTML()};
 function ktwPend(kode){return `<div class="kode">${esc(kode)}</div><small>1) Salin kode di atas  2) Kirim lewat <b>DM Instagram</b> dari akun @${esc(store.get('me',''))} ke <b>@viralindongid</b>  3) Diverifikasi maks. <b>12 jam</b> (Wali Kota cek DM tiap 10.30 & 21.30 WIB).</small><div class="ktwWait">⏳ <b>Menunggu dicek Wali Kota</b><br><small>Sudah kirim DM? Tenang, kodemu tersimpan di sini. Begitu dicek, centang ✓ dan 50 Koin Nada langsung muncul.</small></div><p style="display:flex;gap:8px;margin-top:8px"><button class="btn dark" type="button" id="ktwCp">Salin kode</button><a class="btn" href="https://ig.me/m/viralindongid" target="_blank" rel="noopener">Buka DM</a></p>`}
 function ktwDone(r){return `<div class="ktwok"><b>🪪 KTW kamu sudah aktif</b>${r?idPreview(r,true):''}<ul><li>🔒 <b>Username terkunci</b>: cuma kamu yang bisa pakai</li><li>📱 <b>Bisa main di HP mana pun</b></li><li>✓ <b>Centang biru</b> di akunmu</li><li>🪙 <b>+50 Koin Nada</b> &amp; 50 EXP</li></ul></div>`}
 function ktwHTML(){const k=store.get('ktwKode:'+store.get('me',''),'');return `<div class="ktw"><b>✓ Ambil KTW (Kartu Tanda Warga)</b><small>Dapat centang terverifikasi + 50 Koin Nada, dan username-mu terkunci: cuma kamu yang bisa pakai, di HP mana pun.</small><div id="ktwBox">${k?ktwPend(k):'<button class="btn" type="button" id="ktwGo">Minta kode verifikasi</button>'}</div></div>`}
@@ -466,7 +473,8 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
 
 // ---------- RUMAH: masuk rumah, tiap warga punya layout & dekorasi sendiri ----------
 {const cv=$('roomCv'),cx=cv.getContext('2d');const N=6,TW=100,TH=50,OX=360,OY=170,WH=170;
- const ITEMS=['🛋️','🛏️','🪑','📺','🪴','💡','📚','🖼️','🎸','🥁','🎹','🎤','🎧','🎨','🎥','🔮','🧸','🏆','🪩','🐱','☕','🕯️'];
+ const ITEMS=PERABOT_GRATIS.concat(TOKO.map(t=>t[0]));
+ const bisa=e=>PERABOT_GRATIS.includes(e)||((AK.p&&AK.p.inv)||[]).includes(e)||(RM.awal||[]).includes(e);
  const FLOOR=['#C98B52','#6C4AB6','#2EC4B6','#E0855A','#3A2C5E','#9BB8D3'],WALL=['#FFE6F2','#E8E1FF','#E1FFF6','#FFF1D6','#2A1C4F','#38E1FF'];
  const RM={r:null,d:null,edit:false,sel:'🪴'};
  function defDeco(r){let h=7;for(const ch of r.u)h=(h*31+ch.charCodeAt(0))>>>0;const P={perkusi:'🥁',bass:'🎸',gitar:'🎸',terompet:'🎺',mic2:'🎤',kuas:'🎨',clip:'📚',keytar:'🎹',laptop:'🎧',vinyl:'🪩',palet:'🎨',tatu:'🖼️',spray:'🎨',tablet:'🖼️',kamera:'🎥',kamvid:'🎥',clapper:'🎥',hp:'📺',palu:'🏆',pot:'🪴',pita:'🪩',buku:'📚',topeng:'🖼️',kartu:'🔮'}[r.prop]||(r.grp==='edit'?'🎥':r.grp==='tarot'?'🔮':'📺');
@@ -495,12 +503,12 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
  cv.addEventListener('click',e=>{if(!RM.edit)return;const p=tileAt(e);if(!p)return;const d=RM.d;const k=d.it.findIndex(a=>a[0]===p[0]&&a[1]===p[1]);
    if(RM.sel==='🧽'){if(k>=0){d.it.splice(k,1);sfx('erase')}}else{if(k>=0)d.it.splice(k,1);if(d.it.length<40){d.it.push([p[0],p[1],RM.sel]);sfx('place')}}RM.dirty=true;draw(p)});
  function tools(){const t=$('roomTools');if(!RM.edit){t.innerHTML=`<p class="muted">${RM.r.own?'Istana Seni President':'Rumah @'+esc(RM.r.u)} · hanya pemilik rumah yang bisa dekor.</p>`;return}
-   t.innerHTML=`<div class="rpal">${['🧽',...ITEMS].map(e=>`<button type="button" data-it="${e}" class="${e===RM.sel?'on':''}" aria-label="${e==='🧽'?'Hapus perabot':'Pilih '+e}">${e}</button>`).join('')}</div>
+   t.innerHTML=`<div class="rpal">${['🧽',...ITEMS].map(e=>{const ok=e==='🧽'||bisa(e);return `<button type="button" data-it="${e}" class="${e===RM.sel?'on':''}${ok?'':' lock'}" aria-label="${e==='🧽'?'Hapus perabot':(ok?'Pilih ':'Beli di Toko: ')+e}">${e}</button>`}).join('')}</div><small class="muted">🔒 = belum punya, beli di Toko Perabot (menu 🪙 Akun)</small>
    <div class="rrow"><span>Lantai</span>${FLOOR.map((c,i)=>`<button type="button" data-f="${i}" style="background:${c}" class="sw${RM.d.f===i?' on':''}" aria-label="Warna lantai ${i+1}"></button>`).join('')}</div>
    <div class="rrow"><span>Dinding</span>${WALL.map((c,i)=>`<button type="button" data-w="${i}" style="background:${c}" class="sw${RM.d.w===i?' on':''}" aria-label="Warna dinding ${i+1}"></button>`).join('')}</div>
    <div class="row"><button class="btn ghost" type="button" id="roomSleep">🛏️ Tidur (sampai energi penuh)</button><button class="btn ghost" type="button" id="roomBath">🚿 Mandi</button></div>
    <div class="row"><button class="btn" type="button" id="roomSave">💾 Simpan dekorasi</button><button class="btn ghost" type="button" id="roomReset">↺ Atur ulang</button></div>`;
-   t.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{RM.sel=b.dataset.it;tools()});
+   t.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{const e=b.dataset.it;if(e!=='🧽'&&!bisa(e)){const x=TOKO.find(y=>y[0]===e);toast('🔒 '+(x?x[1]+' ('+x[2]+' 🪙)':e)+' belum kamu punya. Beli dulu di Toko Perabot, menu 🪙 Akun');return}RM.sel=e;tools()});
    t.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{RM.d.f=+b.dataset.f;RM.dirty=true;tools();draw()});
    t.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{RM.d.w=+b.dataset.w;RM.dirty=true;tools();draw()});
    $('roomSleep').onclick=()=>window.KOTA_AKSI('tidur','😴 Tidur');$('roomBath').onclick=()=>window.KOTA_AKSI('mandi','🚿 Segar! Kebersihan +50');
@@ -508,8 +516,8 @@ R.galeri=()=>{const L=window.KOTA_KARYA||[];
    $('roomSave').onclick=async()=>{store.set('deco_'+RM.r.u.toLowerCase(),RM.d);try{await api('rumah',{deco:RM.d});RM.dirty=false;sfx('coin');toast('🏠 Dekorasi rumahmu tersimpan! Warga lain bisa lihat waktu mampir')}catch(e){toast('🏠 Tersimpan di HP ini. '+(e.message||'Sambungan ke server lagi gangguan'))}}}
  async function enterRoom(r){if(!r)return;if(r.nohouse){toast('🏗️ @'+r.u+' belum punya rumah. Komen di postingan @viralindongid buat dapat rumah');return}const me=store.get('me','');RM.r=r;RM.edit=!!me&&me===r.u.toLowerCase();RM.d=null;RM.dirty=false;RM.sel='🪴';
    $('roomT').textContent=r.own?'👑 Istana Seni President':'🏠 Rumah @'+r.u;$('roomSub').textContent=RM.edit?'Pilih perabot di bawah, lalu ketuk lantai buat menaruh. 🧽 buat menghapus.':(r.own?'President lagi di rumah':(r.p||'Warga Kota Seni'));
-   open('room');sfx('door');RM.d=store.get('deco_'+r.u.toLowerCase(),null)||defDeco(r);tools();draw();
-   try{const j=await (await fetch('/api/akun?a=rumah&u='+encodeURIComponent(r.u.toLowerCase()))).json();if(j&&j.deco&&RM.r===r&&!RM.dirty){RM.d=j.deco;tools();draw()}}catch(e){}}
+   open('room');sfx('door');RM.d=store.get('deco_'+r.u.toLowerCase(),null)||defDeco(r);RM.awal=RM.d.it.map(a=>a[2]);tools();draw();
+   try{const j=await (await fetch('/api/akun?a=rumah&u='+encodeURIComponent(r.u.toLowerCase()))).json();if(j&&j.deco&&RM.r===r&&!RM.dirty){RM.d=j.deco;RM.awal=j.deco.it.map(a=>a[2]);tools();draw()}}catch(e){}}
  window.KOTA_ROOM=enterRoom}
 
 // ---------- KARTU INFO GEDUNG (ketuk gedung di peta) ----------

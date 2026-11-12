@@ -47,6 +47,17 @@ const LP = { absen: 5, misi: 1, karya: 15, baru: 10, fest: 10, vote: 3 };
 const festWin = (ms = Date.now()) => { const sat = wkStart(ms) + 5 * 864e5; const mulai = sat + 20 * 36e5; return { tgl: new Date(sat + 7 * 36e5).toISOString().slice(0, 10), mulai, akhir: mulai + 36e5 } };
 const FEST_KOIN = 30;
 // Voting Gedung: buka Rabu 00.00 – Sabtu 23.59 WIB, pemenang dibangun & diumumkan Minggu
+// Toko Perabot: perabot dasar gratis, barang spesial dibeli pakai Koin Nada (tersimpan di inv:<u>)
+const PERABOT_GRATIS = ['🛋️','🛏️','🪑','📺','🪴','💡','📚','🖼️','☕'];
+const TOKO = [
+  { e: '🕯️', nm: 'Lilin Aroma', h: 20, kat: 'hiasan' }, { e: '🌵', nm: 'Kaktus Mini', h: 25, kat: 'hiasan' }, { e: '🧸', nm: 'Boneka Beruang', h: 30, kat: 'hiasan' },
+  { e: '🎤', nm: 'Mic Panggung', h: 40, kat: 'seni' }, { e: '🎧', nm: 'Headphone Studio', h: 40, kat: 'seni' }, { e: '🎨', nm: 'Palet Lukis', h: 40, kat: 'seni' },
+  { e: '🎸', nm: 'Gitar', h: 60, kat: 'seni' }, { e: '🥁', nm: 'Drum', h: 60, kat: 'seni' }, { e: '🎥', nm: 'Kamera Film', h: 60, kat: 'seni' }, { e: '🪕', nm: 'Banjo', h: 70, kat: 'seni' },
+  { e: '🎹', nm: 'Keyboard', h: 80, kat: 'seni' }, { e: '🎮', nm: 'Konsol Game', h: 90, kat: 'hiasan' }, { e: '🔮', nm: 'Bola Kristal', h: 90, kat: 'hiasan' },
+  { e: '🪩', nm: 'Disco Ball', h: 100, kat: 'hiasan' }, { e: '🐠', nm: 'Akuarium Ikan', h: 120, kat: 'hewan' }, { e: '🏆', nm: 'Piala Emas', h: 150, kat: 'hiasan' },
+  { e: '🐱', nm: 'Kucing', h: 200, kat: 'hewan' }, { e: '🐶', nm: 'Anjing', h: 200, kat: 'hewan' }
+];
+const TOKO_E = TOKO.map(t => t.e);
 const GEDUNG = [
   { id: 'galeri', nm: 'Galeri & Studio Lukis', ic: '🎨', kaw: 'rupa', ds: 'Pameran lukisan, ilustrasi & mural warga' },
   { id: 'pertunjukan', nm: 'Gedung Pertunjukan & Sanggar Latihan', ic: '💃', kaw: 'tari', ds: 'Panggung tari & teater, ruang latihan' },
@@ -162,15 +173,15 @@ function send(res, code, obj) {
 
 async function profil(u) {
   const d = today();
-  const [koin, exp, streak, last, done, ver, chatc, pr, lk] = await redis([
+  const [koin, exp, streak, last, done, ver, chatc, pr, lk, inv] = await redis([
     ['GET', 'koin:' + u], ['GET', 'exp:' + u], ['GET', 'streak:' + u], ['GET', 'absen:' + u],
-    ['SMEMBERS', 'misi:' + u + ':' + d], ['GET', 'ver:' + u], ['GET', 'chatc:' + u + ':' + d], ['HGET', 'prof', u], ['HGET', 'look', u]
+    ['SMEMBERS', 'misi:' + u + ':' + d], ['GET', 'ver:' + u], ['GET', 'chatc:' + u + ':' + d], ['HGET', 'prof', u], ['HGET', 'look', u], ['SMEMBERS', 'inv:' + u]
   ]);
   const e = +exp || 0, lv = level(e);
   return {
     u, koin: +koin || 0, exp: e, level: lv, nextExp: 25 * lv * lv, prevExp: 25 * (lv - 1) * (lv - 1),
     streak: last === d || last === yesterday() ? (+streak || 0) : 0, absenHariIni: last === d,
-    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d, prof: normProf(pr), look: lk || null
+    misi: done || [], verified: !!ver, chatHariIni: +chatc || 0, tanggal: d, prof: normProf(pr), look: lk || null, inv: (inv || []).filter(e => TOKO_E.includes(e))
   };
 }
 
@@ -214,6 +225,7 @@ module.exports = async (req, res) => {
         res.setHeader('Cache-Control', 'public, max-age=30');
         return send(res, 200, body);
       }
+      if (q.get('a') === 'toko') { res.setHeader('Cache-Control', 'public, max-age=300'); return send(res, 200, { gratis: PERABOT_GRATIS, toko: TOKO }) }
       if (q.get('a') === 'rumah') { // dekorasi rumah warga (publik, hanya baca)
         const ru = String(q.get('u') || '').toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 40);
         if (!ru) return send(res, 400, { error: 'Username tidak valid.' });
@@ -417,13 +429,30 @@ module.exports = async (req, res) => {
     }
     if (a === 'rumah') { // simpan dekorasi rumah sendiri
       const d = body.deco || {};
-      const ITEMS = ['🛋️','🛏️','🪑','📺','🪴','💡','📚','🖼️','🎸','🥁','🎹','🎤','🎧','🎨','🎥','🔮','🧸','🏆','🪩','🐱','☕','🕯️'];
-      const it = (Array.isArray(d.it) ? d.it : []).slice(0, 40).filter(a => Array.isArray(a) && Number.isInteger(a[0]) && Number.isInteger(a[1]) && a[0] >= 0 && a[0] < 6 && a[1] >= 0 && a[1] < 6 && ITEMS.includes(a[2])).map(a => [a[0], a[1], a[2]]);
+      const ITEMS = PERABOT_GRATIS.concat(TOKO_E);
+      const [oldv, inv] = await redis([['GET', 'rumah:' + u], ['SMEMBERS', 'inv:' + u]]);
+      // barang toko boleh ditaruh kalau sudah dibeli, atau memang sudah ada di dekorasi lama (tidak dihilangkan), atau dekorasi bawaan (maks. 4 barang spesial di simpanan pertama)
+      let lama = {}; try { for (const a of ((oldv ? JSON.parse(oldv) : {}).it || [])) lama[a[2]] = (lama[a[2]] || 0) + 1 } catch (e) { }
+      const punya = new Set(inv || []); let bawaan = oldv ? 0 : 4;
+      const it = (Array.isArray(d.it) ? d.it : []).slice(0, 40).filter(a => Array.isArray(a) && Number.isInteger(a[0]) && Number.isInteger(a[1]) && a[0] >= 0 && a[0] < 6 && a[1] >= 0 && a[1] < 6 && ITEMS.includes(a[2]))
+        .filter(a => { const e = a[2]; if (PERABOT_GRATIS.includes(e) || punya.has(e)) return true; if (lama[e] > 0) { lama[e]--; return true } if (bawaan > 0) { bawaan--; return true } return false }).map(a => [a[0], a[1], a[2]]);
       const deco = { f: Math.max(0, Math.min(5, d.f | 0)), w: Math.max(0, Math.min(5, d.w | 0)), it };
       const [rl] = await redis([['SET', 'rlr:' + u, '1', 'NX', 'PX', '3000']]);
       if (!rl) return send(res, 429, { error: 'Tunggu sebentar sebelum simpan lagi.' });
       await redis([['SET', 'rumah:' + u, JSON.stringify(deco)]]);
       return send(res, 200, { ok: true, deco });
+    }
+    if (a === 'beli') { // Toko Perabot: beli 1 barang pakai Koin Nada (sekali beli, bisa ditaruh berkali-kali)
+      const item = TOKO.find(t => t.e === String(body.e || ''));
+      if (!item) return send(res, 400, { error: 'Barang ini nggak ada di toko.' });
+      const [rl] = await redis([['SET', 'rlb:' + u, '1', 'NX', 'PX', '1500']]);
+      if (!rl) return send(res, 429, { error: 'Tunggu sebentar ya.' });
+      const [kv, ada] = await redis([['GET', 'koin:' + u], ['SISMEMBER', 'inv:' + u, item.e]]);
+      if (+ada) return send(res, 409, { error: 'Kamu sudah punya ' + item.nm + '.' });
+      if ((+kv || 0) < item.h) return send(res, 402, { error: 'Koin Nada kurang. Butuh ' + item.h + ' 🪙, punyamu ' + (+kv || 0) + '. Kerja atau kerjain misi dulu!' });
+      const [sisa] = await redis([['DECRBY', 'koin:' + u, String(item.h)], ['SADD', 'inv:' + u, item.e]]);
+      if (+sisa < 0) { await redis([['INCRBY', 'koin:' + u, String(item.h)], ['SREM', 'inv:' + u, item.e]]); return send(res, 402, { error: 'Koin Nada kurang.' }) }
+      return send(res, 200, { ok: true, e: item.e, nm: item.nm, koin: +sisa, profil: await profil(u) });
     }
     if (a === 'semangat') { // semangati warga lemas: sekali sehari per warga yang disemangati, +10 mood
       const t = String(body.t || '').toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 40);
