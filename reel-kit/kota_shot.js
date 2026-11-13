@@ -73,6 +73,28 @@ SHOTS['telur-kamu']={f:(u,ts=0)=>({yaw:L(.3,.05,u),pitch:.26,dist:L(9,5.5,E(u)),
 SHOTS['distrik-semua']={f:u=>({yaw:L(.2,.3,u),pitch:.62,dist:L(118,110,u),tx:0,tz:-40}),jam:20};
 SHOTS['vilindo-close']={f:u=>({yaw:.1,pitch:.12,dist:3.6,tx:-2.7,ty:1.55,tz:19.2}),jam:19.5,q:'debut=1',warm:12};
 SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),tx:24,tz:26}),jam:17};
+
+// ===== Reel DAY 4 "Kota ini mau bangun gedung baru" (gaya seri harian) — lahan di barat distrik =====
+{const SX=-84,SZ=-56,VX=-84,VZ=-44.5,J=16,ST=(o)=>Object.assign({x:SX,z:SZ,r:10},o),V=(o)=>Object.assign({x:VX,z:VZ,yaw:0},o);
+ const TL=n=>'data/talk_'+n+'.json';
+ SHOTS['d4-buka']={f:(u,ts=0)=>({yaw:L(.14,.04,u),pitch:L(.17,.14,u),dist:L(6.8,4.6,E(u)),tx:VX,ty:1.35,tz:VZ}),jam:J,site:ST({}),vilp:V({}),talk:TL('d4-buka')};
+ SHOTS['d4-kosong']={f:(u,ts=0)=>({yaw:.45,pitch:L(.8,.85,u),dist:L(52,72,E(u)),tx:SX,ty:0,tz:SZ+4}),jam:J,site:ST({}),vilp:V({}),talk:TL('d4-kosong')};
+ SHOTS['d4-ribut']={f:u=>({yaw:L(.25,.4,u),pitch:.62,dist:L(120,104,E(u)),tx:-30,tz:-50}),jam:J,site:ST({})};
+ SHOTS['d4-lahan']={f:(u,ts=0)=>({yaw:L(.3,.18,u),pitch:L(.32,.36,u),dist:L(15,12,E(u)),tx:VX,ty:1,tz:VZ-3}),jam:J,site:ST({lampu:1}),vilp:V({yaw:Math.PI}),talk:TL('d4-lahan')};
+ SHOTS['d4-muka']={f:(u,ts=0)=>PUNCH({yaw:L(-.05,.04,u),pitch:.12,dist:L(3.6,3.2,u),tx:VX,ty:1.45,tz:VZ},ts,1.4),jam:J,site:ST({}),vilp:V({}),talk:TL('d4-muka')};
+ SHOTS['d4-semua']={f:u=>({yaw:L(-.1,.05,u),pitch:.72,dist:L(95,85,E(u)),tx:0,tz:-48}),jam:J,site:ST({})};
+ const G4=(k,o)=>{const [x,z]=KAW[k];return {f:u=>({yaw:ISO+L(o[0],o[1],u),pitch:o[2],dist:L(o[3],o[4],E(u)),tx:x,tz:z+o[5]}),jam:J}};
+ SHOTS['d4-film']=G4('film',[.15,-.05,.5,26,17,8]);
+ SHOTS['d4-rupa-a']=G4('rupa',[-.2,0,.55,30,22,6]);
+ SHOTS['d4-rupa-b']={f:u=>({yaw:L(2.3,2.55,u),pitch:.5,dist:L(23,16,E(u)),tx:-48,tz:-22}),jam:J};
+ SHOTS['d4-tradisi']=G4('tradisi',[-.15,0,.5,24,19,8]);
+ SHOTS['d4-tari']=G4('tari',[.1,-.05,.5,24,19,8]);
+ SHOTS['d4-sastra']=G4('sastra',[-.1,.05,.5,24,19,8]);
+ SHOTS['d4-alat']={f:(u,ts=0)=>({yaw:L(.55,.45,u),pitch:.42,dist:L(34,30,E(u)),tx:SX,ty:2,tz:SZ+2}),jam:J,site:ST({alat:[0,1.4],crane:[.1,1.7]}),vilp:V({}),talk:TL('d4-alat')};
+ SHOTS['d4-tanya']={f:(u,ts=0)=>({yaw:L(-.12,-.02,u),pitch:L(.15,.12,u),dist:L(5,3.4,E(u)),tx:VX,ty:1.45,tz:VZ}),jam:J,site:ST({alat:[-2,-1],crane:[-2,-1]}),vilp:V({}),talk:TL('d4-tanya')};
+ SHOTS['d4-cta']={f:(u,ts=0)=>({yaw:L(.2,.45,u),pitch:L(.38,.42,u),dist:L(26,32,E(u)),tx:SX,ty:2,tz:SZ+4}),jam:J,site:ST({alat:[-2,-1],crane:[-2,-1],lampu:1}),vilp:V({point:1}),talk:TL('d4-cta')};
+}
+if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
 module.exports={SHOTS};
 if(require.main!==module)return;
 const [name,dur,out]=[process.argv[2],+process.argv[3],process.argv[4]];const S=SHOTS[name];if(!S){console.error('shot tidak ada: '+name+'\nPilihan: '+Object.keys(SHOTS).join(', '));process.exit(1)}
@@ -87,6 +109,11 @@ if(S.hero){const R0='function resident(r,t,hi){const p=resPos(r,t);',Y0='M.RY(ya
   const DL='for(const r of DEBUT.L)if(r.onStage&&r.i>=260&&r!==selected)resident(r,t,true);';if(!patched.includes(DL))throw new Error('patch hero draw gagal');
   patched=patched.replace(DL,DL+'if(window.__HERO){const h=RES.find(r=>r.u.toLowerCase()===window.__HERO.u);if(h&&h.i>=260&&!h.onStage)resident(h,t,false)}');
   patched=patched.replace(R0,'function resident(r,t,hi){const p=(window.__HERO&&__heroPos(r,t))||resPos(r,t);').replace(Y0,'M.RY(r.__hy!=null&&window.__HERO&&r.u.toLowerCase()===window.__HERO.u?r.__hy:yaw),lm?M.RX(.35)').replace(MV,'const mv=!!(window.__HERO&&r.u.toLowerCase()===window.__HERO.u&&r.__hmv)||!!(r.w&&!r.slot&&r.w.mv)').replace('function ownerFx(p,t){',fs.readFileSync(path.join(__dirname,'hero_patch.js'),'utf8')+'\nfunction ownerFx(p,t){')}
+if(S.site){const DL='for(const r of DEBUT.L)if(r.onStage&&r.i>=260&&r!==selected)resident(r,t,true);';if(!patched.includes(DL)||!patched.includes('function ownerFx(p,t){'))throw new Error('patch site gagal');
+  patched=patched.replace(DL,DL+'if(window.__SITE)__siteDraw(t);').replace('function ownerFx(p,t){',fs.readFileSync(path.join(__dirname,'site_patch.js'),'utf8')+'\nfunction ownerFx(p,t){')}
+if(S.talk&&S.vilp){const TK0='const TK=window.__TALK;if(TK){const m=TK.m,ti=TK.T;';if(!patched.includes(TK0))throw new Error('patch talk+vilp gagal');
+  patched=patched.replace(TK0,TK0+'if(window.__VILP){p[0]=__VILP.x;p[2]=__VILP.z;p[1]=(__VILP.y||0)+(p[1]-(p[1]|0))*0}const yaw=window.__VILP?__VILP.yaw+(__VILP.pt?0:0):__yaw0;').replace("const yaw=v.mv||talking?v.yaw:v.yaw+Math.sin(t*.8)*.4;","const yaw=v.mv||talking?v.yaw:v.yaw+Math.sin(t*.8)*.4,__yaw0=yaw;");
+  patched=patched.replace("point:Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6)","point:window.__VILP&&__VILP.point!=null?__VILP.point:Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6)")}
 if(S.vilp){const V0="mascot([p[0],p[1],p[2]],yaw,t,{squash:";if(!patched.includes(V0))throw new Error('patch vilp gagal');
   patched=patched.replace(V0,"if(window.__VILP){const V=window.__VILP;mascot([V.x,V.y||0,V.z],V.yaw,t,{squash:0,look:[0,.08],wave:V.wave?Math.max(0,Math.sin(t*5)):0,point:V.point||0});return}"+V0)}
 if(S.debl){const D0='const L=RES.filter(r=>r.i>11&&!r.own&&!r.q).slice(-5)';if(!patched.includes(D0))throw new Error('patch debl gagal');
@@ -105,7 +132,7 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const p=await b.newPage({viewport:{width:W,height:H},deviceScaleFactor:DPR});
   await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
   await p.addInitScript(()=>{let T=0;const q=[];const B0=Date.now();Date.now=()=>B0+T;window.__adv=ms=>{T+=ms;q.splice(0).forEach(f=>f(T))};performance.now=()=>T;window.requestAnimationFrame=f=>{q.push(f);return q.length}});
-  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl},{hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null});
+  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site)},{hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
   await p.addStyleTag({content:''}).catch(()=>{});
   await p.goto(`http://localhost:${port}/kota.html?nowl=1&jam=${S.jam||21}${S.fest?'&fest=1':''}${S.q?'&'+S.q:''}`);
   await p.addStyleTag({content:'body *{visibility:hidden!important;animation:none!important}#gl{visibility:visible!important}'});
@@ -116,6 +143,6 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const WF=20+Math.round((process.env.WARM!=null?+process.env.WARM:(S.warm||0))*30);for(let i=0;i<WF;i++)await p.evaluate(c=>{window.__CAM=c;__adv(33.33)},cam0); // pemanasan
   const ff=spawn('ffmpeg',['-y','-loglevel','error','-f','image2pipe','-framerate',String(FPS),'-c:v','mjpeg','-i','-','-c:v','libx264','-preset','veryfast','-crf','16','-pix_fmt','yuv420p',out]);
   const done=new Promise((res,rej)=>ff.on('close',c=>c===0?res():rej(new Error('ffmpeg '+c))));
-  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__HERO)window.__HERO.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
+  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__HERO)window.__HERO.T=tt;if(window.__SITE)window.__SITE.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
     if(!ff.stdin.write(Buffer.from(d,'base64')))await new Promise(r=>ff.stdin.once('drain',r));if(i%45==0)console.log(name,i,'/',NF)}
   ff.stdin.end();await done;await b.close();srv.close();console.log('selesai',out)});
