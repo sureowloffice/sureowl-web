@@ -104,6 +104,12 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['f5-band']={f:u=>({yaw:L(-.95,-.6,u),pitch:L(.32,.26,u),dist:L(12,8,E(u)),tx:-.5,ty:1.5,tz:-4.5}),fest:1,jam:20.6};
  SHOTS['f5-naik']={f:u=>({yaw:ISO+L(.4,-.1,u),pitch:L(.15,.55,E(u)),dist:L(8,40,E(u)),tx:0,ty:L(1.2,0,u),tz:L(0,-5,u)}),fest:1,jam:20.6};
 }
+
+{const SX=-84,SZ=-56,VX=-84,VZ=-44.5,ST={x:SX,z:SZ,r:10,alat:[-2,-1],crane:[-2,-1]},V={x:VX,z:VZ,yaw:0};
+ SHOTS['f5-hook']={f:(u,ts=0)=>({yaw:L(-.1,.02,u),pitch:.13,dist:L(4.4,3.3,E(u)),tx:VX,ty:1.45,tz:VZ}),jam:16,site:ST,vilp:V,talk:'data/talk_f5-hook.json'};
+ SHOTS['f5-muka']={f:(u,ts=0)=>PUNCH({yaw:L(.12,.02,u),pitch:.12,dist:L(3.6,3.1,u),tx:VX,ty:1.45,tz:VZ},ts,3.2),jam:16,site:ST,vilp:V,talk:'data/talk_f5-muka.json'};
+ SHOTS['f5-cta']={f:(u,ts=0)=>({yaw:L(.85,1.05,u),pitch:L(.2,.24,u),dist:L(6,8.5,E(u)),tx:4.5,ty:1.6,tz:-1}),fest:1,jam:20.6,vilp:{x:4.5,z:-1,yaw:.95,point:1},talk:'data/talk_f5-cta.json'};
+}
 if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
 module.exports={SHOTS};
 if(require.main!==module)return;
