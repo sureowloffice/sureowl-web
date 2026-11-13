@@ -3,6 +3,7 @@ function __heroLerp(K,T){if(T<=K[0][0])return K[0];for(let i=1;i<K.length;i++){i
 function __heroPos(r,t){const H=window.__HERO;if(!H||r.u.toLowerCase()!==H.u)return null;const T=H.T||0;const lu=r.u.toLowerCase();
   r.q=false;r.zz=false;r.slot=null;r.onStage=false;
   if(H.k){const P=PROF[H.k];r.pk=H.k;r.ps=H.ps;r.p=P.sub[H.ps];r.chosen=true;r.grp=PK2GRP[H.k];r.prop=PROP_OF[H.ps]||'none';r.col=shadeHex(P.col,0)}
+  if(H.looks){let lk=null,ti=-1;for(const [a2,v] of H.looks)if(T>=a2){lk=v;ti=a2}if(lk&&r.lk!==lk){r.lk=lk;r._Lk=null;r._L=null}}
   const k=__heroLerp(H.keys,T);r.__hy=k[3];r.__hmv=!!k[4];
   const lem=(H.lemas||[]).some(([a,b])=>T>=a&&T<b);if(lem)LEMAS.set.add(lu);else LEMAS.set.delete(lu);
   if(lem){const y=1.25+Math.sin(t*1.5)*.05;for(const [dx,dy,s] of [[-.22,0,.26],[.05,.06,.32],[.3,0,.24]])D(G.sph,M.chain(M.T(k[1]+dx,y+dy,k[2]),M.S(s,s*.75,s*.75)),'#8C8FA8',{em:.15,cast:false});

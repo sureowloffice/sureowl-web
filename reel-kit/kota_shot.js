@@ -94,6 +94,16 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['d4-tanya']={f:(u,ts=0)=>({yaw:L(-.12,-.02,u),pitch:L(.15,.12,u),dist:L(5,3.4,E(u)),tx:VX,ty:1.45,tz:VZ}),jam:J,site:ST({alat:[-2,-1],crane:[-2,-1]}),vilp:V({}),talk:TL('d4-tanya')};
  SHOTS['d4-cta']={f:(u,ts=0)=>({yaw:L(.2,.45,u),pitch:L(.38,.42,u),dist:L(26,32,E(u)),tx:SX,ty:2,tz:SZ+4}),jam:J,site:ST({alat:[-2,-1],crane:[-2,-1],lampu:1}),vilp:V({point:1}),talk:TL('d4-cta')};
 }
+
+// ===== Reel fitur "Avatar lo hidup di kota ini" =====
+{const U='daffaaa_39';const HH=(keys,o={})=>Object.assign({u:U,k:'musik',ps:'gitaris',keys},o);const Z1=GZ+1.8;
+ SHOTS['f5-jalan']={f:u=>({yaw:L(.3,.12,u),pitch:L(.52,.46,u),dist:L(7.5,6.2,u),tx:L(GX+4,GX-.5,u),ty:.9,tz:Z1}),jam:15.5,
+   hero:HH([[0,GX+5,Z1,-Math.PI/2,1],[4.2,GX-1,Z1,-Math.PI/2,1]]),vilp:{x:GX-1.7,z:GZ-1.6,yaw:.7,wave:1}};
+ SHOTS['f5-look']={f:u=>({yaw:L(-.05,.08,u),pitch:L(.3,.26,u),dist:L(3.2,2.7,u),tx:GX,ty:.8,tz:GZ-.8}),jam:15.5,
+   hero:HH([[0,GX,GZ-.8,0,0]],{looks:[[0,'0:0:0'],[.6,'2:1:3'],[1.1,'4:2:5'],[1.6,'1:3:2'],[2.1,'3:5:1'],[2.6,'5:4:4']]}),vilp:{x:GX-1.7,z:GZ-1.6,yaw:.7}};
+ SHOTS['f5-band']={f:u=>({yaw:L(-.95,-.6,u),pitch:L(.32,.26,u),dist:L(12,8,E(u)),tx:-.5,ty:1.5,tz:-4.5}),fest:1,jam:20.6};
+ SHOTS['f5-naik']={f:u=>({yaw:ISO+L(.4,-.1,u),pitch:L(.15,.55,E(u)),dist:L(8,40,E(u)),tx:0,ty:L(1.2,0,u),tz:L(0,-5,u)}),fest:1,jam:20.6};
+}
 if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
 module.exports={SHOTS};
 if(require.main!==module)return;
