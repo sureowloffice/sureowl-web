@@ -119,7 +119,7 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['d5-naik']={f:u=>{const e=E(u);return {yaw:L(.1,.35,u),pitch:L(.1,.28,e),dist:L(6,18,e),tx:L(-2.7,0,e),ty:L(1.5,4.4,e),tz:L(19.2,-25.2,e)}},jam:19.5,q:'debut=1',warm:12};
  SHOTS['d5-lirik']={f:(u,ts=0)=>({yaw:L(-.35,-.3,u),pitch:.1,dist:L(3.3,3,u),tx:-2.7,ty:1.55,tz:19.2}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_d5-lirik.json'};
  SHOTS['d5-tenang']={f:(u,ts=0)=>({yaw:L(.25,.1,u),pitch:L(.18,.16,u),dist:L(7,5.5,E(u)),tx:-2.5,ty:1.4,tz:19.2}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_d5-tenang.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:Math.PI}};
- SHOTS['d5-turun']={f:u=>({yaw:L(.15,.05,u),pitch:L(.35,.18,E(u)),dist:L(9,5,E(u)),tx:PX,ty:L(3,1,E(u)),tz:PZ}),jam:16,site:ST,hero:PR('d5-turun',[[0,PX,PZ,0,0,9],[1.1,PX,PZ,0,0,0]],{spot:1})};
+ SHOTS['d5-turun']={f:u=>({yaw:L(.15,.05,u),pitch:L(.35,.18,E(u)),dist:L(9,5,E(u)),tx:PX,ty:L(3,1,E(u)),tz:PZ}),jam:16,site:ST,hero:PR('d5-turun',[[0,PX,PZ,0,0]],{spot:1})};
  SHOTS['d5-pres-a']={f:u=>({yaw:L(-.1,.05,u),pitch:.14,dist:L(3.4,2.9,u),tx:PX,ty:.75,tz:PZ}),jam:16,site:ST,hero:PR('d5-pres-a',[[0,PX,PZ,0,0]])};
  SHOTS['d5-orbit']={f:u=>({yaw:L(-.7,.6,u),pitch:L(.2,.28,u),dist:L(5,6.5,u),tx:PX,ty:.9,tz:PZ}),jam:16,site:ST,hero:PR('d5-orbit',[[0,PX,PZ,0,0]])};
  SHOTS['d5-ktw']={f:u=>({yaw:L(.12,.02,u),pitch:.12,dist:L(3.8,3.2,u),tx:PX+.6,ty:.8,tz:PZ}),jam:16,site:ST,hero:PR('d5-ktw',[[0,PX,PZ,.3,0]])};
@@ -132,7 +132,7 @@ if(require.main!==module)return;
 const [name,dur,out]=[process.argv[2],+process.argv[3],process.argv[4]];const S=SHOTS[name];if(!S){console.error('shot tidak ada: '+name+'\nPilihan: '+Object.keys(SHOTS).join(', '));process.exit(1)}
 let patched=fs.readFileSync(path.join(REPO,'kota.js'),'utf8').replace('  const cp=[cam.tx+Math.sin(cam.yaw)','  if(window.__CAM)Object.assign(cam,window.__CAM);\n  const cp=[cam.tx+Math.sin(cam.yaw)');
 if(S.talk){const V0="mascot([p[0],p[1],p[2]],yaw,t,{squash:";if(!patched.includes(V0))throw new Error('patch talk gagal');
-  patched=patched.replace(V0,"const TK=window.__TALK;if(TK){const m=TK.m,ti=TK.T;p[1]+=m*.12+Math.abs(Math.sin(ti*5.5))*m*.08;mascot([p[0],p[1],p[2]],yaw+Math.sin(ti*2.1)*.18,t,{squash:m*.14,look:[.05+Math.sin(ti*1.3)*.08,.08],wave:Math.max(0,Math.sin(ti*2.4))*Math.min(1,m*1.6),point:Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6),mouth:m,tilt:Math.sin(ti*3.1)*.07*(.4+m)});return}"+V0)}
+  patched=patched.replace(V0,"const TK=window.__TALK;if(TK){const m=TK.m,ti=TK.T;const CALM=!!window.__CALM;if(!CALM){p[1]+=m*.12+Math.abs(Math.sin(ti*5.5))*m*.08}mascot([p[0],p[1],p[2]],yaw+Math.sin(ti*2.1)*(CALM?.04:.18),t,{squash:CALM?m*.03:m*.14,look:[.05+Math.sin(ti*1.3)*(CALM?.03:.08),.08],wave:CALM?0:Math.max(0,Math.sin(ti*2.4))*Math.min(1,m*1.6),point:CALM?0:(Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6)),mouth:m,tilt:Math.sin(ti*3.1)*(CALM?.02:.07)*(.4+m)});return}"+V0)}
 let engineP=null;if(S.talk){engineP=fs.readFileSync(path.join(REPO,'engine.js'),'utf8');const M0="const base=M.chain(M.T(pos[0],by,pos[2]),M.RY(yaw));",SM="D(G.sph,W(M.chain(M.T(0,ey-.33,.7),M.S(.12,.05,.05))),C.ink);";
   if(!engineP.includes(M0)||!engineP.includes(SM))throw new Error('patch mulut gagal');
   engineP=engineP.replace(M0,"const base=M.chain(M.T(pos[0],by,pos[2]),M.RY(yaw),M.RZ(o.tilt||0));").replace(SM,"if((o.mouth||0)>.06){const mo=o.mouth;D(G.sph,W(M.chain(M.T(0,ey-.27-mo*.03,.8),M.S(.12+mo*.04,.035+mo*.1,.07))),'#2A0F1F');D(G.sph,W(M.chain(M.T(0,ey-.3-mo*.07,.83),M.S(.07+mo*.03,.02+mo*.035,.05))),'#FF6F91',{cast:false})}else "+SM)}
@@ -164,7 +164,7 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const p=await b.newPage({viewport:{width:W,height:H},deviceScaleFactor:DPR});
   await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
   await p.addInitScript(()=>{let T=0;const q=[];const B0=Date.now();Date.now=()=>B0+T;window.__adv=ms=>{T+=ms;q.splice(0).forEach(f=>f(T))};performance.now=()=>T;window.requestAnimationFrame=f=>{q.push(f);return q.length}});
-  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site)},{hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
+  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site);if(o.calm)window.__CALM=1},{calm:!!(S.calm||process.env.CALM),hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
   await p.addStyleTag({content:''}).catch(()=>{});
   await p.goto(`http://localhost:${port}/kota.html?nowl=1&jam=${S.jam||21}${S.fest?'&fest=1':''}${S.q?'&'+S.q:''}`);
   await p.addStyleTag({content:'body *{visibility:hidden!important;animation:none!important}#gl{visibility:visible!important}'});
