@@ -1,5 +1,5 @@
 // Reel DAY 3: satu warga (tokoh) digerakkan sesuai naskah. Disuntik ke kota.js HANYA saat render reel.
-function __heroLerp(K,T){if(T<=K[0][0])return K[0];for(let i=1;i<K.length;i++){if(T<K[i][0]){const a=K[i-1],b=K[i],f=(T-a[0])/(b[0]-a[0]);return [T,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f,a[3]+(b[3]-a[3])*f,a[4]]}}return K[K.length-1]}
+function __heroLerp(K,T){if(T<=K[0][0])return K[0];for(let i=1;i<K.length;i++){if(T<K[i][0]){const a=K[i-1],b=K[i],f=(T-a[0])/(b[0]-a[0]);return [T,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f,a[3]+(b[3]-a[3])*f,a[4],a[5]!=null&&b[5]!=null?a[5]+(b[5]-a[5])*f:a[5]]}}return K[K.length-1]}
 function __heroPos(r,t){const H=window.__HERO;if(!H||r.u.toLowerCase()!==H.u)return null;const T=H.T||0;const lu=r.u.toLowerCase();
   r.q=false;r.zz=false;r.slot=null;r.onStage=false;
   if(H.k){const P=PROF[H.k];r.pk=H.k;r.ps=H.ps;r.p=P.sub[H.ps];r.chosen=true;r.grp=PK2GRP[H.k];r.prop=PROP_OF[H.ps]||'none';r.col=shadeHex(P.col,0)}
@@ -11,4 +11,6 @@ function __heroPos(r,t){const H=window.__HERO;if(!H||r.u.toLowerCase()!==H.u)ret
   if(H.eat!=null&&T>=H.eat&&!r.__ate){r.__ate=1;FXM.set(lu,{food:'#E8A35A',t0:t})}
   for(const s of (H.coins||[]))if(T>=s&&!(r.__cs||(r.__cs=new Set())).has(s)){r.__cs.add(s);for(let j=0;j<5;j++)SPARK.push([k[1]+(j-2)*.15,1.6,k[2],t+j*.03])}
   if(H.car){const R=CAR.R&&CAR.R.r===r?CAR.R:(CAR.R=carBuild(r));const dd=R.L[0].T+R.stops[0]+R.L[1].T;CAR.t0=t-T+H.car-dd}
-  return [k[1],0,k[2]]}
+  let yy=(k[5]!=null?k[5]:(H.y||0));if(H.talk){const m=H.talk[Math.min(H.talk.length-1,Math.max(0,Math.floor(T*30)))]||0;yy+=m*.09*Math.abs(Math.sin(t*16));r.__hy=k[3]+Math.sin(t*7)*.12*m}
+  if(H.spot)D(G.cone8,M.chain(M.T(k[1],0,k[2]),M.S(1.3,9,1.3)),'#FFF6C8',{em:1,alpha:.22,cast:false});
+  return [k[1],yy,k[2]]}

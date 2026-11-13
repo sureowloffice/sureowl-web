@@ -110,6 +110,22 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['f5-muka']={f:(u,ts=0)=>PUNCH({yaw:L(.12,.02,u),pitch:.12,dist:L(3.6,3.1,u),tx:VX,ty:1.45,tz:VZ},ts,3.2),jam:16,site:ST,vilp:V,talk:'data/talk_f5-muka.json'};
  SHOTS['f5-cta']={f:(u,ts=0)=>({yaw:L(1.02,1.12,u),pitch:L(.24,.28,u),dist:L(5.5,8.5,E(u)),tx:3,ty:1.6,tz:2}),fest:1,jam:20.6,vilp:{x:3,z:2,yaw:.95,point:1},talk:'data/talk_f5-cta.json'};
 }
+
+// ===== Reel DAY 5 "Wakil Presiden mundur, President ambil alih" =====
+{const PX=-84,PZ=-44.5,ST={x:-84,z:-56,r:10,alat:[-2,-1],crane:[-2,-1]},TJ=n=>JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'data/talk_'+n+'.json'),'utf8'));
+ const PR=(n,keys,o={})=>Object.assign({u:'immanuelragil',keys,talk:TJ(n)},o);
+ SHOTS['d5-umum']={f:(u,ts=0)=>({yaw:.08+L(-.06,.04,u),pitch:L(.2,.24,u),dist:L(15,11,E(u)),tx:-2.2,ty:1.6,tz:19.6}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_d5-umum.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:Math.PI}};
+ SHOTS['d5-punch']={f:(u,ts=0)=>PUNCH({yaw:.1+L(-.04,.04,u),pitch:.12,dist:L(4.6,3.6,u),tx:-2.7,ty:1.55,tz:19.2},ts,1.25),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_d5-punch.json'};
+ SHOTS['d5-naik']={f:u=>{const e=E(u);return {yaw:L(.1,.35,u),pitch:L(.1,.28,e),dist:L(6,18,e),tx:L(-2.7,0,e),ty:L(1.5,4.4,e),tz:L(19.2,-25.2,e)}},jam:19.5,q:'debut=1',warm:12};
+ SHOTS['d5-lirik']={f:(u,ts=0)=>({yaw:L(-.35,-.3,u),pitch:.1,dist:L(3.3,3,u),tx:-2.7,ty:1.55,tz:19.2}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_d5-lirik.json'};
+ SHOTS['d5-tenang']={f:(u,ts=0)=>({yaw:L(.25,.1,u),pitch:L(.18,.16,u),dist:L(7,5.5,E(u)),tx:-2.5,ty:1.4,tz:19.2}),jam:19.5,q:'debut=1',warm:12,talk:'data/talk_d5-tenang.json',evo:{t0:-99,spread:0,R:1,jit:0,cx:-1.8,cz:25.2,grid:1,face:Math.PI}};
+ SHOTS['d5-turun']={f:u=>({yaw:L(.15,.05,u),pitch:L(.35,.18,E(u)),dist:L(9,5,E(u)),tx:PX,ty:L(3,1,E(u)),tz:PZ}),jam:16,site:ST,hero:PR('d5-turun',[[0,PX,PZ,0,0,9],[1.1,PX,PZ,0,0,0]],{spot:1})};
+ SHOTS['d5-pres-a']={f:u=>({yaw:L(-.1,.05,u),pitch:.14,dist:L(3.4,2.9,u),tx:PX,ty:.75,tz:PZ}),jam:16,site:ST,hero:PR('d5-pres-a',[[0,PX,PZ,0,0]])};
+ SHOTS['d5-orbit']={f:u=>({yaw:L(-.7,.6,u),pitch:L(.2,.28,u),dist:L(5,6.5,u),tx:PX,ty:.9,tz:PZ}),jam:16,site:ST,hero:PR('d5-orbit',[[0,PX,PZ,0,0]])};
+ SHOTS['d5-ktw']={f:u=>({yaw:L(.12,.02,u),pitch:.12,dist:L(3.8,3.2,u),tx:PX+.6,ty:.8,tz:PZ}),jam:16,site:ST,hero:PR('d5-ktw',[[0,PX,PZ,.3,0]])};
+ SHOTS['d5-bangun']={f:u=>({yaw:L(.55,.42,u),pitch:.42,dist:L(34,28,E(u)),tx:-84,ty:2,tz:-54}),jam:16,site:{x:-84,z:-56,r:10,alat:[0,1.4],crane:[.1,2.2],lampu:1}};
+ SHOTS['d5-cta']={f:u=>({yaw:L(.3,.15,u),pitch:L(.3,.24,u),dist:L(9,6,E(u)),tx:PX,ty:1.3,tz:PZ}),jam:16,site:Object.assign({},ST,{lampu:1}),hero:PR('d5-cta',[[0,PX,PZ,0,0]],{spot:1})};
+}
 if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
 module.exports={SHOTS};
 if(require.main!==module)return;
