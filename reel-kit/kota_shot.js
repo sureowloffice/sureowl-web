@@ -139,6 +139,18 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['e1-warga']={f:u=>({yaw:L(-.25,-.05,u),pitch:L(.22,.3,u),dist:L(16,22,E(u)),tx:-84,ty:2.5,tz:-47}),jam:15,q:'debut=1',warm:12,bio:JADI,evo:{t0:-99,spread:0,R:1,jit:0,cx:-84,cz:-38.5,grid:1,face:Math.PI}};
  SHOTS['e1-cta']={f:u=>({yaw:L(.25,.12,u),pitch:L(.12,.16,u),dist:L(5,8,E(u)),tx:PX,ty:1.4,tz:PZ}),jam:15,bio:JADI,hero:PR('e1-cta',[[0,PX,PZ,0,0]],{spot:1})};
 }
+// ---- Kota Hancur (pembuka seri HARI) ----
+{const PX=-84,PZ=-44.5,TJ=n=>{const f=require('path').join(__dirname,'data/talk_'+n+'.json');return require('fs').existsSync(f)?JSON.parse(require('fs').readFileSync(f,'utf8')):[0]};
+ const PR=(n,keys,o={})=>Object.assign({u:'immanuelragil',keys,talk:TJ(n)},o);const SK=(c,ts,a,t0=0)=>{if(ts<t0)return c;const w=Math.min(1,(ts-t0)*2)*a;c.yaw+=Math.sin(ts*53)*.012*w;c.pitch+=Math.cos(ts*47)*.008*w;c.tx+=Math.sin(ts*61)*.05*w;c.ty=(c.ty||0)+Math.cos(ts*71)*.05*w;return c};
+ const B={jam:11,terang:1,calm:1};const RB={x:-84,z:-50,sp:.03,dr:42,rub:520,novil:1};
+ SHOTS['h0-kemarin']=Object.assign({f:u=>({yaw:L(-.3,.1,u),pitch:L(.1,.14,u),dist:L(20,16,E(u)),tx:-84,ty:4,tz:-50})},B);
+ SHOTS['h0-goyang']=Object.assign({f:(u,ts)=>SK({yaw:L(-.1,.05,u),pitch:.14,dist:L(3.4,3.0,u),tx:PX,ty:.8,tz:PZ},ts,1.6,.5),ruin:{t0:2.3,x:-84,z:-56,sp:.03,novil:1,hide:9},hero:PR('h0-goyang',[[0,PX,PZ,0,0]])},B);
+ SHOTS['h0-runtuh']=Object.assign({f:(u,ts)=>SK({yaw:ISO+L(-.1,.1,u),pitch:.6,dist:L(78,96,E(u)),tx:-24,tz:-30},ts,1.2,0),ruin:{t0:.2,x:60,z:30,sp:.022,dust:140,dr:190,ds:2.2,novil:1,hide:.4}},B);
+ SHOTS['h0-bioskop']=Object.assign({f:(u,ts)=>SK({yaw:L(.25,.12,u),pitch:L(.14,.2,u),dist:L(15,19,E(u)),tx:-84,ty:3.2,tz:-50},ts,1.4,0),ruin:{t0:.7,x:-84,z:-57,sp:.05,dust:34,dr:13,novil:1,hide:0},hero:PR('x',[[0,PX,PZ+2.2,Math.PI,0]])},B);
+ SHOTS['h0-kosong']=Object.assign({f:u=>({yaw:ISO+L(.1,-.05,u),pitch:.6,dist:L(96,84,E(u)),tx:-24,tz:-30}),ruin:{t0:-5.6,x:60,z:30,sp:.022,dust:140,dr:190,ds:2.2,rub:420,novil:1}},B);
+ SHOTS['h0-sendiri']=Object.assign({f:u=>({yaw:L(.3,.1,u),pitch:L(.3,.2,u),dist:L(15,8,E(u)),tx:PX,ty:.9,tz:PZ}),ruin:Object.assign({t0:-60},RB),hero:PR('h0-sendiri',[[0,PX,PZ,0,0]])},B);
+ SHOTS['h0-nol']=Object.assign({f:u=>({yaw:L(-.08,.06,u),pitch:.13,dist:L(3.3,2.9,u),tx:PX,ty:.8,tz:PZ}),ruin:Object.assign({t0:-60},RB),hero:PR('h0-nol',[[0,PX,PZ,0,0]])},B);
+ SHOTS['h0-cta']=Object.assign({f:u=>({yaw:L(.14,.02,u),pitch:L(.14,.18,u),dist:L(4.6,6.4,E(u)),tx:PX,ty:1.2,tz:PZ}),ruin:Object.assign({t0:-60},RB),hero:PR('h0-cta',[[0,PX,PZ,0,0]])},B);}
 if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
 module.exports={SHOTS};
 if(require.main!==module)return;
@@ -169,6 +181,23 @@ if(S.debl){const D0='const L=RES.filter(r=>r.i>11&&!r.own&&!r.q).slice(-5)';if(!
   patched=patched.replace(D0,'const L=(window.__DEBL||[]).map(u=>RES.find(r=>r.u===u)).filter(Boolean)').replace('per:7,intro:9','per:'+(S.debPer||5)+',intro:2').replace('const per=L.length>60?4:L.length>30?5.5:7','const per=DEBUT.per')}
 if(S.evo){const A='M.S(s*(2-chew),s*(lm?.82:1)*chew,s));const Wm=m=>M.mul(B,m);';const R0='function resident(r,t,hi){const p=resPos(r,t);';const Y0='M.RY(yaw),lm?M.RX(.35)';if(!patched.includes(A)||!patched.includes(R0)||!patched.includes(Y0))throw new Error('patch evo gagal');
   patched=patched.replace(A,'M.S(s*(2-chew),s*(lm?.82:1)*chew,s));let Wm=m=>M.mul(B,m);if(window.__EVO&&__evoDraw(r,p,t,B,f=>{Wm=f}))return;').replace(R0,'function resident(r,t,hi){const p=(window.__EVO&&__evoPos(r))||resPos(r,t);').replace(Y0,'M.RY(r.__evoP?r.__evoY:yaw),lm?M.RX(.35)').replace('function ownerFx(p,t){',fs.readFileSync(path.join(__dirname,'evo_patch.js'),'utf8')+'\nfunction ownerFx(p,t){')}
+// ---- Kota Hancur: bangunan runtuh per petak (shader) + tampilan siang terang. Hanya saat render reel. ----
+if(S.ruin||S.terang){if(!engineP)engineP=fs.readFileSync(path.join(REPO,'engine.js'),'utf8');
+  const RF="uniform float uRT,uRX;uniform vec3 uRE;vec4 ruin(vec4 w){if(uRX>.5||uRT<-.5)return w;vec2 c=floor(w.xz/7.);float h=fract(sin(dot(c,vec2(12.9898,78.233)))*43758.5453);float dl=distance(c*7.,uRE.xy)*uRE.z+h*.5;float q=uRT-dl;float k=clamp(q/.8,0.,1.);k=k*k;float sh=step(-.7,q)*(1.-k);w.x+=sin(uRT*47.+h*9.)*.07*sh+(h-.5)*w.y*k*.5;w.z+=cos(uRT*41.+h*5.)*.07*sh;w.y=max(w.y,0.)*(1.-k)+min(w.y,0.)-k*.6;return w;}";
+  const A1="varying vec2 vU;\nvoid main(){vec4 w=uM*vec4(aP,1.);",A2="attribute vec3 aP;uniform mat4 uM,uLVP;void main(){gl_Position=uLVP*uM*vec4(aP,1.);}",A3="cast:o.cast!==false,nofog:o.nofog||0})}";
+  for(const a of [A1,A2,A3])if(!engineP.includes(a))throw new Error('patch ruin engine gagal: '+a.slice(0,30));
+  engineP=engineP.replace(A1,"varying vec2 vU;\n"+RF+"\nvoid main(){vec4 w=ruin(uM*vec4(aP,1.));").replace(A2,"attribute vec3 aP;uniform mat4 uM,uLVP;"+RF+"void main(){gl_Position=uLVP*ruin(uM*vec4(aP,1.));}").replace(A3,"cast:o.cast!==false,nofog:o.nofog||0,rx:(window.__NR||g===G.gnd)?1:0})}");
+  if(S.terang){for(const [a,b] of [["x.fillStyle='#2B2450';x.fillRect(0,0,w,h);x.fillStyle='#302957'","x.fillStyle='#B4DDA0';x.fillRect(0,0,w,h);x.fillStyle='#BDE3AA'"],["x.fillStyle='#2E2754';x.fillRect(w/2+2,4","x.fillStyle='#B8E0A5';x.fillRect(w/2+2,4"]]){if(!engineP.includes(a))throw new Error('patch terang gagal');engineP=engineP.replace(a,b)}
+    const K0="day:{top:'#4F6BFF',hor:'#FFC4E6',sunC:'#FFF6E8',sky:'#E4E4FF',gnd:'#7A68A8',fog:'#A898E0'}";if(!patched.includes(K0))throw new Error('patch terang KEYS gagal');
+    patched=patched.replace(K0,"day:{top:'#58B8FF',hor:'#E6F6FF',sunC:'#FFF9EE',sky:'#F4F8FF',gnd:'#BFD3A8',fog:'#D6ECFF'}")}
+  const U0="gl.uniform1f(u.uShRes,SHS);",U1="gl.uniform3fv(u.uC,d.c);",U2="gl.uniformMatrix4fv(P_DEPTH.u.uLVP,false,LVP);",U3="bindGeo(d.g);gl.uniformMatrix4fv(P_DEPTH.u.uM,false,d.m);",R0="function resident(r,t,hi){",V0="  vilDraw(t);";
+  for(const a of [U0,U1,U2,U3,R0,V0])if(!patched.includes(a))throw new Error('patch ruin kota gagal: '+a);
+  if(!patched.includes('function ownerFx(p,t){'))throw new Error('patch ownerFx gagal');patched=patched.replace('function ownerFx(p,t){','function ownerFx(p,t){if(window.__RUIN||window.__NOFX)return;');
+  const RU=(P)=>"{const R=window.__RUIN;gl.uniform1f("+P+".uRT,R?R.T-R.t0:-1);gl.uniform3f("+P+".uRE,R?R.x:0,R?R.z:0,R?R.sp:0)}";
+  patched=patched.replace(U0,U0+RU('u')).replace(U1,U1+"gl.uniform1f(u.uRX,d.rx||0);").replace(U2,U2+RU('P_DEPTH.u')).replace(U3,U3+"gl.uniform1f(P_DEPTH.u.uRX,d.rx||0);")
+   .replace(R0,"function resident(r,t,hi){const R=window.__RUIN;const me=window.__HERO&&r.u.toLowerCase()===window.__HERO.u;if(R&&!me){const q=R.T-R.t0-(R.hide==null?.2:R.hide);if(q>0)return}window.__NR=1;try{return __res0(r,t,hi)}finally{window.__NR=0}}\nfunction __res0(r,t,hi){")
+   .replace(V0,"  if(!(window.__RUIN&&window.__RUIN.novil))vilDraw(t);\n  {const R=window.__RUIN;if(R&&R.dust){const q0=R.T-R.t0;window.__NR=1;for(let i=0;i<R.dust;i++){const h1=Math.abs(Math.sin(i*12.9898)*43758.5453)%1,h2=Math.abs(Math.sin(i*78.233)*12543.11)%1,h3=Math.abs(Math.sin(i*39.3)*9631.7)%1;const a=h1*6.283,rr=Math.sqrt(h2)*R.dr;const x=R.x+Math.cos(a)*rr,z=R.z+Math.sin(a)*rr;const q=q0-rr*R.sp-h3*.6-.5;if(q<0||q>4.5)continue;const s=(1.2+h3*2.2)*(1-Math.exp(-q*2.2))*(R.ds||1);const al=.55*Math.min(1,q*4)*Math.max(0,1-q/4.5);D(G.sph,M.chain(M.T(x,.4+q*.9+h1,z),M.S(s,s*.7,s)),['#D9C7A8','#C9B594','#E6D8BE'][i%3],{em:.55,alpha:al,cast:false})}if(R.rub)for(let i=0;i<R.rub;i++){const h1=Math.abs(Math.sin(i*91.17)*43758.5453)%1,h2=Math.abs(Math.sin(i*27.61)*12543.11)%1,h3=Math.abs(Math.sin(i*55.9)*9631.7)%1;const a=h1*6.283,rr=Math.sqrt(h2)*R.dr;const x=R.x+Math.cos(a)*rr,z=R.z+Math.sin(a)*rr;const q=q0-rr*R.sp-.9;if(q<0)continue;const g=Math.min(1,q*3);const sz=.25+h3*.7;D(G.box,M.chain(M.T(x,0,z),M.RY(h3*6),M.RZ((h1-.5)*.5),M.S(sz*(1+h1),sz*.45*g,sz)),['#8E86B8','#C9B594','#A9A2C8','#E58FB3','#E8D27A','#9AA3B5'][i%6],{cast:true})}window.__NR=0}}");
+}
 const CT={'.js':'text/javascript','.html':'text/html','.json':'application/json','.png':'image/png'};
 const srv=http.createServer((q,r)=>{const url=new URL(q.url,'http://x');let u=decodeURIComponent(url.pathname);
   if(u.startsWith('/api/')){const a=url.searchParams.get('a');r.writeHead(200,{'content-type':'application/json'});let o=LIVE[a]||{};if((S.evo||S.q)&&a==='lomba')o={};if(a==='fest'&&S.fest)o=Object.assign({},o,{aktif:true,n:Math.max(o.n||0,12)});return r.end(JSON.stringify(o))}
@@ -181,7 +210,7 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const p=await b.newPage({viewport:{width:W,height:H},deviceScaleFactor:DPR});
   await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
   await p.addInitScript(()=>{let T=0;const q=[];const B0=Date.now();Date.now=()=>B0+T;window.__adv=ms=>{T+=ms;q.splice(0).forEach(f=>f(T))};performance.now=()=>T;window.requestAnimationFrame=f=>{q.push(f);return q.length}});
-  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site);if(o.calm)window.__CALM=1;if(o.bio)window.__BIO=Object.assign({T:0},o.bio)},{bio:S.bio||null,calm:!!(S.calm||process.env.CALM),hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
+  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site);if(o.calm)window.__CALM=1;if(o.bio)window.__BIO=Object.assign({T:0},o.bio);if(o.ruin)window.__RUIN=Object.assign({T:0,x:0,z:0,sp:.03,t0:0,dr:30},o.ruin)},{ruin:S.ruin||null,bio:S.bio||null,calm:!!(S.calm||process.env.CALM),hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
   await p.addStyleTag({content:''}).catch(()=>{});
   await p.goto(`http://localhost:${port}/kota.html?nowl=1&jam=${S.jam||21}${S.fest?'&fest=1':''}${S.q?'&'+S.q:''}`);
   await p.addStyleTag({content:'body *{visibility:hidden!important;animation:none!important}#gl{visibility:visible!important}'});
@@ -192,6 +221,6 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const WF=20+Math.round((process.env.WARM!=null?+process.env.WARM:(S.warm||0))*30);for(let i=0;i<WF;i++)await p.evaluate(c=>{window.__CAM=c;__adv(33.33)},cam0); // pemanasan
   const ff=spawn('ffmpeg',['-y','-loglevel','error','-f','image2pipe','-framerate',String(FPS),'-c:v','mjpeg','-i','-','-c:v','libx264','-preset','veryfast','-crf','16','-pix_fmt','yuv420p',out]);
   const done=new Promise((res,rej)=>ff.on('close',c=>c===0?res():rej(new Error('ffmpeg '+c))));
-  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__HERO)window.__HERO.T=tt;if(window.__SITE)window.__SITE.T=tt;if(window.__BIO)window.__BIO.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
+  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__HERO)window.__HERO.T=tt;if(window.__SITE)window.__SITE.T=tt;if(window.__BIO)window.__BIO.T=tt;if(window.__RUIN)window.__RUIN.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
     if(!ff.stdin.write(Buffer.from(d,'base64')))await new Promise(r=>ff.stdin.once('drain',r));if(i%45==0)console.log(name,i,'/',NF)}
   ff.stdin.end();await done;await b.close();srv.close();console.log('selesai',out)});
