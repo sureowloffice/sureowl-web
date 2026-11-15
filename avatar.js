@@ -29,7 +29,7 @@ function mkLook(r){
 
 // ================= 3D =================
 // Wm: matriks lokal warga (sudah termasuk posisi, arah, skala). near=false → versi ringan untuk warga jauh.
-function body3D(r,Wm,t,near,mv){const L=look(r);const ph=t*10+(r.ph||0);const sw=mv?Math.sin(ph)*.55:0;const NC={cast:false};
+function body3D(r,Wm,t,near,mv){const L=look(r);const VF=!near&&!mv&&!!window.KOTA_VF;const ph=t*10+(r.ph||0);const sw=mv?Math.sin(ph)*.55:0;const NC={cast:false};
   // kaki + sepatu (warga jauh yang diam: satu potong saja)
   if(!near&&!mv)D(G.box,Wm(M.chain(M.T(0,0,0),M.S(.36,.42,.15))),L.pants,NC);
   else for(const sx of [-1,1]){const lg=M.chain(M.T(sx*.15,.42,0),M.RX(sx*sw));
@@ -41,7 +41,7 @@ function body3D(r,Wm,t,near,mv){const L=look(r);const ph=t*10+(r.ph||0);const sw
   // tangan
   if(near){for(const sx of [-1,1]){const ar=M.chain(M.T(sx*.36,.88,0),M.RZ(sx*.22),M.RX(-sx*sw*.8));
     D(G.sph,Wm(M.chain(ar,M.T(0,-.2,0),M.S(.09,.22,.09))),L.arm,NC);D(G.sph,Wm(M.chain(ar,M.T(0,-.44,0),M.S(.085,.085,.085))),L.skin,NC)}}
-  else for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.4,.68,0),M.S(.09,.2,.09))),L.arm,NC);
+  else if(!VF)for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.4,.68,0),M.S(.09,.2,.09))),L.arm,NC);
   // detail baju
   if(near){
     if(L.role==='pres'){D(G.box,Wm(M.chain(M.T(0,.76,.23),M.S(.12,.16,.04))),'#FFFFFF',NC);D(G.box,Wm(M.chain(M.T(0,.64,.27),M.S(.05,.2,.03))),'#E0B341',{em:.3,cast:false})}
@@ -62,13 +62,13 @@ function body3D(r,Wm,t,near,mv){const L=look(r);const ph=t*10+(r.ph||0);const sw
     if(L.hair==='poni')D(G.sph,Wm(M.chain(M.T(0,1.62,.3),M.S(.42,.12,.18))),L.hc,NC)}
   // wajah: mata besar krem khas Kota Seni (President pakai kacamata hitam)
   if(L.role==='pres'){for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.19,1.3,.42),M.S(.25,.14,.06))),'#111111',{em:.1,cast:false});D(G.box,Wm(M.chain(M.T(0,1.375,.45),M.S(.14,.03,.03))),'#111111',NC)}
-  else for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.19,1.34,.36),M.S(.15,.18,.11))),CREAM,{em:.2,cast:false});D(G.sph,Wm(M.chain(M.T(sx*.19+.05,1.38,.45),M.S(.075,.075,.05))),INK,NC);
+  else for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.19,1.34,.36),M.S(.15,.18,.11))),CREAM,{em:.2,cast:false});if(!VF)D(G.sph,Wm(M.chain(M.T(sx*.19+.05,1.38,.45),M.S(.075,.075,.05))),INK,NC);
     if(near)D(G.sph,Wm(M.chain(M.T(sx*.19+.08,1.42,.49),M.S(.025,.025,.02))),'#FFFFFF',{em:1,cast:false})}
   if(near){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH,{em:.3,cast:false});D(G.sph,Wm(M.chain(M.T(0,1.12,.41),M.S(.055,.022,.03))),INK,NC)}
   return L}
 
 // aksesori kepala: kawasan untuk anak seni, kostum khusus untuk tokoh kota
-function acc3D(r,Wm,t,near,L){L=L||look(r);const NC={cast:false};
+function acc3D(r,Wm,t,near,L){L=L||look(r);const NC={cast:false};if(!near&&window.KOTA_VF&&L.role!=='pendiri')return;
   if(L.role==='pres')return; // mahkota digambar ownerFx di kota.js
   if(L.role==='pendiri'){D(G.cyl16,Wm(M.chain(M.T(0,1.76,0),M.S(.68,.03,.68))),'#A88A5C',NC);D(G.sphHi,Wm(M.chain(M.T(0,1.82,0),M.S(.4,.24,.4))),'#C8A97E',NC);D(G.cyl16,Wm(M.chain(M.T(0,1.78,0),M.S(.41,.07,.41))),'#6B4A2E',NC);return}
   if(L.role==='donatur'){if(near)for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.15,1.8,.22),M.RX(-.4),M.S(.2,.08,.04))),'#14102B',NC);return}

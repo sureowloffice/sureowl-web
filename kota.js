@@ -103,7 +103,8 @@ function accOf(r,Wm,t){const k=r.pk;
   else{D(G.sph,Wm(M.chain(M.T(.3,1.85,.1),M.S(.12,.12,.12))),'#FFD23F',{em:.5});for(let i=0;i<5;i++){const a=i/5*Math.PI*2;D(G.sph,Wm(M.chain(M.T(.3+Math.cos(a)*.13,1.85+Math.sin(a)*.13,.1),M.S(.09,.09,.06))),'#FF8FB1',{em:.4})}}}
 
 // ---------- canvas sizing ----------
-let W=0,H=0;function size(){const dpr=Math.min(window.devicePixelRatio||1,2);let w=innerWidth*dpr,h=innerHeight*dpr;const maxPix=2.4e6;if(w*h>maxPix){const k=Math.sqrt(maxPix/(w*h));w*=k;h*=k}
+const TOUCH=matchMedia('(pointer:coarse)').matches;const QL={low:false,acc:0,n:0};
+let W=0,H=0;function size(){const dpr=QL.low?1:Math.min(window.devicePixelRatio||1,TOUCH?1.5:2);let w=innerWidth*dpr,h=innerHeight*dpr;const maxPix=QL.low?1e6:TOUCH?1.5e6:2.4e6;if(w*h>maxPix){const k=Math.sqrt(maxPix/(w*h));w*=k;h*=k}
   W=Math.round(w);H=Math.round(h);glc.width=W;glc.height=H}
 size();addEventListener('resize',size);
 
@@ -1118,7 +1119,11 @@ let focus=null;function focusAt(x,z,d){focus={x,z,d:d||16};selected=null;lastInp
 // ---------- render ----------
 let selected=null;
 function sayOf(u){const L=window.KOTA_SAY;if(!L||!L.length)return '';for(let i=L.length-1;i>=0&&i>L.length-30;i--){const m=L[i];if(m.u===u.toLowerCase()&&Date.now()-m.ts<90000)return m.t.length>40?m.t.slice(0,40)+'…':m.t}return ''}
-function frame(now){const t=now/1000;
+function frame(now){
+  // HP: maks ±30 fps (hemat baterai & panas); kualitas turun otomatis kalau tetap patah-patah
+  if(TOUCH&&now-(frame.lr||0)<30){requestAnimationFrame(frame);return}const fdt=now-(frame.lr||now);frame.lr=now;
+  if(!QL.low&&fdt>0&&fdt<1000){QL.acc+=fdt;QL.n++;if(QL.n>=90){if(QL.acc/QL.n>55){QL.low=true;size()}QL.acc=0;QL.n=0}}
+  const t=now/1000;
   const dtn=Math.min(.05,t-(frame.lt||t));frame.lt=t;playStep(t);netStep(t,dtn);wanderStep(t,dtn);
   if(!PLAY.on){const ki=1-Math.exp(-dtn*4);let dy=ISO_Y-cam.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));cam.yaw+=dy*ki;cam.pitch+=(ISO_P-cam.pitch)*ki}
   const tgt=PLAY.on?[PLAY.x,1.1,PLAY.z]:selected?resPos(selected,t):focus?[focus.x,1.5,focus.z]:[HOME.x,1.5,HOME.z];const k=1-Math.exp(-dtn*(PLAY.on?7:3.6));cam.tx+=(tgt[0]-cam.tx)*k;cam.ty+=((selected?1.2:tgt[1])-cam.ty)*k;cam.tz+=(tgt[2]-cam.tz)*k;
@@ -1126,11 +1131,11 @@ function frame(now){const t=now/1000;
   const cp=[cam.tx+Math.sin(cam.yaw)*Math.cos(cam.pitch)*cam.dist,cam.ty+Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*Math.cos(cam.pitch)*cam.dist];
   DL=[];world(t);D(G.gnd,M.T(0,-.002,-240),[1,1,1],{tex:gridTex,em:.5,cast:false});XF=PXF;stage(99);sign(99);notes(40+t%600);places(t);if(!BK.fest)BK.fest=bake(festStatic);drawBaked(BK.fest);festDyn(t);XF=null;road();houses(t,cp);office(t,cp);staff(t);site(t,cp);decor(t,cp);lombaDraw(t);fireworks(t);debutStep(t);debutDraw(t);heli(t);sparks(t);billboards(t);planeDraw(t);
   vilDraw(t);
-  const shown=RES.slice(1,260);for(const r of shown)if(!r.q&&!(r.zz&&!(PLAY.on&&PLAY.r===r)))resident(r,t,selected===r||!!r.onStage);if(selected&&selected.i>=260)resident(selected,t,true);for(const r of DEBUT.L)if(r.onStage&&r.i>=260&&r!==selected)resident(r,t,true);
+  window.KOTA_VF=cam.dist>40;const shown=RES.slice(1,260);const offV=r=>{if(!VPprev||r===selected||(PLAY.on&&PLAY.r===r)||r.own)return false;const p=resPos(r,t);const V=VPprev;const x=V[0]*p[0]+V[4]*(p[1]+.6)+V[8]*p[2]+V[12],y=V[1]*p[0]+V[5]*(p[1]+.6)+V[9]*p[2]+V[13];return Math.abs(x)>1.12||Math.abs(y)>1.12};for(const r of shown)if(!r.q&&!(r.zz&&!(PLAY.on&&PLAY.r===r))&&!offV(r))resident(r,t,selected===r||!!r.onStage);if(selected&&selected.i>=260)resident(selected,t,true);for(const r of DEBUT.L)if(r.onStage&&r.i>=260&&r!==selected)resident(r,t,true);
   const sun=norm([-0.55,0.9,0.75]);const lc=[0,0,0];const LV=M.look(add(lc,scl(sun,30)),lc,[0,1,0]);const LP=M.ortho(-26,26,-26,26,1,70);const LVP=M.mul(LP,LV);
   gl.bindFramebuffer(gl.FRAMEBUFFER,shFB);gl.viewport(0,0,SHS,SHS);gl.clearColor(1,1,1,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
   gl.useProgram(P_DEPTH.p);gl.uniformMatrix4fv(P_DEPTH.u.uLVP,false,LVP);
-  for(const d of DL){if(!d.cast||d.alpha<1||d.tex)continue;bindGeo(d.g);gl.uniformMatrix4fv(P_DEPTH.u.uM,false,d.m);gl.drawArrays(gl.TRIANGLES,0,d.g.n)}
+  const lsx=Math.hypot(LVP[0],LVP[4],LVP[8]),lsy=Math.hypot(LVP[1],LVP[5],LVP[9]);for(const d of DL){if(!d.cast||d.alpha<1||d.tex)continue;if(sizeOf(d)<.22||!inView(d,LVP,lsx,lsy))continue;bindGeo(d.g);gl.uniformMatrix4fv(P_DEPTH.u.uM,false,d.m);gl.drawArrays(gl.TRIANGLES,0,d.g.n)}
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
   gl.disable(gl.DEPTH_TEST);gl.useProgram(P_SKY.p);const L=light();gl.uniform3fv(P_SKY.u.uTop,L.top);gl.uniform3fv(P_SKY.u.uHor,L.hor);bindGeo(skyQ);gl.drawArrays(gl.TRIANGLES,0,6);gl.enable(gl.DEPTH_TEST);
   const asp=W/H;const fov=asp<1?cam.fov*Math.PI/180:Math.min(cam.fov,42)*Math.PI/180;
@@ -1139,7 +1144,7 @@ function frame(now){const t=now/1000;
   gl.uniform3fv(u.uSky,L.sky);gl.uniform3fv(u.uGnd,L.gnd);gl.uniform3fv(u.uFog,L.fog);gl.uniform1f(u.uFogN,170);gl.uniform1f(u.uFogF,420);gl.uniform3fv(u.uCam,cp);gl.uniform1f(u.uShRes,SHS);
   gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,shTex);gl.uniform1i(u.uSh,0);gl.uniform1i(u.uTex,1);
   gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-  for(const d of [...DL.filter(d=>d.alpha>=1),...DL.filter(d=>d.alpha<1)]){bindGeo(d.g);gl.uniformMatrix4fv(u.uM,false,d.m);gl.uniformMatrix3fv(u.uNM,false,M.normal(d.m));gl.uniform3fv(u.uC,d.c);gl.uniform1f(u.uEm,d.em);gl.uniform1f(u.uAlpha,d.alpha);
+  const vsx=Math.hypot(VP[0],VP[4],VP[8]),vsy=Math.hypot(VP[1],VP[5],VP[9]);const VIS=DL.filter(d=>inView(d,VP,vsx,vsy));for(const d of [...VIS.filter(d=>d.alpha>=1),...VIS.filter(d=>d.alpha<1)]){bindGeo(d.g);gl.uniformMatrix4fv(u.uM,false,d.m);gl.uniformMatrix3fv(u.uNM,false,M.normal(d.m));gl.uniform3fv(u.uC,d.c);gl.uniform1f(u.uEm,d.em);gl.uniform1f(u.uAlpha,d.alpha);
     gl.uniform1f(u.uShOn,d.em>=1?0:1);gl.uniform1f(u.uNoFog,d.nofog||0);if(d.tex){gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,d.tex);gl.uniform1f(u.uTexOn,1)}else gl.uniform1f(u.uTexOn,0);
     gl.depthMask(d.alpha>=1);gl.drawArrays(gl.TRIANGLES,0,d.g.n)}
   gl.depthMask(true);

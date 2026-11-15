@@ -72,7 +72,16 @@ vec3 col=base.rgb*(hemi*.62+uSunC*ndl*(.35+.65*s));col=mix(col,base.rgb,uEm);
 float d=length(vW-uCam);float f=smoothstep(uFogN,uFogF,d)*(1.-uNoFog);col=mix(col,uFog,f);gl_FragColor=vec4(col,base.a*uAlpha);}`);
 const P_DEPTH=prog(`attribute vec3 aP;uniform mat4 uM,uLVP;void main(){gl_Position=uLVP*uM*vec4(aP,1.);}`,`precision mediump float;void main(){gl_FragColor=vec4(1.);}`);
 const P_SKY=prog(`attribute vec3 aP;varying float vy;void main(){vy=aP.y;gl_Position=vec4(aP.xy,.9999,1.);}`,`precision mediump float;varying float vy;uniform vec3 uTop,uHor;void main(){gl_FragColor=vec4(mix(uHor,uTop,smoothstep(-.35,.75,vy)),1.);}`);
-function upload(g){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(g.v),gl.STATIC_DRAW);return {b,n:g.v.length/8}}
+function upload(g){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(g.v),gl.STATIC_DRAW);
+  // bola pembatas (untuk culling): pusat & jari-jari di ruang lokal
+  let a=[1e9,1e9,1e9],z=[-1e9,-1e9,-1e9];const v=g.v;for(let i=0;i<v.length;i+=8)for(let k=0;k<3;k++){if(v[i+k]<a[k])a[k]=v[i+k];if(v[i+k]>z[k])z[k]=v[i+k]}
+  const bc=[(a[0]+z[0])/2,(a[1]+z[1])/2,(a[2]+z[2])/2],br=Math.hypot(z[0]-a[0],z[1]-a[1],z[2]-a[2])/2;return {b,n:v.length/8,bc,br}}
+function sizeOf(d){const g=d.g,m=d.m;if(g.br==null)return 1e9;return g.br*Math.max(Math.hypot(m[0],m[1],m[2]),Math.hypot(m[4],m[5],m[6]),Math.hypot(m[8],m[9],m[10]))}
+// true kalau objek mungkin terlihat di kamera ortho VP (m = matriks model)
+function inView(d,VP,sx,sy){const g=d.g;if(g.br==null||!(g.br<1e8))return true;const m=d.m,c=g.bc;
+  const x=m[0]*c[0]+m[4]*c[1]+m[8]*c[2]+m[12],y=m[1]*c[0]+m[5]*c[1]+m[9]*c[2]+m[13],z=m[2]*c[0]+m[6]*c[1]+m[10]*c[2]+m[14];
+  const sc=Math.max(Math.hypot(m[0],m[1],m[2]),Math.hypot(m[4],m[5],m[6]),Math.hypot(m[8],m[9],m[10]));const R=g.br*sc;
+  const cx=VP[0]*x+VP[4]*y+VP[8]*z+VP[12],cy=VP[1]*x+VP[5]*y+VP[9]*z+VP[13];return Math.abs(cx)<=1+R*sx&&Math.abs(cy)<=1+R*sy}
 const skyQ=upload((()=>{const g=new Geo();g.v=[-1,-1,0,0,0,1,0,0, 1,-1,0,0,0,1,0,0, 1,1,0,0,0,1,0,0, -1,-1,0,0,0,1,0,0, 1,1,0,0,0,1,0,0, -1,1,0,0,0,1,0,0];return g})());
 // shadow fbo
 const SHS=(window.innerWidth<700?1024:2048);const shTex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,shTex);gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,SHS,SHS,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_INT,null);
