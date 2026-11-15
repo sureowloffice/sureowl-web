@@ -133,10 +133,10 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['e1-hook']={f:u=>({yaw:L(-.12,.0,u),pitch:.14,dist:L(3.6,3.0,u),tx:PX,ty:.8,tz:PZ}),jam:15,site:ST,bio:KOS,hero:PR('e1-hook',[[0,PX,PZ,0,0]])};
  SHOTS['e1-lahan']={f:u=>({yaw:L(.6,.45,u),pitch:L(.55,.5,u),dist:L(42,36,E(u)),tx:-84,ty:0,tz:-54}),jam:15,site:ST,bio:KOS};
  SHOTS['e1-kabul']={f:(u,ts=0)=>PUNCH({yaw:L(.1,.02,u),pitch:.13,dist:L(3.4,3.0,u),tx:PX,ty:.8,tz:PZ},ts,1.0),jam:15,site:ST,bio:KOS,hero:PR('e1-kabul',[[0,PX,PZ,0,0]])};
- SHOTS['e1-bangun']={f:u=>({yaw:L(.55,.38,u),pitch:L(.42,.36,u),dist:L(40,34,E(u)),tx:-82,ty:3,tz:-53}),jam:15,site:ST,bio:{k:[[.15,.75,0,.34],[.95,1.55,.34,.67],[1.85,2.45,.67,1]],cf:2.45}};
+ SHOTS['e1-bangun']={f:u=>({yaw:L(-.45,-.3,u),pitch:L(.16,.12,u),dist:L(25,21,E(u)),tx:-81,ty:4,tz:-53}),jam:15,site:ST,bio:{k:[[.15,.75,0,.34],[.95,1.55,.34,.67],[1.85,2.45,.67,1]],cf:2.45}};
  SHOTS['e1-reveal']={f:u=>({yaw:L(-.35,.3,u),pitch:L(.08,.14,u),dist:L(22,17,E(u)),tx:-84,ty:4,tz:-50}),jam:15,bio:JADI};
- SHOTS['e1-detail']={f:u=>({yaw:L(.55,.25,u),pitch:.12,dist:L(7,5.5,u),tx:L(-80,-84,u),ty:1.4,tz:-46}),jam:15,bio:JADI};
- SHOTS['e1-warga']={f:u=>({yaw:L(-.25,-.05,u),pitch:L(.22,.3,u),dist:L(16,22,E(u)),tx:-84,ty:2.5,tz:-47}),jam:15,bio:JADI,evo:{t0:-99,spread:0,R:1,jit:0,cx:-84,cz:-38.5,grid:1,face:Math.PI}};
+ SHOTS['e1-detail']={f:u=>({yaw:L(.45,.15,u),pitch:.12,dist:L(11,8.5,u),tx:L(-80,-82,u),ty:1.8,tz:-48}),jam:15,bio:JADI};
+ SHOTS['e1-warga']={f:u=>({yaw:L(-.25,-.05,u),pitch:L(.22,.3,u),dist:L(16,22,E(u)),tx:-84,ty:2.5,tz:-47}),jam:15,q:'debut=1',warm:12,bio:JADI,evo:{t0:-99,spread:0,R:1,jit:0,cx:-84,cz:-38.5,grid:1,face:Math.PI}};
  SHOTS['e1-cta']={f:u=>({yaw:L(.25,.12,u),pitch:L(.12,.16,u),dist:L(5,8,E(u)),tx:PX,ty:1.4,tz:PZ}),jam:15,bio:JADI,hero:PR('e1-cta',[[0,PX,PZ,0,0]],{spot:1})};
 }
 if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
@@ -161,7 +161,7 @@ if(S.talk&&S.vilp){const TK0='const TK=window.__TALK;if(TK){const m=TK.m,ti=TK.T
   patched=patched.replace("point:Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6)","point:window.__VILP&&__VILP.point!=null?__VILP.point:Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6)")}
 
 if(S.bio){const B0='if(!BK.bio)BK.bio=bake(bioStatic);drawBaked(BK.bio);';if(!patched.includes(B0)||!patched.includes('bioskop(t);'))throw new Error('patch bio gagal');
-  patched=patched.replace(B0,'if(!BK.bio)BK.bio=bake(bioStatic);for(const d of BK.bio)DL.push(XF?Object.assign({},d,{m:M.mul(XF,d.m)}):d);')
+  patched=patched.replace(B0,'if(!BK.bio){const xf0=XF;XF=null;BK.bio=bake(bioStatic);XF=xf0}for(const d of BK.bio)DL.push(XF?Object.assign({},d,{m:M.mul(XF,d.m)}):d);')
    .replace('bioskop(t);',"{const Bo=window.__BIO;let u=1;if(Bo){const T=Bo.T||0;u=0;for(const [a,b,v0,v1] of Bo.k){if(T>=a)u=T>=b?v1:v0+(v1-v0)*((T-a)/(b-a))}}if(u>0.003){XF=u<.999?M.chain(M.T(-84,0,-56),M.S(1,Math.max(.02,u),1),M.T(84,0,56)):null;bioskop(t);XF=null}if(Bo&&Bo.cf!=null){const c=(Bo.T||0)-Bo.cf;if(c>0&&c<2.6){for(let i=0;i<70;i++){const a=i*2.39,r=2+(i%9)*1.2,h=12-c*5+((i*37)%10)*.4;D(G.box,M.chain(M.T(-84+Math.cos(a)*r,Math.max(.2,h),-50+Math.sin(a)*r*.6),M.RY(c*6+i),M.RX(c*4+i),M.S(.22,.04,.14)),['#FFD23F','#FF4FA3','#38E1FF','#9BE15D','#FFFFFF'][i%5],{em:.8,cast:false})}}}}")}
 if(S.vilp){const V0="mascot([p[0],p[1],p[2]],yaw,t,{squash:";if(!patched.includes(V0))throw new Error('patch vilp gagal');
   patched=patched.replace(V0,"if(window.__VILP){const V=window.__VILP;mascot([V.x,V.y||0,V.z],V.yaw,t,{squash:0,look:[0,.08],wave:V.wave?Math.max(0,Math.sin(t*5)):0,point:V.point||0});return}"+V0)}
