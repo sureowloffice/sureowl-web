@@ -126,6 +126,19 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['d5-bangun']={f:u=>({yaw:L(.55,.42,u),pitch:.42,dist:L(34,28,E(u)),tx:-84,ty:2,tz:-54}),jam:16,site:{x:-84,z:-56,r:10,alat:[0,1.4],crane:[.1,2.2],lampu:1}};
  SHOTS['d5-cta']={f:u=>({yaw:L(.3,.15,u),pitch:L(.3,.24,u),dist:L(9,6,E(u)),tx:PX,ty:1.3,tz:PZ}),jam:16,site:Object.assign({},ST,{lampu:1}),hero:PR('d5-cta',[[0,PX,PZ,0,0]],{spot:1})};
 }
+
+// ===== Warga Minta, President Kabulin #1: Bioskop =====
+{const PX=-84,PZ=-44.5,TJ=n=>JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'data/talk_'+n+'.json'),'utf8'));const PR=(n,keys,o={})=>Object.assign({u:'immanuelragil',keys,talk:TJ(n)},o);
+ const KOS={k:[[0,1,0,0]]},JADI={k:[[0,1,1,1]]},ST={x:-84,z:-56,r:10,alat:[-2,-1]};
+ SHOTS['e1-hook']={f:u=>({yaw:L(-.12,.0,u),pitch:.14,dist:L(3.6,3.0,u),tx:PX,ty:.8,tz:PZ}),jam:15,site:ST,bio:KOS,hero:PR('e1-hook',[[0,PX,PZ,0,0]])};
+ SHOTS['e1-lahan']={f:u=>({yaw:L(.6,.45,u),pitch:L(.55,.5,u),dist:L(42,36,E(u)),tx:-84,ty:0,tz:-54}),jam:15,site:ST,bio:KOS};
+ SHOTS['e1-kabul']={f:(u,ts=0)=>PUNCH({yaw:L(.1,.02,u),pitch:.13,dist:L(3.4,3.0,u),tx:PX,ty:.8,tz:PZ},ts,1.0),jam:15,site:ST,bio:KOS,hero:PR('e1-kabul',[[0,PX,PZ,0,0]])};
+ SHOTS['e1-bangun']={f:u=>({yaw:L(.55,.38,u),pitch:L(.42,.36,u),dist:L(40,34,E(u)),tx:-82,ty:3,tz:-53}),jam:15,site:ST,bio:{k:[[.15,.75,0,.34],[.95,1.55,.34,.67],[1.85,2.45,.67,1]],cf:2.45}};
+ SHOTS['e1-reveal']={f:u=>({yaw:L(-.35,.3,u),pitch:L(.08,.14,u),dist:L(22,17,E(u)),tx:-84,ty:4,tz:-50}),jam:15,bio:JADI};
+ SHOTS['e1-detail']={f:u=>({yaw:L(.55,.25,u),pitch:.12,dist:L(7,5.5,u),tx:L(-80,-84,u),ty:1.4,tz:-46}),jam:15,bio:JADI};
+ SHOTS['e1-warga']={f:u=>({yaw:L(-.25,-.05,u),pitch:L(.22,.3,u),dist:L(16,22,E(u)),tx:-84,ty:2.5,tz:-47}),jam:15,bio:JADI,evo:{t0:-99,spread:0,R:1,jit:0,cx:-84,cz:-38.5,grid:1,face:Math.PI}};
+ SHOTS['e1-cta']={f:u=>({yaw:L(.25,.12,u),pitch:L(.12,.16,u),dist:L(5,8,E(u)),tx:PX,ty:1.4,tz:PZ}),jam:15,bio:JADI,hero:PR('e1-cta',[[0,PX,PZ,0,0]],{spot:1})};
+}
 if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
 module.exports={SHOTS};
 if(require.main!==module)return;
@@ -146,6 +159,10 @@ if(S.site){const DL='for(const r of DEBUT.L)if(r.onStage&&r.i>=260&&r!==selected
 if(S.talk&&S.vilp){const TK0='const TK=window.__TALK;if(TK){const m=TK.m,ti=TK.T;';if(!patched.includes(TK0))throw new Error('patch talk+vilp gagal');
   patched=patched.replace(TK0,TK0+'if(window.__VILP){p[0]=__VILP.x;p[2]=__VILP.z;p[1]=(__VILP.y||0)+(p[1]-(p[1]|0))*0}const yaw=window.__VILP?__VILP.yaw+(__VILP.pt?0:0):__yaw0;').replace("const yaw=v.mv||talking?v.yaw:v.yaw+Math.sin(t*.8)*.4;","const yaw=v.mv||talking?v.yaw:v.yaw+Math.sin(t*.8)*.4,__yaw0=yaw;");
   patched=patched.replace("point:Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6)","point:window.__VILP&&__VILP.point!=null?__VILP.point:Math.max(0,-Math.sin(ti*2.4))*Math.min(1,m*1.6)")}
+
+if(S.bio){const B0='if(!BK.bio)BK.bio=bake(bioStatic);drawBaked(BK.bio);';if(!patched.includes(B0)||!patched.includes('bioskop(t);'))throw new Error('patch bio gagal');
+  patched=patched.replace(B0,'if(!BK.bio)BK.bio=bake(bioStatic);for(const d of BK.bio)DL.push(XF?Object.assign({},d,{m:M.mul(XF,d.m)}):d);')
+   .replace('bioskop(t);',"{const Bo=window.__BIO;let u=1;if(Bo){const T=Bo.T||0;u=0;for(const [a,b,v0,v1] of Bo.k){if(T>=a)u=T>=b?v1:v0+(v1-v0)*((T-a)/(b-a))}}if(u>0.003){XF=u<.999?M.chain(M.T(-84,0,-56),M.S(1,Math.max(.02,u),1),M.T(84,0,56)):null;bioskop(t);XF=null}if(Bo&&Bo.cf!=null){const c=(Bo.T||0)-Bo.cf;if(c>0&&c<2.6){for(let i=0;i<70;i++){const a=i*2.39,r=2+(i%9)*1.2,h=12-c*5+((i*37)%10)*.4;D(G.box,M.chain(M.T(-84+Math.cos(a)*r,Math.max(.2,h),-50+Math.sin(a)*r*.6),M.RY(c*6+i),M.RX(c*4+i),M.S(.22,.04,.14)),['#FFD23F','#FF4FA3','#38E1FF','#9BE15D','#FFFFFF'][i%5],{em:.8,cast:false})}}}}")}
 if(S.vilp){const V0="mascot([p[0],p[1],p[2]],yaw,t,{squash:";if(!patched.includes(V0))throw new Error('patch vilp gagal');
   patched=patched.replace(V0,"if(window.__VILP){const V=window.__VILP;mascot([V.x,V.y||0,V.z],V.yaw,t,{squash:0,look:[0,.08],wave:V.wave?Math.max(0,Math.sin(t*5)):0,point:V.point||0});return}"+V0)}
 if(S.debl){const D0='const L=RES.filter(r=>r.i>11&&!r.own&&!r.q).slice(-5)';if(!patched.includes(D0))throw new Error('patch debl gagal');
@@ -164,7 +181,7 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const p=await b.newPage({viewport:{width:W,height:H},deviceScaleFactor:DPR});
   await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
   await p.addInitScript(()=>{let T=0;const q=[];const B0=Date.now();Date.now=()=>B0+T;window.__adv=ms=>{T+=ms;q.splice(0).forEach(f=>f(T))};performance.now=()=>T;window.requestAnimationFrame=f=>{q.push(f);return q.length}});
-  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site);if(o.calm)window.__CALM=1},{calm:!!(S.calm||process.env.CALM),hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
+  await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site);if(o.calm)window.__CALM=1;if(o.bio)window.__BIO=Object.assign({T:0},o.bio)},{bio:S.bio||null,calm:!!(S.calm||process.env.CALM),hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
   await p.addStyleTag({content:''}).catch(()=>{});
   await p.goto(`http://localhost:${port}/kota.html?nowl=1&jam=${S.jam||21}${S.fest?'&fest=1':''}${S.q?'&'+S.q:''}`);
   await p.addStyleTag({content:'body *{visibility:hidden!important;animation:none!important}#gl{visibility:visible!important}'});
@@ -175,6 +192,6 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const WF=20+Math.round((process.env.WARM!=null?+process.env.WARM:(S.warm||0))*30);for(let i=0;i<WF;i++)await p.evaluate(c=>{window.__CAM=c;__adv(33.33)},cam0); // pemanasan
   const ff=spawn('ffmpeg',['-y','-loglevel','error','-f','image2pipe','-framerate',String(FPS),'-c:v','mjpeg','-i','-','-c:v','libx264','-preset','veryfast','-crf','16','-pix_fmt','yuv420p',out]);
   const done=new Promise((res,rej)=>ff.on('close',c=>c===0?res():rej(new Error('ffmpeg '+c))));
-  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__HERO)window.__HERO.T=tt;if(window.__SITE)window.__SITE.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
+  for(let i=0;i<NF;i++){const d=await p.evaluate(([c,tt])=>{window.__CAM=c;if(window.__EVO)window.__EVO.T=tt;if(window.__HERO)window.__HERO.T=tt;if(window.__SITE)window.__SITE.T=tt;if(window.__BIO)window.__BIO.T=tt;if(window.__TALKE)window.__TALK={m:window.__TALKE[Math.min(window.__TALKE.length-1,Math.round(tt*30))]||0,T:tt};__adv(1000/30);return document.getElementById('gl').toDataURL('image/jpeg',.92).split(',')[1]},[S.f(i/(NF-1),i/FPS),i/FPS]);
     if(!ff.stdin.write(Buffer.from(d,'base64')))await new Promise(r=>ff.stdin.once('drain',r));if(i%45==0)console.log(name,i,'/',NF)}
   ff.stdin.end();await done;await b.close();srv.close();console.log('selesai',out)});
