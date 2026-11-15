@@ -838,7 +838,7 @@ body.playing .dock,body.playing .rail,body.playing #arrM{display:none!important}
   window.KOTA_DATA=data;window.KOTA_INFO=info;window.POP=data.warga.length;
   document.getElementById('pop').textContent=data.warga.length.toLocaleString('id-ID');
   document.getElementById('day').textContent='DAY '+(data.day||1);
-  await Promise.all(['engine.js','avatar.js','kota.js','ui.js'].map(src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=40';s.async=false;s.onload=res;s.onerror=rej;document.body.appendChild(s)})));// unduh paralel, jalan berurutan
+  await Promise.all(['engine.js','avatar.js','kota.js','ui.js'].map(src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src+'?v=41';s.async=false;s.onload=res;s.onerror=rej;document.body.appendChild(s)})));// unduh paralel, jalan berurutan
 })();
 </script>
 </body>
