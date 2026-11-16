@@ -154,7 +154,21 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['h0-nol']=Object.assign({f:u=>({yaw:L(-.08,.06,u),pitch:.13,dist:L(3.3,2.9,u),tx:PX,ty:.8,tz:PZ}),ruin:RB,hero:PR('h0-nol',H0)},B);
  SHOTS['h0-hadap']=Object.assign({f:u=>({yaw:L(.22,.12,u),pitch:.16,dist:L(5.2,4.4,E(u)),tx:PX,ty:1,tz:PZ}),ruin:RB,hero:PR('h0-hadap',H0)},B);
  SHOTS['h0-cta']=Object.assign({f:u=>({yaw:L(.1,-.04,u),pitch:L(.14,.18,u),dist:L(4.4,6.6,E(u)),tx:PX,ty:1.5,tz:PZ}),ruin:RB,hero:PR('h0-cta',H0)},B);
- SHOTS['h0-papan']=Object.assign({f:u=>({yaw:L(.2,.05,u),pitch:L(.16,.22,u),dist:L(6,10,E(u)),tx:PX+.8,ty:1.3,tz:PZ}),ruin:Object.assign({},RB,{papan:[PX+1.9,PZ-.3],py:-.2}),hero:PR('h0-papan',H0)},B);}
+ SHOTS['h0-papan']=Object.assign({f:u=>({yaw:L(.2,.05,u),pitch:L(.16,.22,u),dist:L(6,10,E(u)),tx:PX+.8,ty:1.3,tz:PZ}),ruin:Object.assign({},RB,{papan:[PX+1.9,PZ-.3],py:-.2}),hero:PR('h0-papan',H0)},B);
+ // ---- contoh gaya baru (kamera dinamis) ----
+ const RUN={t0:-1.0,x:60,z:30,sp:.019,dust:140,dr:190,ds:2.2,novil:1,hide:.4};const P3=k=>1-Math.pow(1-Math.min(1,k),3);
+ SHOTS['k1-hook']=Object.assign({f:(u,ts)=>SK({yaw:ISO+L(-.18,0,u),pitch:L(.72,.6,u),dist:L(115,78,P3(u*1.2)),tx:-30,tz:-30},ts,1.8,0),ruin:RUN},B);
+ SHOTS['k1-dolly']=Object.assign({f:u=>({yaw:L(.06,0,u),pitch:L(.06,.05,u),dist:L(36,15,P3(u)),tx:-84,ty:L(3,4.6,u),tz:-52})},B);
+ SHOTS['k1-resmi']=Object.assign({f:u=>({yaw:L(.95,.3,E(u)),pitch:.1,dist:L(6,5,u),tx:PX,ty:1,tz:PZ}),hero:PR('k1-resmi',H0)},B);
+ SHOTS['k1-pita']=Object.assign({f:u=>({yaw:L(-.22,-.06,u),pitch:L(.02,.05,u),dist:L(3.4,2.8,u),tx:PX,ty:.92,tz:PZ}),hero:PR('k1-pita',H0)},B);
+ SHOTS['k1-foto']=Object.assign({f:u=>({yaw:L(-.55,-.3,u),pitch:.1,dist:L(9.5,7,E(u)),tx:-73.8,ty:2,tz:-53})},B);
+ SHOTS['k1-senyum']=Object.assign({f:u=>{const e=P3(u*2.2);return {yaw:.1,pitch:.1,dist:L(4.6,1.9,e),tx:PX,ty:L(.8,.95,e),tz:PZ}},hero:PR('k1-senyum',H0)},B);
+ SHOTS['k1-hariini']=Object.assign({f:u=>({yaw:ISO+L(0,.15,u),pitch:L(.3,.72,P3(u)),dist:L(10,72,P3(u)),tx:PX,tz:PZ}),ruin:RB,hero:PR('x',H0)},B);
+ SHOTS['k1-pita2']=Object.assign({f:u=>({yaw:L(-.65,-.25,u),pitch:.05,dist:L(9,5.5,E(u)),tx:PX+.6,ty:.75,tz:PZ}),ruin:Object.assign({},RB,{papan:[PX+1.9,PZ-.3],py:-.2}),hero:PR('k1-pita2',H0)},B);
+ SHOTS['k1-kenalin']=Object.assign({f:u=>({yaw:L(-.75,.45,E(u)),pitch:.05,dist:L(4.3,3.5,u),tx:PX,ty:.9,tz:PZ}),hero:PR('k1-kenalin',H0)},B);
+ SHOTS['k1-bahagia']=Object.assign({f:u=>({yaw:L(.15,0,u),pitch:L(.08,.36,E(u)),dist:L(5,17,E(u)),tx:PX,ty:L(1.2,4,u),tz:L(PZ,-50,u)}),hero:PR('k1-bahagia',H0)},B);
+ SHOTS['k1-12jam']=Object.assign({f:u=>{const e=u<.72?L(0,.28,u/.72):L(.28,1,Math.pow((u-.72)/.28,2));return {yaw:.05,pitch:.1,dist:L(5.2,1.9,e),tx:PX,ty:L(.8,.95,e),tz:PZ}},ruin:RB,hero:PR('k1-12jam',H0)},B);
+}
 if(process.env.CAM){const C=JSON.parse(process.env.CAM);SHOTS.cam=Object.assign({f:u=>({yaw:C.yaw,pitch:C.pitch,dist:C.dist,tx:C.tx,ty:C.ty||0,tz:C.tz}),jam:C.jam||13},C.o||{})}
 module.exports={SHOTS};
 if(require.main!==module)return;
