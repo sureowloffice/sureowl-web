@@ -191,6 +191,9 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['c1-pres']=Object.assign({f:u=>({yaw:L(.12,.04,u),pitch:.03,dist:L(3.3,3.0,u),tx:PX,ty:1.05,tz:PZ}),chr:1,ruin:Object.assign({},RB,{rub:0,tanah:0,dust:0}),hero:PR('c1-pres',H0)},B);
  const RBC=Object.assign({},RB,{cl:[[-84,-30,9],[-84,-40,6],[-84,-47,4]],rub:650,rs:1.0,tanah:0});
  SHOTS['n1-bahu']=Object.assign({f:u=>({yaw:Math.PI,pitch:.05,dist:16.7,tx:-84.35,ty:1.2,tz:-30}),cine:{fov:.82},ruin:RBC,k3:K3(3.2),hero:PR('x',H0)},B);
+ {const XO=()=>({ex:[[0,process.env.EX||'netral']],ges:[[0,process.env.GES||'diam']]});
+  SHOTS['r-muka']=Object.assign({f:u=>({yaw:+(process.env.YAW||.12),pitch:.03,dist:+(process.env.DIST||1.5),tx:PX,ty:+(process.env.TY||.98),tz:PZ}),cine:{fov:.6},ruin:RBC,hero:Object.assign(PR('k3-bengong',H0),XO())},B);
+  SHOTS['r-badan']=Object.assign({f:u=>({yaw:+(process.env.YAW||.25),pitch:.06,dist:+(process.env.DIST||4.2),tx:PX,ty:.62,tz:PZ}),cine:{fov:.6},ruin:RBC,hero:Object.assign(PR('k3-bengong',H0),XO())},B)}
  SHOTS['n1-muka']=Object.assign({f:u=>({yaw:L(.38,.32,u),pitch:.02,dist:L(3.4,3.3,u),tx:PX-.15,ty:1.45,tz:PZ}),cine:{fov:.6},ruin:RBC,hero:PR('k3-bengong',H0)},B);
  for(const n of ['k3-jauh','k3-kaki','k3-bengong','k3-bahu','k3-sampai','k3-ribut','k3-malam','k3-pagi','k3-menang'])SHOTS['c'+n]=Object.assign({},SHOTS[n],{cine:{fov:.87},ruin:Object.assign({},SHOTS[n].ruin,{rs:1,tanah:0})});
 
@@ -258,7 +261,12 @@ if(PRESV||S.halus){if(!engineP)engineP=fs.readFileSync(path.join(REPO,'engine.js
 if(PRESV){avatarP=fs.readFileSync(path.join(REPO,'avatar.js'),'utf8');
   const A1="if(role==='pres'){Object.assign(L,{shirt:'#1E2A44',arm:'#1E2A44',pants:'#1E2A44',shoe:'#111111',hair:'pendek',hc:'#1F1F1F'})}",A2="if(L.role==='pres'){for(const sx of [-1,1])D(G.box",A3="if(L.role==='pres')return; // mahkota digambar ownerFx di kota.js";
   for(const a of [A1,A2,A3])if(!avatarP.includes(a))throw new Error('patch pres gagal: '+a.slice(0,40));
-  {const B1='function body3D(r,Wm,t,near,mv){',B2='function acc3D(r,Wm,t,near,L){';if(!avatarP.includes(B1)||!avatarP.includes(B2))throw new Error('patch dewasa');const AD='function __adult(W0){if(!window.__CINE)return W0;const HB=M.chain(M.T(0,1.3,0),M.S(.86,.86,.86),M.T(0,-1.0,0)),BB=M.S(1,1.3,1);return m=>W0(M.mul(m[13]>=1.0?HB:BB,m))}\n';avatarP=avatarP.replace(B1,AD+'function body3D(r,Wm0,t,near,mv){const Wm=__adult(Wm0);').replace(B2,'function acc3D(r,Wm0,t,near,L){const Wm=__adult(Wm0);')}
+  {const B1='function body3D(r,Wm,t,near,mv){',B2='function acc3D(r,Wm,t,near,L){';if(!avatarP.includes(B1)||!avatarP.includes(B2))throw new Error('patch dewasa');const AD='function __adult(W0){if(!window.__CINE)return W0;const HB=M.chain(M.T(0,1.3,0),M.S(.86,.86,.86),M.T(0,-1.0,0)),BB=M.S(1,1.3,1);return m=>W0(M.mul(m[13]>=1.0?HB:BB,m))}\n';avatarP=avatarP.replace(B1,AD+'function body3D(r,Wm0,t,near,mv){if(window.__REAL&&window.__MAN){const L=look(r);window.__MAN(r,L,Wm0,t,near,mv);return L}const Wm=__adult(Wm0);').replace(B2,'function acc3D(r,Wm0,t,near,L){if(window.__REAL)return;const Wm=__adult(Wm0);')}
+  {const F1="else for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.19,1.34,.36),M.S(.15,.18,.11))),CREAM",F2="if(near){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH";
+   if(!avatarP.includes(F1)||!avatarP.includes(F2))throw new Error('patch muka');
+   avatarP=avatarP.replace(F1,"else if(window.__CINE)__face(r,L,Wm,t,near);"+F1).replace(F2,"if(near&&!window.__CINE){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH");
+   avatarP+='\n'+fs.readFileSync(path.join(__dirname,'face_patch.js'),'utf8')}
+  if(S.real||process.env.REAL)avatarP+='\n'+fs.readFileSync(path.join(__dirname,'manusia.js'),'utf8');
   avatarP=avatarP.replace(A1,"if(role==='pres'){Object.assign(L,window.__PRES)}").replace(A2,"if(L.role==='pres'&&L.glass){for(const sx of [-1,1])D(G.box")
    .replace(A3,"if(L.role==='pres'){const P1='#FFD23F';if(L.pin){D(G.sph,Wm(M.chain(M.T(.17,.8,.25),M.S(.045,.035,.03))),'#FFD23F',{em:.6,cast:false});D(G.box,Wm(M.chain(M.T(.2,.82,.26),M.S(.018,.12,.018))),'#FFD23F',{em:.6,cast:false});D(G.box,Wm(M.chain(M.T(.225,.93,.26),M.S(.06,.03,.018))),'#FFD23F',{em:.6,cast:false})}if(L.acc==='hp'||L.acc==='hpgit'){D(G.box,Wm(M.chain(M.T(0,1.87,0),M.S(.5,.07,.14))),INK,NC);for(const s of [-1,1]){D(G.box,Wm(M.chain(M.T(s*.55,1.5,0),M.RZ(s*.64),M.S(.07,.5,.14))),INK,NC);D(G.sph,Wm(M.chain(M.T(s*.56,1.36,0),M.S(.13,.22,.22))),INK,NC);D(G.sph,Wm(M.chain(M.T(s*.66,1.36,0),M.S(.05,.15,.15))),P1,{em:.6,cast:false})}}"
     +"if(L.acc==='hpgit'){D(G.sphHi,Wm(M.chain(M.T(.12,.62,-.34),M.S(.26,.3,.07))),'#C97B3A',NC);D(G.sph,Wm(M.chain(M.T(.12,.62,-.39),M.S(.08,.08,.03))),'#2B1A0E',NC);D(G.box,Wm(M.chain(M.T(-.18,1.2,-.34),M.RZ(.5),M.S(.08,.9,.05))),'#5A3A1E',NC);D(G.box,Wm(M.chain(M.T(-.4,1.62,-.34),M.RZ(.5),M.S(.15,.17,.06))),'#2B1A0E',NC)}if(L.acc==='beanie'){D(G.sphHi,Wm(M.chain(M.T(0,1.66,-.02),M.S(.53,.34,.52))),'#E5484D',NC);D(G.cyl16,Wm(M.chain(M.T(0,1.56,-.02),M.S(.535,.1,.525))),'#B5352C',NC);D(G.sph,Wm(M.chain(M.T(0,2.02,-.02),M.S(.1,.1,.1))),'#FFF7E8',NC);"
@@ -291,7 +299,7 @@ srv.listen(0,async()=>{const port=srv.address().port;
   const p=await b.newPage({viewport:{width:W,height:H},deviceScaleFactor:DPR});
   await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
   await p.addInitScript(()=>{let T=0;const q=[];const B0=Date.now();Date.now=()=>B0+T;window.__adv=ms=>{T+=ms;q.splice(0).forEach(f=>f(T))};performance.now=()=>T;window.requestAnimationFrame=f=>{q.push(f);return q.length}});
-  if(PRESV)await p.addInitScript(o=>{window.__PRES=o},PRESV);
+  if(PRESV)await p.addInitScript(o=>{window.__PRES=o},PRESV);if(S.real||process.env.REAL)await p.addInitScript(()=>{window.__REAL=1});
   await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site);if(o.calm)window.__CALM=1;if(o.bio)window.__BIO=Object.assign({T:0},o.bio);if(o.ruin)window.__RUIN=Object.assign({T:0,x:0,z:0,sp:.03,t0:0,dr:30},o.ruin);if(o.k3)window.__K3=Object.assign({T:0},o.k3);if(o.chr)window.__CHR=1;if(o.cine)window.__CINE=o.cine},{cine:S.cine||null,chr:S.chr||null,k3:S.k3||null,ruin:S.ruin||null,bio:S.bio||null,calm:!!(S.calm||process.env.CALM),hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
   p.on('pageerror',e=>console.log('PAGEERR',e.message));
   await p.addStyleTag({content:''}).catch(()=>{});

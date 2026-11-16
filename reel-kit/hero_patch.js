@@ -13,6 +13,6 @@ function __heroPos(r,t){const H=window.__HERO;if(!H||r.u.toLowerCase()!==H.u)ret
   if(H.car){const R=CAR.R&&CAR.R.r===r?CAR.R:(CAR.R=carBuild(r));const dd=R.L[0].T+R.stops[0]+R.L[1].T;CAR.t0=t-T+H.car-dd}
   let yy=(k[5]!=null?k[5]:(H.y||0));if(H.talk){const m=H.talk[Math.min(H.talk.length-1,Math.max(0,Math.floor(T*30)))]||0;r.__hy=k[3]+Math.sin(t*1.3)*.04;
     if(H.mk){for(const [y,c] of H.mk)D(G.sph,M.chain(M.T(k[1],y,k[2]+(H.mz||.3)),M.S(.03,.03,.03)),c,{em:1})}
-    const mo=Math.min(1,m*1.3);if(yy<.01&&mo>.05){const a=k[3];const MY=H.my||(window.__CINE?.825:.655),MZ=H.mz||(window.__CINE?.197:.29);D(G.sph,M.chain(M.T(k[1]+Math.sin(a)*MZ,MY+yy,k[2]+Math.cos(a)*MZ),M.RY(a),M.S(.045,.01+.032*mo,.02)),'#3A1A22',{cast:false})}}
+    const mo=Math.min(1,m*1.3);r.__mo=mo;if(!window.__REAL&&yy<.01&&mo>.05){const a=k[3];const MY=H.my||(window.__CINE?.825:.655),MZ=H.mz||(window.__CINE?.197:.29);D(G.sph,M.chain(M.T(k[1]+Math.sin(a)*MZ,MY+yy,k[2]+Math.cos(a)*MZ),M.RY(a),M.S(.045,.01+.032*mo,.02)),'#3A1A22',{cast:false})}}
   if(H.spot)D(G.cone8,M.chain(M.T(k[1],0,k[2]),M.S(1.3,9,1.3)),'#FFF6C8',{em:1,alpha:.22,cast:false});
   return [k[1],yy,k[2]]}
