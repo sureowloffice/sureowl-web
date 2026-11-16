@@ -1,7 +1,7 @@
 // Muka, rambut, dan gerakan tangan avatar versi video (mode cine). Web asli tidak berubah.
 function __face(r,L,Wm,t,near){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()===H.u,TT=me?(H.T||0):t;
- const EX={netral:[0,0,1,0],senyum:[.01,0,.8,1],kaget:[.07,.06,1.3,0],sedih:[.06,-.03,.8,-1],bingung:[.04,0,1,-.3],marah:[-.04,.03,.85,-.6],semangat:[.04,.04,1.1,1],merem:[.01,0,0,.6],ketawa:[.03,.02,0,1]};
- let k='netral';if(me&&H.ex)for(const x of H.ex)if(TT>=x[0])k=EX[x[1]]?x[1]:k;const e=EX[k];
+ const EX={netral:[0,0,1,0],senyum:[.01,0,.8,1],kaget:[.07,.06,1.3,0],sedih:[.06,-.03,.8,-1],bingung:[.04,0,1,-.3],marah:[-.04,.03,.85,-.6],semangat:[.04,.04,1.1,1],merem:[.01,0,0,.6],ketawa:[.03,.02,0,1],nguap:[.02,.02,0,0],teriak:[-.04,.03,.95,-.3],sakit:[.05,-.03,0,-.8]};
+ let k=(!me&&r.__ex&&EX[r.__ex])?r.__ex:'netral';if(me&&H.ex)for(const x of H.ex)if(TT>=x[0])k=EX[x[1]]?x[1]:k;const e=EX[k];
  const NC={cast:false},hc=L.hc||'#1F1F1F',ph=r.ph||0;const bk=((t*.28+ph*.13)%1)<.04;const op=bk?.08:e[2];
  for(const s of [-1,1]){const x=s*.17,y=1.33;
   if(op<.05){const cv=k==='ketawa'?1:.5;for(const d of [-1,1])D(G.sph,Wm(M.chain(M.T(x+d*.035,y+.005*cv,.43),M.RZ(-d*.45*cv),M.S(.045,.012,.02))),'#2A1A12',NC)}
@@ -10,6 +10,8 @@ function __face(r,L,Wm,t,near){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase(
    D(G.sph,Wm(M.chain(M.T(x+.03,y+.022,.457),M.S(.013,.013,.008))),'#FFFFFF',{em:1,cast:false})}}
   const yi=1.46+e[0],yo=1.455+e[1];D(G.sph,Wm(M.chain(M.T(x,(yi+yo)/2,.4),M.RZ(Math.atan2(yo-yi,.1)*s),M.S(.085,.02,.03))),hc,NC)}
  if(!near||(me&&(r.__mo||0)>.05))return;
+ if(k==='nguap'){D(G.sph,Wm(M.chain(M.T(0,1.11,.41),M.S(.06,.085,.025))),'#3A1A22',NC);return}
+ if(k==='teriak'||k==='sakit'){D(G.sph,Wm(M.chain(M.T(0,1.115,.41),M.S(.065,.04+.015*Math.abs(Math.sin(t*9+ph)),.025))),'#3A1A22',NC);D(G.sph,Wm(M.chain(M.T(0,1.145,.427),M.S(.05,.01,.01))),'#FFFFFF',NC);return}
  if(k==='kaget'){D(G.sph,Wm(M.chain(M.T(0,1.12,.41),M.S(.045,.055,.025))),'#3A1A22',NC);return}
  if(k==='ketawa'){D(G.sph,Wm(M.chain(M.T(0,1.125,.41),M.S(.07,.045,.025))),'#3A1A22',NC);D(G.sph,Wm(M.chain(M.T(0,1.155,.428),M.S(.05,.012,.01))),'#FFFFFF',NC);return}
  const sm=e[3];for(const s of [-1,1])D(G.sph,Wm(M.chain(M.T(s*.03,1.13+sm*.008,.415),M.RZ(s*sm*.35),M.S(.04,.011,.02))),'#5A2A26',NC)}
@@ -34,7 +36,12 @@ const __GS={diam:{R:{a:.22},L:{a:.22}},
  palu:{R:{a:.22,f:1.2,e:.9,hm:1},L:{a:.35,f:.7,e:.7}},
  junjung:{R:{a:.3,f:2.75,e:.35},L:{a:.3,f:2.75,e:.35}}};
 function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()===H.u,TT=me?(H.T||0):t;const NC={cast:false};
- let A=__GS.diam,B=__GS.diam,f=1;if(!me&&r.__ges){A=B=__GS[r.__ges]||__GS.diam}if(me&&H.ges){let i=-1;for(let k=0;k<H.ges.length;k++)if(TT>=H.ges[k][0])i=k;
+ let A=__GS.diam,B=__GS.diam,f=1;if(!me&&r.__ges){A=B=__GS[r.__ges]||__GS.diam}
+ const K3=window.__K3;if(!me&&!r.__ges&&K3&&K3.crowd&&K3.crowd.argue&&sw===0&&r.u&&r.u.startsWith('warga')){const i=Math.round((r.ph||0)/1.7);const g=['semangat','tunjuk','pinggang','tunjuk'][(i+Math.floor(t*1.2+i*.4))%4];A=B=__GS[g];r.__ex=i%2?'marah':'teriak';
+  const P0=Wm(M.T(0,2.55,0));const sl=K3.say||[];
+  if(i<sl.length){const P1=Wm(M.T(0,1.3,0));D(G.box,M.chain(M.T(P1[12],P1[13],P1[14]),M.S(.03,P0[13]-P1[13],.03)),'#7A5230',{cast:false});__bb(P0[12],P0[13],P0[14],sl[i],.85,'#FFF4C2')}
+  else if(i<14&&Math.floor(t*.8+i*.37)%2==0)__bb(P0[12],P0[13],P0[14],['RUMAH!','GEDUNG!','RUMAH DULU!','GEDUNG!!'][i%4],.55,'#FFFFFF')}
+ else if(!me&&!r.__ges)r.__ex=null;if(me&&H.ges){let i=-1;for(let k=0;k<H.ges.length;k++)if(TT>=H.ges[k][0])i=k;
   if(i>=0){B=__GS[H.ges[i][1]]||__GS.diam;A=i>0?(__GS[H.ges[i-1][1]]||__GS.diam):(H.ges[0][0]<=0?B:__GS.diam);const q=Math.min(1,(TT-H.ges[i][0])/.3);f=q*q*(3-2*q)}}
  for(const s of [-1,1]){const a=s>0?A.R:A.L,b=s>0?B.R:B.L;const g=k=>(a[k]||0)+((b[k]||0)-(a[k]||0))*f;const bb=f>.5?b:a;
   const wv=bb.wv?Math.sin(t*9)*.4:0;const hp=bb.hm?Math.sin((t*(r.__sp||1)*4.5+(r.ph||0))*6.283):0;const hs=hp>0?hp:hp*.35;const sh=M.chain(M.T(s*.36,.88,0),M.RZ(s*g('a')),M.RX(-g('f')-s*sw*.8-hs*.55));
@@ -48,18 +55,30 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
 
 // kru bangunan: warga + President kerja (palu, angkut, atap), tumpukan bahan, debu tiap pukulan
-window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
- const X=Bd.x,Z=Bd.z,w=4.2,dp=3.4,FB=.14,hg=2.5,sp=K.crew.sp||1,NC={cast:false};const fr=v=>Math.abs(Math.sin(v)*43758.5453)%1;
+window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.spy)__spyF(K,T,t,man,REC);if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
+ const X=Bd.x,Z=Bd.z,w=4.2,dp=3.4,FB=.14,hg=2.5,NC={cast:false};
+ if(b>5.6&&K.plak){const tx=__bbTex(K.plak,'#F4E2C0');D(G.box,M.chain(M.T(X+1.35,FB+.55,Z+dp/2+.1),M.S(1.1,.55,.03)),'#FFFFFF',{tex:tx,em:.6,cast:false})}
+ if(!K.crew)return;const sp=K.crew.sp||1;const fr=v=>Math.abs(Math.sin(v)*43758.5453)%1;
  // tumpukan bahan
  const px=X-4.6,pz=Z+2.6;for(let i=0;i<6;i++)D(G.box,M.chain(M.T(px,i*.09,pz),M.RY(fr(i)*.08),M.S(2.2,.08,.32)),['#C49A62','#B9834A'][i%2],{tex:window.__CINE&&window.__cineTexF?window.__cineTexF('wood'):undefined});
  for(let i=0;i<3;i++)for(let j=0;j<4;j++)D(G.box,M.chain(M.T(px+.2+j*.26,i*.12,pz-1.1),M.S(.24,.11,.5)),'#B4523A',NC);
  for(let i=0;i<4;i++)D(G.sphHi,M.chain(M.T(px+1.5+(i%2)*.4,.13+Math.floor(i/2)*.2,pz+1+(i%2)*.1),M.S(.3,.13,.2)),'#D9D4C7',NC);
  const sc=b<2?0:b<5.2?1:1-cl((b-5.2)/.5);const wt=FB+hg*cl((b-3)/1);const lv=(sc>.5&&wt>1.4)?1.1*sc:0;
- const put=(i,x,z,yw,y,g,hit)=>{const R=REC(i);R.__ges=g;R.__sp=sp;man(i,x,z,yw,false,y,false);
+ const AD=K.crew.aduh;const put=(i,x,z,yw,y,g,hit)=>{const R=REC(i);let yy=y;R.__ex=null;if(AD&&i===40&&T>=AD[0]&&T<AD[1]){g='lambai';R.__ex='sakit';yy=y+Math.abs(Math.sin(T*14))*.18;hit=null;const P=[x,y+1.45,z];__bb(P[0],P[1],P[2],'ADUH! JEMPOL! 😖',.95,'#FFE0E0')}R.__ges=g;R.__sp=sp;man(i,x,z,yw,false,yy,false);
   if(hit){const q=((t*sp*4.5+(R.ph||0))%1);if(q<.35){const a=1-q/.35;for(let k=0;k<4;k++)D(G.sph,M.chain(M.T(hit[0]+(fr(k+i)-.5)*.3,hit[1]+q*.5+fr(k*3)*.1,hit[2]+(fr(k*7)-.5)*.2),M.S(.08+q*.25,.08+q*.2,.08+q*.25)),'#D8C6A6',{alpha:.5*a,cast:false})}}};
  if(b<5.6){
   put(40,X-1.2,Z+dp/2+.62,Math.PI,lv,'palu',[X-1.2,Math.max(.3,wt-.2),Z+dp/2+.12]);
   put(41,X+w/2+.62,Z-.6,-Math.PI/2,lv,'palu',[X+w/2+.12,Math.max(.3,wt-.2),Z-.6]);
   const c=(t*sp*.35)%1,go=c<.5,u=go?c*2:2-c*2;const cx=px+(X-1.6-px)*u,cz=pz+(Z+dp/2+1.3-pz)*u;const R=REC(42);R.__ges=go?'junjung':'diam';man(42,cx,cz,Math.atan2(X-1.6-px,Z+dp/2+1.3-pz)+(go?0:Math.PI),true,Math.abs(Math.sin(t*9))*.06,go);
   if(b>4&&b<5.4)put(43,X+.9,Z+.35,0,FB+hg+.42,'palu',[X+.9,FB+hg+.6,Z+.75])}
- if(K.crew.pres){const H=window.__HERO;if(H){H.keys=[[0,X+1.2,Z+dp/2+.62,Math.PI,0,lv]];H.ges=[[0,'palu']]}}};
+ if(K.crew.pres){const H=window.__HERO;if(H){H.keys=[[0,X+1.2,Z+dp/2+.62,K.crew.pyaw!=null?K.crew.pyaw:Math.PI,0,lv]];const N=K.crew.nguap;H.ges=N?[[0,'palu'],[N[0],'garuk'],[N[1],'palu']]:[[0,'palu']];H.ex=N?[[0,'netral'],[N[0],'nguap'],[N[1],'netral']]:[[0,'netral']]}}};
+function __spyF(K,T,t,man,REC){const S=K.spy;const R=REC(60);R.col='#1A1A22';R.pk='pusat';R.__ges='dagu';R.__ex=null;R._Lk=null;const pk=Math.max(0,Math.min(1,(T-(S.t0||0))/.6));const x=S.x+S.dx*pk,z=S.z+S.dz*pk;man(60,x,z,S.yaw,false,0,false);
+ D(G.sphHi,M.chain(M.T(x,.97,z),M.RY(S.yaw),M.S(.25,.26,.25)),'#141418',{cast:false});D(G.sphHi,M.chain(M.T(x,.86,z),M.RY(S.yaw),M.T(0,0,-.06),M.S(.26,.2,.24)),'#141418',{cast:false})}
+
+// papan/balon teks yang selalu menghadap kamera
+function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;if(C[k])return C[k];
+ const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle=bg;x.strokeStyle='#14102B';x.lineWidth=12;x.beginPath();x.roundRect(10,10,w-20,h-56,40);x.fill();x.stroke();
+  x.beginPath();x.moveTo(w/2-30,h-48);x.lineTo(w/2,h-8);x.lineTo(w/2+30,h-48);x.fill();x.stroke();x.fillRect(w/2-26,h-60,52,16);
+  x.fillStyle='#14102B';x.textAlign='center';x.textBaseline='middle';let fs=120;do{x.font='900 '+fs+'px Inter, sans-serif';fs-=6}while(x.measureText(txt).width>w-70&&fs>30);x.fillText(txt,w/2,(h-46)/2+6)});
+ return C[k]=texFromCanvas(cv)}
+function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.box,M.chain(M.T(px,py,pz),M.RY(yw),M.S(sz,sz/2,.02)),'#FFFFFF',{tex:__bbTex(txt,bg||'#FFFFFF'),em:1,cast:false})}
