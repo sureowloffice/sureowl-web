@@ -198,6 +198,7 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  for(const n of ['k3-jauh','k3-kaki','k3-bengong','k3-bahu','k3-sampai','k3-ribut','k3-malam','k3-pagi','k3-menang'])SHOTS['c'+n]=Object.assign({},SHOTS[n],{cine:{fov:.87},ruin:Object.assign({},SHOTS[n].ruin,{rs:1,tanah:0})});
 {const XG={'ck3-jauh':{ex:[[0,'sedih']]},'ck3-bengong':{ex:[[0,'netral'],[.4,'kaget']],ges:[[0,'diam'],[.55,'tunjuk']]},'ck3-bahu':{ex:[[0,'bingung']],ges:[[0,'garuk'],[2.4,'angkat']]},'ck3-pagi':{ex:[[0,'senyum']],ges:[[0,'diam'],[1.5,'pinggang']]},'ck3-menang':{ex:[[0,'senyum'],[1.35,'ketawa']],ges:[[0,'diam'],[1.35,'semangat']]}};
  for(const k in XG)if(SHOTS[k].hero)SHOTS[k]=Object.assign({},SHOTS[k],{hero:Object.assign({},SHOTS[k].hero,XG[k])});
+ SHOTS['ck3-jauh']=Object.assign({},SHOTS['ck3-jauh'],{f:u=>{const e=E(u),e2=1-Math.pow(1-u,3);return {yaw:L(Math.PI-1.1,Math.PI-.18,e2),pitch:L(.85,.07,e2),dist:L(48,11,e2),tx:-84,ty:L(0,1.7,e),tz:L(-44,-36,e)}}});
  SHOTS['xck3-bengong']=Object.assign({},SHOTS['ck3-bengong'],{chr:1});}
 
 
