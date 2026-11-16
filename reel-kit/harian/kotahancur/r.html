@@ -61,9 +61,10 @@ window.draw=async(f,t)=>{const im=await new Promise(r=>{const i=new Image();i.on
   {const [a,b]=S['h0-bangga'];sticker(t,a+.2,b,'KEMARIN 🎉',430,-.04,'#fff','#111')}
   {const [a,b]=S['h0-goyang'];sticker(t,a+.2,b,'PAGI INI ⚠️',430,.04,R,'#fff')}
   {const a=S['h0-runtuh'][0],b=S['h0-bioskop'][1],m=S['h0-bioskop'][0];if(t>=a&&t<b){const u=cl((t-a-.3)/(b-a-1.1));const n=Math.round(127*(1-eo(u)*0+ -u)) ;const v=Math.max(0,Math.round(127*(1-u)));big(a+.1,b,'GEDUNG TERSISA',String(v),v===0?'habis.':'runtuh satu per satu…',v<20?R:'#111')}}
-  {const [a,b]=S['h0-kosong'];big(a+.1,b,'KOTA SENI SEKARANG','0','gedung · rumah · warga',R)}
-  {const [a,b]=S['h0-sendiri'];big(a+.2,b,'JUMLAH WARGA','1','itu pun President-nya',R)}
-  {const [a,b]=S['h0-nol'];sticker(t,a+1.9,b,'BANGUN LAGI DARI NOL 💪',430,-.03,Y,'#111')}
+  {const [a,b]=S['h0-kosong'];big(a+.1,S['h0-sendiri'][0]+2.2,'KOTA SENI SEKARANG','0','gedung · 0 rumah',R)}
+  {const [a,b]=S['h0-sendiri'];const m=window.SUB.find(q=>q[2].startsWith('Warga: satu'))[0];big(m,b,'JUMLAH WARGA','1','President sekaligus rakyat',R)}
+  {const [a,b]=S['h0-nol'];const m=window.SUB.find(q=>q[2].startsWith('Jadi gue'))[0];sticker(t,m,b,'BANGUN LAGI DARI NOL 💪',430,-.03,Y,'#111')}
+  {const [a,b]=S['h0-hadap'];const m=window.SUB.find(q=>q[2].startsWith('Gue butuh'))[0];sticker(t,m,b,'DICARI: WARGA 🙋',430,.03,R,'#fff')}
   {const [a,b]=S['h0-cta'];const m=window.SUB.find(s=>s[2].startsWith('Terus komen'))[0];
     if(t>=a&&t<m)pop(a+.1,t,(s)=>{x.translate(W/2,400);x.scale(s,s);out('BANTU FOLLOW 🙏',0,-70,100,'#fff');out('= WARGA PERTAMA',0,50,88,Y);x.restore()});
     if(t>=m&&t<b)pop(m,t,(s)=>{x.translate(W/2,400);x.scale(s,s);out('KOMEN 👇',0,-70,112,'#fff');out('BESOK BANGUN APA DULU?',0,50,70,Y);x.restore()})}

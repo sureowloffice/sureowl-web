@@ -146,7 +146,7 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  SHOTS['h0-kemarin']=Object.assign({f:u=>({yaw:L(-.3,.05,u),pitch:L(.1,.14,u),dist:L(20,16,E(u)),tx:-84,ty:4,tz:-50})},B);
  SHOTS['h0-flash']=Object.assign({f:u=>({yaw:ISO+L(-.1,.05,u),pitch:.5,dist:L(30,38,E(u)),tx:-82,tz:-46}),ruin:RB},B);
  SHOTS['h0-bangga']=Object.assign({f:u=>u<.45?{yaw:L(-.1,.02,u/.45),pitch:.13,dist:L(3.3,3.0,u/.45),tx:PX,ty:.8,tz:PZ}:{yaw:L(.32,.2,(u-.45)/.55),pitch:.15,dist:L(9,7.4,E((u-.45)/.55)),tx:PX-.6,ty:2.2,tz:PZ-2},hero:PR('h0-bangga',H0)},B);
- SHOTS['h0-goyang']=Object.assign({f:(u,ts)=>SK({yaw:L(-.1,.05,u),pitch:.14,dist:L(3.4,3.0,u),tx:PX,ty:.8,tz:PZ},ts,1.8,.3),ruin:{t0:2.6,x:-84,z:-56,sp:.03,novil:1,hide:9},hero:PR('h0-goyang',H0)},B);
+ SHOTS['h0-goyang']=Object.assign({f:(u,ts)=>SK({yaw:L(-.1,.05,u),pitch:.14,dist:L(3.4,3.0,u),tx:PX,ty:.8,tz:PZ},ts,1.8,.3),ruin:{t0:4.5,x:-84,z:-56,sp:.03,novil:1,hide:9},hero:PR('h0-goyang',H0)},B);
  SHOTS['h0-runtuh']=Object.assign({f:(u,ts)=>SK({yaw:ISO+L(-.1,.1,u),pitch:.6,dist:L(78,96,E(u)),tx:-24,tz:-30},ts,1.2,0),ruin:{t0:.15,x:60,z:30,sp:.019,dust:140,dr:190,ds:2.2,novil:1,hide:.4}},B);
  SHOTS['h0-bioskop']=Object.assign({f:(u,ts)=>SK({yaw:L(.25,.12,u),pitch:L(.14,.2,u),dist:L(13,17,E(u)),tx:-84,ty:3,tz:-50},ts,1.4*Math.max(0,1-ts/2.4),0),ruin:{t0:.9,x:-84,z:-57,sp:.05,dust:34,dr:13,rub:60,novil:1,hide:0},hero:PR('x',[[0,PX,PZ+2.2,Math.PI,0]])},B);
  SHOTS['h0-kosong']=Object.assign({f:u=>({yaw:ISO+L(.1,-.05,u),pitch:.6,dist:L(96,84,E(u)),tx:-24,tz:-30}),ruin:{t0:-5.4,x:60,z:30,sp:.019,dust:140,dr:190,ds:2.2,rub:700,rs:2.2,tanah:260,novil:1}},B);
