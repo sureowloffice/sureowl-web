@@ -265,6 +265,8 @@ if(PRESV){avatarP=fs.readFileSync(path.join(REPO,'avatar.js'),'utf8');
   {const F1="else for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.19,1.34,.36),M.S(.15,.18,.11))),CREAM",F2="if(near){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH";
    if(!avatarP.includes(F1)||!avatarP.includes(F2))throw new Error('patch muka');
    avatarP=avatarP.replace(F1,"else if(window.__CINE)__face(r,L,Wm,t,near);"+F1).replace(F2,"if(near&&!window.__CINE){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH");
+   {const F3="else D(G.sphHi,Wm(M.chain(M.T(0,1.52,-.06),M.S(.53,.36,.47))),L.hc,NC);",F4="if(near){for(const sx of [-1,1]){const ar=M.chain(M.T(sx*.36,.88,0)";if(!avatarP.includes(F3)||!avatarP.includes(F4))throw new Error('patch rambut/tangan');
+    avatarP=avatarP.replace(F3,"else if(window.__CINE&&L.role==='pres')__hairP(Wm,L.hc);"+F3).replace(F4,"if(near&&window.__CINE)__arms(r,L,Wm,t,sw);else "+F4)}
    avatarP+='\n'+fs.readFileSync(path.join(__dirname,'face_patch.js'),'utf8')}
   if(S.real||process.env.REAL)avatarP+='\n'+fs.readFileSync(path.join(__dirname,'manusia.js'),'utf8');
   avatarP=avatarP.replace(A1,"if(role==='pres'){Object.assign(L,window.__PRES)}").replace(A2,"if(L.role==='pres'&&L.glass){for(const sx of [-1,1])D(G.box")
