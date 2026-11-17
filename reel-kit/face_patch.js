@@ -144,7 +144,11 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
 
 // siluet burung hantu kecil (pencuri misterius) — hitam, tanpa muka
 function __owlSil(p,T,t){let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||1)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u}
- const sc=p.sc||.55,c=p.col||'#0B0B10',NC={cast:false};const hop=Math.abs(Math.sin(t*12))*.05*(p.to?1:0);const R=m=>M.chain(M.T(x,hop,z),M.RY(p.yaw||0),M.S(sc,sc,sc),m);
- D(G.sphHi,R(M.chain(M.T(0,.42,0),M.S(.34,.42,.3))),c,NC);D(G.sphHi,R(M.chain(M.T(0,.92,0),M.S(.3,.26,.27))),c,NC);
- for(const s of [-1,1]){D(G.sphHi,R(M.chain(M.T(s*.17,1.16,0),M.RZ(-s*.35),M.S(.06,.14,.06))),c,NC);D(G.sph,R(M.chain(M.T(s*.1,.02,.06),M.S(.06,.03,.1))),c,NC);D(G.sphHi,R(M.chain(M.T(s*.3,.45,-.02),M.RZ(s*.25),M.S(.08,.3,.2))),c,NC)}
- if(p.roti)D(G.sphHi,R(M.chain(M.T(.18,.5,.25),M.RY(.4),M.S(.2,.12,.12))),'#2A1C10',NC)}
+ // siluet Vilindo (bentuk sama dengan mascot() di engine.js): badan bulat satu, baret pipih + tonjolan, kaki, tangan kecil
+ const sc=p.sc||.4,c=p.col||'#0B0B10',NC={cast:false};const mv=!!p.to;const hop=mv?Math.abs(Math.sin(t*12))*.06:0;const sq=mv?Math.abs(Math.sin(t*12))*.12:0;const sY=1-sq*.25,sX=1+sq*.18;
+ const R=m=>M.chain(M.T(x,hop,z),M.RY(p.yaw||0),M.S(sc,sc,sc),m);
+ for(const s of [-1,1])D(G.sph,R(M.chain(M.T(s*.32,.1,.12),M.S(.24,.13,.32))),c,NC);
+ D(G.sphHi,R(M.chain(M.T(0,.95*sY,0),M.S(.82*sX,.98*sY,.78*sX))),c,NC);
+ D(G.sphHi,R(M.chain(M.T(.05,1.86*sY,0),M.RZ(-.18),M.S(.62,.16,.58))),c,NC);D(G.sph,R(M.chain(M.T(.08,2.02*sY,0),M.S(.07,.08,.07))),c,NC);
+ for(const s of [-1,1])D(G.sph,R(M.chain(M.T(s*.8,.95*sY,.05),M.RZ(s*(mv?.9+Math.sin(t*12)*.3:.35)),M.T(0,-.28,0),M.S(.15,.3,.15))),c,NC);
+ if(p.roti)D(G.sphHi,R(M.chain(M.T(.55,1.0,.55),M.RY(.4),M.S(.3,.18,.18))),'#2A1C10',NC)}
