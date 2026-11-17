@@ -60,7 +60,7 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   if(L.role==='pres')D(G.sph,Wm(M.chain(el,M.T(0,-.22,0),M.S(.07,.03,.07))),'#F6F6F2',NC);
   const hd=M.chain(el,M.T(0,-.29,0));D(G.sph,Wm(M.chain(hd,M.S(.075,.08,.07))),L.skin,NC);
   if(s>0&&r.__hold==='roti'){D(G.sphHi,Wm(M.chain(hd,M.T(0,-.06,.06),M.RZ(1.2),M.S(.17,.085,.09))),'#C98A3E',NC);D(G.sph,Wm(M.chain(hd,M.T(0,-.02,.09),M.RZ(1.2),M.S(.13,.03,.05))),'#E7B66E',NC)}
-  if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.01)),'#FFFFFF',{tex:__bbTex('KTW ⚡ WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
+  if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.01)),'#FFFFFF',{tex:__bbTex('KTW WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
   if(bb.hm){D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.14,0),M.S(.028,.17,.028))),'#8A5A2B',NC);D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.3,0),M.S(.1,.045,.045))),'#5B5F66',NC)}
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
 
@@ -74,7 +74,7 @@ window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.spy)__spyF(K,T,t,ma
  for(let i=0;i<3;i++)for(let j=0;j<4;j++)D(G.box,M.chain(M.T(px+.2+j*.26,i*.12,pz-1.1),M.S(.24,.11,.5)),'#B4523A',NC);
  for(let i=0;i<4;i++)D(G.sphHi,M.chain(M.T(px+1.5+(i%2)*.4,.13+Math.floor(i/2)*.2,pz+1+(i%2)*.1),M.S(.3,.13,.2)),'#D9D4C7',NC);
  const sc=b<2?0:b<5.2?1:1-cl((b-5.2)/.5);const wt=FB+hg*cl((b-3)/1);const lv=(sc>.5&&wt>1.4)?1.1*sc:0;
- const AD=K.crew.aduh;const put=(i,x,z,yw,y,g,hit)=>{const R=REC(i);let yy=y;R.__ex=null;if(AD&&i===40&&T>=AD[0]&&T<AD[1]){g='lambai';R.__ex='sakit';yy=y+Math.abs(Math.sin(T*14))*.18;hit=null;const P=[x,y+1.2,z];__bb(P[0],P[1],P[2],'ADUH! JEMPOL! 😖',.75,'#FFE0E0')}R.__ges=g;R.__sp=sp;man(i,x,z,yw,false,yy,false);
+ const AD=K.crew.aduh;const put=(i,x,z,yw,y,g,hit)=>{const R=REC(i);let yy=y;R.__ex=null;if(AD&&i===40&&T>=AD[0]&&T<AD[1]){g='lambai';R.__ex='sakit';yy=y+Math.abs(Math.sin(T*14))*.18;hit=null;const P=[x,y+1.2,z];__bb(P[0],P[1],P[2],'ADUH! JEMPOL!',.75,'#FFE0E0')}R.__ges=g;R.__sp=sp;man(i,x,z,yw,false,yy,false);
   if(hit){const q=((t*sp*4.5+(R.ph||0))%1);if(q<.35){const a=1-q/.35;for(let k=0;k<4;k++)D(G.sph,M.chain(M.T(hit[0]+(fr(k+i)-.5)*.3,hit[1]+q*.5+fr(k*3)*.1,hit[2]+(fr(k*7)-.5)*.2),M.S(.08+q*.25,.08+q*.2,.08+q*.25)),'#D8C6A6',{alpha:.5*a,cast:false})}}};
  if(b<5.6){
   put(40,X-1.2,Z+dp/2+.62,Math.PI,lv,'palu',[X-1.2,Math.max(.3,wt-.2),Z+dp/2+.12]);
@@ -87,9 +87,12 @@ function __spyF(K,T,t,man,REC){const S=K.spy;const R=REC(60);R.col='#1A1A22';R.p
 
 // papan/balon teks yang selalu menghadap kamera
 function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;if(C[k])return C[k];
- const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle=bg;x.strokeStyle='#14102B';x.lineWidth=12;x.beginPath();x.roundRect(10,10,w-20,h-56,40);x.fill();x.stroke();
-  x.beginPath();x.moveTo(w/2-30,h-48);x.lineTo(w/2,h-8);x.lineTo(w/2+30,h-48);x.fill();x.stroke();x.fillRect(w/2-26,h-60,52,16);
-  x.fillStyle='#14102B';x.textAlign='center';x.textBaseline='middle';let fs=120;do{x.font='900 '+fs+'px Inter, sans-serif';fs-=6}while(x.measureText(txt).width>w-70&&fs>30);x.fillText(txt,w/2,(h-46)/2+6)});
+ const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle=bg;x.strokeStyle='#111';x.lineWidth=12;x.lineJoin='round';
+  x.beginPath();x.ellipse(w/2,(h-50)/2+6,w/2-14,(h-60)/2,0,0,Math.PI*2);x.fill();x.stroke();
+  x.beginPath();x.moveTo(w/2-34,h-62);x.lineTo(w/2-6,h-6);x.lineTo(w/2+22,h-58);x.fill();x.stroke();x.beginPath();x.ellipse(w/2,(h-50)/2+6,w/2-20,(h-66)/2,0,0,Math.PI*2);x.fill();
+  let nm='',T=txt;const ci=txt.indexOf(': ');if(ci>0){nm=txt.slice(0,ci);T=txt.slice(ci+2)}T=T.toUpperCase();x.fillStyle='#111';x.textAlign='center';x.textBaseline='middle';const cy=(h-50)/2+6;
+  if(nm){let f2=40;do{x.font='700 '+f2+'px "Comic Neue", sans-serif';f2-=2}while(x.measureText(nm).width>w-150&&f2>20);x.fillStyle='#555';x.fillText(nm,w/2,cy-48);x.fillStyle='#111'}
+  let fs=nm?90:110;do{x.font=fs+'px Bangers, "Comic Neue", sans-serif';fs-=5}while(x.measureText(T).width>w-110&&fs>28);x.fillText(T,w/2,nm?cy+18:cy+4)});
  return C[k]=texFromCanvas(cv)}
 function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.box,M.chain(M.T(px,py,pz),M.RY(yw),M.S(sz,sz/2,.02)),'#FFFFFF',{tex:__bbTex(txt,bg||'#FFFFFF'),em:1,cast:false})}
 
@@ -112,7 +115,7 @@ function __rotiF(K,T,t){const Bd=K.build,cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b
  for(let k=0;k<10;k++){const xx=X-w/2+.21+k*.42;D(G.box,M.chain(M.T(xx,FB+1.75,fz+.45),M.RX(-.45),M.S(.42,.05,1.0*ap)),k%2?'#FFFFFF':'#E5484D',NC)}
  for(let k=0;k<10;k++){const xx=X-w/2+.21+k*.42;D(G.sph,M.chain(M.T(xx,FB+1.52,fz+.88),M.S(.21,.1,.05)),k%2?'#FFFFFF':'#E5484D',NC)}
  // papan nama
- D(G.box,M.chain(M.T(X,FB+2.05,fz+.12),M.S(2.6,.62,.06)),'#FFFFFF',{tex:__bbTex('TOKO ROTI 🥐','#FFF2D6'),em:.6,cast:false});
+ D(G.box,M.chain(M.T(X,FB+2.05,fz+.12),M.S(2.6,.62,.06)),'#FFFFFF',{tex:__bbTex('TOKO ROTI','#FFF2D6'),em:.6,cast:false});
  // meja etalase + roti
  D(G.box,M.chain(M.T(X-1.25,0,fz+.75),M.S(1.3,.55,.6)),'#8A5A2B',NC);D(G.box,M.chain(M.T(X-1.25,.55,fz+.75),M.S(1.36,.05,.66)),'#F4E2C0',NC);
  const nr=(K.rotiT!=null&&T>K.rotiT)?9:10;for(let k=0;k<nr;k++){const c=k%5,rw=Math.floor(k/5);D(G.sphHi,M.chain(M.T(X-1.75+c*.25,.66+rw*.02,fz+.6+rw*.28),M.RY(.4),M.S(.11,.07,.07)),k%3?'#C98A3E':'#D9A25A',NC)}}
