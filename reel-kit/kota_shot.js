@@ -231,6 +231,31 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
   mk('h1-akhir',{f:u=>({yaw:Math.PI-.5+L(.1,0,u),pitch:L(.22,.3,u),dist:L(26,32,E(u)),tx:-80,ty:2,tz:-50}),k3:{night:1,build:{x:-79,z:-47,b0:6,b1:6,dur:1},roti:1,zzz:[[-80,2.4,-44.6,0],[-78.4,2.6,-44.6,.33],[-79.2,2.9,-44.8,.66]]},B:{jam:22}});
   mk('h1-hilang',{f:u=>({yaw:.75,pitch:.14,dist:L(4.2,3.6,u),tx:-80.6,ty:.8,tz:-44.2}),k3:{night:1,build:{x:-79,z:-47,b0:6,b1:6,dur:1},roti:1,rotiT:1.0,spy:{x:-80.8,z:-43.4,dx:-3.5,dz:1.4,t0:1.0,yaw:-1.2}},B:{jam:23}});
  }
+ {const HS=Math.PI;const CB2=Object.assign({},RB3,{rs:1,tanah:0,cl:CLR.concat([[-79,-35,7],[-88,-46,3]]),papan:null});
+  // kamera dinamis: kunci [f,yaw,pitch,dist,tx,ty,tz]; pindah cepat 0.22 dtk, dorong pelan di dalam kunci
+  const DYN=(K,dur)=>(u,ts)=>{let i=0;for(let k=0;k<K.length;k++)if(u>=K[k][0])i=k;const c=K[i],p=i>0?K[i-1]:c;const dt=(u-c[0])*dur;const e=i>0?(q=>q*q*(3-2*q))(Math.min(1,dt/.22)):1;
+   const nx=i<K.length-1?K[i+1][0]:1;const lp=Math.min(1,(u-c[0])/Math.max(.01,nx-c[0]));const mix=j=>p[j]+(c[j]-p[j])*e;
+   const sk=i>0&&dt<.35?Math.exp(-dt*9)*.5:0;
+   return {yaw:mix(1)+Math.sin(ts*47)*.015*sk,pitch:mix(2)+Math.cos(ts*53)*.012*sk,dist:mix(3)*(1-.06*lp),tx:mix(4),ty:mix(5)+Math.sin(ts*61)*.015*sk,tz:mix(6)}};
+  const P0=[PX,0,PZ];const F=(f,yaw,pitch,dist,ty,tx=PX,tz=PZ)=>[f,yaw,pitch,dist,tx,ty,tz];
+  const re=(n,K)=>{const d=+(require('fs').readFileSync('/home/claude/h1/shots.txt','utf8').split('\n').find(l=>l.startsWith(n+' '))||'x 3').split(' ')[1];SHOTS[n]=Object.assign({},SHOTS[n],{f:DYN(K,d)})};
+  re('h1-terharu',[F(0,HS-.1,.06,3.0,.82),F(.24,HS+.05,.03,1.3,.93),F(.5,HS-.2,.08,3.8,.85),F(.74,HS+.3,.02,1.4,.94)]);
+  re('h1-haru',[F(0,HS,.04,1.7,.93),F(.55,HS+.55,.03,1.35,.94)]);
+  re('h1-adil',[F(0,HS-.6,-.06,3.2,1.0),F(.3,HS-.1,-.06,3.0,1.0),F(.55,HS+.1,.02,1.4,.94),F(.8,HS+.35,-.14,3.8,1.05)]);
+  re('h1-seri',[F(0,HS,.06,2.9,.82),F(.33,HS-.15,.03,1.2,.93)]);
+  re('h1-janji',[F(0,HS+.3,-.1,3.0,.95),F(.33,HS+.05,.03,1.35,.94),F(.68,HS-.25,-.16,3.5,1.1)]);
+  re('h1-kasih',[F(0,Math.PI/2+.25,.05,3.4,.75,-80.6,-43.0),F(.45,.45,.03,1.45,.93,-80.6,-43.4)]);
+  re('ck3-bahu',[F(0,HS+.35,.1,4.8,1.3,PX,PZ+1.6),F(.5,.25,.03,1.4,.94),F(.78,HS+.2,.12,4.6,1.3,PX,PZ+1.6)]);
+  re('h1-pagi',[F(0,.28,.12,12.5,1.6,-79,-46.5),F(.55,.35,.03,1.6,.93,-82.2,-43.3),F(.8,.2,.1,8.5,1.5,-79.5,-45.5)]);
+  {const o=SHOTS['h1-roti'].f;SHOTS['h1-roti']=Object.assign({},SHOTS['h1-roti'],{f:(u,ts)=>{const c=o(u,ts);if(ts<2.1){const e=ts<.9?0:(q=>q*q*(3-2*q))(Math.min(1,(ts-.9)/.22));c.dist=3.3*(1-e)+2.2*e;c.yaw+=-.25*e}return c}});SHOTS['xh1-roti']=Object.assign({},SHOTS['h1-roti'],{chr:1})}
+  {const o=SHOTS['ck3-bahu'];}
+  // close-up reaksi warga
+  const RX=(n,i,ex,ges,col,yaw0=0)=>{SHOTS[n]=Object.assign({ruin:CB2,cine:{fov:.87},f:(u,ts)=>({yaw:HS+yaw0+L(-.04,.04,u),pitch:.03,dist:L(1.25,1.05,u),tx:-84,ty:.74,tz:-41.6}),k3:K3(60,{ppl:[{i,x:-84,z:-41.6,yaw:HS+yaw0,ex,ges,col}]}),hero:PR('x',[[0,-95,-60,0,0]])},B)};
+  RX('r-kaget',101,'kaget','diam','#3B6FD9');RX('r-marah',102,'teriak','tunjuk','#E5484D',.2);RX('r-melongo',103,'bengong','diam','#2FA36B');
+  RX('r-sedih',104,'sedih','diam','#8E5BD9',-.2);RX('r-o',105,'kaget','diam','#F2A93B',.15);RX('r-ketawa',106,'ketawa','semangat','#E0609A');RX('r-lemas',107,'lemas','diam','#2BB3C0');
+  // close-up jempol kena palu
+  SHOTS['h1-jempol']=Object.assign({},SHOTS['h1-malam'],{k3:Object.assign({},SHOTS['h1-malam'].k3,{build:{x:-79,z:-47,b0:1.5,b1:1.5,dur:1},crew:Object.assign({},SHOTS['h1-malam'].k3.crew,{aduh:[.05,2],nguap:null,pres:0})}),hero:PR('x',[[0,-95,-60,0,0]]),f:(u,ts)=>({yaw:Math.PI-.55,pitch:.05,dist:L(1.9,1.5,u),tx:-80.2,ty:.8,tz:-44.68})});
+ }
  SHOTS['xck3-bengong']=Object.assign({},SHOTS['ck3-bengong'],{chr:1});}
 
 

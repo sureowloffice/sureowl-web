@@ -75,6 +75,23 @@ a,b=S['h1-tidur'];put(cricket(b-a),a,.25)
 a,b=S['h1-ab'];put(popc(),a+.3,.6);put(popc(),a+1.3,.6)
 a,b=S['h1-hilang'];put(steps(.6),a+1.0,.5);put(sting(),a+1.0,.3)
 a,b=S['h1-akhir'];put(boom(1.6),a+.1,.7)
+P=json.load(open('fx.json'))
+def boing():t=T(.5);f=180+120*np.sin(2*np.pi*9*t)*np.exp(-t*4);return np.sin(2*np.pi*np.cumsum(f)/sr)*np.exp(-t*3)*.7
+def chew(d):
+    s=np.zeros(int(d*sr))
+    for k in np.arange(0,d-.1,.22):i=int(k*sr);n=int(.09*sr);s[i:i+n]+=lp(rng.standard_normal(n),3)*np.exp(-np.arange(n)/sr*40)
+    return norm(s)*.6
+def dun():
+    out=np.zeros(int(1.5*sr))
+    for k,(f,dd) in enumerate([(98,.25),(92,.25),(73,.8)]):
+        t=T(dd);w=(np.sign(np.sin(2*np.pi*f*t))*.4+np.sin(2*np.pi*f*t))*np.exp(-t*2.5);i=int([0,.28,.56][k]*sr);out[i:i+len(w)]+=w
+    return out*.6
+for n,t,d in P['cuts']:put(swoosh(.25),t-.12,.35)
+for t in P['punch']:put(swoosh(.2),t-.05,.25)
+for t,d in P['freeze']:put(dun(),t,.55)
+jm=[c for c in P['cuts'] if c[0]=='h1-jempol'][0];put(boing(),jm[1]+.15,.6);put(hammer(),jm[1]+.05,.6)
+a,b=S['h1-adil'];put(ding(),a+(b-a)*.8,.45)
+a,b=S['h1-kasih'];put(chew(1.2),a+1.6,.4)
 # musik: naik turun
 g=np.full(N,.22)
 def seg(n,v):i,j=int(S[n][0]*sr),int(S[n][1]*sr);g[i:j]=v
