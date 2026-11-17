@@ -1,7 +1,7 @@
 // Muka, rambut, dan gerakan tangan avatar versi video (mode cine). Web asli tidak berubah.
 function __face(r,L,Wm,t,near){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()===H.u,TT=me?(H.T||0):t;
  const EX={netral:[0,0,1,0],senyum:[.01,0,.8,1],kaget:[.07,.06,1.3,0],sedih:[.06,-.03,.8,-1],bingung:[.04,0,1,-.3],marah:[-.04,.03,.85,-.6],semangat:[.04,.04,1.1,1],merem:[.01,0,0,.6],ketawa:[.03,.02,0,1],nguap:[.02,.02,0,0],haru:[.06,-.02,.8,.55],bengong:[.05,.04,1.25,-.1],ngantuk:[-.01,-.01,.3,0],lemas:[.05,-.03,.6,-.5],teriak:[-.04,.03,.95,-.3],sakit:[.05,-.03,0,-.8]};
- let k=(!me&&r.__ex&&EX[r.__ex])?r.__ex:'netral';if(me&&H.ex)for(const x of H.ex)if(TT>=x[0])k=EX[x[1]]?x[1]:k;const e=EX[k];
+ let k=((!me||!H.ex)&&r.__ex&&EX[r.__ex])?r.__ex:'netral';if(me&&H.ex)for(const x of H.ex)if(TT>=x[0])k=EX[x[1]]?x[1]:k;const e=EX[k];
  const NC={cast:false},hc=L.hc||'#1F1F1F',ph=r.ph||0;const bk=((t*.28+ph*.13)%1)<.04;const op=bk?.08:e[2];
  for(const s of [-1,1]){const x=s*.17,y=1.33;
   if(op<.05){const cv=k==='ketawa'?1:.5;for(const d of [-1,1])D(G.sph,Wm(M.chain(M.T(x+d*.035,y+.005*cv,.43),M.RZ(-d*.45*cv),M.S(.045,.012,.02))),'#2A1A12',NC)}
@@ -47,7 +47,7 @@ const __GS={diam:{R:{a:.22},L:{a:.22}},
  tidur:{R:{a:.05,f:0,e:.1},L:{a:.05,f:0,e:.1}},
  pencet:{R:{a:.1,f:1.45,e:.1,pt:1},L:{a:.22}}};
 function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()===H.u,TT=me?(H.T||0):t;const NC={cast:false};
- let A=__GS.diam,B=__GS.diam,f=1;if(!me&&r.__ges){A=B=__GS[r.__ges]||__GS.diam}
+ let A=__GS.diam,B=__GS.diam,f=1;if((!me||!H.ges)&&r.__ges){A=B=__GS[r.__ges]||__GS.diam}
  const K3=window.__K3;if(!me&&!r.__ges&&K3&&K3.crowd&&K3.crowd.argue&&sw===0&&r.u&&r.u.startsWith('warga')){const i=Math.round((r.ph||0)/1.7);const g=['semangat','tunjuk','pinggang','tunjuk'][(i+Math.floor(t*1.2+i*.4))%4];A=B=__GS[g];r.__ex=i%2?'marah':'teriak';
   const P0=Wm(M.T(0,2.55,0));const sl=K3.say||[];
   if(i<sl.length){const P1=Wm(M.T(0,1.3,0));D(G.box,M.chain(M.T(P1[12],P1[13],P1[14]),M.S(.03,P0[13]-P1[13],.03)),'#7A5230',{cast:false});__bb(P0[12],P0[13],P0[14],sl[i],.85,'#FFF4C2')}
@@ -121,7 +121,7 @@ function __rotiF(K,T,t){const Bd=K.build,cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b
  D(G.box,M.chain(M.T(X,FB+2.05,fz+.12),M.S(2.6,.62,.06)),'#FFFFFF',{tex:__bbTex('TOKO ROTI','#FFF2D6'),em:.6,cast:false});
  // meja etalase + roti
  D(G.box,M.chain(M.T(X-1.25,0,fz+.75),M.S(1.3,.55,.6)),'#8A5A2B',NC);D(G.box,M.chain(M.T(X-1.25,.55,fz+.75),M.S(1.36,.05,.66)),'#F4E2C0',NC);
- const nr=(K.rotiT!=null&&T>K.rotiT)?9:10;for(let k=0;k<nr;k++){const c=k%5,rw=Math.floor(k/5);D(G.sphHi,M.chain(M.T(X-1.75+c*.25,.66+rw*.02,fz+.6+rw*.28),M.RY(.4),M.S(.11,.07,.07)),k%3?'#C98A3E':'#D9A25A',NC)}}
+ const nr=(K.rotiT!=null&&T>K.rotiT)?9:(K.rotiN!=null?K.rotiN:10);for(let k=0;k<nr;k++){const c=k%5,rw=Math.floor(k/5);D(G.sphHi,M.chain(M.T(X-1.75+c*.25,.66+rw*.02,fz+.6+rw*.28),M.RY(.4),M.S(.11,.07,.07)),k%3?'#C98A3E':'#D9A25A',NC)}}
 
 // properti adegan: kasur, kamar, isi toko roti, saklar, tepung+jejak, gerobak, papan tulis
 function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,c,o)=>D(G.box,M.chain(M.T(x,y,z),M.S(sx,sy,sz)),c,o||{});
