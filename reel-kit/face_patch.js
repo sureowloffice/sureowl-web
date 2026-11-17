@@ -60,7 +60,7 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   if(L.role==='pres')D(G.sph,Wm(M.chain(el,M.T(0,-.22,0),M.S(.07,.03,.07))),'#F6F6F2',NC);
   const hd=M.chain(el,M.T(0,-.29,0));D(G.sph,Wm(M.chain(hd,M.S(.075,.08,.07))),L.skin,NC);
   if(s>0&&r.__hold==='roti'){D(G.sphHi,Wm(M.chain(hd,M.T(0,-.06,.06),M.RZ(1.2),M.S(.17,.085,.09))),'#C98A3E',NC);D(G.sph,Wm(M.chain(hd,M.T(0,-.02,.09),M.RZ(1.2),M.S(.13,.03,.05))),'#E7B66E',NC)}
-  if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.01)),'#FFFFFF',{tex:__bbTex('KTW WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
+  if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.0005)),'#FFFFFF',{tex:__bbTex('KTW WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
   if(bb.hm){D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.14,0),M.S(.028,.17,.028))),'#8A5A2B',NC);D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.3,0),M.S(.1,.045,.045))),'#5B5F66',NC)}
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
 
@@ -89,12 +89,12 @@ function __spyF(K,T,t,man,REC){const S=K.spy;const R=REC(60);R.col='#1A1A22';R.p
 function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;if(C[k])return C[k];
  const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle=bg;x.strokeStyle='#111';x.lineWidth=12;x.lineJoin='round';
   x.beginPath();x.ellipse(w/2,(h-50)/2+6,w/2-14,(h-60)/2,0,0,Math.PI*2);x.fill();x.stroke();
-  x.beginPath();x.moveTo(w/2-34,h-62);x.lineTo(w/2-6,h-6);x.lineTo(w/2+22,h-58);x.fill();x.stroke();x.beginPath();x.ellipse(w/2,(h-50)/2+6,w/2-20,(h-66)/2,0,0,Math.PI*2);x.fill();
+  x.beginPath();x.moveTo(w/2-34,h-62);x.lineTo(w/2-6,h-6);x.lineTo(w/2+22,h-58);x.fill();x.stroke();x.beginPath();x.ellipse(w/2,(h-50)/2+6,w/2-18.5,(h-64)/2,0,0,Math.PI*2);x.fill();
   let nm='',T=txt;const ci=txt.indexOf(': ');if(ci>0){nm=txt.slice(0,ci);T=txt.slice(ci+2)}T=T.toUpperCase();x.fillStyle='#111';x.textAlign='center';x.textBaseline='middle';const cy=(h-50)/2+6;
   if(nm){let f2=40;do{x.font='700 '+f2+'px "Comic Neue", sans-serif';f2-=2}while(x.measureText(nm).width>w-150&&f2>20);x.fillStyle='#555';x.fillText(nm,w/2,cy-48);x.fillStyle='#111'}
   let fs=nm?90:110;do{x.font=fs+'px Bangers, "Comic Neue", sans-serif';fs-=5}while(x.measureText(T).width>w-110&&fs>28);x.fillText(T,w/2,nm?cy+18:cy+4)});
  return C[k]=texFromCanvas(cv)}
-function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.box,M.chain(M.T(px,py,pz),M.RY(yw),M.S(sz,sz/2,.02)),'#FFFFFF',{tex:__bbTex(txt,bg||'#FFFFFF'),em:1,cast:false})}
+function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.box,M.chain(M.T(px,py,pz),M.RY(yw),M.S(sz,sz/2,.0005)),'#FFFFFF',{tex:__bbTex(txt,bg||'#FFFFFF'),em:1,cast:false})}
 
 // orang yang diatur satu per satu: {i,x,z,yaw,ges,ex,role,hold,lama,mv,y,bb,bbz,bbc,t0,t1}
 function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)continue;if(p.t1!=null&&T>p.t1)continue;const R=REC(p.i);
