@@ -1,0 +1,10 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const pg=await b.newPage({viewport:{width:1080,height:1920}});
+await pg.goto('file://'+__dirname+'/r.html');await pg.evaluate(()=>document.fonts.load('900 40px Inter'));
+await pg.evaluate(async()=>{const c=document.getElementById('c'),x=c.getContext('2d');
+ const im=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src='file:///tmp/claude-0/h1/cv.png'});
+ x.drawImage(im,-30,-60,1140,2027);
+ let g=x.createLinearGradient(0,0,0,900);g.addColorStop(0,'rgba(20,16,43,.55)');g.addColorStop(1,'rgba(20,16,43,0)');x.fillStyle=g;x.fillRect(0,0,W,900);
+ rr(W/2-150,300,300,92,46,'#E53935');x.font='900 54px Inter';x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText('HARI 1',W/2,348);
+ out('WARGA PERTAMA',W/2,500,110,'#fff');out('DATANG?! 😱',W/2,640,130,'#FFD23F');});
+await pg.screenshot({path:'Cover_HARI1.jpg',type:'jpeg',quality:92});await b.close()})();
