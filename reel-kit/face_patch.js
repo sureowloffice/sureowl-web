@@ -1,6 +1,6 @@
 // Muka, rambut, dan gerakan tangan avatar versi video (mode cine). Web asli tidak berubah.
 function __face(r,L,Wm,t,near){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()===H.u,TT=me?(H.T||0):t;
- const EX={netral:[0,0,1,0],senyum:[.01,0,.8,1],kaget:[.07,.06,1.3,0],sedih:[.06,-.03,.8,-1],bingung:[.04,0,1,-.3],marah:[-.04,.03,.85,-.6],semangat:[.04,.04,1.1,1],merem:[.01,0,0,.6],ketawa:[.03,.02,0,1],nguap:[.02,.02,0,0],teriak:[-.04,.03,.95,-.3],sakit:[.05,-.03,0,-.8]};
+ const EX={netral:[0,0,1,0],senyum:[.01,0,.8,1],kaget:[.07,.06,1.3,0],sedih:[.06,-.03,.8,-1],bingung:[.04,0,1,-.3],marah:[-.04,.03,.85,-.6],semangat:[.04,.04,1.1,1],merem:[.01,0,0,.6],ketawa:[.03,.02,0,1],nguap:[.02,.02,0,0],haru:[.06,-.02,.8,.55],lemas:[.05,-.03,.6,-.5],teriak:[-.04,.03,.95,-.3],sakit:[.05,-.03,0,-.8]};
  let k=(!me&&r.__ex&&EX[r.__ex])?r.__ex:'netral';if(me&&H.ex)for(const x of H.ex)if(TT>=x[0])k=EX[x[1]]?x[1]:k;const e=EX[k];
  const NC={cast:false},hc=L.hc||'#1F1F1F',ph=r.ph||0;const bk=((t*.28+ph*.13)%1)<.04;const op=bk?.08:e[2];
  for(const s of [-1,1]){const x=s*.17,y=1.33;
@@ -8,7 +8,12 @@ function __face(r,L,Wm,t,near){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase(
   else{D(G.sph,Wm(M.chain(M.T(x,y,.405),M.S(.078,.085*op,.045))),'#F7F3EC',{em:.15,cast:false});
   if(op>.3){D(G.sph,Wm(M.chain(M.T(x+.012,y-.005,.44),M.S(.046,.05*Math.min(1,op),.02))),'#2A1A12',NC);
    D(G.sph,Wm(M.chain(M.T(x+.03,y+.022,.457),M.S(.013,.013,.008))),'#FFFFFF',{em:1,cast:false})}}
+  if(k==='haru'&&op>.3){D(G.sph,Wm(M.chain(M.T(x+.05,y-.075-((t*.4)%1)*.06,.43),M.S(.022,.03,.015))),'#9FD8FF',{em:.6,alpha:.85,cast:false});D(G.sph,Wm(M.chain(M.T(x+.0,y-.03,.452),M.S(.05,.012,.006))),'#CFEFFF',{em:.8,alpha:.7,cast:false})}
   const yi=1.46+e[0],yo=1.455+e[1];D(G.sph,Wm(M.chain(M.T(x,(yi+yo)/2,.4),M.RZ(Math.atan2(yo-yi,.1)*s),M.S(.085,.02,.03))),hc,NC)}
+ const RL=r.__role;if(RL==='pemadam'){D(G.sphHi,Wm(M.chain(M.T(0,1.62,-.02),M.S(.56,.36,.54))),'#D7261E',NC);D(G.sphHi,Wm(M.chain(M.T(0,1.55,-.04),M.S(.66,.06,.68))),'#B51E17',NC);D(G.sph,Wm(M.chain(M.T(0,1.72,.42),M.S(.12,.12,.04))),'#F5C542',{em:.4,cast:false})}
+ else if(RL==='pilot'){D(G.sphHi,Wm(M.chain(M.T(0,1.72,-.02),M.S(.5,.18,.5))),'#1B2A4A',NC);D(G.sphHi,Wm(M.chain(M.T(0,1.66,.33),M.S(.36,.04,.24))),'#111827',NC);D(G.sph,Wm(M.chain(M.T(0,1.78,.44),M.S(.1,.07,.03))),'#F5C542',{em:.5,cast:false})}
+ else if(RL==='kepsek'){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.17,1.33,.455),M.S(.11,.1,.012))),'#1A1A1A',{alpha:.85,cast:false});D(G.sph,Wm(M.chain(M.T(0,1.35,.46),M.S(.06,.015,.01))),'#1A1A1A',NC)}
+ else if(RL==='dokter'){D(G.sph,Wm(M.chain(M.T(0,1.62,.4),M.S(.12,.12,.03))),'#E8EDF2',{em:.5,cast:false});D(G.sph,Wm(M.chain(M.T(0,1.62,.41),M.S(.04,.04,.02))),'#9AA3AD',NC);D(G.sphHi,Wm(M.chain(M.T(0,1.66,0),M.S(.52,.08,.5))),'#DDE3EA',NC)}
  if(!near||(me&&(r.__mo||0)>.05))return;
  if(k==='nguap'){D(G.sph,Wm(M.chain(M.T(0,1.11,.41),M.S(.06,.085,.025))),'#3A1A22',NC);return}
  if(k==='teriak'||k==='sakit'){D(G.sph,Wm(M.chain(M.T(0,1.115,.41),M.S(.065,.04+.015*Math.abs(Math.sin(t*9+ph)),.025))),'#3A1A22',NC);D(G.sph,Wm(M.chain(M.T(0,1.145,.427),M.S(.05,.01,.01))),'#FFFFFF',NC);return}
@@ -34,6 +39,9 @@ const __GS={diam:{R:{a:.22},L:{a:.22}},
  semangat:{R:{a:2.25,z:-.35,fist:1},L:{a:2.25,z:-.35,fist:1}},
  dagu:{R:{a:.1,f:.6,e:2.2},L:{a:.35,f:.5,e:1.6}},
  palu:{R:{a:.22,f:1.2,e:.9,hm:1},L:{a:.35,f:.7,e:.7}},
+ dada:{R:{a:-.08,f:.75,e:2.05},L:{a:.22}},
+ kasih:{R:{a:.05,f:1.25,e:.35},L:{a:.22}},
+ tepuk:{R:{a:.05,f:1.0,e:1.2,cl:1},L:{a:.05,f:1.0,e:1.2,cl:1}},
  junjung:{R:{a:.3,f:2.75,e:.35},L:{a:.3,f:2.75,e:.35}}};
 function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()===H.u,TT=me?(H.T||0):t;const NC={cast:false};
  let A=__GS.diam,B=__GS.diam,f=1;if(!me&&r.__ges){A=B=__GS[r.__ges]||__GS.diam}
@@ -44,18 +52,20 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
  else if(!me&&!r.__ges)r.__ex=null;if(me&&H.ges){let i=-1;for(let k=0;k<H.ges.length;k++)if(TT>=H.ges[k][0])i=k;
   if(i>=0){B=__GS[H.ges[i][1]]||__GS.diam;A=i>0?(__GS[H.ges[i-1][1]]||__GS.diam):(H.ges[0][0]<=0?B:__GS.diam);const q=Math.min(1,(TT-H.ges[i][0])/.3);f=q*q*(3-2*q)}}
  for(const s of [-1,1]){const a=s>0?A.R:A.L,b=s>0?B.R:B.L;const g=k=>(a[k]||0)+((b[k]||0)-(a[k]||0))*f;const bb=f>.5?b:a;
-  const wv=bb.wv?Math.sin(t*9)*.4:0;const hp=bb.hm?Math.sin((t*(r.__sp||1)*4.5+(r.ph||0))*6.283):0;const hs=hp>0?hp:hp*.35;const sh=M.chain(M.T(s*.36,.88,0),M.RZ(s*g('a')),M.RX(-g('f')-s*sw*.8-hs*.55));
+  if(me)r.__hold=H.hold||null;const wv=bb.wv?Math.sin(t*9)*.4:bb.cl?Math.sin(t*14+(r.ph||0))*.25*s:0;const hp=bb.hm?Math.sin((t*(r.__sp||1)*4.5+(r.ph||0))*6.283):0;const hs=hp>0?hp:hp*.35;const sh=M.chain(M.T(s*.36,.88,0),M.RZ(s*g('a')),M.RX(-g('f')-s*sw*.8-hs*.55));
   D(G.sph,Wm(M.chain(sh,M.T(0,-.12,0),M.S(.09,.15,.09))),L.arm,NC);
   const el=M.chain(sh,M.T(0,-.24,0),M.RZ(s*(g('z')+wv)),M.RX(-g('e')-hs*.5));
   D(G.sph,Wm(M.chain(sh,M.T(0,-.24,0),M.S(.08,.08,.08))),L.arm,NC);
   D(G.sph,Wm(M.chain(el,M.T(0,-.11,0),M.S(.08,.14,.08))),L.arm,NC);
   if(L.role==='pres')D(G.sph,Wm(M.chain(el,M.T(0,-.22,0),M.S(.07,.03,.07))),'#F6F6F2',NC);
   const hd=M.chain(el,M.T(0,-.29,0));D(G.sph,Wm(M.chain(hd,M.S(.075,.08,.07))),L.skin,NC);
+  if(s>0&&r.__hold==='roti'){D(G.sphHi,Wm(M.chain(hd,M.T(0,-.06,.06),M.RZ(1.2),M.S(.17,.085,.09))),'#C98A3E',NC);D(G.sph,Wm(M.chain(hd,M.T(0,-.02,.09),M.RZ(1.2),M.S(.13,.03,.05))),'#E7B66E',NC)}
+  if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.01)),'#FFFFFF',{tex:__bbTex('KTW ⚡ WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
   if(bb.hm){D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.14,0),M.S(.028,.17,.028))),'#8A5A2B',NC);D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.3,0),M.S(.1,.045,.045))),'#5B5F66',NC)}
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
 
 // kru bangunan: warga + President kerja (palu, angkut, atap), tumpukan bahan, debu tiap pukulan
-window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.spy)__spyF(K,T,t,man,REC);if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
+window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.spy)__spyF(K,T,t,man,REC);if(K.ppl)__pplF(K,T,t,man,REC);if(K.zzz)__zzzF(K,t);if(Bd&&K.roti)__rotiF(K,T,t);if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
  const X=Bd.x,Z=Bd.z,w=4.2,dp=3.4,FB=.14,hg=2.5,NC={cast:false};
  if(b>5.6&&K.plak){const tx=__bbTex(K.plak,'#F4E2C0');D(G.box,M.chain(M.T(X+1.35,FB+.55,Z+dp/2+.1),M.S(1.1,.55,.03)),'#FFFFFF',{tex:tx,em:.6,cast:false})}
  if(!K.crew)return;const sp=K.crew.sp||1;const fr=v=>Math.abs(Math.sin(v)*43758.5453)%1;
@@ -82,3 +92,27 @@ function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;
   x.fillStyle='#14102B';x.textAlign='center';x.textBaseline='middle';let fs=120;do{x.font='900 '+fs+'px Inter, sans-serif';fs-=6}while(x.measureText(txt).width>w-70&&fs>30);x.fillText(txt,w/2,(h-46)/2+6)});
  return C[k]=texFromCanvas(cv)}
 function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.box,M.chain(M.T(px,py,pz),M.RY(yw),M.S(sz,sz/2,.02)),'#FFFFFF',{tex:__bbTex(txt,bg||'#FFFFFF'),em:1,cast:false})}
+
+// orang yang diatur satu per satu: {i,x,z,yaw,ges,ex,role,hold,lama,mv,y,bb,bbz,bbc,t0,t1}
+function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)continue;if(p.t1!=null&&T>p.t1)continue;const R=REC(p.i);
+ if(p.lama&&!R.__lm){R.col=['#8C8577','#7E7466','#958A78','#6F6A60'][p.i%4];R.__lm=1;R._Lk=null}if(p.col&&R.col!==p.col){R.col=p.col;R._Lk=null}
+ R.__ges=p.ges||'diam';R.__ex=p.ex||null;R.__role=p.role||null;R.__hold=p.hold||null;
+ let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||2)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u;p.__mv=u<1}
+ const bob=(p.__mv?Math.abs(Math.sin(t*9+p.i))*.06:0)+(p.y||0)+(p.hop?Math.abs(Math.sin(t*8+p.i))*.12:0);man(p.i,x,z,p.yaw||0,!!p.__mv,bob,false);
+ if(p.lama&&window.__CINE){for(let k=0;k<3;k++){const q=((t*.6+k*.33+p.i*.1)%1);D(G.sph,M.chain(M.T(x+(k-1)*.12,.15+q*.5,z),M.S(.06+q*.1,.06+q*.1,.06+q*.1)),'#BFAF92',{alpha:.35*(1-q),cast:false})}}
+ if(p.bb&&(p.bbt==null||T>=p.bbt))__bb(x,(p.y||0)+(p.bby||1.22),z,p.bb,p.bbs||.7,p.bbc||'#FFFFFF')}}
+function __zzzF(K,t){for(const z of K.zzz){const q=(t*.5+z[3])%1;__bb(z[0]+Math.sin(q*6)*.15,z[1]+q*1.1,z[2],'Zzz',.35+q*.25,'#E6E9FF')}}
+// dekorasi toko roti di atas rumah
+function __rotiF(K,T,t){const Bd=K.build,cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);const X=Bd.x,Z=Bd.z,w=4.2,dp=3.4,FB=.14,hg=2.5,NC={cast:false};const fz=Z+dp/2;
+ if(b>=4.2){ // cerobong
+  D(G.box,M.chain(M.T(X+1.2,FB+hg+.2,Z-.6),M.S(.45,1.3,.45)),'#9C4A36',NC);D(G.box,M.chain(M.T(X+1.2,FB+hg+1.5,Z-.6),M.S(.55,.12,.55)),'#7A3828',NC);
+  if(b>=5.5)for(let k=0;k<6;k++){const q=((t*.35+k/6)%1);D(G.sph,M.chain(M.T(X+1.2+Math.sin(q*5+k)*.25,FB+hg+1.7+q*2.2,Z-.6+q*.4),M.S(.18+q*.45,.18+q*.45,.18+q*.45)),'#EDEDED',{alpha:.55*(1-q),cast:false})}}
+ if(b<5.6)return;const ap=cl((b-5.6)/.4);
+ // tenda garis-garis di atas pintu & jendela
+ for(let k=0;k<10;k++){const xx=X-w/2+.21+k*.42;D(G.box,M.chain(M.T(xx,FB+1.75,fz+.45),M.RX(-.45),M.S(.42,.05,1.0*ap)),k%2?'#FFFFFF':'#E5484D',NC)}
+ for(let k=0;k<10;k++){const xx=X-w/2+.21+k*.42;D(G.sph,M.chain(M.T(xx,FB+1.52,fz+.88),M.S(.21,.1,.05)),k%2?'#FFFFFF':'#E5484D',NC)}
+ // papan nama
+ D(G.box,M.chain(M.T(X,FB+2.05,fz+.12),M.S(2.6,.62,.06)),'#FFFFFF',{tex:__bbTex('TOKO ROTI 🥐','#FFF2D6'),em:.6,cast:false});
+ // meja etalase + roti
+ D(G.box,M.chain(M.T(X-1.25,0,fz+.75),M.S(1.3,.55,.6)),'#8A5A2B',NC);D(G.box,M.chain(M.T(X-1.25,.55,fz+.75),M.S(1.36,.05,.66)),'#F4E2C0',NC);
+ const nr=(K.rotiT!=null&&T>K.rotiT)?9:10;for(let k=0;k<nr;k++){const c=k%5,rw=Math.floor(k/5);D(G.sphHi,M.chain(M.T(X-1.75+c*.25,.66+rw*.02,fz+.6+rw*.28),M.RY(.4),M.S(.11,.07,.07)),k%3?'#C98A3E':'#D9A25A',NC)}}
