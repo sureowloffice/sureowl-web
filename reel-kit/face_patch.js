@@ -42,7 +42,10 @@ const __GS={diam:{R:{a:.22},L:{a:.22}},
  dada:{R:{a:-.08,f:.75,e:2.05},L:{a:.22}},
  kasih:{R:{a:.05,f:1.25,e:.35},L:{a:.22}},
  tepuk:{R:{a:.05,f:1.0,e:1.2,cl:1},L:{a:.05,f:1.0,e:1.2,cl:1}},
- junjung:{R:{a:.3,f:2.75,e:.35},L:{a:.3,f:2.75,e:.35}}};
+ junjung:{R:{a:.3,f:2.75,e:.35},L:{a:.3,f:2.75,e:.35}},
+ dorong:{R:{a:.15,f:1.1,e:.3},L:{a:.15,f:1.1,e:.3}},
+ tidur:{R:{a:.05,f:0,e:.1},L:{a:.05,f:0,e:.1}},
+ pencet:{R:{a:.1,f:1.45,e:.1,pt:1},L:{a:.22}}};
 function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()===H.u,TT=me?(H.T||0):t;const NC={cast:false};
  let A=__GS.diam,B=__GS.diam,f=1;if(!me&&r.__ges){A=B=__GS[r.__ges]||__GS.diam}
  const K3=window.__K3;if(!me&&!r.__ges&&K3&&K3.crowd&&K3.crowd.argue&&sw===0&&r.u&&r.u.startsWith('warga')){const i=Math.round((r.ph||0)/1.7);const g=['semangat','tunjuk','pinggang','tunjuk'][(i+Math.floor(t*1.2+i*.4))%4];A=B=__GS[g];r.__ex=i%2?'marah':'teriak';
@@ -65,7 +68,7 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
 
 // kru bangunan: warga + President kerja (palu, angkut, atap), tumpukan bahan, debu tiap pukulan
-window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.spy)__spyF(K,T,t,man,REC);if(K.ppl)__pplF(K,T,t,man,REC);if(K.zzz)__zzzF(K,t);if(Bd&&K.roti)__rotiF(K,T,t);if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
+window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.props)__propsF(K,T,t,man,REC);if(K.spy)__spyF(K,T,t,man,REC);if(K.ppl)__pplF(K,T,t,man,REC);if(K.zzz)__zzzF(K,t);if(Bd&&K.roti)__rotiF(K,T,t);if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
  const X=Bd.x,Z=Bd.z,w=4.2,dp=3.4,FB=.14,hg=2.5,NC={cast:false};
  if(b>5.6&&K.plak){const tx=__bbTex(K.plak,'#F4E2C0');D(G.box,M.chain(M.T(X+1.35,FB+.55,Z+dp/2+.1),M.S(1.1,.55,.03)),'#FFFFFF',{tex:tx,em:.6,cast:false})}
  if(!K.crew)return;const sp=K.crew.sp||1;const fr=v=>Math.abs(Math.sin(v)*43758.5453)%1;
@@ -99,9 +102,9 @@ function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.b
 // orang yang diatur satu per satu: {i,x,z,yaw,ges,ex,role,hold,lama,mv,y,bb,bbz,bbc,t0,t1}
 function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)continue;if(p.t1!=null&&T>p.t1)continue;const R=REC(p.i);
  if(p.lama&&!R.__lm){R.col=['#8C8577','#7E7466','#958A78','#6F6A60'][p.i%4];R.__lm=1;R._Lk=null}if(p.col&&R.col!==p.col){R.col=p.col;R._Lk=null}
- R.__ges=p.ges||'diam';R.__ex=p.ex||null;R.__role=p.role||null;R.__hold=p.hold||null;
+ if(p.pres&&!R.own){R.own=1;R.u=(window.__HERO||{}).u;R._Lk=null}R.__ges=p.ges||'diam';R.__ex=p.ex||null;R.__role=p.role||null;R.__hold=p.hold||null;
  let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||2)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u;p.__mv=u<1}
- const bob=(p.__mv?Math.abs(Math.sin(t*9+p.i))*.06:0)+(p.y||0)+(p.hop?Math.abs(Math.sin(t*8+p.i))*.12:0);man(p.i,x,z,p.yaw||0,!!p.__mv,bob,false);
+ const bob=(p.__mv?Math.abs(Math.sin(t*9+p.i))*.06:0)+(p.y||0)+(p.hop?Math.abs(Math.sin(t*8+p.i))*.12:0)+(p.lie?.16:0);window.__MRX=p.lie?-Math.PI/2:(p.bend||0);window.__MS=p.ms||1;man(p.i,x,z,p.yaw||0,!!p.__mv,bob,false);window.__MRX=0;window.__MS=1;
  if(p.lama&&window.__CINE){for(let k=0;k<3;k++){const q=((t*.6+k*.33+p.i*.1)%1);D(G.sph,M.chain(M.T(x+(k-1)*.12,.15+q*.5,z),M.S(.06+q*.1,.06+q*.1,.06+q*.1)),'#BFAF92',{alpha:.35*(1-q),cast:false})}}
  if(p.bb&&(p.bbt==null||T>=p.bbt))__bb(x,(p.y||0)+(p.bby||1.22),z,p.bb,p.bbs||.7,p.bbc||'#FFFFFF')}}
 function __zzzF(K,t){for(const z of K.zzz){const q=(t*.5+z[3])%1;__bb(z[0]+Math.sin(q*6)*.15,z[1]+q*1.1,z[2],'Zzz',.35+q*.25,'#E6E9FF')}}
@@ -119,3 +122,22 @@ function __rotiF(K,T,t){const Bd=K.build,cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b
  // meja etalase + roti
  D(G.box,M.chain(M.T(X-1.25,0,fz+.75),M.S(1.3,.55,.6)),'#8A5A2B',NC);D(G.box,M.chain(M.T(X-1.25,.55,fz+.75),M.S(1.36,.05,.66)),'#F4E2C0',NC);
  const nr=(K.rotiT!=null&&T>K.rotiT)?9:10;for(let k=0;k<nr;k++){const c=k%5,rw=Math.floor(k/5);D(G.sphHi,M.chain(M.T(X-1.75+c*.25,.66+rw*.02,fz+.6+rw*.28),M.RY(.4),M.S(.11,.07,.07)),k%3?'#C98A3E':'#D9A25A',NC)}}
+
+// properti adegan: kasur, kamar, isi toko roti, saklar, tepung+jejak, gerobak, papan tulis
+function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,c,o)=>D(G.box,M.chain(M.T(x,y,z),M.S(sx,sy,sz)),c,o||{});
+ for(const p of K.props){const X=p.x,Z=p.z,Y=p.y||0,ry=p.ry||0;const R=m=>M.chain(M.T(X,Y,Z),M.RY(ry),m);const b=(x,y,z,sx,sy,sz,c,o)=>D(G.box,M.chain(R(M.T(x,y,z)),M.S(sx,sy,sz)),c,o||NC);
+  if(p.type=='kasur'){b(0,0,0,1.3,.32,2.1,'#7A5230');b(0,.32,0,1.22,.16,2.0,'#F4F1EA');b(0,.48,-.72,.9,.12,.42,'#FFFFFF');b(0,.44,.25,1.26,.1,1.3,p.c||'#5B7FD6')}
+  if(p.type=='kamar'){b(0,-.01,0,p.w||6,.02,p.d||6,p.lantai||'#C9A27A');b(0,0,-(p.d||6)/2,p.w||6,3,.1,p.dinding||'#F2E6D0');b(-(p.w||6)/2,0,0,.1,3,p.d||6,p.dinding||'#EADCC2');
+   b(.6,1.3,-(p.d||6)/2+.06,1.2,.9,.02,'#BFE6FF',{em:.8,cast:false});b(-1.6,0,-(p.d||6)/2+.35,.9,1.8,.5,'#8A5A2B');}
+  if(p.type=='tokodalam'){b(0,-.01,0,p.w||7,.02,p.d||5,'#B98A5A');b(0,0,-(p.d||5)/2,p.w||7,3,.1,'#F6E7CF');b(-(p.w||7)/2,0,0,.1,3,p.d||5,'#EFDCC0');
+   for(let k=0;k<3;k++){b(1.6,.5+k*.6,-(p.d||5)/2+.3,2.4,.06,.5,'#8A5A2B');for(let q=0;q<6;q++)D(G.sphHi,M.chain(R(M.T(.7+q*.36,.62+k*.6,-(p.d||5)/2+.3)),M.RY(.4),M.S(.14,.08,.08)),q%2?'#C98A3E':'#D9A25A',NC)}
+   D(G.sph,M.chain(R(M.T(0,2.8,0)),M.S(.25,.12,.25)),'#FFE9B0',{em:1,cast:false})}
+  if(p.type=='saklar'){b(0,0,0,3,2.6,.1,p.dinding||'#F2E6D0');b(0,.72,.06,.2,.3,.03,'#FFFFFF');const on=(T*1.6)%1<.5;b(0,.78+(on?.0:-.05),.085,.06,.1,.03,'#DDDDDD')}
+  if(p.type=='tepung'){for(let k=0;k<7;k++)D(G.sph,M.chain(R(M.T((k%3-1)*.35,.005,(Math.floor(k/3)-1)*.3)),M.S(.45,.01,.38)),'#F7F3EA',NC);
+   const n=p.n||9;for(let k=0;k<n;k++){const zz=-.3-k*.32,xx=(k%2?.09:-.09);D(G.sph,M.chain(R(M.T(xx,.015,zz)),M.S(.06,.006,.1)),k<3?'#E6DCC8':'#6B5B45',NC);D(G.sph,M.chain(R(M.T(xx,.016,zz-.11)),M.S(.035,.006,.04)),k<3?'#E6DCC8':'#6B5B45',NC)}}
+  if(p.type=='gerobak'){b(0,.32,0,.7,.32,1.0,'#5D6B7A');b(0,.18,.0,.6,.06,.9,'#4A5563');D(G.sphHi,M.chain(R(M.T(0,.16,.62)),M.RZ(Math.PI/2),M.S(.16,.04,.16)),'#222',NC);
+   for(let k=0;k<6;k++)b((k%2-.5)*.28,.64+Math.floor(k/2)*.0,(Math.floor(k/2)-1)*.28,.26,.12,.24,'#B4523A');for(const s of [-1,1])b(s*.25,.45,-.75,.05,.05,.7,'#8A5A2B')}
+  if(p.type=='papantulis'){b(0,.8,0,2.6,1.3,.06,'#2F5D46');b(0,.78,0,2.75,.06,.12,'#8A5A2B');D(G.box,M.chain(R(M.T(0,1.05,.04)),M.S(2.2,.8,.0005)),'#FFFFFF',{tex:__bbTex(p.txt||'KOTA SENI','#2F5D46'),em:.6,cast:false})}
+  if(p.type=='meja'){for(let r=0;r<(p.rows||2);r++)for(let c=0;c<(p.cols||3);c++)b((c-((p.cols||3)-1)/2)*1.1,0,r*1.0,.8,.45,.5,'#B98A5A')}
+  if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15,Z),M.S(p.r,p.h,p.r)),'#7FAF5A',{tex:window.__CINE&&window.__cineTexF?window.__cineTexF('grass'):undefined})}
+ }}
