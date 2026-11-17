@@ -100,7 +100,7 @@ function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;
 function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.box,M.chain(M.T(px,py,pz),M.RY(yw),M.S(sz,sz/2,.0005)),'#FFFFFF',{tex:__bbTex(txt,bg||'#FFFFFF'),em:1,cast:false})}
 
 // orang yang diatur satu per satu: {i,x,z,yaw,ges,ex,role,hold,lama,mv,y,bb,bbz,bbc,t0,t1}
-function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)continue;if(p.t1!=null&&T>p.t1)continue;const R=REC(p.i);
+function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)continue;if(p.t1!=null&&T>p.t1)continue;if(p.owl){__owlSil(p,T,t);continue}const R=REC(p.i);
  if(p.lama&&!R.__lm){R.col=['#8C8577','#7E7466','#958A78','#6F6A60'][p.i%4];R.__lm=1;R._Lk=null}if(p.col&&R.col!==p.col){R.col=p.col;R._Lk=null}
  if(p.pres&&!R.own){R.own=1;R.u=(window.__HERO||{}).u;R._Lk=null}R.__ges=p.ges||'diam';R.__ex=p.ex||null;R.__role=p.role||null;R.__hold=p.hold||null;
  let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||2)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u;p.__mv=u<1}
@@ -134,10 +134,17 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
    D(G.sph,M.chain(R(M.T(0,2.8,0)),M.S(.25,.12,.25)),'#FFE9B0',{em:1,cast:false})}
   if(p.type=='saklar'){b(0,0,0,3,2.6,.1,p.dinding||'#F2E6D0');b(0,.6,.06,.2,.3,.03,'#FFFFFF');const on=(T*1.6)%1<.5;b(0,.66+(on?.0:-.05),.085,.06,.1,.03,'#DDDDDD')}
   if(p.type=='tepung'){for(let k=0;k<7;k++)D(G.sph,M.chain(R(M.T((k%3-1)*.35,.005,(Math.floor(k/3)-1)*.3)),M.S(.45,.01,.38)),'#F7F3EA',NC);
-   const n=p.n||9;for(let k=0;k<n;k++){const zz=-.3-k*.32,xx=(k%2?.09:-.09);D(G.sph,M.chain(R(M.T(xx,.015,zz)),M.S(.06,.006,.1)),k<3?'#E6DCC8':'#6B5B45',NC);D(G.sph,M.chain(R(M.T(xx,.016,zz-.11)),M.S(.035,.006,.04)),k<3?'#E6DCC8':'#6B5B45',NC)}}
+   const n=p.n||9;for(let k=0;k<n;k++){const zz=-.3-k*.3,xx=(k%2?.08:-.08);const col=k<3?'#D9CDB4':'#5A4A38';for(const an of [-.55,0,.55])D(G.sph,M.chain(R(M.T(xx,.015,zz)),M.RY(an),M.T(0,0,-.07),M.S(.012,.005,.07)),col,NC);D(G.sph,M.chain(R(M.T(xx,.015,zz)),M.T(0,0,.05),M.S(.012,.005,.05)),col,NC)}}
   if(p.type=='gerobak'){b(0,.32,0,.7,.32,1.0,'#5D6B7A');b(0,.18,.0,.6,.06,.9,'#4A5563');D(G.sphHi,M.chain(R(M.T(0,.16,.62)),M.RZ(Math.PI/2),M.S(.16,.04,.16)),'#222',NC);
    for(let k=0;k<6;k++)b((k%2-.5)*.28,.64+Math.floor(k/2)*.0,(Math.floor(k/2)-1)*.28,.26,.12,.24,'#B4523A');for(const s of [-1,1])b(s*.25,.45,-.75,.05,.05,.7,'#8A5A2B')}
   if(p.type=='papantulis'){b(0,.8,0,2.6,1.3,.06,'#2F5D46');b(0,.78,0,2.75,.06,.12,'#8A5A2B');D(G.box,M.chain(R(M.T(0,1.05,.04)),M.S(2.2,.8,.0005)),'#FFFFFF',{tex:__bbTex(p.txt||'KOTA SENI','#2F5D46'),em:.6,cast:false})}
   if(p.type=='meja'){for(let r=0;r<(p.rows||2);r++)for(let c=0;c<(p.cols||3);c++)b((c-((p.cols||3)-1)/2)*1.1,0,r*1.0,.8,.45,.5,'#B98A5A')}
   if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15,Z),M.S(p.r,p.h,p.r)),'#6E9A4E',{cast:false})}
  }}
+
+// siluet burung hantu kecil (pencuri misterius) — hitam, tanpa muka
+function __owlSil(p,T,t){let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||1)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u}
+ const sc=p.sc||.55,c=p.col||'#0B0B10',NC={cast:false};const hop=Math.abs(Math.sin(t*12))*.05*(p.to?1:0);const R=m=>M.chain(M.T(x,hop,z),M.RY(p.yaw||0),M.S(sc,sc,sc),m);
+ D(G.sphHi,R(M.chain(M.T(0,.42,0),M.S(.34,.42,.3))),c,NC);D(G.sphHi,R(M.chain(M.T(0,.92,0),M.S(.3,.26,.27))),c,NC);
+ for(const s of [-1,1]){D(G.sphHi,R(M.chain(M.T(s*.17,1.16,0),M.RZ(-s*.35),M.S(.06,.14,.06))),c,NC);D(G.sph,R(M.chain(M.T(s*.1,.02,.06),M.S(.06,.03,.1))),c,NC);D(G.sphHi,R(M.chain(M.T(s*.3,.45,-.02),M.RZ(s*.25),M.S(.08,.3,.2))),c,NC)}
+ if(p.roti)D(G.sphHi,R(M.chain(M.T(.18,.5,.25),M.RY(.4),M.S(.2,.12,.12))),'#2A1C10',NC)}
