@@ -73,16 +73,17 @@ function gelap(t,a,b,k){if(t<a||t>=b)return;x.fillStyle=`rgba(4,6,20,${k})`;x.fi
 function splitLabel(t,a,b){if(t<a||t>=b)return;x.fillStyle='#111';x.fillRect(0,H/2-6,W,12);const st=(txt,y,bg,fg)=>{x.save();x.translate(W/2,y);x.font='80px Bangers';const w=x.measureText(txt).width+70;x.fillStyle='#111';x.fillRect(-w/2+8,-48,w,104);x.fillStyle=bg;x.fillRect(-w/2,-56,w,104);x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';x.fillText(txt,0,0);x.restore()};st('EKSPEKTASI',H/2-120,'#FFD23F','#111');st('REALITA',H/2+130,'#E53935','#fff')}
 window.draw=async(f,t)=>{const FX=window.FX;let fz=null;for(const [a,d] of FX.freeze)if(t>=a&&t<a+d)fz=a;if(fz!=null)f=Math.round(fz*30);
   const im=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src='bg/'+String(f+1).padStart(5,'0')+'.jpg'});
-  const S=window.P.S,R='#E53935';const IN=n=>t>=S[n][0]&&t<S[n][1];const NIGHT=IN('s2-cctv')||IN('s2-jejak');
+  const S=window.P.S,R='#E53935';const IN=n=>t>=S[n][0]&&t<S[n][1];const NIGHT=IN('s2-cctv')||IN('s2-jejak')||IN('s2-realita');
   let pz=1;for(const p of FX.punch){const d=t-p;if(d>=0&&d<.6)pz=Math.max(pz,1+.13*(d<.06?d/.06:Math.exp(-(d-.06)*6)))}
   let sx0=0,sy0=0;for(const s0 of FX.shake){const d=t-s0;if(d>=0&&d<.45){const k=Math.exp(-d*7)*28;sx0+=Math.sin(d*90)*k;sy0+=Math.cos(d*77)*k}}
   x.save();x.translate(W/2+sx0,H/2+sy0);x.scale(pz,pz);x.translate(-W/2,-H/2);x.filter=fz!=null?'contrast(1.15) saturate(.4)':(NIGHT?'contrast(1.05) saturate(.9)':'contrast(1.07) saturate(1.1) sepia(.07)');__trans(im,t);x.restore();
-  if(!NIGHT&&!IN('split')){x.save();x.globalCompositeOperation='screen';x.globalAlpha=.2;x.filter='blur(22px) brightness(1.2)';x.drawImage(im,0,0,W,H);x.restore()}
+  if(!NIGHT&&!IN('s2-ekspek')){x.save();x.globalCompositeOperation='screen';x.globalAlpha=.2;x.filter='blur(22px) brightness(1.2)';x.drawImage(im,0,0,W,H);x.restore()}
   {let vg=x.createRadialGradient(W/2,H*.48,H*.25,W/2,H*.5,H*.72);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(10,6,0,.42)');x.fillStyle=vg;x.fillRect(0,0,W,H)}
   if(IN('s2-jejak'))gelap(t,S['s2-jejak'][0],S['s2-jejak'][1],.35);
   cctv(t,S['s2-cctv'][0],S['s2-cctv'][1],'02:13:'+String(Math.floor((t*7)%60)).padStart(2,'0'));
-  splitLabel(t,S['split'][0],S['split'][1]);
-  if(t<S['split'][1]){x.save();rr(W/2-120,70,240,72,36,R);x.font='56px Bangers';x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText('HARI 2',W/2,108);x.restore()}
+  {const [a,b]=S['s2-ekspek'];if(t<b){x.save();x.globalCompositeOperation='screen';x.globalAlpha=.35;x.filter='blur(30px) brightness(1.3)';x.drawImage(im,0,0,W,H);x.restore();x.fillStyle='rgba(255,230,250,.12)';x.fillRect(0,0,W,H);sticker(t,a+.05,b,'EKSPEKTASI',330,-.04,'#FFD23F','#111')}}
+  {const [a,b]=S['s2-realita'];if(t>=a&&t<b){sticker(t,a,a+2.2,'REALITA',330,.04,R,'#fff');const d=t-a;if(d<.12){x.fillStyle=`rgba(255,255,255,${.7*(1-d/.12)})`;x.fillRect(0,0,W,H)}}}
+  if(t<S['s2-realita'][1]){x.save();rr(W/2-120,70,240,72,36,R);x.font='56px Bangers';x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText('HARI 2',W/2,108);x.restore()}
   {const [a,b]=S['s2-roti'];if(t>=a+1.4&&t<b){card(t,a+1.4,b,430,'KEMARIN 10, SEKARANG 8','roti ilang lagi',R)}}
   if(fz!=null){const d=t-fz;x.fillStyle=`rgba(255,255,255,${Math.max(0,.6-d*3)})`;x.fillRect(0,0,W,H);x.save();x.translate(W/2,860);x.rotate(-.08);const s=back(d/.25);x.scale(s*1.1,s*1.1);out('LAH?!',0,0,170,'#FFD23F');x.restore()}
   sticker(t,S['s2-cctv'][0]+.15,S['s2-cctv'][1],'REKAMAN SEMALAM',330,-.03,'#111','#fff');

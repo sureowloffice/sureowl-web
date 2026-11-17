@@ -8,7 +8,7 @@ tl=json.load(open('tl.json'));S={r[0]:(r[1],r[2]) for r in tl['S']};TOT=tl['TOT'
 r,vo=wavfile.read('vo.wav');vo=vo.astype(np.float32)/32768;vo=np.pad(vo,(0,max(0,N-len(vo))))[:N]
 syn=Synth('/home/claude/score/GeneralUser-GS.sf2')
 r0=S['s2-roti'][0]
-sheet=[(0,r0+.5,'komedi'),(r0+.5,S['s2-roti'][1],'hit'),(S['s2-cctv'][0],TOT,'misteri')]
+sheet=[(0,S['s2-ekspek'][1],'haru'),(S['s2-realita'][0],r0+.5,'komedi'),(r0+.5,S['s2-roti'][1],'hit'),(S['s2-cctv'][0],TOT,'misteri')]
 mus=make_score(sheet,TOT+.3,syn,key=62).mean(1);mus=np.pad(mus,(0,max(0,N-len(mus))))[:N]
 def T(d):return np.arange(int(d*sr))/sr
 def lp(n,k):return np.convolve(n,np.ones(k)/k,'same')
@@ -39,7 +39,10 @@ def hoot():
         t=T(d);w=np.sin(2*np.pi*(380+8*np.sin(2*np.pi*6*t))*t)*np.sin(np.pi*t/d)**2;i=int(st*sr);out[i:i+len(w)]+=w
     return out*.5
 for n in ['s2-krek','s2-roti','s2-cctv','s2-jejak']:put(swoosh(),S[n][0]-.25,.45)
-put(snore(S['split'][1]),0,.18)
+put(snore(S['s2-realita'][1]-S['s2-realita'][0]),S['s2-realita'][0],.3)
+def scratchs():
+    t=T(.5);f=900+1400*np.sin(2*np.pi*2.2*t)**2;return np.sin(2*np.pi*np.cumsum(f)/sr)*.5+norm(lp(rng.standard_normal(len(t)),2))*.3*np.exp(-t*4)
+put(scratchs(),S['s2-realita'][0]-.08,.7)
 put(crack(),S['s2-krek'][0]+.35,.7)
 put(dun(),r0+.8,.55)
 a,b=S['s2-cctv'];put(hiss(b-a),a,.35);put(steps(1.8),a+.3,.5)
