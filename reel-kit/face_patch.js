@@ -132,12 +132,12 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
   if(p.type=='tokodalam'){b(0,-.01,0,p.w||7,.02,p.d||5,'#B98A5A');b(0,0,-(p.d||5)/2,p.w||7,3,.1,'#F6E7CF');b(-(p.w||7)/2,0,0,.1,3,p.d||5,'#EFDCC0');
    for(let k=0;k<3;k++){b(1.6,.5+k*.6,-(p.d||5)/2+.3,2.4,.06,.5,'#8A5A2B');for(let q=0;q<6;q++)D(G.sphHi,M.chain(R(M.T(.7+q*.36,.62+k*.6,-(p.d||5)/2+.3)),M.RY(.4),M.S(.14,.08,.08)),q%2?'#C98A3E':'#D9A25A',NC)}
    D(G.sph,M.chain(R(M.T(0,2.8,0)),M.S(.25,.12,.25)),'#FFE9B0',{em:1,cast:false})}
-  if(p.type=='saklar'){b(0,0,0,3,2.6,.1,p.dinding||'#F2E6D0');b(0,.72,.06,.2,.3,.03,'#FFFFFF');const on=(T*1.6)%1<.5;b(0,.78+(on?.0:-.05),.085,.06,.1,.03,'#DDDDDD')}
+  if(p.type=='saklar'){b(0,0,0,3,2.6,.1,p.dinding||'#F2E6D0');b(0,.6,.06,.2,.3,.03,'#FFFFFF');const on=(T*1.6)%1<.5;b(0,.66+(on?.0:-.05),.085,.06,.1,.03,'#DDDDDD')}
   if(p.type=='tepung'){for(let k=0;k<7;k++)D(G.sph,M.chain(R(M.T((k%3-1)*.35,.005,(Math.floor(k/3)-1)*.3)),M.S(.45,.01,.38)),'#F7F3EA',NC);
    const n=p.n||9;for(let k=0;k<n;k++){const zz=-.3-k*.32,xx=(k%2?.09:-.09);D(G.sph,M.chain(R(M.T(xx,.015,zz)),M.S(.06,.006,.1)),k<3?'#E6DCC8':'#6B5B45',NC);D(G.sph,M.chain(R(M.T(xx,.016,zz-.11)),M.S(.035,.006,.04)),k<3?'#E6DCC8':'#6B5B45',NC)}}
   if(p.type=='gerobak'){b(0,.32,0,.7,.32,1.0,'#5D6B7A');b(0,.18,.0,.6,.06,.9,'#4A5563');D(G.sphHi,M.chain(R(M.T(0,.16,.62)),M.RZ(Math.PI/2),M.S(.16,.04,.16)),'#222',NC);
    for(let k=0;k<6;k++)b((k%2-.5)*.28,.64+Math.floor(k/2)*.0,(Math.floor(k/2)-1)*.28,.26,.12,.24,'#B4523A');for(const s of [-1,1])b(s*.25,.45,-.75,.05,.05,.7,'#8A5A2B')}
   if(p.type=='papantulis'){b(0,.8,0,2.6,1.3,.06,'#2F5D46');b(0,.78,0,2.75,.06,.12,'#8A5A2B');D(G.box,M.chain(R(M.T(0,1.05,.04)),M.S(2.2,.8,.0005)),'#FFFFFF',{tex:__bbTex(p.txt||'KOTA SENI','#2F5D46'),em:.6,cast:false})}
   if(p.type=='meja'){for(let r=0;r<(p.rows||2);r++)for(let c=0;c<(p.cols||3);c++)b((c-((p.cols||3)-1)/2)*1.1,0,r*1.0,.8,.45,.5,'#B98A5A')}
-  if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15,Z),M.S(p.r,p.h,p.r)),'#7FAF5A',{tex:window.__CINE&&window.__cineTexF?window.__cineTexF('grass'):undefined})}
+  if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15,Z),M.S(p.r,p.h,p.r)),'#6E9A4E',{cast:false})}
  }}
