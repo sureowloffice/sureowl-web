@@ -98,8 +98,9 @@ window.draw=async(f,t)=>{const FX=window.FX;let fz=null;for(const [a,d] of FX.fr
   // per adegan
   if(IN('b03-roti')&&t>A('b03-roti')+1.3)card(t,A('b03-roti')+1.3,B('b03-roti'),430,'ROTI: 10 → 8','ilang lagi',R);
   counter(t,A('b05-nambah')+.1,B('b05-nambah'),491,N);
-  board(t,A('b07-vote')+.3,B('b07-vote'),12,0,TV['L07'][1]-.75);
-  if(IN('b07-vote')&&t>TV['L07'][1]-.75)komen(t,TV['L07'][1]-.4,B('b07-vote'),'nafis_saja','Rumahh aja duluu pak biar gak tidur di toko rotii lagii',1000,1);
+  const RXA=TV['L07'][1]-.75+.4,inRX=t>=RXA&&t<RXA+.54;
+  if(!inRX)board(t,A('b07-vote')+.3,B('b07-vote'),12,0,TV['L07'][1]-.75);
+  if(IN('b07-vote')&&!inRX&&t>TV['L07'][1]-.75)komen(t,TV['L07'][1]-.4,B('b07-vote'),'nafis_saja','Rumahh aja duluu pak biar gak tidur di toko rotii lagii',1000,1);
   if(IN('b09-bukit'))sticker(t,A('b09-bukit')+.2,B('b09-bukit'),'RUMAH DI ATAS BUKIT',330,-.03,'#FFD23F','#111');
   if(IN('b10-kerja'))sticker(t,A('b10-kerja')+.05,B('b10-kerja'),'KERJA BAKTI',330,-.03,'#FFD23F','#111');
   if(IN('b10-jempol'))sticker(t,A('b10-jempol')+.3,B('b10-jempol'),'SI JEMPOL (2X)',330,.04,R,'#fff');
