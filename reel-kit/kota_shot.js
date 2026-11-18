@@ -333,6 +333,27 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
    // 17 A/B
    T0('b17-ab',u=>({yaw:L(.75,.55,u),pitch:.1,dist:L(3.4,2.8,u),tx:BX+1.3,ty:LF+.9,tz:BZ+3.6}),{night:1,lift:LF,props:[BK],build:{x:BX,z:BZ,b0:6,b1:6,dur:1}},P2('b17-ab',[[0,BX+1.3,BZ+3.6,.7,0,LF]],{ex:[[0,'semangat']],ges:[[0,'tunjuk'],[1.5,'angkat']]}),{jam:20});
 }
+  {// ===== HARI 3 SIANG: lomba rebutan kursi wapres =====
+ const tj=n=>{const f=path.join(__dirname,'data/talk_'+n+'.json');return fs.existsSync(f)?JSON.parse(fs.readFileSync(f,'utf8')):null};
+ const E=u=>u*u*(3-2*u);
+ const HP=(n,keys,o)=>Object.assign({u:'immanuelragil',keys,talk:tj(n)},o||{});
+ const RT={build:{x:-79,z:-47,b0:6,b1:6,dur:1},roti:1,plak:'Usulan ★vanzz★'};
+ const CX=-80.55,CZ=-38.45,EB=[-79.6,-37.7];
+ const WP=['alvaro.alifiandra','mhmdf4qih_2','basskalbar','idyysse','Luki aja tuh','bayupranata411','kenz_$$'];
+ const KUR={type:'kursi',x:CX,z:CZ,ry:0,sign:'KURSI WAPRES'},EMB={type:'ember',x:EB[0],z:EB[1]};
+ const row=(o)=>WP.map((n,k)=>Object.assign({i:170+k,x:k<4?-81.95+k*.55:-81.7+(k-4)*.55,z:k<4?-39.6:-40.4,yaw:0,ges:'angkat',ex:k%2?'semangat':'teriak',bb:n,bbs:.46,bby:k<4?1.2:1.62},o?o(k):{}));
+ const P=(o)=>Object.assign({},RT,o);
+ T0('c1-intro',u=>({yaw:L(.06,0,u),pitch:.06,dist:L(4.6,3.9,E(u)),tx:-81.55,ty:1.05,tz:-39.0}),P({props:[KUR],ppl:row()}),HP('c1-intro',[[0,-81.5,-37.9,0,0]],{ex:[[0,'semangat'],[1.6,'lemas']],ges:[[0,'tunjuk'],[1.5,'garuk']]}),{jam:12});
+ T0('c2-komen',u=>({yaw:L(-.38,.38,u),pitch:.07,dist:2.7,tx:L(-82.6,-80.0,u),ty:1.15,tz:-40.1}),P({props:[],ppl:row(k=>({ges:k%2?'dorong':'pinggang',ex:k%3==0?'marah':(k%3==1?'semangat':'teriak'),hop:k%2}))}),HP('x',[[0,-95,-60,0,0]]),{jam:12});
+ T0('c3-peluit',u=>({yaw:L(.15,.02,u),pitch:.04,dist:L(1.7,1.2,E(u)),tx:-81.5,ty:.95,tz:-37.9}),P({props:[KUR],ppl:row()}),HP('c3-peluit',[[0,-81.5,-37.9,0,0]],{ex:[[0,'semangat']],ges:[[0,'angkat']]}),{jam:12});
+ {const ppl=WP.map((n,k)=>{const a0=k*2*Math.PI/7,end=k==0?{y:.62,lie:0,ges:'angkat',ex:'ketawa',yaw:.2}:(k==3?{lie:1,yaw:2.2,ex:'kaget'}:{lie:1,yaw:a0+1.2,ex:k%2?'sedih':'marah',y:k==2||k==5?.2:0});
+   const to=k==0?[CX,CZ+.02]:(k==3?[CX+.75,CZ-.25]:[CX+Math.sin(a0)*(.45+.12*(k%2)),CZ+Math.cos(a0)*(.45+.12*(k%2))]);
+   return {i:170+k,x:CX,z:CZ,orb:{cx:CX,cz:CZ,r:1.25,a0,w:1.7,t1:3.1},to,dw:.32,end,ex:'semangat',ges:'diam',bb:n,bbs:.45,bby:1.25}});
+  T0('c4-muter',u=>({yaw:L(.3,1.4,E(u)),pitch:L(.32,.2,u),dist:L(5.0,3.8,E(u)),tx:CX,ty:.55,tz:CZ}),P({props:[KUR,EMB],ppl}),HP('c4-muter',[[0,-82.9,-37.3,.9,0]],{ex:[[0,'semangat'],[3.2,'teriak']],ges:[[0,'angkat'],[3.2,'tunjuk']]}),{jam:12});
+  const fin=ppl.map(p=>Object.assign({},p,{orb:null,x:p.to[0],z:p.to[1]},p.end,{bb:p.i==170?'alvaro.alifiandra':null}));
+  T0('c5-menang',u=>({yaw:L(.25,.1,u),pitch:L(-.06,.04,u),dist:L(2.6,2.0,E(u)),tx:CX,ty:1.2,tz:CZ}),P({props:[KUR,EMB],ppl:fin}),HP('c5-menang',[[0,-95,-60,0,0]]),{jam:12});
+  T0('c6-lah',u=>({yaw:L(-.05,.15,u),pitch:.12,dist:L(4.4,3.9,u),tx:-80.4,ty:.95,tz:-37.9}),P({props:[KUR,EMB],ppl:fin}),HP('c6-lah',[[0,-81.6,-37.5,1.2,0],[.6,-81.6,-37.5,2.4,0],[1.3,-80.3,-37.7,1.57,1],[1.75,EB[0],EB[1],0,0,.33],[9,EB[0],EB[1],0,0,.33]],{ex:[[0,'bingung'],[1.8,'bengong']],ges:[[0,'bingung'],[1.8,'diam']]}),{jam:12});
+  T0('c7-cta',u=>({yaw:L(.12,0,u),pitch:.03,dist:L(2.3,1.6,E(u)),tx:EB[0],ty:1.25,tz:EB[1]}),P({props:[KUR,EMB],ppl:fin}),HP('c7-cta',[[0,EB[0],EB[1],0,0,.33]],{ex:[[0,'senyum'],[2.4,'semangat']],ges:[[0,'tunjuk'],[2.4,'semangat']]}),{jam:12});}}
   T0('s2-jejak',u=>({yaw:.2,pitch:L(.55,.42,u),dist:L(3.4,4.6,E(u)),tx:-75,ty:0,tz:L(-70.5,-71.5,u)}),{night:1,props:[{type:'tepung',x:-75,z:-70,ry:.3,n:12}],ppl:[{owl:1,x:-76.5,z:-75.6,to:[-77.4,-77.8],tw:1.0,dw:1.6,yaw:-2.8,sc:.38}]},null,{jam:22});
   T0('t-bungkuk',u=>({yaw:1.9,pitch:.08,dist:4.2,tx:-83.8,ty:.5,tz:-41.4}),K3(60,{ppl:[0,1,2,3].map(k=>({i:120+k,x:-85.2+k*.8,z:-41.4,yaw:.3,bend:.3,ges:'pinggang',ex:'sakit'}))}));
   T0('t-saklar',u=>({yaw:1.25,pitch:.04,dist:L(2.2,1.8,u),tx:-69.95,ty:.72,tz:-62.25}),{props:[{type:'saklar',x:-70,z:-62.6}]},PR('x',[[0,-69.95,-61.95,HS,0]],{ges:[[0,'pencet']],ex:[[0,'bingung']]}));

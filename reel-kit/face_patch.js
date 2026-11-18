@@ -105,8 +105,12 @@ function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.b
 function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)continue;if(p.t1!=null&&T>p.t1)continue;if(p.owl){__owlSil(p,T,t);continue}const R=REC(p.i);
  if(p.lama&&!R.__lm){R.col=['#8C8577','#7E7466','#958A78','#6F6A60'][p.i%4];R.__lm=1;R._Lk=null}if(p.col&&R.col!==p.col){R.col=p.col;R._Lk=null}
  if(p.pres&&!R.own){R.own=1;R.u=(window.__HERO||{}).u;R._Lk=null}R.__ges=p.ges||'diam';R.__ex=p.ex||null;R.__role=p.role||null;R.__hold=p.hold||null;
- let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||2)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u;p.__mv=u<1}
- const bob=(p.__mv?Math.abs(Math.sin(t*9+p.i))*.06:0)+(p.y||0)+(p.hop?Math.abs(Math.sin(t*8+p.i))*.12:0)+(p.lie?.16:0);window.__MRX=p.lie?-Math.PI/2:(p.bend||0);window.__MS=p.ms||1;man(p.i,x,z,p.yaw||0,!!p.__mv,bob,false);window.__MRX=0;window.__MS=1;
+ let x=p.x,z=p.z;let P=p;if(p.orb){const o=p.orb,tt=Math.min(T,o.t1),an=o.a0+o.w*tt,ox=o.cx+o.r*Math.sin(an),oz=o.cz+o.r*Math.cos(an);
+  if(T<o.t1){x=ox;z=oz;P=Object.assign({},p,{yaw:an+Math.PI/2*Math.sign(o.w),hop:0});p.__mv=true}
+  else{const u=Math.min(1,(T-o.t1)/(p.dw||.35));const tg=p.to||[ox,oz];x=ox+(tg[0]-ox)*u;z=oz+(tg[1]-oz)*u;p.__mv=u<1;P=u<1?Object.assign({},p,{yaw:Math.atan2(tg[0]-ox,tg[1]-oz)}):Object.assign({},p,p.end||{})}
+  R.__ges=P.ges||'diam';R.__ex=P.ex||null}
+ else if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||2)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u;p.__mv=u<1}
+ const bob=(p.__mv?Math.abs(Math.sin(t*9+p.i))*.06:0)+(P.y||0)+(P.hop?Math.abs(Math.sin(t*8+p.i))*.12:0)+(P.lie?.16:0);window.__MRX=P.lie?-Math.PI/2:(P.bend||0);window.__MS=p.ms||1;man(p.i,x,z,P.yaw||0,!!p.__mv,bob,false);window.__MRX=0;window.__MS=1;
  if(p.lama&&window.__CINE){for(let k=0;k<3;k++){const q=((t*.6+k*.33+p.i*.1)%1);D(G.sph,M.chain(M.T(x+(k-1)*.12,.15+q*.5,z),M.S(.06+q*.1,.06+q*.1,.06+q*.1)),'#BFAF92',{alpha:.35*(1-q),cast:false})}}
  if(p.bb&&(p.bbt==null||T>=p.bbt))__bb(x,(p.y||0)+(p.bby||1.22),z,p.bb,p.bbs||.7,p.bbc||'#FFFFFF')}}
 function __zzzF(K,t){for(const z of K.zzz){const q=(t*.5+z[3])%1;__bb(z[0]+Math.sin(q*6)*.15,z[1]+q*1.1,z[2],'Zzz',.35+q*.25,'#E6E9FF')}}
@@ -141,6 +145,8 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
    for(let k=0;k<6;k++)b((k%2-.5)*.28,.64+Math.floor(k/2)*.0,(Math.floor(k/2)-1)*.28,.26,.12,.24,'#B4523A');for(const s of [-1,1])b(s*.25,.45,-.75,.05,.05,.7,'#8A5A2B')}
   if(p.type=='papantulis'){b(0,.8,0,2.6,1.3,.06,'#2F5D46');b(0,.78,0,2.75,.06,.12,'#8A5A2B');D(G.box,M.chain(R(M.T(0,1.05,.04)),M.S(2.2,.8,.0005)),'#FFFFFF',{tex:__bbTex(p.txt||'KOTA SENI','#2F5D46'),em:.6,cast:false})}
   if(p.type=='meja'){for(let r=0;r<(p.rows||2);r++)for(let c=0;c<(p.cols||3);c++)b((c-((p.cols||3)-1)/2)*1.1,0,r*1.0,.8,.45,.5,'#B98A5A')}
+  if(p.type=='kursi'){const ry=p.ry||0,C=p.col||'#B5733E',ch=(dx,dy,dz,sx,sy,sz,c)=>D(G.box,M.chain(M.T(X,0,Z),M.RY(ry),M.T(dx,dy,dz),M.S(sx,sy,sz)),c);ch(0,.42,0,.5,.06,.5,C);for(const [lx,lz] of [[-.21,-.21],[.21,-.21],[-.21,.21],[.21,.21]])ch(lx,0,lz,.05,.42,.05,'#8A5530');ch(0,.45,-.23,.5,.55,.05,C);if(p.sign)__bb(X,1.25,Z,p.sign,.55,'#FFD23F')}
+  if(p.type=='ember'){D(G.cyl16,M.chain(M.T(X,0,Z),M.S(.34,.32,.34)),p.col||'#3FA7E0');D(G.cyl16,M.chain(M.T(X,.31,Z),M.S(.36,.02,.36)),'#2A7FB0')}
   if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15+(p.dy||0),Z),M.S(p.r,p.h,p.r)),'#6E9A4E',{cast:false});if(p.jalan)for(let k=0;k<9;k++){const a=k/9*1.2;D(G.box,M.chain(M.T(X+Math.sin(p.jalan+a*.0)*(p.r*(.95-k*.1)),(p.dy||0)+p.h*.85-p.h*Math.max(0,(.95-k*.1))**2*.9-.02,Z+Math.cos(p.jalan)*(p.r*(.95-k*.1))),M.RY(p.jalan),M.S(1.2,.05,1.1)),'#B8946A',{cast:false})}}
  }}
 
