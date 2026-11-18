@@ -92,6 +92,16 @@ function __spyF(K,T,t,man,REC){const S=K.spy;const R=REC(60);R.col='#1A1A22';R.p
 
 // papan/balon teks yang selalu menghadap kamera
 function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;if(C[k])return C[k];
+ const NT=window.__NT||'P';
+ if(txt[0]=='@'&&NT=='A'){const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);let fs=70;do{x.font='900 '+fs+'px Inter, sans-serif';fs-=2}while(x.measureText(txt).width>w-40&&fs>22);x.textAlign='center';x.textBaseline='middle';x.lineJoin='round';x.lineWidth=14;x.strokeStyle='#111';x.strokeText(txt.slice(1),w/2,h/2);x.fillStyle='#fff';x.fillText(txt.slice(1),w/2,h/2)});return C[k]=texFromCanvas(cv)}
+ if(txt[0]=='@'&&NT=='B'){const cols=['#E53935','#1E88E5','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E'];let hsh=0;for(const ch of txt)hsh=(hsh*31+ch.charCodeAt(0))>>>0;const col=cols[hsh%cols.length];
+   const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);let fs=60;do{x.font='800 '+fs+'px Inter, sans-serif';fs-=2}while(x.measureText(txt).width>w-80&&fs>22);const tw=x.measureText(txt.slice(1)).width,pw=tw+60,ph=fs+30,px=(w-pw)/2,py=(h-ph)/2;
+   x.fillStyle=col;x.beginPath();x.roundRect(px,py,pw,ph,14);x.fill();x.beginPath();x.moveTo(w/2-14,py+ph);x.lineTo(w/2,py+ph+16);x.lineTo(w/2+14,py+ph);x.fill();x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(txt.slice(1),w/2,h/2+2)});return C[k]=texFromCanvas(cv)}
+ if(txt[0]=='@'&&NT=='D'){const cols=['#E53935','#1E88E5','#2E9E4F','#F57C00','#8E24AA','#0097A7','#D84315'];let hsh=0;for(const ch of txt)hsh=(hsh*31+ch.charCodeAt(0))>>>0;const col=cols[hsh%cols.length];
+   const t2=txt.slice(1),mc=document.createElement('canvas').getContext('2d');mc.font='800 64px Inter, sans-serif';const tw=Math.ceil(mc.measureText(t2).width)+64;
+   const cv=signCanvas(tw,100,(x,w,h)=>{x.fillStyle=col;x.fillRect(0,0,w,h);x.fillStyle='rgba(0,0,0,.22)';x.fillRect(0,h-12,w,12);x.fillStyle='rgba(255,255,255,.25)';x.fillRect(0,0,w,6);x.font='800 64px Inter, sans-serif';x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(t2,w/2,h/2-3)});const T=texFromCanvas(cv);T.__ar=tw/100;return C[k]=T}
+ if(txt[0]=='@'&&NT=='C'){const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);let fs=52;do{x.font='800 '+fs+'px Inter, sans-serif';fs-=2}while(x.measureText(txt).width>w-150&&fs>20);const tw=x.measureText(txt.slice(1)).width,pw=tw+120,ph=fs+44,px=(w-pw)/2,py=(h-ph)/2;
+   x.fillStyle='#FFFFFF';x.beginPath();x.roundRect(px,py,pw,ph,ph/2);x.fill();x.lineWidth=6;x.strokeStyle='#111';x.stroke();const cx=px+ph/2,cy=h/2;x.fillStyle='#FFD23F';x.beginPath();x.arc(cx,cy,ph/2-10,0,7);x.fill();x.stroke();x.fillStyle='#111';x.font='900 '+(fs*.9)+'px Inter';x.textAlign='center';x.textBaseline='middle';x.fillText(txt[1].toUpperCase(),cx,cy+2);x.font='800 '+fs+'px Inter, sans-serif';x.fillText(txt.slice(1),px+ph+ (pw-ph)/2-8,cy+2)});return C[k]=texFromCanvas(cv)}
  if(txt[0]=='@'){const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);let fs=64;do{x.font='800 '+fs+'px Inter, sans-serif';fs-=2}while(x.measureText(txt).width>w-70&&fs>22);
    const tw=x.measureText(txt).width,pw=tw+56,ph=fs+34,px=(w-pw)/2,py=(h-ph)/2;x.fillStyle='rgba(17,17,17,.88)';x.beginPath();x.roundRect(px,py,pw,ph,ph/2);x.fill();x.strokeStyle='#FFD23F';x.lineWidth=5;x.stroke();
    x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,w/2,h/2+2)});return C[k]=texFromCanvas(cv)}
@@ -102,7 +112,7 @@ function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;
   if(nm){let f2=40;do{x.font='700 '+f2+'px "Comic Neue", sans-serif';f2-=2}while(x.measureText(nm).width>w-150&&f2>20);x.fillStyle='#555';x.fillText(nm,w/2,cy-48);x.fillStyle='#111'}
   let fs=nm?90:110;do{x.font=fs+'px Bangers, "Comic Neue", sans-serif';fs-=5}while(x.measureText(T).width>w-110&&fs>28);x.fillText(T,w/2,nm?cy+18:cy+4)});
  return C[k]=texFromCanvas(cv)}
-function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;D(G.box,M.chain(M.T(px,py,pz),M.RY(yw),M.S(sz,sz/2,.0005)),'#FFFFFF',{tex:__bbTex(txt,bg||'#FFFFFF'),em:1,cast:false})}
+function __bb(px,py,pz,txt,sz,bg){const c=window.__CAMO;const yw=c?c.yaw:0;const tg=txt[0]=='@'&&window.__NT=='D';const TX=__bbTex(txt,bg||'#FFFFFF');const hh=sz*.2;D(G.box,M.chain(M.T(px,py+(tg?sz*.12:0),pz),M.RY(yw),M.S(tg?hh*(TX.__ar||4):sz,tg?hh:sz/2,.0005)),'#FFFFFF',{tex:TX,em:1,cast:false})}
 
 // orang yang diatur satu per satu: {i,x,z,yaw,ges,ex,role,hold,lama,mv,y,bb,bbz,bbc,t0,t1}
 function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)continue;if(p.t1!=null&&T>p.t1)continue;if(p.owl){__owlSil(p,T,t);continue}const R=REC(p.i);

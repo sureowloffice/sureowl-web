@@ -474,6 +474,7 @@ srv.listen(0,async()=>{const port=srv.address().port;
   await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
   await p.addInitScript(()=>{let T=0;const q=[];const B0=Date.now();Date.now=()=>B0+T;window.__adv=ms=>{T+=ms;q.splice(0).forEach(f=>f(T))};performance.now=()=>T;window.requestAnimationFrame=f=>{q.push(f);return q.length}});
   if(PRESV)await p.addInitScript(o=>{window.__PRES=o},PRESV);if(S.real||process.env.REAL)await p.addInitScript(()=>{window.__REAL=1});
+  await p.addInitScript(nt=>{window.__NT=nt},process.env.NT||'P');
   await p.addInitScript(o=>{if(o.hero)window.__HERO=Object.assign({T:0},o.hero);if(o.vilp)window.__VILP=o.vilp;if(o.debl)window.__DEBL=o.debl;if(o.site)window.__SITE=Object.assign({T:0},o.site);if(o.calm)window.__CALM=1;if(o.bio)window.__BIO=Object.assign({T:0},o.bio);if(o.ruin)window.__RUIN=Object.assign({T:0,x:0,z:0,sp:.03,t0:0,dr:30},o.ruin);if(o.k3)window.__K3=Object.assign({T:0},o.k3);if(o.chr)window.__CHR=1;if(o.cine)window.__CINE=o.cine},{cine:S.cine||null,chr:S.chr||null,k3:S.k3||null,ruin:S.ruin||null,bio:S.bio||null,calm:!!(S.calm||process.env.CALM),hero:S.hero||null,vilp:S.vilp||null,debl:S.debl||null,site:S.site||null});
   p.on('pageerror',e=>console.log('PAGEERR',e.message));
   await p.addStyleTag({content:''}).catch(()=>{});
