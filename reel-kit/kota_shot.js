@@ -285,6 +285,14 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
    T0('h2-siapa',u=>({yaw:.65,pitch:.26,dist:L(1.8,1.35,E(u)),tx:-68.3,ty:.26,tz:-61.5}),{night:1,props:[TK],ppl:sl.concat([{owl:1,x:-68.3,z:-61.5,yaw:.65,sc:.36,roti:1}])},null,{jam:23});
    // President melek di antara warga tidur, kamera dorong ke muka
    T0('h2-melek',u=>({yaw:.3,pitch:1.22,dist:L(2.0,1.3,E(u)),tx:-70.36,ty:.15,tz:-60.8}),{night:1,props:[TK],ppl:sl.concat([PRES('kaget'),{i:161,x:-70.2,z:-60.84,yaw:-Math.PI/2,lie:1,y:.16,ex:'merem',ges:'tidur'}])},null,{jam:23});}
+  {const TK={type:'tokodalam',x:-70.4,z:-60.5,w:5,d:4.4};const sl=[];for(let r=0;r<3;r++)for(let c=0;c<5;c++){if(r==1&&c==2)continue;sl.push({i:110+r*5+c,x:-71.6+c*.62,z:-61.2+r*1.15,yaw:0,lie:1,ex:'merem',ges:'tidur'})}
+   const KM=[{type:'kamar',x:-60,z:-60,w:5,d:5},{type:'kasur',x:-60,z:-60.4,ry:0}];const sm=q=>q*q*(3-2*q);
+   // EKSPEKTASI 1: close dari atas, President tidur pulas di kasur (framing sama persis dengan realita 1)
+   T0('h2-eksp1',u=>({yaw:.3,pitch:1.22,dist:L(1.45,1.25,u),tx:-60,ty:.57,tz:-60.75}),{props:KM,ppl:[{i:150,pres:1,x:-60,z:-60.0,yaw:0,lie:1,y:.42,ex:'merem',ges:'tidur'}]});
+   // REALITA 1: framing sama, lalu mundur memperlihatkan lantai penuh warga
+   T0('h2-real1',u=>{const e=sm(Math.min(1,Math.max(0,(u-.3)/.6)));return {yaw:.3-.15*e,pitch:1.22-.22*e,dist:1.3+2.9*e,tx:-70.36+.06*e,ty:.15+.05*e,tz:-60.8+.5*e}},{night:1,props:[TK],ppl:sl.concat([{i:160,pres:1,x:-70.36,z:-60.05,yaw:0,lie:1,ex:'kaget',ges:'tidur'},{i:161,x:-70.42,z:-60.66,yaw:-Math.PI/2,lie:1,y:.2,ex:'merem',ges:'tidur'}])},null,{jam:23});
+   // EKSPEKTASI 2: bangun segar, peregangan di kamar terang
+   T0('h2-eksp2',u=>({yaw:L(.3,.08,u),pitch:.1,dist:L(2.7,2.2,sm(u)),tx:-60.4,ty:.75,tz:-58.9}),{props:KM,ppl:[{i:150,pres:1,x:-60.4,z:-58.9,yaw:0,ges:'semangat',ex:'senyum'}]});}
   T0('s2-jejak',u=>({yaw:.2,pitch:L(.55,.42,u),dist:L(3.4,4.6,E(u)),tx:-75,ty:0,tz:L(-70.5,-71.5,u)}),{night:1,props:[{type:'tepung',x:-75,z:-70,ry:.3,n:12}],ppl:[{owl:1,x:-76.5,z:-75.6,to:[-77.4,-77.8],tw:1.0,dw:1.6,yaw:-2.8,sc:.38}]},null,{jam:22});
   T0('t-bungkuk',u=>({yaw:1.9,pitch:.08,dist:4.2,tx:-83.8,ty:.5,tz:-41.4}),K3(60,{ppl:[0,1,2,3].map(k=>({i:120+k,x:-85.2+k*.8,z:-41.4,yaw:.3,bend:.3,ges:'pinggang',ex:'sakit'}))}));
   T0('t-saklar',u=>({yaw:1.25,pitch:.04,dist:L(2.2,1.8,u),tx:-69.95,ty:.72,tz:-62.25}),{props:[{type:'saklar',x:-70,z:-62.6}]},PR('x',[[0,-69.95,-61.95,HS,0]],{ges:[[0,'pencet']],ex:[[0,'bingung']]}));
