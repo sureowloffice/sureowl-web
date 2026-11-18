@@ -92,6 +92,9 @@ function __spyF(K,T,t,man,REC){const S=K.spy;const R=REC(60);R.col='#1A1A22';R.p
 
 // papan/balon teks yang selalu menghadap kamera
 function __bbTex(txt,bg){const C=window.__BBT||(window.__BBT={});const k=txt+bg;if(C[k])return C[k];
+ if(txt[0]=='@'){const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);let fs=64;do{x.font='800 '+fs+'px Inter, sans-serif';fs-=2}while(x.measureText(txt).width>w-70&&fs>22);
+   const tw=x.measureText(txt).width,pw=tw+56,ph=fs+34,px=(w-pw)/2,py=(h-ph)/2;x.fillStyle='rgba(17,17,17,.88)';x.beginPath();x.roundRect(px,py,pw,ph,ph/2);x.fill();x.strokeStyle='#FFD23F';x.lineWidth=5;x.stroke();
+   x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,w/2,h/2+2)});return C[k]=texFromCanvas(cv)}
  const cv=signCanvas(512,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle=bg;x.strokeStyle='#111';x.lineWidth=12;x.lineJoin='round';
   x.beginPath();x.ellipse(w/2,(h-50)/2+6,w/2-14,(h-60)/2,0,0,Math.PI*2);x.fill();x.stroke();
   x.beginPath();x.moveTo(w/2-34,h-62);x.lineTo(w/2-6,h-6);x.lineTo(w/2+22,h-58);x.fill();x.stroke();x.beginPath();x.ellipse(w/2,(h-50)/2+6,w/2-18.5,(h-64)/2,0,0,Math.PI*2);x.fill();
