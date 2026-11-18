@@ -7,7 +7,7 @@ sr=SR;rng=np.random.default_rng(3)
 tl=json.load(open('tl.json'));S={r[0]:(r[1],r[2]) for r in tl['S']};TOT=tl['TOT'];N=int((TOT+.3)*sr)
 vo=np.zeros(N,np.float32)
 syn=Synth('/home/claude/score/GeneralUser-GS.sf2')
-sheet=[(0,3.18,'haru'),(3.2,6.6,'komedi'),(6.6,8.0,'haru'),(8.0,TOT,'komedi')]
+sheet=[(0,4.73,'haru'),(4.75,9.2,'komedi'),(9.2,10.88,'haru'),(10.9,TOT,'komedi')]
 mus=make_score(sheet,TOT+.3,syn,key=62).mean(1);mus=np.pad(mus,(0,max(0,N-len(mus))))[:N]
 def T(d):return np.arange(int(d*sr))/sr
 def lp(n,k):return np.convolve(n,np.ones(k)/k,'same')
@@ -38,7 +38,7 @@ def addvo(f,t):
     r,a=wavfile.read(f);a=a.astype(np.float32)/32768
     if a.ndim>1:a=a.mean(1)
     i=int(t*sr);j=min(N,i+len(a));vo[i:j]+=a[:j-i]
-addvo('vo/V1a.wav',.15);addvo('vo/V1b.wav',3.3);addvo('vo/V2.wav',8.2)
+addvo('vo/E1.wav',.05);addvo('vo/V1a.wav',1.45);addvo('vo/R1.wav',4.85);addvo('vo/V1b.wav',5.75);addvo('vo/E1.wav',9.25);addvo('vo/R1.wav',10.95);addvo('vo/V2.wav',11.6)
 def scratchs():
     t=T(.5);f=900+1400*np.sin(2*np.pi*2.2*t)**2;return np.sin(2*np.pi*np.cumsum(f)/sr)*.5+norm(lp(rng.standard_normal(len(t)),2))*.3*np.exp(-t*4)
 def chime():
@@ -46,14 +46,20 @@ def chime():
     for k,f0 in enumerate([1568,2093,2637,3136]):
         i=int(k*.08*sr);tt=t[:len(t)-i];s[i:]+=np.sin(2*np.pi*f0*tt)*np.exp(-tt*3)
     return s*.25
-put(chime(),.05,.5);put(chime(),6.62,.5)
-put(scratchs(),3.12,.8);put(scratchs(),7.92,.8)
-put(dun(),3.2,.6)
-put(snore(3.4),3.2,.55)
-put(crack(),8.7,.9)
+put(chime(),.02,.5);put(chime(),9.22,.5)
+def harp():
+    t=T(1.0);s=np.zeros(len(t))
+    for k,f0 in enumerate([523,659,784,1047,1319,1568,2093]):
+        i=int(k*.06*sr);tt=t[:len(t)-i];s[i:]+=np.sin(2*np.pi*f0*tt)*np.exp(-tt*4)
+    return s*.3
+put(harp(),.05,.6);put(harp(),9.25,.6)
+put(scratchs(),4.6,.8);put(scratchs(),10.75,.8)
+put(dun(),4.75,1.0);put(dun(),10.9,1.0)
+put(snore(4.4),4.75,.5)
+put(crack(),11.55,.9)
 env=np.convolve(np.abs(vo),np.ones(2205)/2205,'same');duck=1-.45*np.clip(env/(env.max()+1e-9)*4,0,1)
 # musik putus total di titik REALITA (0.25 dtk)
-for t0 in (3.12,7.92):
+for t0 in (4.6,10.75):
     i=int(t0*sr);mus[i:i+int(.3*sr)]*=0
 mix=vo/(np.abs(vo).max()+1e-9)*.85+mus*duck*1.0+fx*.5
 mix=mix/max(1,np.abs(mix).max()/.95)
