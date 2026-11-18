@@ -1,0 +1,49 @@
+import sys,json,numpy as np
+sys.path.insert(0,'/home/claude/score')
+from sf2 import Synth,SR
+from cues import make_score
+from scipy.io import wavfile
+sr=SR;rng=np.random.default_rng(3)
+tl=json.load(open('tl.json'));S={r[0]:(r[1],r[2]) for r in tl['S']};TOT=tl['TOT'];N=int((TOT+.3)*sr)
+vo=np.zeros(N,np.float32)
+syn=Synth('/home/claude/score/GeneralUser-GS.sf2')
+sheet=[(0,3.1,'misteri'),(3.12,4.2,'hit'),(4.25,TOT,'komedi')]
+mus=make_score(sheet,TOT+.3,syn,key=62).mean(1);mus=np.pad(mus,(0,max(0,N-len(mus))))[:N]
+def T(d):return np.arange(int(d*sr))/sr
+def lp(n,k):return np.convolve(n,np.ones(k)/k,'same')
+def norm(a):return a/(np.abs(a).max()+1e-9)
+fx=np.zeros(N)
+def put(s,t,g=1):
+    i=max(0,int(t*sr));j=min(N,i+len(s))
+    if i<N:fx[i:j]+=s[:j-i]*g
+def swoosh(d=.38):t=T(d);n=rng.standard_normal(len(t));a=lp(n,30);b=lp(n,4);w=np.clip(t/d,0,1);return norm(a*(1-w)+b*w)*np.sin(np.pi*t/d)**1.5
+def crack():
+    s=np.zeros(int(.35*sr))
+    for k in range(9):i=int(rng.uniform(0,.25)*sr);n=int(.012*sr);s[i:i+n]+=rng.standard_normal(n)*np.exp(-np.arange(n)/sr*400)
+    return norm(s)
+def snore(d):t=T(d);env=np.clip(np.sin(2*np.pi*.45*t),0,1)**2;return lp(rng.standard_normal(len(t)),18)*env*(1+.5*np.sin(2*np.pi*28*t))*.6
+def dun():
+    out=np.zeros(int(1.5*sr))
+    for k,(f,dd) in enumerate([(98,.25),(92,.25),(73,.8)]):
+        t=T(dd);w=(np.sign(np.sin(2*np.pi*f*t))*.4+np.sin(2*np.pi*f*t))*np.exp(-t*2.5);i=int([0,.28,.56][k]*sr);out[i:i+len(w)]+=w
+    return out*.6
+def hiss(d):return lp(rng.standard_normal(int(d*sr)),2)*.25
+def steps(d):
+    s=np.zeros(int(d*sr))
+    for k in np.arange(0,d-.05,.09):i=int(k*sr);n=int(.03*sr);s[i:i+n]+=lp(rng.standard_normal(n),5)*np.exp(-np.arange(n)/sr*120)
+    return norm(s)*.4
+
+def addvo(f,t):
+    r,a=wavfile.read(f);a=a.astype(np.float32)/32768
+    if a.ndim>1:a=a.mean(1)
+    i=int(t*sr);j=min(N,i+len(a));vo[i:j]+=a[:j-i]
+addvo('vo/H1.wav',.2);addvo('vo/H2.wav',4.35)
+put(steps(1.0),.05,.5);put(steps(1.5),1.55,.55)
+put(swoosh(),2.8,.5);put(dun(),3.12,.9);put(swoosh(),4.0,.5)
+put(snore(4.2),4.2,.18)
+# duck music under VO
+env=np.convolve(np.abs(vo),np.ones(2205)/2205,'same');duck=1-.45*np.clip(env/ (env.max()+1e-9)*4,0,1)
+mix=vo/ (np.abs(vo).max()+1e-9)*.85+mus*duck*1.0+fx*.5
+mix=mix/max(1,np.abs(mix).max()/.95)
+wavfile.write('mix.wav',sr,(np.stack([mix,mix],1)*32767).astype(np.int16))
+print('mix ok',len(mix)/sr)

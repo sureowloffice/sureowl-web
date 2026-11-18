@@ -274,6 +274,17 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
   T0('s2-roti',(u,ts)=>{const z=ts<.55?0:1-Math.pow(1-Math.min(1,(ts-.55)/.2),3);const sk=ts>.7?Math.exp(-(ts-.7)*4)*.6:0;return {yaw:.45*(1-z)+.1*z+Math.sin(ts*47)*.02*sk,pitch:.06,dist:3.1*(1-z)+1.15*z,tx:-79.7,ty:.72+.21*z,tz:-43.3}},{build:{x:-79,z:-47,b0:6,b1:6,dur:1},roti:1,rotiN:8},PR('x',[[0,-79.7,-43.3,.1,0]],{ex:[[0,'bengong'],[.55,'kaget']],ges:[[0,'diam'],[.7,'tunjuk']]}),{jam:9});
   SHOTS['xs2-roti']=Object.assign({},SHOTS['s2-roti'],{chr:1});
   T0('s2-cctv',u=>({yaw:.6,pitch:.42,dist:4.0,tx:-70.4,ty:.3,tz:-60.6}),{night:1,props:[{type:'tokodalam',x:-70.4,z:-60.5,w:5,d:4.4}],ppl:[0,1,2,3,4,5,6,7,8,9].map(k=>({i:110+k,x:-71.6+(k%5)*.62,z:-61.2+Math.floor(k/5)*1.15,yaw:0,lie:1,ex:'merem',ges:'tidur'})).concat([{owl:1,x:-69.0,z:-62.0,to:[-72.0,-59.0],tw:.2,dw:2.2,yaw:-.8,sc:.36,roti:1}])},null,{jam:23});
+  {const TK={type:'tokodalam',x:-70.4,z:-60.5,w:5,d:4.4};const sl=[];for(let r=0;r<3;r++)for(let c=0;c<5;c++){if(r==1&&c==2)continue;sl.push({i:110+r*5+c,x:-71.6+c*.62,z:-61.2+r*1.15,yaw:0,lie:1,ex:'merem',ges:'tidur'})}
+   const PRES=ex=>({i:160,pres:1,x:-70.36,z:-60.05,yaw:0,lie:1,ex,ges:'tidur'});
+   // HOOK HARI 2: rekaman CCTV pojok atas, Vilindo (siluet) jinjit ambil roti dari rak lalu kabur lewat sela warga tidur
+   T0('h2-cctv',u=>({yaw:-.55,pitch:.78,dist:L(5.6,5.2,u),tx:-69.6,ty:.3,tz:-61.0}),{night:1,props:[TK],ppl:sl.concat([PRES('merem'),
+     {owl:1,x:-67.4,z:-60.2,to:[-68.7,-61.9],tw:.05,dw:1.0,yaw:-2.5,sc:.36,t1:1.25},
+     {owl:1,x:-68.7,z:-61.9,yaw:-2.5,sc:.36,roti:1,t0:1.25,t1:1.55},
+     {owl:1,x:-68.7,z:-61.9,to:[-72.6,-59.2],tw:1.55,dw:1.5,yaw:-1.0,sc:.36,roti:1,t0:1.55}])},null,{jam:23});
+   // close-up siluet pegang roti (dipakai untuk freeze)
+   T0('h2-siapa',u=>({yaw:.65,pitch:.26,dist:L(1.8,1.35,E(u)),tx:-68.3,ty:.26,tz:-61.5}),{night:1,props:[TK],ppl:sl.concat([{owl:1,x:-68.3,z:-61.5,yaw:.65,sc:.36,roti:1}])},null,{jam:23});
+   // President melek di antara warga tidur, kamera dorong ke muka
+   T0('h2-melek',u=>({yaw:.3,pitch:1.22,dist:L(2.0,1.3,E(u)),tx:-70.36,ty:.15,tz:-60.8}),{night:1,props:[TK],ppl:sl.concat([PRES('kaget'),{i:161,x:-70.2,z:-60.84,yaw:-Math.PI/2,lie:1,y:.16,ex:'merem',ges:'tidur'}])},null,{jam:23});}
   T0('s2-jejak',u=>({yaw:.2,pitch:L(.55,.42,u),dist:L(3.4,4.6,E(u)),tx:-75,ty:0,tz:L(-70.5,-71.5,u)}),{night:1,props:[{type:'tepung',x:-75,z:-70,ry:.3,n:12}],ppl:[{owl:1,x:-76.5,z:-75.6,to:[-77.4,-77.8],tw:1.0,dw:1.6,yaw:-2.8,sc:.38}]},null,{jam:22});
   T0('t-bungkuk',u=>({yaw:1.9,pitch:.08,dist:4.2,tx:-83.8,ty:.5,tz:-41.4}),K3(60,{ppl:[0,1,2,3].map(k=>({i:120+k,x:-85.2+k*.8,z:-41.4,yaw:.3,bend:.3,ges:'pinggang',ex:'sakit'}))}));
   T0('t-saklar',u=>({yaw:1.25,pitch:.04,dist:L(2.2,1.8,u),tx:-69.95,ty:.72,tz:-62.25}),{props:[{type:'saklar',x:-70,z:-62.6}]},PR('x',[[0,-69.95,-61.95,HS,0]],{ges:[[0,'pencet']],ex:[[0,'bingung']]}));
