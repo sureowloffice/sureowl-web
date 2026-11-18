@@ -9,7 +9,7 @@ def load(p):
     return v
 def onmask(v):
     n=int(SR*.03);e=np.convolve(np.abs(v),np.ones(n)/n,'same');return e>0.012
-def tight(v,maxgap=.2):
+def tight(v,maxgap=.14):
     on=onmask(v);idx=np.where(on)[0];a,b=max(0,idx[0]-int(.04*SR)),min(len(v),idx[-1]+int(.12*SR));v=v[a:b];on=on[a:b]
     out=[];i=0;n=len(v)
     while i<n:
@@ -30,28 +30,28 @@ def pauses(v):
     return g
 # (id, teks per potongan subtitle, kata kunci, shots, jeda sebelum)
 SEQ=[('L03',['Tuh kan…','ROTINYA ILANG LAGI!','Kemarin satu, sekarang dua!'],'ILANG LAGI! dua!',['b03-roti'],.15),
- ('L05',['Kabar baiknya…','warga nambah lagi!'],'nambah lagi!',['b05-nambah'],.25),
- ('L06',['Kabar buruknya…','lantai toko rotinya','nggak nambah.'],'nggak nambah.',['b06-buruk'],.25),
- ('L07',['Kalian udah milih…','dan yang menang…','RUMAH DI BUKIT!'],'RUMAH DI BUKIT!',['b07-vote'],.3),
- ('L09',['Rumah di atas bukit.','Pemandangannya bagus…','masalahnya, gue harus','dorong bata ke atas bukit.'],'bagus… dorong bata',['b09-bukit','b09-gerobak'],.25),
- ('L10',['Kerja bakti dimulai…','dan iya,','jempolnya kena lagi.'],'jempolnya lagi.',['b10-kerja','b10-jempol'],.3),
- ('L12a',['Kubu sekolah, sabar.','Ap Kaumon,','lo kepsek tanpa sekolah.'],'kepsek tanpa sekolah.',['b12-kepsek'],.25),
- ('L12b',['Terus yang daftar wapres…','tujuh orang.','Kota belum ada jalan,','udah ada tujuh wapres.'],'tujuh wapres.',['b12-wapres'],.3),
- ('L12c',['Tempat ibadah buat semua,','sama warung…','gue catat.'],'catat.',['b12-catat'],.3),
- ('L13',['Dan jadilah…','RUMAH PERTAMA','di atas bukit!'],'RUMAH PERTAMA bukit!',['b13-jadi'],.25),
- ('L14',['Kunci pertama buat warga lama.','Akhirnya ada yang tidur','bukan di lantai.'],'warga lama. bukan lantai.',['b14-kunci'],.3),
- ('L15',['…lah?'],'lah?',['b15-saklar'],1.4),
- ('L16',['Listriknya…','belum ada.'],'belum ada.',['b16-gelap'],.4),
- ('L17',['Besok cuma cukup buat satu.','A: listrik.','B: air.','Komen!'],'satu. listrik. air. Komen!',['b17-ab'],.4),
- ('L18',['Jejaknya kecil banget…','ini bukan manusia.','Bantu follow, biar lo bisa','bantu gue nangkep pencurinya.'],'kecil bukan manusia. follow, nangkep pencurinya.',['b18-jejak'],.5)]
+ ('L05',['Kabar baiknya…','warga nambah lagi!'],'nambah lagi!',['b05-nambah'],.2),
+ ('L06',['Kabar buruknya…','lantai toko rotinya','nggak nambah.'],'nggak nambah.',['b06-buruk'],.2),
+ ('L07',['Kalian udah milih…','dan yang menang…','RUMAH DI BUKIT!'],'RUMAH DI BUKIT!',['b07-vote'],.2),
+ ('L09',['Rumah di atas bukit.','Pemandangannya bagus…','masalahnya, gue harus','dorong bata ke atas bukit.'],'bagus… dorong bata',['b09-bukit','b09-gerobak'],.2),
+ ('L10',['Kerja bakti dimulai…','dan iya,','jempolnya kena lagi.'],'jempolnya lagi.',['b10-kerja','b10-jempol'],.2),
+ ('L12a',['Kubu sekolah, sabar.','Ap Kaumon,','lo kepsek tanpa sekolah.'],'kepsek tanpa sekolah.',['b12-kepsek'],.2),
+ ('L12b',['Terus yang daftar wapres…','tujuh orang.','Kota belum ada jalan,','udah ada tujuh wapres.'],'tujuh wapres.',['b12-wapres'],.2),
+ ('L12c',['Tempat ibadah buat semua,','sama warung…','gue catat.'],'catat.',['b12-catat'],.2),
+ ('L13',['Dan jadilah…','RUMAH PERTAMA','di atas bukit!'],'RUMAH PERTAMA bukit!',['b13-jadi'],.2),
+ ('L14',['Kunci pertama buat warga lama.','Akhirnya ada yang tidur','bukan di lantai.'],'warga lama. bukan lantai.',['b14-kunci'],.2),
+ ('L15',['…lah?'],'lah?',['b15-saklar'],1.2),
+ ('L16',['Listriknya…','belum ada.'],'belum ada.',['b16-gelap'],.2),
+ ('L17',['Besok cuma cukup buat satu.','A: listrik.','B: air.','Komen!'],'satu. listrik. air. Komen!',['b17-ab'],.2),
+ ('L18',['Jejaknya kecil banget…','ini bukan manusia.','Bantu follow, biar lo bisa','bantu gue nangkep pencurinya.'],'kecil bukan manusia. follow, nangkep pencurinya.',['b18-jejak'],.3)]
 L=[];T=[]
 t=.1
 for idn,ch,hl,sh,pre in SEQ:
     v=tight(load('vo/%s.wav'%idn))
     wavfile.write('vo/t.wav',SR,(v*32767).astype(np.int16))
-    subprocess.run(['ffmpeg','-y','-loglevel','error','-i','vo/t.wav','-af','atempo=1.15','vo/s_%s.wav'%idn],check=True)
+    subprocess.run(['ffmpeg','-y','-loglevel','error','-i','vo/t.wav','-af','atempo=1.2','vo/s_%s.wav'%idn],check=True)
     v=load('vo/s_%s.wav'%idn);t+=pre;T.append((round(t,3),round(t+len(v)/SR,3)));L.append(v);t+=len(v)/SR
-TOT=round(t+2.2,2);out=np.zeros(int(TOT*SR)+SR,np.float32)
+TOT=round(t+1.7,2);out=np.zeros(int(TOT*SR)+SR,np.float32)
 for (a,b),v in zip(T,L):out[int(a*SR):int(a*SR)+len(v)]+=v
 out/=np.abs(out).max()/.95;wavfile.write('vo.wav',SR,(out*32767).astype(np.int16))
 SUB=[];SPLIT={}

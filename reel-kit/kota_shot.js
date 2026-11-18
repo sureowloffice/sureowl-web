@@ -308,7 +308,7 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
    SHOTS['b07-vote']=Object.assign({},SHOTS['h1-adil'],{hero:Object.assign({},SHOTS['h1-adil'].hero,{talk:TJ2('b07-vote'),ex:[[0,'bingung'],[2.4,'kaget'],[3.0,'semangat']],ges:[[0,'dagu'],[3.0,'angkat']]})});
    // 9 bukit: dari kaki bukit, lahan kosong di puncak
    const PF=[BX+7.0,BZ+9.9],FY=Math.atan2(-7.0,-9.9);
-   T0('b09-bukit',u=>({yaw:FY+Math.PI/2+.25,pitch:L(.12,.2,u),dist:L(19,24,sm(u)),tx:BX+3,ty:L(3.6,4.2,u),tz:BZ+4}),{lift:LF,props:[BK],build:{x:BX,z:BZ,b0:.6,b1:.6,dur:1}},P2('x',[[0,PF[0],PF[1],FY,0,0]],{ex:[[0,'bengong']],ges:[[0,'dagu']]}),{jam:10});
+   T0('b09-bukit',u=>({yaw:.9,pitch:L(-.04,-.01,u),dist:L(32,25,sm(u)),tx:BX,ty:L(4.0,4.4,u),tz:BZ}),{lift:LF,props:[BK],build:{x:BX,z:BZ,b0:2,b1:2,dur:1}},P2('x',[[0,BX+Math.sin(.9)*11.6,BZ+Math.cos(.9)*11.6,.9+Math.PI,0,0]],{ex:[[0,'bengong']],ges:[[0,'dagu']]}),{jam:10});
    // 9 gerobak: dorong bata nanjak, melorot balik
    {const fx=Math.sin(FY),fz=Math.cos(FY),G0=[PF[0]+fx*.6,PF[1]+fz*.6];
     T0('b09-gerobak',u=>({yaw:FY+Math.PI/2,pitch:.06,dist:L(3.4,3.0,u),tx:PF[0]+fx*.5,ty:.7,tz:PF[1]+fz*.5}),{props:[BK,{type:'gerobak',x:G0[0],z:G0[1],ry:FY,path:[[0,0,0],[1.4,fx*.7,fz*.7],[1.9,fx*.7,fz*.7],[2.4,-fx*.5,-fz*.5],[9,-fx*.5,-fz*.5]]}],lift:0},
@@ -320,13 +320,13 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
    T0('b12-kepsek',u=>({yaw:L(.15,.05,u),pitch:.05,dist:L(4.0,3.5,u),tx:-80.6,ty:1.05,tz:-41.5}),Object.assign({},RT,{ppl:[{i:143,x:-80.25,z:-41.4,yaw:-1.6,role:'kepsek',ges:'pinggang',ex:'sedih',bb:'Ap Kaumon: SEKOLAH MANA?',bbs:.62}]}),P2('b12-kepsek',[[0,-81.45,-41.6,1.4,0]],{ex:[[0,'senyum'],[1.6,'ketawa']],ges:[[0,'tunjuk'],[1.6,'garuk']]}),{jam:12});
    // 12 tujuh wapres
    {const WP=['alvaro.alifiandra','mhmdf4qih_2','basskalbar','idyysse','Luki aja tuh','bayupranata411','kenz_$$'];
-    T0('b12-wapres',u=>({yaw:L(-.15,.15,u),pitch:.12,dist:L(6.0,5.4,u),tx:-80.7,ty:1.2,tz:-40.8}),Object.assign({},RT,{ppl:WP.map((n,k)=>({i:170+k,x:k<4?-81.9+k*.8:-81.5+(k-4)*.8,z:k<4?-40.3:-41.3,yaw:0,ges:'angkat',ex:k%2?'semangat':'teriak',hop:1,bb:n+': WAPRES!',bbs:.62,bby:k<4?1.2:1.65}))}),P2('x',[[0,-95,-60,0,0]]),{jam:12});}
+    T0('b12-wapres',u=>({yaw:L(-.15,.15,u),pitch:.12,dist:L(6.0,5.4,u),tx:-80.7,ty:1.2,tz:-40.8}),Object.assign({},RT,{ppl:WP.map((n,k)=>({i:170+k,x:k<4?-81.9+k*.8:-81.5+(k-4)*.8,z:k<4?-40.3:-41.3,yaw:0,ges:'angkat',ex:k%2?'semangat':'teriak',hop:1,bb:'WAPRES!',bbs:.8,bby:k<4?1.2:1.65}))}),P2('x',[[0,-95,-60,0,0]]),{jam:12});}
    // 12 dicatat
    T0('b12-catat',u=>({yaw:L(-.3,-.15,u),pitch:.06,dist:L(2.2,1.7,u),tx:-80.6,ty:.9,tz:-43.4}),RT,P2('b12-catat',[[0,-80.6,-43.4,0,0]],{ex:[[0,'senyum']],ges:[[0,'dada'],[1.4,'tunjuk']]}),{jam:12});
    // 13 rumah jadi di puncak
    T0('b13-jadi',u=>{const a=sm(Math.min(1,u/.45)),b=sm(Math.max(0,(u-.45)/.55));return {yaw:.55+.2*b,pitch:L(-.08,.12,a)+.1*b,dist:6+9*b,tx:BX,ty:LF+L(.3,2.2,a)-.6*b,tz:BZ}},{lift:LF,props:[BK],build:{x:BX,z:BZ,b0:6,b1:6,dur:1},plak:'Usulan nafis_saja',cf:{t:.3,x:BX,z:BZ+2}},P2('b13-jadi',[[0,BX+1.0,BZ+3.6,.55,0,LF]],{ex:[[0,'senyum'],[1.2,'ketawa']],ges:[[0,'pinggang'],[1.2,'semangat']]}),{jam:16});
    // 14 kunci untuk warga lama, senja, trompet
-   T0('b14-kunci',u=>({yaw:L(.9,.6,u),pitch:.06,dist:L(3.6,3.0,u),tx:BX+.2,ty:LF+.85,tz:BZ+2.6}),{lift:LF,props:[BK],build:{x:BX,z:BZ,b0:6,b1:6,dur:1},plak:'Usulan nafis_saja',ppl:[{i:70,lama:1,x:BX-.2,z:BZ+2.5,yaw:.9,ges:'kasih',ex:'haru',hold:'kunci',bb:'fadila49218',bbs:.55},{i:71,lama:1,x:BX-.9,z:BZ+2.2,yaw:1.0,ges:'kasih',ex:'merem',hold:'trompet',bb:'iamrafiramzi18',bbs:.55,bby:1.5}]},P2('b14-kunci',[[0,BX+.75,BZ+3.0,-2.2,0,LF]],{ex:[[0,'haru']],ges:[[0,'kasih']]}),{jam:18.2});
+   T0('b14-kunci',u=>{const e=sm(Math.max(0,(u-.45)/.55));return {yaw:L(.15,-.05,u)+.25*e,pitch:.05,dist:L(3.8,3.3,u)-1.9*e,tx:BX+L(-.4,.55,e),ty:LF+L(.85,1.12,e),tz:BZ+3.45}},{lift:LF,props:[BK],build:{x:BX,z:BZ,b0:6,b1:6,dur:1},plak:'Usulan nafis_saja',ppl:[{i:70,lama:1,x:BX-.35,z:BZ+3.55,yaw:1.0,ges:'kasih',ex:'haru',hold:'kunci',bb:'fadila49218',bbs:.75},{i:71,lama:1,x:BX-1.15,z:BZ+3.1,yaw:.75,ges:'kasih',ex:'merem',hold:'trompet',bb:'iamrafiramzi18',bbs:.75,bby:1.55}]},P2('b14-kunci',[[0,BX+.6,BZ+3.4,-.85,0,LF]],{ex:[[0,'senyum'],[1.2,'haru']],ges:[[0,'kasih'],[1.6,'dada']]}),{jam:18.2});
    // 15 saklar
    // 16 kota gelap
    T0('b16-gelap',u=>({yaw:.5,pitch:L(.12,.42,sm(u)),dist:L(10,34,sm(u)),tx:L(BX,-84,u),ty:L(LF+1,1,u),tz:L(BZ,-34,u)}),{night:1,lift:LF,props:[BK],build:{x:BX,z:BZ,b0:6,b1:6,dur:1}},P2('x',[[0,-95,-60,0,0]]),{jam:20.6});
