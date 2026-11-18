@@ -63,6 +63,8 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   if(L.role==='pres')D(G.sph,Wm(M.chain(el,M.T(0,-.22,0),M.S(.07,.03,.07))),'#F6F6F2',NC);
   const hd=M.chain(el,M.T(0,-.29,0));D(G.sph,Wm(M.chain(hd,M.S(.075,.08,.07))),L.skin,NC);
   if(s>0&&r.__hold==='roti'){D(G.sphHi,Wm(M.chain(hd,M.T(0,-.06,.06),M.RZ(1.2),M.S(.17,.085,.09))),'#C98A3E',NC);D(G.sph,Wm(M.chain(hd,M.T(0,-.02,.09),M.RZ(1.2),M.S(.13,.03,.05))),'#E7B66E',NC)}
+  if(s>0&&r.__hold==='trompet'){D(G.box,Wm(M.chain(hd,M.T(0,-.04,.2),M.S(.045,.045,.34))),'#E8B83A',NC);D(G.sphHi,Wm(M.chain(hd,M.T(0,-.04,.4),M.S(.12,.12,.06))),'#F2C94C',NC);D(G.box,Wm(M.chain(hd,M.T(0,.03,.16),M.S(.03,.06,.1))),'#C9962A',NC)}
+  if(s>0&&r.__hold==='kunci'){D(G.box,Wm(M.chain(hd,M.T(0,-.12,.06),M.S(.035,.16,.02))),'#F2C94C',{em:.3,cast:false});D(G.sphHi,Wm(M.chain(hd,M.T(0,-.0,.06),M.S(.07,.07,.02))),'#F2C94C',{em:.3,cast:false});D(G.box,Wm(M.chain(hd,M.T(.03,-.18,.06),M.S(.05,.025,.02))),'#F2C94C',{em:.3,cast:false})}
   if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.0005)),'#FFFFFF',{tex:__bbTex('KTW WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
   if(bb.hm){D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.14,0),M.S(.028,.17,.028))),'#8A5A2B',NC);D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.3,0),M.S(.1,.045,.045))),'#5B5F66',NC)}
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
@@ -125,7 +127,7 @@ function __rotiF(K,T,t){const Bd=K.build,cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b
 
 // properti adegan: kasur, kamar, isi toko roti, saklar, tepung+jejak, gerobak, papan tulis
 function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,c,o)=>D(G.box,M.chain(M.T(x,y,z),M.S(sx,sy,sz)),c,o||{});
- for(const p of K.props){const X=p.x,Z=p.z,Y=p.y||0,ry=p.ry||0;const R=m=>M.chain(M.T(X,Y,Z),M.RY(ry),m);const b=(x,y,z,sx,sy,sz,c,o)=>D(G.box,M.chain(R(M.T(x,y,z)),M.S(sx,sy,sz)),c,o||NC);
+ for(const p of K.props){let X=p.x,Z=p.z;if(p.path){const P=p.path;let o=P[P.length-1];for(let i=1;i<P.length;i++)if(T<P[i][0]){const A=P[i-1],B=P[i],f=(T-A[0])/(B[0]-A[0]);o=[0,A[1]+(B[1]-A[1])*f,A[2]+(B[2]-A[2])*f];break}if(T<P[0][0])o=P[0];X+=o[1];Z+=o[2]}const Y=p.y||0,ry=p.ry||0;const R=m=>M.chain(M.T(X,Y,Z),M.RY(ry),m);const b=(x,y,z,sx,sy,sz,c,o)=>D(G.box,M.chain(R(M.T(x,y,z)),M.S(sx,sy,sz)),c,o||NC);
   if(p.type=='kasur'){b(0,0,0,1.3,.32,2.1,'#7A5230');b(0,.32,0,1.22,.16,2.0,'#F4F1EA');b(0,.48,-.72,.9,.12,.42,'#FFFFFF');b(0,.44,.25,1.26,.1,1.3,p.c||'#5B7FD6')}
   if(p.type=='kamar'){b(0,-.01,0,p.w||6,.02,p.d||6,p.lantai||'#C9A27A');b(0,0,-(p.d||6)/2,p.w||6,3,.1,p.dinding||'#F2E6D0');b(-(p.w||6)/2,0,0,.1,3,p.d||6,p.dinding||'#EADCC2');
    b(.6,1.3,-(p.d||6)/2+.06,1.2,.9,.02,'#BFE6FF',{em:.8,cast:false});b(-1.6,0,-(p.d||6)/2+.35,.9,1.8,.5,'#8A5A2B');}
@@ -139,7 +141,7 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
    for(let k=0;k<6;k++)b((k%2-.5)*.28,.64+Math.floor(k/2)*.0,(Math.floor(k/2)-1)*.28,.26,.12,.24,'#B4523A');for(const s of [-1,1])b(s*.25,.45,-.75,.05,.05,.7,'#8A5A2B')}
   if(p.type=='papantulis'){b(0,.8,0,2.6,1.3,.06,'#2F5D46');b(0,.78,0,2.75,.06,.12,'#8A5A2B');D(G.box,M.chain(R(M.T(0,1.05,.04)),M.S(2.2,.8,.0005)),'#FFFFFF',{tex:__bbTex(p.txt||'KOTA SENI','#2F5D46'),em:.6,cast:false})}
   if(p.type=='meja'){for(let r=0;r<(p.rows||2);r++)for(let c=0;c<(p.cols||3);c++)b((c-((p.cols||3)-1)/2)*1.1,0,r*1.0,.8,.45,.5,'#B98A5A')}
-  if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15,Z),M.S(p.r,p.h,p.r)),'#6E9A4E',{cast:false})}
+  if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15+(p.dy||0),Z),M.S(p.r,p.h,p.r)),'#6E9A4E',{cast:false});if(p.jalan)for(let k=0;k<9;k++){const a=k/9*1.2;D(G.box,M.chain(M.T(X+Math.sin(p.jalan+a*.0)*(p.r*(.95-k*.1)),(p.dy||0)+p.h*.85-p.h*Math.max(0,(.95-k*.1))**2*.9-.02,Z+Math.cos(p.jalan)*(p.r*(.95-k*.1))),M.RY(p.jalan),M.S(1.2,.05,1.1)),'#B8946A',{cast:false})}}
  }}
 
 // siluet burung hantu kecil (pencuri misterius) — hitam, tanpa muka
