@@ -64,6 +64,7 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   const hd=M.chain(el,M.T(0,-.29,0));D(G.sph,Wm(M.chain(hd,M.S(.075,.08,.07))),L.skin,NC);
   if(s>0&&r.__hold==='roti'){D(G.sphHi,Wm(M.chain(hd,M.T(0,-.06,.06),M.RZ(1.2),M.S(.17,.085,.09))),'#C98A3E',NC);D(G.sph,Wm(M.chain(hd,M.T(0,-.02,.09),M.RZ(1.2),M.S(.13,.03,.05))),'#E7B66E',NC)}
   if(s>0&&r.__hold==='trompet'){D(G.box,Wm(M.chain(hd,M.T(0,-.04,.2),M.S(.045,.045,.34))),'#E8B83A',NC);D(G.sphHi,Wm(M.chain(hd,M.T(0,-.04,.4),M.S(.12,.12,.06))),'#F2C94C',NC);D(G.box,Wm(M.chain(hd,M.T(0,.03,.16),M.S(.03,.06,.1))),'#C9962A',NC)}
+  if(s>0&&r.__hold==='hp'){D(G.box,Wm(M.chain(hd,M.T(0,-.06,.08),M.S(.08,.15,.016))),'#1A1A1A',NC);D(G.box,Wm(M.chain(hd,M.T(0,-.06,.09),M.S(.068,.13,.004))),'#D8EEFF',{em:1,cast:false});D(G.sph,Wm(M.chain(hd,M.T(0,-.02,.16),M.S(.28,.28,.28))),'#BFE0FF',{em:1,alpha:window.__K3&&window.__K3.night?.22:.0,cast:false})}
   if(s>0&&r.__hold==='kunci'){D(G.box,Wm(M.chain(hd,M.T(0,-.12,.06),M.S(.035,.16,.02))),'#F2C94C',{em:.3,cast:false});D(G.sphHi,Wm(M.chain(hd,M.T(0,-.0,.06),M.S(.07,.07,.02))),'#F2C94C',{em:.3,cast:false});D(G.box,Wm(M.chain(hd,M.T(.03,-.18,.06),M.S(.05,.025,.02))),'#F2C94C',{em:.3,cast:false})}
   if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.0005)),'#FFFFFF',{tex:__bbTex('KTW WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
   if(bb.hm){D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.14,0),M.S(.028,.17,.028))),'#8A5A2B',NC);D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.3,0),M.S(.1,.045,.045))),'#5B5F66',NC)}
@@ -125,6 +126,7 @@ function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)conti
  else if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||2)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u;p.__mv=u<1}
  const bob=(p.__mv?Math.abs(Math.sin(t*9+p.i))*.06:0)+(P.y||0)+(P.hop?Math.abs(Math.sin(t*8+p.i))*.12:0)+(P.lie?.16:0);window.__MRX=P.lie?-Math.PI/2:(P.bend||0);window.__MS=p.ms||1;man(p.i,x,z,P.yaw||0,!!p.__mv,bob,false);window.__MRX=0;window.__MS=1;
  if(p.lama&&window.__CINE){for(let k=0;k<3;k++){const q=((t*.6+k*.33+p.i*.1)%1);D(G.sph,M.chain(M.T(x+(k-1)*.12,.15+q*.5,z),M.S(.06+q*.1,.06+q*.1,.06+q*.1)),'#BFAF92',{alpha:.35*(1-q),cast:false})}}
+ if(p.helm&&(p.helmT==null||T>=p.helmT)){const hy=bob+(p.hy||1.0);D(G.sphHi,M.chain(M.T(x,hy,z),M.RY(P.yaw||0),M.S(.2,.13,.21)),'#FFC400');D(G.box,M.chain(M.T(x,hy-.01,z),M.RY(P.yaw||0),M.T(0,0,.08),M.S(.36,.025,.34)),'#F2B705')}
  if(p.bb&&(p.bbt==null||T>=p.bbt))__bb(x,(p.y||0)+(p.bby||1.22),z,p.bb,p.bbs||.7,p.bbc||'#FFFFFF')}}
 function __zzzF(K,t){for(const z of K.zzz){const q=(t*.5+z[3])%1;__bb(z[0]+Math.sin(q*6)*.15,z[1]+q*1.1,z[2],'Zzz',.35+q*.25,'#E6E9FF')}}
 // dekorasi toko roti di atas rumah
@@ -159,12 +161,27 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
   if(p.type=='papantulis'){b(0,.8,0,2.6,1.3,.06,'#2F5D46');b(0,.78,0,2.75,.06,.12,'#8A5A2B');D(G.box,M.chain(R(M.T(0,1.05,.04)),M.S(2.2,.8,.0005)),'#FFFFFF',{tex:__bbTex(p.txt||'KOTA SENI','#2F5D46'),em:.6,cast:false})}
   if(p.type=='meja'){for(let r=0;r<(p.rows||2);r++)for(let c=0;c<(p.cols||3);c++)b((c-((p.cols||3)-1)/2)*1.1,0,r*1.0,.8,.45,.5,'#B98A5A')}
   if(p.type=='kursi'){const ry=p.ry||0,C=p.col||'#B5733E',ch=(dx,dy,dz,sx,sy,sz,c)=>D(G.box,M.chain(M.T(X,0,Z),M.RY(ry),M.T(dx,dy,dz),M.S(sx,sy,sz)),c);ch(0,.42,0,.5,.06,.5,C);for(const [lx,lz] of [[-.21,-.21],[.21,-.21],[-.21,.21],[.21,.21]])ch(lx,0,lz,.05,.42,.05,'#8A5530');ch(0,.45,-.23,.5,.55,.05,C);if(p.sign)__bb(X,1.25,Z,p.sign,.55,'#FFD23F')}
+  if(p.type=='tiang'){const H=4.6,ilang=(p.ilangT!=null&&T>=p.ilangT)||p.st=='ilang';const ln=(x0,y0,z0,x1,y1,z1,w,c)=>{const dx=x1-x0,dy=y1-y0,dz=z1-z0,L=Math.hypot(dx,dy,dz);D(G.box,M.chain(M.T((x0+x1)/2,(y0+y1)/2,(z0+z1)/2),M.RY(Math.atan2(dx,dz)),M.RX(-Math.atan2(dy,Math.hypot(dx,dz))),M.S(w,w,L)),c,NC)};
+   D(G.cyl16||G.cyl8,M.chain(M.T(X,0,Z),M.S(.075,H,.075)),'#6E6A63');b(0,H-.25,0,1.4,.07,.08,'#55504A');
+   for(const q of [-.55,0,.55])D(G.sph,M.chain(M.T(X+q,H-.17,Z),M.S(.04,.06,.04)),'#EEEEEE',NC);
+   b(0,.62,.08,.3,.4,.06,'#D9D4C8');b(0,.84,.08,.34,.04,.08,'#A9A397');
+   if(!ilang){b(0,.64,.115,.18,.18,.015,'#FFFFFF');for(const q of [-1,1])b(q*.035,.68,.125,.018,.05,.008,'#222')}
+   else{b(0,.64,.115,.2,.2,.015,'#141414');const sw=Math.sin(t*2.4)*.18;D(G.box,M.chain(R(M.T(.12,.74,.13)),M.RZ(.35+sw),M.T(0,-.12,0),M.S(.09,.24,.008)),'#2B1F3A',NC);D(G.box,M.chain(R(M.T(.16,.7,.135)),M.RZ(-.25+sw),M.T(0,-.08,0),M.S(.055,.17,.008)),'#3D2C55',NC)}
+   const mn=p.mn||0;if(mn&&!ilang){for(let k=0;k<mn;k++){const yy=.74+k*.085,dx=Math.sin(k*1.7)*.035,rz=Math.sin(k*2.3)*.06;D(G.box,M.chain(R(M.T(dx,yy,.15)),M.RZ(rz),M.S(.3,.055,.09)),'#F4F4F0');b(dx+.11,yy+.03,.2,.022,.022,.012,'#E53935',{em:.9,cast:false});
+     const a1=k*2.39,rr2=.55+((k*7)%5)*.12;ln(X+dx+(k%2?.1:-.1),yy,Z+.2,X+Math.sin(a1)*rr2,.02,Z+.25+Math.abs(Math.cos(a1))*rr2,.014,'#222')}
+    if(p.spark&&(p.sparkT==null||T>=p.sparkT))for(let q=0;q<16;q++){const f=Math.sin(t*37+q*7.1);if(f<.1)continue;const an=q*.63+t*9,r2=.16+.14*Math.abs(Math.sin(t*23+q));D(G.sph,M.chain(R(M.T(Math.cos(an)*r2,.74+(q%8)*.085*mn/8,.2+Math.sin(an)*r2*.5)),M.S(.028,.028,.028)),q%2?'#FFF6A0':'#8FE0FF',{em:1,cast:false})}}
+   for(const q of [-.55,.55])ln(X+q,H-.22,Z,X+q,H-1.2,Z-14,.012,'#222')}
   if(p.type=='ember'){D(G.cyl16,M.chain(M.T(X,0,Z),M.S(.34,.32,.34)),p.col||'#3FA7E0');D(G.cyl16,M.chain(M.T(X,.31,Z),M.S(.36,.02,.36)),'#2A7FB0')}
   if(p.type=='bukit'){D(G.sphHi,M.chain(M.T(X,-p.h*.15+(p.dy||0),Z),M.S(p.r,p.h,p.r)),'#6E9A4E',{cast:false});if(p.jalan)for(let k=0;k<9;k++){const a=k/9*1.2;D(G.box,M.chain(M.T(X+Math.sin(p.jalan+a*.0)*(p.r*(.95-k*.1)),(p.dy||0)+p.h*.85-p.h*Math.max(0,(.95-k*.1))**2*.9-.02,Z+Math.cos(p.jalan)*(p.r*(.95-k*.1))),M.RY(p.jalan),M.S(1.2,.05,1.1)),'#B8946A',{cast:false})}}
  }}
 
 // siluet burung hantu kecil (pencuri misterius) — hitam, tanpa muka
 function __owlSil(p,T,t){let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,(T-(p.tw||0))/(p.dw||1)));x=p.x+(p.to[0]-p.x)*u;z=p.z+(p.to[1]-p.z)*u}
+ if(p.jubah){const sc=p.sc||.5,NC={cast:false},mv=!!p.to&&T<(p.tw||0)+(p.dw||1)&&T>(p.tw||0);const hop=mv?Math.abs(Math.sin(t*13))*.07:0;const R=m=>M.chain(M.T(x,hop,z),M.RY(p.yaw||0),M.RX(mv?.18:0),M.S(sc,sc,sc),m);const C1='#21173A';
+  D(G.cone16||G.cone8,R(M.S(.66,1.6,.66)),C1,NC);D(G.sphHi,R(M.chain(M.T(0,1.62,0),M.S(.46,.48,.46))),C1,NC);D(G.sphHi,R(M.chain(M.T(0,1.56,.17),M.S(.33,.33,.31))),'#04020A',NC);
+  const bl=(Math.sin(t*2.7+1)>.97)?.12:1;for(const q of [-1,1])D(G.sph,R(M.chain(M.T(q*.12,1.6,.45),M.S(.07,.07*bl,.03))),'#FFE45A',{em:1,cast:false});
+  if(p.colok){D(G.box,R(M.chain(M.T(.48,.9,.22),M.S(.28,.28,.07))),'#FFFFFF',NC);for(const q of [-1,1])D(G.box,R(M.chain(M.T(.48+q*.05,.95,.26),M.S(.03,.07,.01))),'#222',NC)}
+  return}
  // siluet Vilindo (bentuk sama dengan mascot() di engine.js): badan bulat satu, baret pipih + tonjolan, kaki, tangan kecil
  const sc=p.sc||.4,c=p.col||'#0B0B10',NC={cast:false};const mv=!!p.to;const hop=mv?Math.abs(Math.sin(t*12))*.06:0;const sq=mv?Math.abs(Math.sin(t*12))*.12:0;const sY=1-sq*.25,sX=1+sq*.18;
  const R=m=>M.chain(M.T(x,hop,z),M.RY(p.yaw||0),M.S(sc,sc,sc),m);

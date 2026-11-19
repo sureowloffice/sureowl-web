@@ -357,6 +357,50 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
   T0('c6b-pov',u=>({yaw:-.84,pitch:.1,dist:L(2.1,1.7,E(u)),tx:CX,ty:1.0,tz:CZ}),P({props:[KUR,EMB],ppl:fin2}),HP('x',[[0,-95,-60,0,0]]),{jam:12});
   T0('c6c-ember',u=>u<.22?{yaw:.05,pitch:.03,dist:1.05,tx:-81.6,ty:.98,tz:-37.5}:({yaw:L(-.15,.1,u),pitch:.1,dist:L(3.4,2.9,u),tx:L(-80.9,-79.9,E((u-.22)/.78)),ty:1.0,tz:-37.7}),P({props:[KUR,EMB],ppl:fin2}),HP('c6c-ember',[[0,-81.6,-37.5,.2,0],[.75,-81.6,-37.5,1.57,0],[1.55,-79.95,-37.7,1.57,1],[1.85,EB[0],EB[1],0,0,.33],[9,EB[0],EB[1],0,0,.33]],{ex:[[0,'kaget'],[.75,'lemas']],ges:[[0,'diam'],[.8,'diam'],[1.9,'garuk']]}),{jam:12});
   T0('c7-cta',u=>({yaw:L(.12,0,u),pitch:.03,dist:L(2.3,1.6,E(u)),tx:EB[0],ty:1.25,tz:EB[1]}),P({props:[KUR,EMB],ppl:fin}),HP('c7-cta',[[0,EB[0],EB[1],0,0,.33]],{ex:[[0,'senyum'],[2.4,'semangat']],ges:[[0,'tunjuk'],[2.4,'semangat']]}),{jam:12});}}
+ {// ===== HARI 3 MALAM: 645 warga, 1 colokan =====
+ const tj=n=>{const f=path.join(__dirname,'data/talk_'+n+'.json');return fs.existsSync(f)?JSON.parse(fs.readFileSync(f,'utf8')):null};
+ const KFJ=fs.existsSync(path.join(__dirname,'data/h3m_kf.json'))?JSON.parse(fs.readFileSync(path.join(__dirname,'data/h3m_kf.json'),'utf8')):{jangan:3.4,satu:1.2,maaf:2.6};
+ const sm=q=>{q=Math.max(0,Math.min(1,q));return q*q*(3-2*q)};
+ const KF=(ts,K,ease)=>{if(ts<=K[0][0])return Object.assign({},K[0][1]);for(let i=1;i<K.length;i++)if(ts<K[i][0]){const a=K[i-1],b=K[i];let f=(ts-a[0])/(b[0]-a[0]);f=(b[2]==='snap')?1-Math.pow(1-f,4):sm(f);const o={};for(const k in b[1])o[k]=a[1][k]+(b[1][k]-a[1][k])*f;return o}return Object.assign({},K[K.length-1][1])};
+ const HP=(n,keys,o)=>Object.assign({u:'immanuelragil',keys,talk:tj(n)},o||{});
+ const RT={build:{x:-79,z:-47,b0:6,b1:6,dur:1},roti:1,plak:'Usulan ★vanzz★'};
+ const TX=-80.8,TZ=-41.6,PX=-79.85,PZ=-40.45;
+ const TI=(o)=>Object.assign({type:'tiang',x:TX,z:TZ,ry:0},o||{});
+ const CR=[];{let k=0;for(let q=0;q<7;q++)CR.push({i:200+k++,x:-82.5+q*.55,z:-42.55-(q%2)*.35,yaw:0});for(let q=0;q<4;q++)CR.push({i:200+k++,x:-82.3+(q%2)*.45,z:-41.7+Math.floor(q/2)*.6+(q%2)*.15,yaw:1.35});for(let q=0;q<3;q++)CR.push({i:200+k++,x:-79.0-(q%2)*.35,z:-41.9-q*.4,yaw:-1.1})}
+ const crowd=(f)=>CR.map((p,k)=>Object.assign({},p,{ges:k%3==0?'dorong':'kasih',hold:k%3==0?null:'hp',ex:['teriak','marah','semangat'][k%3],hop:k%2},f?f(p,k):{}));
+ const JP={i:164,x:-81.05,z:-40.95,yaw:2.68};
+ const VZ='@★vanzz★';const JP2={i:164,x:-80.4,z:-41.25,yaw:-1.75};
+ // 1 premis: crowd rebutan di tiang, kamera wide -> President -> snap close JANGAN
+ T0('m1-premis',(u,ts)=>{const c=KF(ts,[[0,{yaw:.32,pitch:.26,dist:7.6,tx:-80.6,ty:1.3,tz:-41.2}],[KFJ.satu,{yaw:.12,pitch:.1,dist:2.7,tx:PX-.3,ty:1.05,tz:PZ-.2}],[KFJ.jangan,{yaw:.08,pitch:.08,dist:2.3,tx:PX-.2,ty:1.0,tz:PZ}],[KFJ.jangan+.22,{yaw:.02,pitch:.02,dist:1.1,tx:PX,ty:.98,tz:PZ},'snap'],[9,{yaw:.0,pitch:.02,dist:1.0,tx:PX,ty:.98,tz:PZ}]]);if(ts>KFJ.jangan){const w=Math.exp(-(ts-KFJ.jangan)*3);c.yaw+=Math.sin(ts*53)*.02*w;c.ty+=Math.cos(ts*61)*.03*w}return c},Object.assign({},RT,{props:[TI({mn:8,spark:1})],ppl:crowd().concat([Object.assign({},JP,{ges:'dorong',ex:'semangat'})])}),HP('m1-premis',[[0,PX,PZ,0,0]],{ex:[[0,'senyum'],[KFJ.satu,'lemas'],[KFJ.jangan-.1,'teriak']],ges:[[0,'tunjuk'],[KFJ.satu,'pinggang'],[KFJ.jangan-.1,'semangat']]}),{jam:16});
+ // 2 setrum: close panel, Si Jempol nyolok lalu kesetrum
+ T0('m2-setrum',(u,ts)=>{const c={yaw:L(.05,.0,u),pitch:.06,dist:L(2.0,1.55,sm(u)),tx:-80.6,ty:.85,tz:-41.2};if(ts>.32){const w=Math.exp(-(ts-.32)*2.5);c.yaw+=Math.sin(ts*71)*.03*w;c.tx+=Math.sin(ts*67)*.05*w}return c},Object.assign({},RT,{props:[TI({mn:9,spark:1,sparkT:.3})],ppl:crowd(p=>({ex:'kaget',hop:0})).filter(p=>p.z<-41.8).concat([Object.assign({},JP2,{t1:.32,ges:'pencet',ex:'senyum'}),Object.assign({},JP2,{t0:.32,ges:'junjung',ex:'kaget',hop:1})])}),HP('x',[[0,-95,-60,0,0]]),{jam:16});
+ // 3 gelap: malam, muka disinari HP
+ T0('m3-gelap',(u,ts)=>({yaw:L(.15,.0,u),pitch:.05,dist:L(2.6,1.7,sm(u)),tx:-80.4,ty:1.0,tz:-41.6}),{night:1,props:[TI({mn:9})],ppl:crowd(p=>({ges:'kasih',hold:'hp',ex:['sedih','bengong','kaget'][p.i%3],hop:0})).concat([Object.assign({},JP,{ges:'kasih',hold:'hp',ex:'sedih',yaw:.3})])},HP('x',[[0,PX,PZ,0,0]],{ex:[[0,'kaget']],ges:[[0,'diam']]}),{jam:23});
+ // 4a President umumkan (lampu nyala)
+ T0('m4a-pres',(u,ts)=>({yaw:L(-.1,.0,u),pitch:.04,dist:L(2.4,1.55,sm(u)),tx:PX,ty:1.0,tz:PZ}),Object.assign({},RT,{props:[TI({mn:9})],ppl:crowd(p=>({ges:'diam',hold:'hp',hop:0,ex:'bengong'})).concat([{i:180,x:-81.9,z:-40.6,yaw:.4,ges:'angkat',ex:'semangat',bb:VZ,bbs:.5,bby:1.15}])}),HP('m4a-pres',[[0,PX,PZ,0,0]],{ex:[[0,'lemas'],[1.4,'senyum']],ges:[[0,'garuk'],[1.4,'tunjuk']]}),{jam:16.3});
+ // 4b vanzz maju, helm, sorak
+ T0('m4b-vanzz',(u,ts)=>KF(ts,[[0,{yaw:-.5,pitch:.1,dist:3.4,tx:-81.4,ty:1.0,tz:-40.2}],[1.2,{yaw:-.15,pitch:.05,dist:2.0,tx:-81.0,ty:1.0,tz:-39.7}],[3.6,{yaw:.15,pitch:.03,dist:1.45,tx:-80.95,ty:1.05,tz:-39.6}]]),Object.assign({},RT,{props:[TI({mn:9})],cf:{t:1.2,x:-81,z:-39.6},ppl:crowd(p=>({ges:'semangat',hold:null,hop:1,ex:'ketawa'})).concat([{i:180,x:-81.9,z:-40.6,to:[-80.95,-39.65],tw:.05,dw:.9,yaw:0,ges:'dada',ex:'haru',helm:1,helmT:1.15,hy:1.02,bb:VZ,bbs:.5,bby:1.3}])}),HP('x',[[0,PX+.6,PZ,-.4,0]],{ex:[[0,'senyum']],ges:[[0,'tepuk']]}),{jam:16.3});
+ // 4c Beresin ini — President close-up lemas
+ T0('m4c-beresin',(u,ts)=>({yaw:L(.2,.1,u),pitch:.03,dist:L(1.3,1.05,sm(u)),tx:PX,ty:.98,tz:PZ}),Object.assign({},RT,{props:[TI({mn:9})],ppl:crowd(p=>({ges:'diam',hold:'hp',hop:0,ex:'bengong'}))}),HP('m4c-beresin',[[0,PX,PZ,.15,0]],{ex:[[0,'lemas']],ges:[[0,'tunjuk']]}),{jam:16.3});
+ // 5a papan jadwal ngecas
+ const PJ={type:'papantulis',x:-82.6,z:-41.2,ry:.55,txt:'JADWAL NGECAS'};
+ const JW=[{i:181,x:-81.6,z:-39.9,yaw:-.4,ges:'semangat',ex:'ketawa',hop:1,bb:'@namonah',bbs:.45,bby:1.15},{i:182,x:-81.0,z:-39.7,yaw:-.3,ges:'angkat',ex:'senyum',bb:'@DakWah',bbs:.45,bby:1.15},{i:183,x:-80.3,z:-39.9,yaw:-.5,ges:'diam',ex:'bengong',bb:'@si noob main FF',bbs:.45,bby:1.15},{i:70,lama:1,x:-82.2,z:-39.8,yaw:.2,ges:'tepuk',ex:'ketawa',bb:'WARGA LAMA',bbs:.45,bby:1.15}];
+ T0('m5a-papan',(u,ts)=>({yaw:L(.55,.3,sm(u)),pitch:.08,dist:L(3.6,3.0,sm(u)),tx:-81.9,ty:1.05,tz:-40.6}),Object.assign({},RT,{props:[TI({mn:3}),PJ],ppl:crowd(p=>({ges:'diam',hold:'hp',hop:0,ex:'senyum'})).concat([{i:180,x:-81.75,z:-40.95,yaw:.75,ges:'tunjuk',ex:'semangat',helm:1,hy:1.02,bb:VZ,bbs:.42,bby:1.32}]).concat(JW)}),HP('x',[[0,-95,-60,0,0]]),{jam:16.8});
+ // 5b President ke kamera: si noob jam 3 pagi, Maaf (zoom punch)
+ T0('m5b-pres',(u,ts)=>KF(ts,[[0,{yaw:-.2,pitch:.05,dist:2.2,tx:PX,ty:1.0,tz:PZ}],[KFJ.maaf-.1,{yaw:-.05,pitch:.04,dist:1.5,tx:PX,ty:1.0,tz:PZ}],[KFJ.maaf+.15,{yaw:0,pitch:.02,dist:1.0,tx:PX,ty:.98,tz:PZ},'snap'],[9,{yaw:0,pitch:.02,dist:.95,tx:PX,ty:.98,tz:PZ}]]),Object.assign({},RT,{props:[TI({mn:3}),PJ],ppl:crowd(p=>({ges:'diam',hold:'hp',hop:0,ex:'senyum'}))}),HP('m5b-pres',[[0,PX,PZ,0,0]],{ex:[[0,'senyum'],[.9,'ketawa'],[KFJ.maaf-.1,'sedih']],ges:[[0,'tunjuk'],[KFJ.maaf-.1,'dada']]}),{jam:16.8});
+ // 5c reaksi si noob
+ T0('m5c-noob',(u,ts)=>({yaw:L(-.4,-.5,u),pitch:.02,dist:L(1.25,1.0,sm(u)),tx:-80.3,ty:.95,tz:-39.9}),Object.assign({},RT,{props:[TI({mn:3}),PJ],ppl:JW.map(p=>p.i==183?Object.assign({},p,{ex:'kaget',ges:'garuk',bb:null}):Object.assign({},p,{bb:null}))}),HP('x',[[0,-95,-60,0,0]]),{jam:16.8});
+ // 6a hentak ke tiang: colokan ilang + kain jubah
+ T0('m6a-tiang',(u,ts)=>KF(ts,[[0,{yaw:.3,pitch:.12,dist:3.2,tx:TX,ty:1.0,tz:TZ}],[.32,{yaw:.05,pitch:.04,dist:.75,tx:TX+.05,ty:.88,tz:TZ+.2},'snap'],[9,{yaw:.02,pitch:.03,dist:.62,tx:TX+.06,ty:.88,tz:TZ+.2}]]),Object.assign({},RT,{props:[TI({st:'ilang'})],ppl:[]}),HP('x',[[0,-95,-60,0,0]]),{jam:17.6});
+ // 6b President berbisik, kamera merayap pelan
+ T0('m6b-bisik',(u,ts)=>({yaw:L(.45,.3,u),pitch:.03,dist:L(1.45,.95,sm(u)),tx:PX-.1,ty:.97,tz:PZ}),Object.assign({},RT,{props:[TI({st:'ilang'})],ppl:[]}),HP('m6b-bisik',[[0,PX-.1,PZ,.5,0]],{ex:[[0,'kaget'],[.35,'bingung']],ges:[[0,'bingung'],[.4,'dagu']]}),{jam:18.0});
+ // 7a CTA
+ T0('m7a-cta',(u,ts)=>({yaw:L(-.12,0,u),pitch:.04,dist:L(2.4,1.5,sm(u)),tx:PX,ty:1.02,tz:PZ}),Object.assign({},RT,{props:[TI({st:'ilang'})],ppl:[{i:181,x:-81.3,z:-41.5,yaw:.3,ges:'angkat',ex:'semangat',bb:'calon ketua @namonah',bbs:.42,bby:1.15}]}),HP('m7a-cta',[[0,PX,PZ,0,0]],{ex:[[0,'semangat'],[2.5,'senyum']],ges:[[0,'tunjuk'],[1.0,'angkat'],[2.5,'semangat']]}),{jam:18.2});
+ // 7b senja: sosok berjubah kabur bawa colokan
+ {const J0=[-81.6,-42.6],J1=[-86.6,-45.6],JP=ts=>{const q=Math.max(0,Math.min(1,(ts-.35)/2.5));return [J0[0]+(J1[0]-J0[0])*q,J0[1]+(J1[1]-J0[1])*q]};
+  T0('m7b-jubah',(u,ts)=>{const p=JP(ts);return {yaw:L(-1.25,-1.6,u),pitch:L(.1,.16,u),dist:L(2.2,3.4,sm(u)),tx:p[0],ty:.62,tz:p[1]}},Object.assign({},RT,{props:[TI({st:'ilang'})],ppl:[{owl:1,jubah:1,colok:1,x:J0[0],z:J0[1],to:J1,tw:.35,dw:2.5,yaw:Math.atan2(J1[0]-J0[0],J1[1]-J0[1])+.5,sc:.6}]}),HP('x',[[0,-95,-60,0,0]]),{jam:18.6});}
+ T0('mt-test',(u,ts)=>({yaw:.25,pitch:.1,dist:4.2,tx:-80.9,ty:1.0,tz:-41.0}),Object.assign({},RT,{props:[TI({mn:8,spark:1}),PJ],ppl:crowd().concat([{i:180,x:-81.4,z:-40.4,yaw:0,ges:'dada',ex:'haru',helm:1,hy:1.02,bb:VZ,bbs:.5,bby:1.3},{owl:1,jubah:1,colok:1,x:-80.2,z:-40.2,yaw:-.3,sc:.5}])}),HP('m1-premis',[[0,PX,PZ,0,0]],{ex:[[0,'teriak']],ges:[[0,'semangat']]}),{jam:16});
+ }
   T0('s2-jejak',u=>({yaw:.2,pitch:L(.55,.42,u),dist:L(3.4,4.6,E(u)),tx:-75,ty:0,tz:L(-70.5,-71.5,u)}),{night:1,props:[{type:'tepung',x:-75,z:-70,ry:.3,n:12}],ppl:[{owl:1,x:-76.5,z:-75.6,to:[-77.4,-77.8],tw:1.0,dw:1.6,yaw:-2.8,sc:.38}]},null,{jam:22});
   T0('t-bungkuk',u=>({yaw:1.9,pitch:.08,dist:4.2,tx:-83.8,ty:.5,tz:-41.4}),K3(60,{ppl:[0,1,2,3].map(k=>({i:120+k,x:-85.2+k*.8,z:-41.4,yaw:.3,bend:.3,ges:'pinggang',ex:'sakit'}))}));
   T0('t-saklar',u=>({yaw:1.25,pitch:.04,dist:L(2.2,1.8,u),tx:-69.95,ty:.72,tz:-62.25}),{props:[{type:'saklar',x:-70,z:-62.6}]},PR('x',[[0,-69.95,-61.95,HS,0]],{ges:[[0,'pencet']],ex:[[0,'bingung']]}));
