@@ -391,7 +391,7 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  // 5c reaksi si noob
  T0('m5c-noob',(u,ts)=>({yaw:L(-.4,-.5,u),pitch:.02,dist:L(1.25,1.0,sm(u)),tx:-80.3,ty:.95,tz:-39.9}),Object.assign({},RT,{props:[TI({mn:3}),PJ],ppl:JW.map(p=>p.i==183?Object.assign({},p,{ex:'kaget',ges:'garuk',bb:null}):Object.assign({},p,{bb:null}))}),HP('x',[[0,-95,-60,0,0]]),{jam:16.8});
  // 6a hentak ke tiang: colokan ilang + kain jubah
- T0('m6a-tiang',(u,ts)=>KF(ts,[[0,{yaw:.3,pitch:.12,dist:3.2,tx:TX,ty:1.0,tz:TZ}],[.32,{yaw:.05,pitch:.04,dist:.75,tx:TX+.05,ty:.88,tz:TZ+.2},'snap'],[9,{yaw:.02,pitch:.03,dist:.62,tx:TX+.06,ty:.88,tz:TZ+.2}]]),Object.assign({},RT,{props:[TI({st:'ilang'})],ppl:[]}),HP('x',[[0,-95,-60,0,0]]),{jam:17.6});
+ T0('m6a-tiang',(u,ts)=>KF(ts,[[0,{yaw:.45,pitch:.14,dist:3.6,tx:TX,ty:1.0,tz:TZ}],[(KFJ.snap6||1.5)-.05,{yaw:.3,pitch:.12,dist:3.0,tx:TX,ty:1.0,tz:TZ}],[(KFJ.snap6||1.5)+.25,{yaw:.05,pitch:.04,dist:.75,tx:TX+.05,ty:.88,tz:TZ+.2},'snap'],[9,{yaw:.02,pitch:.03,dist:.62,tx:TX+.06,ty:.88,tz:TZ+.2}]]),Object.assign({},RT,{props:[TI({st:'ilang'})],ppl:[]}),HP('x',[[0,-95,-60,0,0]]),{jam:17.6});
  // 6b President berbisik, kamera merayap pelan
  T0('m6b-bisik',(u,ts)=>({yaw:L(.45,.3,u),pitch:.03,dist:L(1.45,.95,sm(u)),tx:PX-.1,ty:.97,tz:PZ}),Object.assign({},RT,{props:[TI({st:'ilang'})],ppl:[]}),HP('m6b-bisik',[[0,PX-.1,PZ,.5,0]],{ex:[[0,'kaget'],[.35,'bingung']],ges:[[0,'bingung'],[.4,'dagu']]}),{jam:18.0});
  // 7a CTA

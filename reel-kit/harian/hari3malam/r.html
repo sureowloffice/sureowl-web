@@ -115,7 +115,7 @@ window.draw=async(f,t)=>{const FX=window.FX;let fz=null;for(const [a,d] of FX.fr
   if(IN('m5a-papan'))jadwal(t,A('m5a-papan')+.2,B('m5a-papan'),null,false);
   if(IN('m5b-pres')){jadwal(t,A('m5b-pres'),B('m5b-pres'),A('m5b-pres')+1.2,true);if(t>A('m5b-pres')+K.maaf)stamp(t,A('m5b-pres')+K.maaf,'MAAF.',820,'#111','#fff',.06)}
   if(IN('m5c-noob'))sticker(t,A('m5c-noob')+.05,B('m5c-noob'),'@si noob main FF: JAM 03.00',330,-.03,R,'#fff');
-  if(IN('m6a-tiang')){const a0=A('m6a-tiang');if(t>a0+.32)stamp(t,a0+.32,'COLOKANNYA ILANG?!',330,R,'#fff',-.05);if(t>a0+.9){x.save();x.globalAlpha=cl((t-a0-.9)/.2);out('kain apa ini?',W*.7,1050,64,'#fff');x.restore()}}
+  if(IN('m6a-tiang')){const a0=A('m6a-tiang');if(t>a0+K.snap6)stamp(t,a0+K.snap6,'COLOKANNYA ILANG?!',330,R,'#fff',-.05);if(t>a0+K.snap6+.6){x.save();x.globalAlpha=cl((t-a0-K.snap6-.6)/.2);out('kain apa ini?',W*.7,1050,64,'#fff');x.restore()}}
   if(IN('m6b-bisik')){x.save();x.globalAlpha=cl((t-A('m6b-bisik')-.2)/.3);out('...ada yang ngambil',W/2,330,84,'#C9B8FF');x.restore()}
   if(IN('m7a-cta')){const a0=A('m7a-cta');x.save();x.globalAlpha=cl((t-a0-.1)/.2);out('BESOK BANGUN APA?',W/2,300,92,'#fff');x.restore();ab2(t,TV['S5'][0]+.15);
     if(t>TV['S5'][0]+3.0)sticker(t,TV['S5'][0]+3.0,B('m7a-cta'),'YANG KOMEN MASUK JADWAL NGECAS BESOK',860,-.03,R,'#fff')}

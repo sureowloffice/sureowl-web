@@ -10,7 +10,7 @@ if r!=sr:
     import subprocess;subprocess.run(['ffmpeg','-y','-loglevel','error','-i','vo.wav','-ar',str(sr),'vo_sr.wav'],check=True);r,vo=wavfile.read('vo_sr.wav');vo=vo.astype(np.float32)/32768
 vo=np.pad(vo,(0,max(0,N-len(vo))))[:N]
 A=lambda n:S[n][0];B=lambda n:S[n][1];FX=json.load(open('fx.json'))
-zap=A('m2-setrum')+.32;jg=A('m3-gelap');helm=A('m4b-vanzz')+1.15;ila=A('m6a-tiang')+.32;maaf=A('m5b-pres')+KF['maaf']
+zap=A('m2-setrum')+.32;jg=A('m3-gelap');helm=A('m4b-vanzz')+1.15;ila=A('m6a-tiang')+KF['snap6'];maaf=A('m5b-pres')+KF['maaf']
 sheet=[(0,zap,'komedi'),(zap,jg,'hit'),(jg,jg+1.2,'diam'),(jg+1.2,B('m3-gelap'),'sedih'),(A('m4a-pres'),helm-.05,'komedi'),(helm,B('m4b-vanzz'),'heroik'),(A('m4c-beresin'),B('m5b-pres'),'komedi'),(B('m5b-pres'),B('m5c-noob'),'sedih'),(ila,ila+.4,'hit'),(ila+.4,B('m6b-bisik'),'misteri'),(A('m7a-cta'),B('m7a-cta'),'tegang'),(A('m7b-jubah'),TOT,'misteri')]
 syn=Synth('/home/claude/score/GeneralUser-GS.sf2')
 mus=make_score(sheet,TOT+.3,syn,key=62).mean(1);mus=np.pad(mus,(0,max(0,N-len(mus))))[:N]
