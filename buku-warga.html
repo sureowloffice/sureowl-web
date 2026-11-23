@@ -85,6 +85,10 @@ tr:last-child td{background:#B8352E}
   </form>
   <p id="hasil" aria-live="polite"></p>
 
+  <h2>Pendiri Kota <small>sejak 1 Nov 2026</small></h2>
+  <p class="lead" style="margin:0 0 10px;font-size:14px">10 warga pertama sebelum Kota Seni hancur. Nama mereka nggak ikut hancur.</p>
+  <div class="chips" id="pendiri"></div>
+
   <h2>Pejabat Kota <small>dilantik di video</small></h2>
   <div class="list" id="pejabat"></div>
 
@@ -130,7 +134,8 @@ const DATA={
  ],
  antre:[['fani','guru'],['basskalbar','guru'],['ZZZZZZ','pemain bola no. 10'],['datboy.han','tukang kue'],['rinz_verse','menteri keuangan']],
  lomba:['alvaro.alifiandra','basskalbar','idyysse','Luki aja tuh','bayupranata411','kenz_$$','mhmdf4qih_2'],
- lain:['tiaraaatj','DakWah','si noob main FF','nafis_saja','pulz1818','日號','corzzonn','imdayp0','_its.me.jihano','dndmnk_']
+ pendiri:[["cokiramartin", "Editor"], ["tiaraaatj", "Head Creative"], ["drunkenvr", "Gitaris & Vokalis"], ["barralaode_", "Drummer"], ["idayuputriii_", "Editor"], ["kmeonn", "Ilustrator"], ["vynicholl_", "Editor"], ["yang_terkasihi", "Gitaris"], ["irfan_hbbi_", "Filmmaker"], ["johanes.nnd", "Tarot Reader"]],
+ lain:['DakWah','si noob main FF','nafis_saja','pulz1818','日號','corzzonn','imdayp0','_its.me.jihano','dndmnk_']
 };
 const $=id=>document.getElementById(id);
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -138,11 +143,12 @@ $('pejabat').innerHTML=DATA.pejabat.map(p=>`<div class="row" data-u="${esc(p.u.t
 $('ngecas').innerHTML=DATA.ngecas.map(([j,n])=>`<tr><td>${j}</td><td>${esc(n)}</td></tr>`).join('');
 $('bangun').innerHTML=DATA.bangun.map(b=>`<li class="${b.next?'next':b.lost?'lost':''}"><b>${esc(b.n)}</b><small>${esc(b.k)}</small></li>`).join('');
 $('antre').innerHTML=DATA.antre.map(([u,j])=>`<span class="chip">@${esc(u)} <i>· ${esc(j)}</i></span>`).join('');
+$('pendiri').innerHTML=DATA.pendiri.map(([u,j])=>`<span class="chip" style="border-color:#d4a72c;background:#FFF3C4">👑 @${esc(u)} <i>· ${esc(j)}</i></span>`).join('');
 $('lomba').innerHTML=DATA.lomba.map(u=>`<span class="chip">@${esc(u)}</span>`).join('');
 const ALL=new Map();
 const add=(u,info)=>{const k=u.toLowerCase().replace(/^@/,'');if(!ALL.has(k))ALL.set(k,{u,info:[]});ALL.get(k).info.push(info)};
 DATA.pejabat.forEach(p=>add(p.u,p.role.toLowerCase()));DATA.ngecas.forEach(([j,n])=>{if(n!=='Warga lama')add(n.replace(' (maaf)',''),'jadwal ngecas jam '+j)});
-DATA.antre.forEach(([u,j])=>add(u,'antre jadi '+j));DATA.lomba.forEach(u=>add(u,'peserta lomba kursi wapres'));DATA.lain.forEach(u=>add(u,'warga yang komen'));
+DATA.antre.forEach(([u,j])=>add(u,'antre jadi '+j));DATA.lomba.forEach(u=>add(u,'peserta lomba kursi wapres'));DATA.pendiri.forEach(([u,j])=>add(u,'Pendiri Kota ('+j+')'));DATA.lain.forEach(u=>add(u,'warga yang komen'));
 add('nafis_saja','pengusul rumah di bukit');
 $('nPejabat').textContent=DATA.pejabat.filter(p=>!p.calon).length;$('nBangun').textContent=DATA.bangun.filter(b=>!b.next&&!b.lost).length;$('nWarga').textContent=ALL.size;
 function cari(){const q=$('q').value.trim().toLowerCase().replace(/^@/,'');document.querySelectorAll('.row').forEach(r=>r.classList.toggle('hit',!!q&&r.dataset.u.includes(q)));
