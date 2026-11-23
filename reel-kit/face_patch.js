@@ -74,7 +74,7 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
 
 // kru bangunan: warga + President kerja (palu, angkut, atap), tumpukan bahan, debu tiap pukulan
-window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.props)__propsF(K,T,t,man,REC);if(K.spy)__spyF(K,T,t,man,REC);if(K.ppl)__pplF(K,T,t,man,REC);if(K.zzz)__zzzF(K,t);if(Bd&&K.roti)__rotiF(K,T,t);if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
+window.__crewF=function(K,T,t,man,REC){const Bd=K.build;if(K.props)__propsF(K,T,t,man,REC);if(K.spy)__spyF(K,T,t,man,REC);if(K.ppl)__pplF(K,T,t,man,REC);if(K.zzz||K.zz2)__zzzF(K,t);if(Bd&&K.roti)__rotiF(K,T,t);if(!Bd)return;const cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);
  const X=Bd.x,Z=Bd.z,w=4.2,dp=3.4,FB=.14,hg=2.5,NC={cast:false};
  if(b>5.6&&K.plak){const tx=__bbTex(K.plak,'#F4E2C0');D(G.box,M.chain(M.T(X+1.35,FB+.55,Z+dp/2+.1),M.S(1.1,.55,.03)),'#FFFFFF',{tex:tx,em:.6,cast:false})}
  if(!K.crew)return;const sp=K.crew.sp||1;const fr=v=>Math.abs(Math.sin(v)*43758.5453)%1;
@@ -132,7 +132,8 @@ function __pplF(K,T,t,man,REC){for(const p of K.ppl){if(p.t0!=null&&T<p.t0)conti
  if(p.beret&&(p.beretT==null||T>=p.beretT)){const hy=bob+(p.hy||1.0);D(G.sphHi,M.chain(M.T(x,hy+.02,z),M.RY(P.yaw||0),M.RZ(-.25),M.T(.03,0,0),M.S(.24,.07,.22)),p.beret===1?'#C62828':p.beret);D(G.sphHi,M.chain(M.T(x,hy+.09,z),M.RY(P.yaw||0),M.S(.03,.04,.03)),'#7f1d1d')}
  if(p.helm&&(p.helmT==null||T>=p.helmT)){const hy=bob+(p.hy||1.0);D(G.sphHi,M.chain(M.T(x,hy,z),M.RY(P.yaw||0),M.S(.2,.13,.21)),'#FFC400');D(G.box,M.chain(M.T(x,hy-.01,z),M.RY(P.yaw||0),M.T(0,0,.08),M.S(.36,.025,.34)),'#F2B705')}
  if(p.bb&&(p.bbt==null||T>=p.bbt))__bb(x,(p.y||0)+(p.bby||1.22),z,p.bb,p.bbs||.7,p.bbc||'#FFFFFF')}}
-function __zzzF(K,t){for(const z of K.zzz){const q=(t*.5+z[3])%1;__bb(z[0]+Math.sin(q*6)*.15,z[1]+q*1.1,z[2],'Zzz',.35+q*.25,'#E6E9FF')}}
+function __zTex(){if(window.__ZT)return window.__ZT;const cv=signCanvas(128,128,(x,w,h)=>{x.clearRect(0,0,w,h);x.font='110px Bangers, Impact, sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillStyle='rgba(20,24,60,.85)';x.fillText('Z',w/2+6,h/2+12);x.fillStyle='#FFFFFF';x.fillText('Z',w/2,h/2+6)});return window.__ZT=texFromCanvas(cv)}
+function __zzzF(K,t){if(K.zz2){const c=window.__CAMO;const yw=c?c.yaw:0;for(const z of K.zz2)for(let k=0;k<3;k++){const q=((t*.55+z[3]+k/3)%1);const sz=.07+q*.1;D(G.box,M.chain(M.T(z[0]-q*.12+Math.sin(q*7+k)*.03,z[1]+q*.3,z[2]),M.RY(yw),M.S(sz,sz,.0005)),'#FFFFFF',{tex:__zTex(),em:1,alpha:Math.min(1,(1-q)*2.2)*Math.min(1,q*6),cast:false})}}if(!K.zzz)return;for(const z of K.zzz){const q=(t*.5+z[3])%1;__bb(z[0]+Math.sin(q*6)*.15,z[1]+q*1.1,z[2],'Zzz',.35+q*.25,'#E6E9FF')}}
 // dekorasi toko roti di atas rumah
 function __rotiF(K,T,t){const Bd=K.build,cl=v=>v<0?0:v>1?1:v;const b=Bd.b0+(Bd.b1-Bd.b0)*cl((T-(Bd.t0||0))/Bd.dur);const X=Bd.x,Z=Bd.z,w=4.2,dp=3.4,FB=.14,hg=2.5,NC={cast:false};const fz=Z+dp/2;
  if(b>=4.2){ // cerobong
