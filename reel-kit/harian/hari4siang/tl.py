@@ -2,7 +2,7 @@ import numpy as np,json
 from scipy.io import wavfile
 SR=44100
 exec(open('/home/claude/h2b/tl.py').read().split('# (id, teks')[0].split('SR=44100;')[1].split('\n',1)[1])
-K=['L1','L2','L3','L4','L5','L6'];V={k:load('vo/s_%s.wav'%k) for k in K};d=lambda k:len(V[k])/SR
+K=['L1','L2','L3','L4','L5','L6'];V={k:load('vo/s_%s.wav'%k) for k in K};V['L6']=V['L6'][:int(3.78*SR)]*np.minimum(1,np.linspace(40,0,int(3.78*SR)));d=lambda k:len(V[k])/SR
 T={};S=[]
 T['L1']=(.3,.3+d('L1'));S.append(['p1-timbun',0])
 p2=round(T['L1'][1]+.2,3);S.append(['p2-satu',p2]);T['L2']=(p2+.15,p2+.15+d('L2'))

@@ -75,7 +75,7 @@ put(creak(2.0),A('p4a-tegak')+.4,1.0);put(thunk(),A('p4a-tegak')+2.4,.8);put(scr
 for k in range(8):put(brush(),A('p4c-cat')+.3+k*.35,.8);put(pop(),A('p4c-cat')+.45+k*.35,.35)
 put(clap(1.8),A('p4c-cat')+3.0,.7)
 put(swoosh(.3),A('p5-tumpah')+.05,.6);put(clang(),hit,1.0);put(splash(),hit+.02,1.0);put(stampS(),lah,.8)
-put(pop(),A('p6-cta')+.2,.8);put(stampS(),T['L6'][0]+3.9,.6)
+put(pop(),A('p6-cta')+.2,.8);put(stampS(),T['L6'][1]+.05,.6)
 ev=np.convolve(np.abs(vo),np.ones(2205)/2205,'same');duck=1-.55*np.clip(ev*10,0,1)
 mus=mus/(np.abs(mus).max()+1e-9)
 # musik senyap total saat JEGLEK 1 dtk

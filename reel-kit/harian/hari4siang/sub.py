@@ -3,11 +3,11 @@ from scipy.io import wavfile
 SR=44100
 exec(open('/home/claude/h2b/tl.py').read().split('# (id, teks')[0].split('SR=44100;')[1].split('\n',1)[1])
 d=json.load(open('tl.json'));T=d['T'];S=d['S'];TOT=d['TOT'];KF=d['KF'];A={n:a for n,a,b in S}
-V={k:load('vo/s_%s.wav'%k) for k in T}
+V={k:load('vo/s_%s.wav'%k) for k in T};V['L6']=V['L6'][:int(3.78*SR)]
 CH={'L1':['Kalian minta jadi apa aja…','guru, tukang kue,','pemain bola nomor sepuluh…'],'L2':['Tapi…','gue cuma bisa lantik SATU.'],
 'L3':['Nah.','Ini kan Kota Seni.','Makanya…','Animasi Fakta,','lo Pelukis Kota!'],'L4':['Terus… catnya hati-hati,','jangan sampai keti—'],'L5':['…oke.','Lo tetap pelukis.'],
-'L6':['Tag temen lo','yang cocok jadi apa.','Minggu ini gue lantik lagi.','Dan nanti malam…','pos jaga dibangun!']}
-HL={'L1':'guru, kue, sepuluh…','L2':'Tapi… SATU.','L3':'Nah. Makanya… Pelukis Kota!','L4':'Terus…','L5':'pelukis.','L6':'Tag temen pos jaga dibangun!'}
+'L6':['Tag temen lo','yang cocok jadi apa.','Minggu ini gue lantik lagi.']}
+HL={'L1':'guru, kue, sepuluh…','L2':'Tapi… SATU.','L3':'Nah. Makanya… Pelukis Kota!','L4':'Terus…','L5':'pelukis.','L6':'Tag temen lantik'}
 SUB=[]
 for k in CH:
     a,b=T[k];ch=CH[k];gp=pauses(V[k]);Lc=sum(len(c) for c in ch);prop=[sum(len(c) for c in ch[:q+1])/Lc*(b-a) for q in range(len(ch)-1)];cuts=[]
