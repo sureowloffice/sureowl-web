@@ -475,6 +475,11 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  // 6b pagi: kuas Pelukis Kota ilang, jejak cakar
  const P6=[GX+1.6,GZ+1.6];
  T0('q6b-kuas',(u,ts)=>KF(ts,[[0,{yaw:.5,pitch:.45,dist:2.0,tx:GX+1.0,ty:.2,tz:GZ+.3}],[KFJ.snap6-.05,{yaw:.45,pitch:.3,dist:2.6,tx:GX+1.1,ty:.6,tz:GZ+.6}],[KFJ.snap6+.2,{yaw:.0,pitch:.03,dist:1.15,tx:P6[0],ty:1.0,tz:P6[1]},'snap'],[9,{yaw:0,pitch:.03,dist:1.0,tx:P6[0],ty:1.0,tz:P6[1]}]]),Object.assign({},RT,{props:[PKS,PG({full:1}),{type:'tepung',x:GX+1.0,z:GZ+.2,ry:-1.9,n:8},{type:'ember',x:GX+.5,z:GZ+.35,col:'#E53935'}],ppl:[AF({x:GX+.1,z:GZ+.6,yaw:.5,ges:'bingung',ex:'kaget'})]}),HP('q6b-kuas',[[0,P6[0]+4,P6[1]+4,0,0],[KFJ.snap6-.03,P6[0]+4,P6[1]+4,0,0],[KFJ.snap6,P6[0],P6[1],0,0]],{ex:[[0,'bingung'],[KFJ.snap6,'kaget']],ges:[[0,'garuk'],[KFJ.snap6,'bingung']]}),{jam:7.2});
+ // 0 HOOK: ketua pos jaga dua-duanya tidur, sosok berjubah lewat di depan mereka
+ T0('q0-hook',(u,ts)=>({yaw:L(.08,-.05,u),pitch:L(.12,.08,u),dist:L(2.9,2.3,sm(u)),tx:GX,ty:.95,tz:GZ+.1}),Object.assign({},RT,{night:1,props:[PKS,PG({full:1,mural:[-2,-1]})],zzz:[[GX-.4,1.5,GZ-.2,0],[GX+.4,1.5,GZ-.2,.5]],ppl:[NM(0,GX-.4,GZ-.3,.15,{hold:'kentongan',ges:'dada',ex:'merem',bb:'@namonah · KETUA POS JAGA'}),IV(0,GX+.4,GZ-.3,-.15,{hold:'kentongan',ges:'dada',ex:'merem',bb:'@ivellll10 · KETUA POS JAGA'}),{owl:1,jubah:1,x:GX+1.5,z:GZ+.25,yaw:-Math.PI/2+.75,sc:.6,to:[GX-1.5,GZ+.25],tw:.2,dw:2.6}]}),HP('x',[[0,-95,-60,0,0]]),{jam:1.2});
+ // 3e janji: namonah ngomong ke President
+ const P3=[GX+1.1,GZ+1.5];
+ T0('q3e-janji',(u,ts)=>({yaw:L(-.35,-.25,u),pitch:.05,dist:L(2.3,1.9,sm(u)),tx:GX-.1,ty:1.0,tz:GZ+1.1}),Object.assign({},RT,{props:[PKS,PG({full:1})],ppl:[NM(0,GX-.45,GZ+1.0,.5,{hold:'kentongan',ges:'angkat',ex:'teriak',hop:1,bb:'@namonah · KETUA POS JAGA'}),IV(0,GX+.3,GZ+.9,.2,{hold:'kentongan',ges:'semangat',ex:'semangat',bb:'@ivellll10 · KETUA POS JAGA'})]}),HP('x',[[0,P3[0],P3[1],-.9,0]],{ex:[[0,'senyum']],ges:[[0,'semangat']]}),{jam:17.5});
  // 7 CTA
  T0('q7-cta',(u,ts)=>({yaw:L(-.12,0,u),pitch:.04,dist:L(2.4,1.45,sm(u)),tx:P6[0],ty:1.02,tz:P6[1]}),Object.assign({},RT,{props:[PKS,PG({full:1})],ppl:[AF({x:GX+.3,z:GZ+.9,yaw:.6,ges:'bingung',ex:'sedih'})]}),HP('q7-cta',[[0,P6[0],P6[1],0,0]],{ex:[[0,'senyum'],[2.2,'semangat']],ges:[[0,'tunjuk'],[2.2,'angkat']]}),{jam:7.5});
  }
