@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Buku Warga Kota Seni</title>
+<meta name="description" content="Daftar resmi warga, pejabat, dan bangunan Kota Seni. Komen di video = nama lo masuk Buku Warga.">
+<meta property="og:title" content="Buku Warga Kota Seni">
+<meta property="og:description" content="Cek nama lo di Kota Seni. Komen di video @viralindongid = nama lo masuk Buku Warga.">
+<meta property="og:image" content="/kota-hancur.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@500;700;800;900&display=swap">
+<style>
+:root{--paper:#F6EBD3;--paper2:#EEDDBA;--ink:#2A1E12;--soft:#6B5638;--red:#E53935;--yel:#FFD23F;--blue:#1E5AA8;--green:#2F7D4F;--line:rgba(107,86,56,.25)}
+*{box-sizing:border-box}
+html{background:#1b140c}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:radial-gradient(120% 60% at 50% 0%,#3a2a18,#1b140c);min-height:100vh}
+main{max-width:560px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left)) 48px max(16px,env(safe-area-inset-right))}
+.book{background:var(--paper);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 0 0 3px #d8c39a;padding:22px 20px 26px;position:relative}
+.book:before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;border-radius:18px 0 0 18px;background:linear-gradient(90deg,#b98a55,#d8c39a)}
+.badge{display:inline-block;background:var(--red);color:#fff;font:400 18px Bangers,Impact,sans-serif;letter-spacing:.04em;padding:4px 12px;border-radius:999px}
+h1{font:400 clamp(44px,12vw,64px)/.95 Bangers,Impact,sans-serif;letter-spacing:.02em;margin:10px 0 6px;color:var(--ink);text-wrap:balance}
+h1 span{color:var(--red)}
+.lead{font-weight:700;color:var(--soft);line-height:1.5;margin:0 0 16px}
+h2{font:400 30px/1 Bangers,Impact,sans-serif;letter-spacing:.03em;margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+h2 small{font:800 12px Inter,sans-serif;color:var(--soft);letter-spacing:.06em;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 4px}
+.stats div{background:var(--paper2);border-radius:12px;padding:10px 6px;text-align:center}
+.stats b{display:block;font:400 32px/1 Bangers,Impact,sans-serif;color:var(--blue)}
+.stats small{font-weight:800;font-size:12px;color:var(--soft)}
+.search{display:flex;gap:8px;margin-top:6px}
+.search input{flex:1;min-width:0;font:700 16px Inter,sans-serif;padding:12px 14px;border-radius:12px;border:2px solid #cdb68a;background:#fffaf0;color:var(--ink)}
+.search input:focus{outline:3px solid var(--yel);border-color:var(--ink)}
+#hasil{font-weight:800;font-size:14px;margin:8px 2px 0;min-height:20px}
+.ok{color:var(--green)}.no{color:var(--red)}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:#fffaf0;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.row.hit{outline:3px solid var(--yel)}
+.role{font:400 18px/1 Bangers,Impact,sans-serif;letter-spacing:.03em;background:var(--ink);color:var(--yel);padding:6px 9px;border-radius:8px;white-space:nowrap}
+.role.calon{background:#8a6d43;color:#fff}
+.who{min-width:0}
+.who b{display:block;font-weight:900;font-size:16px;overflow-wrap:anywhere}
+.who small{display:block;color:var(--soft);font-weight:600;font-size:13px;line-height:1.4}
+.timeline{list-style:none;margin:0;padding:0;border-left:3px dashed #cdb68a;margin-left:8px}
+.timeline li{position:relative;padding:0 0 14px 18px}
+.timeline li:before{content:"";position:absolute;left:-9px;top:3px;width:15px;height:15px;border-radius:50%;background:var(--green);border:3px solid var(--paper)}
+.timeline li.next:before{background:var(--yel)}
+.timeline li.lost:before{background:var(--red)}
+.timeline b{font-weight:900}
+.timeline small{display:block;color:var(--soft);font-weight:600;font-size:13px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;background:#2F5D46;color:#F4F1E6;border-radius:12px;overflow:hidden}
+td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.12);font-weight:800}
+td:first-child{font:400 22px Bangers,Impact,sans-serif;color:var(--yel);width:80px}
+tr:last-child td{background:#B8352E}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fffaf0;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:800;font-size:13px}
+.chip i{font-style:normal;color:var(--soft);font-weight:600}
+.misteri{background:#21173A;color:#E9E2FF;border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.eyes{display:flex;gap:6px;flex:none}.eyes span{width:12px;height:12px;border-radius:50%;background:#FFE45A;box-shadow:0 0 10px #FFE45A}
+.misteri b{font:400 22px Bangers,Impact,sans-serif;letter-spacing:.03em;color:#FFE45A}
+.cta{margin-top:24px;background:var(--yel);border-radius:14px;padding:16px;text-align:center}
+.cta p{margin:0 0 10px;font-weight:900;font-size:17px;line-height:1.4}
+.btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;font:400 22px Bangers,Impact,sans-serif;letter-spacing:.04em;padding:10px 18px;border-radius:12px}
+.btn:focus-visible{outline:3px solid var(--red)}
+.note{font-size:12px;color:var(--soft);font-weight:600;margin-top:16px;line-height:1.5}
+@media (prefers-reduced-motion:no-preference){.eyes span{animation:blink 4s infinite}@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}}
+</style>
+</head>
+<body>
+<main>
+<div class="book">
+  <span class="badge">KOTA SENI</span>
+  <h1>Buku <span>Warga</span></h1>
+  <p class="lead">Catatan resmi President. Siapa aja yang udah jadi warga, siapa yang dilantik, dan apa aja yang udah dibangun lagi sejak Kota Seni hancur.</p>
+  <div class="stats">
+    <div><b id="nPejabat">0</b><small>pejabat</small></div>
+    <div><b id="nBangun">0</b><small>bangunan</small></div>
+    <div><b id="nWarga">0</b><small>tercatat</small></div>
+  </div>
+
+  <h2>Cari nama lo</h2>
+  <form class="search" id="cari" role="search">
+    <label for="q" style="position:absolute;left:-9999px">Username</label>
+    <input id="q" type="text" placeholder="@username lo" autocomplete="off" autocapitalize="off">
+  </form>
+  <p id="hasil" aria-live="polite"></p>
+
+  <h2>Pejabat Kota <small>dilantik di video</small></h2>
+  <div class="list" id="pejabat"></div>
+
+  <h2>Jadwal Ngecas <small>1 colokan</small></h2>
+  <table aria-label="Jadwal ngecas"><tbody id="ngecas"></tbody></table>
+
+  <h2>Yang udah dibangun</h2>
+  <ul class="timeline" id="bangun"></ul>
+
+  <h2>Antre minta jabatan <small>dari komen</small></h2>
+  <div class="chips" id="antre"></div>
+
+  <h2>Peserta lomba kursi wapres</h2>
+  <div class="chips" id="lomba"></div>
+
+  <h2>Kasus belum selesai</h2>
+  <div class="misteri"><div class="eyes" aria-hidden="true"><span></span><span></span></div><div><b>Pencuri roti &amp; colokan</b><br>Sosok kecil berjubah, matanya nyala. Ninggalin jejak cakar burung. Belum ketangkep.</div></div>
+
+  <div class="cta">
+    <p>Nama lo belum ada?<br>Follow + komen di video terbaru, nama lo masuk Buku Warga.</p>
+    <a class="btn" href="https://www.instagram.com/viralindongid/" rel="noopener">Ke @viralindongid</a>
+  </div>
+  <p class="note">Buku ini diperbarui tiap ada episode baru. Nama diambil dari komen publik di Instagram &amp; TikTok @viralindongid. Game Kota Seni versi baru lagi dibangun, kabarnya diumumkan di Instagram.</p>
+</div>
+</main>
+<script>
+const DATA={
+ pejabat:[
+  {role:'WAKIL PRESIDEN',u:'alvaro.alifiandra',ket:'Menang undian rebutan kursi wapres · HARI 3'},
+  {role:'MENTERI LISTRIK',u:'★vanzz★',ket:'Like terbanyak pilih listrik · HARI 3. Juga pengusul toko roti di HARI 1'},
+  {role:'PELUKIS KOTA',u:'Animasi Fakta',ket:'Ngecat ulang papan KOTA SENI · HARI 4'},
+  {role:'CALON KETUA POS JAGA',u:'namonah',ket:'"mau jadi ketua keamanan biar bisa jaga malam"',calon:1},
+  {role:'CALON KETUA POS JAGA',u:'ivellll10',ket:'"A bang jadiin kepala pos jaga bang"',calon:1}
+ ],
+ ngecas:[['07.00','Warga lama'],['09.00','namonah'],['12.00','DakWah'],['03.00','si noob main FF (maaf)']],
+ bangun:[
+  {n:'Toko Roti',k:'HARI 1 · usul ★vanzz★. Rotinya hilang tiap malam.'},
+  {n:'Rumah di Bukit',k:'HARI 2 · usul nafis_saja'},
+  {n:'Tiang Listrik',k:'HARI 3 · cuma 1 colokan, terus JEGLEK.'},
+  {n:'Colokan',k:'HARI 3 · dicuri waktu gelap',lost:1},
+  {n:'Papan KOTA SENI dicat ulang',k:'HARI 4 · oleh Pelukis Kota'},
+  {n:'Pos Jaga',k:'Selanjutnya · pilihan A menang (pulz1818, ivellll10)',next:1}
+ ],
+ antre:[['fani','guru'],['basskalbar','guru'],['ZZZZZZ','pemain bola no. 10'],['datboy.han','tukang kue'],['rinz_verse','menteri keuangan']],
+ lomba:['alvaro.alifiandra','basskalbar','idyysse','Luki aja tuh','bayupranata411','kenz_$$','mhmdf4qih_2'],
+ lain:['tiaraaatj','DakWah','si noob main FF','nafis_saja','pulz1818','日號','corzzonn','imdayp0','_its.me.jihano','dndmnk_']
+};
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('pejabat').innerHTML=DATA.pejabat.map(p=>`<div class="row" data-u="${esc(p.u.toLowerCase())}"><span class="role${p.calon?' calon':''}">${esc(p.role)}</span><div class="who"><b>@${esc(p.u)}</b><small>${esc(p.ket)}</small></div></div>`).join('');
+$('ngecas').innerHTML=DATA.ngecas.map(([j,n])=>`<tr><td>${j}</td><td>${esc(n)}</td></tr>`).join('');
+$('bangun').innerHTML=DATA.bangun.map(b=>`<li class="${b.next?'next':b.lost?'lost':''}"><b>${esc(b.n)}</b><small>${esc(b.k)}</small></li>`).join('');
+$('antre').innerHTML=DATA.antre.map(([u,j])=>`<span class="chip">@${esc(u)} <i>· ${esc(j)}</i></span>`).join('');
+$('lomba').innerHTML=DATA.lomba.map(u=>`<span class="chip">@${esc(u)}</span>`).join('');
+const ALL=new Map();
+const add=(u,info)=>{const k=u.toLowerCase().replace(/^@/,'');if(!ALL.has(k))ALL.set(k,{u,info:[]});ALL.get(k).info.push(info)};
+DATA.pejabat.forEach(p=>add(p.u,p.role.toLowerCase()));DATA.ngecas.forEach(([j,n])=>{if(n!=='Warga lama')add(n.replace(' (maaf)',''),'jadwal ngecas jam '+j)});
+DATA.antre.forEach(([u,j])=>add(u,'antre jadi '+j));DATA.lomba.forEach(u=>add(u,'peserta lomba kursi wapres'));DATA.lain.forEach(u=>add(u,'warga yang komen'));
+add('nafis_saja','pengusul rumah di bukit');
+$('nPejabat').textContent=DATA.pejabat.filter(p=>!p.calon).length;$('nBangun').textContent=DATA.bangun.filter(b=>!b.next&&!b.lost).length;$('nWarga').textContent=ALL.size;
+function cari(){const q=$('q').value.trim().toLowerCase().replace(/^@/,'');document.querySelectorAll('.row').forEach(r=>r.classList.toggle('hit',!!q&&r.dataset.u.includes(q)));
+ if(!q){$('hasil').textContent='';return}
+ const m=[...ALL.entries()].filter(([k])=>k.includes(q));
+ $('hasil').className=m.length?'ok':'no';
+ $('hasil').textContent=m.length?m.slice(0,3).map(([k,v])=>'@'+v.u+' tercatat: '+[...new Set(v.info)].join(', ')).join(' · '):'Belum ketemu. Komen di video terbaru biar nama lo masuk.'}
+$('q').addEventListener('input',cari);$('cari').addEventListener('submit',e=>{e.preventDefault();cari()});
+</script>
+</body>
+</html>
