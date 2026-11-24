@@ -485,6 +485,52 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  // 7 CTA
  T0('q7-cta',(u,ts)=>({yaw:L(-.12,0,u),pitch:.04,dist:L(2.4,1.45,sm(u)),tx:P6[0],ty:1.02,tz:P6[1]}),Object.assign({},RT,{props:[PKS,PG({full:1})],ppl:[AF({x:GX+.3,z:GZ+.9,yaw:.6,ges:'bingung',ex:'sedih'})]}),HP('q7-cta',[[0,P6[0],P6[1],0,0]],{ex:[[0,'senyum'],[2.2,'semangat']],ges:[[0,'tunjuk'],[2.2,'angkat']]}),{jam:7.5});
  }
+ {// ===== HARI 6: WIFI LO LEMOT? (Kota Seni pasang WiFi pertama) =====
+ const tj=n=>{const f=path.join(__dirname,'data/talk_'+n+'.json');return fs.existsSync(f)?JSON.parse(fs.readFileSync(f,'utf8')):null};const HP=(n,keys,o)=>Object.assign({u:'immanuelragil',keys,talk:tj(n)},o||{});
+ const KP=path.join(__dirname,'data/h6_kf.json');const K6=fs.existsSync(KP)?JSON.parse(fs.readFileSync(KP,'utf8')):{};const k6=(n,d)=>K6[n]!=null?K6[n]:d;
+ const sm=q=>{q=Math.max(0,Math.min(1,q));return q*q*(3-2*q)};
+ const KF=(ts,K)=>{if(ts<=K[0][0])return Object.assign({},K[0][1]);for(let i=1;i<K.length;i++)if(ts<K[i][0]){const a=K[i-1],b=K[i];let f=(ts-a[0])/(b[0]-a[0]);f=(b[2]==='snap')?1-Math.pow(1-f,4):sm(f);const o={};for(const k in b[1])o[k]=a[1][k]+(b[1][k]-a[1][k])*f;return o}return Object.assign({},K[K.length-1][1])};
+ const RT={build:{x:-79,z:-47,b0:6,b1:6,dur:1},roti:1,plak:'Usulan ★vanzz★'};const GX=-86.6,GZ=-42.6,MX=-82.5,MZ=-44.4;
+ const PKS={type:'papanks',x:-83.3,z:-41.4,ry:0,full:1};const TIA={type:'tiang',x:-80.8,z:-41.6,ry:0,lamp:1,st:'ilang'};const PG={type:'posjaga',x:GX,z:GZ,ry:0,kent:1,full:1};
+ const TW=o=>Object.assign({type:'menara',x:MX,z:MZ,ry:0,full:1,sig:'kuat'},o||{});
+ const AF=o=>Object.assign({i:190,beret:1,hy:1.02,ex:'semangat',ges:'diam',bb:'@Animasi Fakta · PELUKIS',bbs:.5,bby:1.32},o||{});
+ const NM=o=>Object.assign({i:201,ex:'semangat',ges:'diam',bb:'@namonah',bbs:.45,bby:1.3},o||{});const IV=o=>Object.assign({i:202,ex:'semangat',ges:'diam',bb:'@ivellll10',bbs:.45,bby:1.3},o||{});
+ const RTR={type:'router',x:-80.2,z:-44.6,ry:.3,y:.55,crate:1,sig:'lemah'};
+ // 1 HOOK: Pelukis upload karya, loading terus
+ const A1=[-80.9,-43.2];
+ T0('w1-hook',(u,ts)=>({yaw:L(.25,.1,u),pitch:.05,dist:L(1.25,1.0,sm(u)),tx:A1[0],ty:1.0,tz:A1[1]}),Object.assign({},RT,{props:[PKS,TIA],ppl:[AF({x:A1[0],z:A1[1],yaw:.1,hold:'hp',ges:'angkat',ex:'bingung',bb:null})]}),HP('x',[[0,-95,-60,0,0]]),{jam:10.5});
+ // 2a WiFi pertama Kota Seni: router baru, warga rame
+ const P2=[-81.1,-43.6];
+ T0('w2-wifi',(u,ts)=>({yaw:L(.45,.25,u),pitch:L(.12,.08,u),dist:L(4.4,3.6,sm(u)),tx:-80.6,ty:.9,tz:-44.0}),Object.assign({},RT,{props:[PKS,TIA,Object.assign({},RTR,{sig:'lemah'})],ppl:[AF({x:-79.6,z:-43.6,yaw:-.4,hold:'hp',ges:'angkat',ex:'semangat'}),NM({x:-80.1,z:-43.0,yaw:-.2,hold:'hp',ges:'angkat',hop:1}),IV({x:-81.9,z:-43.2,yaw:.5,hold:'hp',ges:'semangat',hop:1}),{i:193,x:-79.0,z:-43.0,yaw:-.6,ges:'tepuk',ex:'ketawa',hop:1},{i:194,x:-82.4,z:-43.8,yaw:.7,ges:'tepuk',ex:'ketawa'}]}),HP('w2-wifi',[[0,P2[0],P2[1],.2,0]],{ex:[[0,'semangat']],ges:[[0,'semangat'],[2.5,'tunjuk']]}),{jam:10.7});
+ // 2b kena ketiganya (facepalm)
+ T0('w2b-kena',(u,ts)=>({yaw:L(-.1,0,u),pitch:.03,dist:L(1.5,1.05,sm(u)),tx:P2[0],ty:1.0,tz:P2[1]}),Object.assign({},RT,{props:[PKS,TIA,RTR]}),HP('w2b-kena',[[0,P2[0],P2[1],0,0]],{ex:[[0,'senyum'],[1.0,'lemas']],ges:[[0,'semangat'],[1.0,'garuk']]}),{jam:10.8});
+ // 3 router ngumpet di balik tembok toko roti
+ const RB={type:'router',x:-79.0,z:-49.25,ry:Math.PI,y:.5,crate:1,sig:'lemah'};
+ T0('w3-tembok',(u,ts)=>KF(ts,[[0,{yaw:Math.PI+.35,pitch:.18,dist:2.0,tx:-79.0,ty:.6,tz:-49.25}],[k6('w3a',2.4),{yaw:Math.PI+.25,pitch:.2,dist:3.2,tx:-79.0,ty:.9,tz:-49.0}],[9,{yaw:Math.PI+.15,pitch:.22,dist:4.0,tx:-79.0,ty:1.0,tz:-48.8}]]),Object.assign({},RT,{props:[RB,PKS],ppl:[NM({x:-80.2,z:-44.0,yaw:Math.PI,hold:'hp',ges:'bingung',ex:'kesal',bb:null}),IV({x:-78.4,z:-44.1,yaw:Math.PI,hold:'hp',ges:'bingung',ex:'kesal',bb:null})]}),HP('w3-tembok',[[0,-80.0,-49.4,Math.PI+.4,0]],{ex:[[0,'serius'],[2.5,'kesal']],ges:[[0,'tunjuk'],[2.5,'pinggang']]}),{jam:11.2});
+ // 4 bangun menara WiFi
+ const LIFT=[[197,-.95,.95,.7],[198,.95,.95,-.7],[199,-.95,-.95,2.4],[200,.95,-.95,-2.4]];
+ T0('w4-menara',(u,ts)=>KF(ts,[[0,{yaw:1.0,pitch:.08,dist:5.6,tx:MX,ty:1.4,tz:MZ}],[k6('w4b1',4.2),{yaw:.9,pitch:.04,dist:7.0,tx:MX,ty:2.2,tz:MZ}],[k6('w4b1',4.2)+.4,{yaw:.85,pitch:0,dist:6.4,tx:MX,ty:2.7,tz:MZ},'snap'],[9,{yaw:.82,pitch:0,dist:6.2,tx:MX,ty:2.7,tz:MZ}]]),Object.assign({},RT,{props:[PKS,TIA,TW({full:0,b0:k6('w4b0',.4),b1:k6('w4b1',4.2)})],ppl:LIFT.map(([i,dx,dz,yw])=>({i,x:MX+dx,z:MZ+dz,yaw:yw,ges:'palu',ex:'serius',helm:1,hy:1.0})).concat([AF({x:MX-1.6,z:MZ-1.2,yaw:.9,ges:'semangat',hold:'hp'}),NM({x:MX-1.9,z:MZ+.3,yaw:.9,ges:'semangat',hop:1,bb:null}),IV({x:MX-1.4,z:MZ-2.0,yaw:.8,ges:'tepuk',hop:1,bb:null})])}),HP('x',[[0,MX+2.4,MZ+.6,-1.3,0]],{ex:[[0,'semangat']],ges:[[0,'tunjuk']]}),{jam:12});
+ // 5a malam: semua warga streaming, WiFi kebagi
+ const WN=[[201,-1.3,1.3,.6],[202,1.3,1.3,-.6],[190,0,1.9,0],[193,-2.0,.4,1.1],[194,2.0,.4,-1.1],[195,-.6,2.6,.2],[196,.7,2.6,-.2],[197,-2.3,1.8,.9],[198,2.3,1.8,-.9]];
+ const WARGA=()=>WN.map(([i,dx,dz,yw])=>Object.assign({i,x:MX+dx,z:MZ+dz,yaw:yw*.5,hold:'hp',ges:'angkat',ex:'bingung'},i==190?{beret:1,hy:1.02}:{}));
+ T0('w5-malam',(u,ts)=>({yaw:L(.95,.8,u),pitch:L(.22,.16,u),dist:L(6.2,5.0,sm(u)),tx:MX,ty:1.2,tz:MZ+1.0}),Object.assign({},RT,{night:1,props:[PKS,TIA,TW()],ppl:WARGA()}),HP('x',[[0,-95,-60,0,0]]),{jam:20});
+ // 5b jadwal WiFi
+ const P5=[MX+.2,MZ+3.4];
+ T0('w5b-jadwal',(u,ts)=>({yaw:L(.1,0,u),pitch:.04,dist:L(1.9,1.3,sm(u)),tx:P5[0],ty:1.05,tz:P5[1]}),Object.assign({},RT,{night:1,props:[PKS,TIA,TW()],ppl:WARGA().slice(0,4)}),HP('w5b-jadwal',[[0,P5[0],P5[1],0,0]],{ex:[[0,'lemas'],[1.2,'semangat']],ges:[[0,'garuk'],[1.2,'tunjuk']]}),{jam:20.2});
+ // 6a nomor tiga: ada yang nebeng
+ T0('w6-tiga',(u,ts)=>({yaw:L(-.2,-.05,u),pitch:.05,dist:L(2.2,1.4,sm(u)),tx:P5[0],ty:1.05,tz:P5[1]}),Object.assign({},RT,{night:1,props:[PKS,TIA,TW()]}),HP('w6-tiga',[[0,P5[0],P5[1],0,0]],{ex:[[0,'serius']],ges:[[0,'tunjuk']]}),{jam:20.4});
+ // 6b cek perangkat terhubung (HP besar di tangan President)
+ T0('w6b-cek',(u,ts)=>KF(ts,[[0,{yaw:-.25,pitch:.08,dist:1.3,tx:P5[0],ty:1.15,tz:P5[1]}],[k6('lah',5.8)-.05,{yaw:-.2,pitch:.07,dist:1.15,tx:P5[0],ty:1.12,tz:P5[1]}],[k6('lah',5.8)+.2,{yaw:0,pitch:.03,dist:.8,tx:P5[0],ty:1.02,tz:P5[1]},'snap'],[12,{yaw:0,pitch:.03,dist:.75,tx:P5[0],ty:1.02,tz:P5[1]}]]),Object.assign({},RT,{night:1,props:[PKS,TIA,TW()]}),HP('w6b-cek',[[0,P5[0],P5[1],0,0]],{ex:[[0,'serius'],[k6('lah',5.8),'kaget']],ges:[[0,'diam'],[k6('lah',5.8),'bingung']]},),{jam:20.5});
+ // 7 lacak sinyal ke mural pos jaga
+ const P7a=[MX-.4,MZ+2.6],P7b=[GX+.4,GZ+1.4];
+ T0('w7-lacak',(u,ts)=>KF(ts,[[0,{yaw:.5,pitch:.08,dist:2.6,tx:P7a[0],ty:1.0,tz:P7a[1]}],[k6('mural',2.6)-.05,{yaw:.6,pitch:.07,dist:2.4,tx:(P7a[0]+P7b[0])/2,ty:1.0,tz:(P7a[1]+P7b[1])/2}],[k6('mural',2.6)+.25,{yaw:.15,pitch:.06,dist:2.6,tx:GX,ty:1.0,tz:GZ},'snap'],[9,{yaw:.1,pitch:.06,dist:2.4,tx:GX,ty:1.0,tz:GZ}]]),Object.assign({},RT,{night:1,props:[PKS,PG]}),HP('w7-lacak',[[0,P7a[0],P7a[1],-1.2,1],[k6('mural',2.6),P7b[0],P7b[1],-1.0,1],[k6('mural',2.6)+.3,P7b[0],P7b[1],-2.6,0]],{ex:[[0,'serius'],[k6('mural',2.6),'kaget']],ges:[[0,'angkat'],[k6('mural',2.6),'tunjuk']]}),{jam:20.8});
+ // 8 di balik mural: kuas + HP nyala + jejak, sosok berjubah kabur
+ const P8=[GX+1.25,GZ-1.0];
+ T0('w8-balik',(u,ts)=>({yaw:L(Math.PI-.6,Math.PI-.45,u),pitch:L(.42,.34,u),dist:L(3.0,2.5,sm(u)),tx:GX+.2,ty:.3,tz:GZ-1.15}),Object.assign({},RT,{night:1,props:[PKS,PG,{type:'kuasjatuh',x:GX-.2,z:GZ-1.0,ry:.5},{type:'hpkecil',x:GX+.25,z:GZ-1.05,ry:-.3}],ppl:[{owl:1,jubah:1,x:GX+.6,z:GZ-1.6,yaw:Math.PI/2+.6,sc:.5,to:[GX+3.0,GZ-2.4],tw:.3,dw:2.2}]}),HP('w8-balik',[[0,P8[0],P8[1],-1.8,0]],{ex:[[0,'kaget']],ges:[[0,'bingung']]}),{jam:21});
+ // 9 CTA
+ const P9=[GX+1.5,GZ+1.6];
+ T0('w9-cta',(u,ts)=>({yaw:L(-.1,0,u),pitch:.04,dist:L(2.2,1.35,sm(u)),tx:P9[0],ty:1.02,tz:P9[1]}),Object.assign({},RT,{night:1,props:[PKS,PG]}),HP('w9-cta',[[0,P9[0],P9[1],0,0]],{ex:[[0,'serius'],[2,'semangat']],ges:[[0,'tunjuk'],[2,'angkat']]}),{jam:21.2});
+ }
   T0('s2-jejak',u=>({yaw:.2,pitch:L(.55,.42,u),dist:L(3.4,4.6,E(u)),tx:-75,ty:0,tz:L(-70.5,-71.5,u)}),{night:1,props:[{type:'tepung',x:-75,z:-70,ry:.3,n:12}],ppl:[{owl:1,x:-76.5,z:-75.6,to:[-77.4,-77.8],tw:1.0,dw:1.6,yaw:-2.8,sc:.38}]},null,{jam:22});
   T0('t-bungkuk',u=>({yaw:1.9,pitch:.08,dist:4.2,tx:-83.8,ty:.5,tz:-41.4}),K3(60,{ppl:[0,1,2,3].map(k=>({i:120+k,x:-85.2+k*.8,z:-41.4,yaw:.3,bend:.3,ges:'pinggang',ex:'sakit'}))}));
   T0('t-saklar',u=>({yaw:1.25,pitch:.04,dist:L(2.2,1.8,u),tx:-69.95,ty:.72,tz:-62.25}),{props:[{type:'saklar',x:-70,z:-62.6}]},PR('x',[[0,-69.95,-61.95,HS,0]],{ges:[[0,'pencet']],ex:[[0,'bingung']]}));

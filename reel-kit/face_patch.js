@@ -195,6 +195,20 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
    D(G.cyl16||G.cyl8,M.chain(M.T(xx,yy,zz),M.RZ(rot),M.T(0,-.11,0),M.S(.13,.22,.13)),'#B0B6BD');D(G.cyl16||G.cyl8,M.chain(M.T(xx,yy,zz),M.RZ(rot),M.T(0,.105,0),M.S(.12,.012,.12)),'#E53935');
    if(u>0&&u<1)for(let q=0;q<8;q++)D(G.sph,M.chain(M.T(xx-Math.sin(rot)*.15*q*.3,yy-.05-q*.06,zz+.03*q),M.S(.05,.05,.05)),['#E53935','#FDD835','#1E88E5'][q%3],NC)}
   if(p.type=='catmuka'&&T>=(p.t0||0)){const cols=['#E53935','#FDD835','#1E88E5','#43A047'];for(let q=0;q<14;q++){const spots=[[-.15,.12],[.13,.15],[-.05,.2],[.17,.02],[-.18,-.02],[.0,.24],[.1,-.1],[-.12,-.12],[.2,.18],[-.2,.18]];if(q>=spots.length)continue;const [sx,sy]=spots[q];const dr=Math.min(1,(T-(p.t0||0))/1.2)*((q%3)*.025);D(G.sphHi,M.chain(M.T(X+sx,(p.hy||.98)+sy-dr*.5,Z+.19),M.S(.035+(q%3)*.01,.03+dr*.6,.012)),cols[q%4],NC)}}
+  if(p.type=='router'||p.type=='menara'){const cl=v=>v<0?0:v>1?1:v;let topY=.0;
+   if(p.type=='menara'){const H=p.h||4.2;const pr=p.full?1:cl((T-(p.b0||0))/Math.max(.01,(p.b1||1)-(p.b0||0)));const seg=8;const ns=Math.ceil(pr*seg);
+    for(let k=0;k<ns;k++){const y0=k/seg*H,y1=(k+1)/seg*H,w0=.55*(1-k/seg*.6),w1=.55*(1-(k+1)/seg*.6);const fr=(k==ns-1&&pr<1)?(pr*seg-(ns-1)):1;
+     for(const [sx,sz] of [[-1,-1],[1,-1],[-1,1],[1,1]]){const a=[sx*w0,y0,sz*w0],c=[sx*w1,y0+(y1-y0)*fr,sz*w1];const dx=c[0]-a[0],dy=c[1]-a[1],dz=c[2]-a[2],L=Math.hypot(dx,dy,dz);
+      D(G.box,R(M.chain(M.T(a[0],a[1],a[2]),M.RZ(-Math.atan2(dx,dy)),M.RX(Math.atan2(dz,dy)),M.T(0,0,0),M.S(.06,L,.06))),'#9AA3AD',NC)}
+     if(fr>=1){for(const [ax,az,bx,bz] of [[-1,-1,1,-1],[-1,1,1,1],[-1,-1,-1,1],[1,-1,1,1]]){const yy=y1-.02;const ww=w1;D(G.box,R(M.chain(M.T((ax+bx)/2*ww,yy,(az+bz)/2*ww),M.RY(ax==bx?Math.PI/2:0),M.S(2*ww,.04,.04))),'#C0392B',NC)}}}
+    topY=pr*H;if(pr>=1){b(0,H,0,.5,.05,.5,'#6B7380');topY=H+.05}
+    if(pr<1&&p.b0!=null&&T>=p.b0)for(let q=0;q<4;q++){const ph=(t*2+q*.25)%1;D(G.sph,R(M.chain(M.T((q%2?.3:-.3),topY+ph*.3,(q<2?.3:-.3)),M.S(.05,.05,.05))),'#FFD23F',{em:1,alpha:1-ph,cast:false})}}
+   const show=p.type=='router'||(p.full||T>=(p.b1||0));
+   if(show){const y=p.type=='menara'?topY:(p.y||0);if(p.crate&&y>.05)D(G.box,R(M.chain(M.S(.5,y,.4))),'#A9784A',window.__cineTexF?{tex:window.__cineTexF('wood')}:{});D(G.box,R(M.chain(M.T(0,y,0),M.S(.34,.07,.22))),'#F4F4F4',NC);for(const q of [-.12,0,.12])D(G.box,R(M.chain(M.T(q,y+.07,-.08),M.RZ(q*1.5),M.S(.018,.22,.018))),'#222',NC);
+    for(let q=0;q<4;q++){const on=Math.sin(t*9+q*1.7)>0;D(G.sph,R(M.chain(M.T(-.12+q*.06,y+.04,.112),M.S(.014,.014,.006))),on?'#39FF6A':'#164d22',{em:on?1:0,cast:false})}
+    const st=p.sig;if(st){const blk=st=='lemah';const rmax=blk?.7:(p.rmax||3);const col=blk?'#FF5A5A':'#5CF2FF';for(let k=0;k<3;k++){const q=((t*.7+k/3)%1);const r=.25+q*rmax;const n=Math.round(14+r*8);for(let j=0;j<n;j++){const an=j/n*Math.PI*2;D(G.sph,R(M.chain(M.T(Math.cos(an)*r,y+.12+Math.sin(an*3+t)*.02,Math.sin(an)*r),M.S(.045,.045,.045))),col,{em:1,alpha:(1-q)*(blk?.9:.8),cast:false})}}}}}
+  if(p.type=='hpkecil'){const on=Math.sin(t*6)>-.3;D(G.box,R(M.chain(M.S(.1,.012,.18))),'#15151A',NC);D(G.box,R(M.chain(M.T(0,.013,0),M.S(.085,.002,.16))),on?'#8FE3FF':'#2a4a5a',{em:on?1:.2,cast:false});if(on)D(G.sph,R(M.chain(M.T(0,.05,0),M.S(.35,.05,.35))),'#8FE3FF',{em:1,alpha:.12,cast:false})}
+  if(p.type=='kuasjatuh'){D(G.box,R(M.chain(M.T(0,.03,0),M.RZ(Math.PI/2),M.S(.05,.7,.05))),'#8A5A2B',NC);D(G.box,R(M.chain(M.T(.38,.03,0),M.RZ(Math.PI/2),M.S(.09,.14,.07))),'#C9CFD6',NC);D(G.sphHi,R(M.chain(M.T(.5,.04,0),M.S(.1,.06,.08))),p.col||'#E53935',NC)}
   if(p.type=='posjaga'){const cl=v=>v<0?0:v>1?1:v,ee=q=>q*q*(3-2*q),pr=a=>a?cl((T-a[0])/Math.max(.01,a[1]-a[0])):(p.full?1:0);
    const g=p.full?1:pr(p.gali),tp=ee(pr(p.tiang)),at=ee(pr(p.atap)),mu=pr(p.mural);const WD=window.__cineTexF;const wood=WD?{tex:WD('wood')}:{};
    const CN=[[-.85,.6],[.85,.6],[-.85,-.6],[.85,-.6]];const digA=p.gali&&!p.full&&T>=p.gali[0]&&T<p.gali[1];
