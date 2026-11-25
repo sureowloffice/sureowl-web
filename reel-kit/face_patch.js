@@ -180,7 +180,7 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
    for(const q of [-.55,.55])ln(X+q,H-.22,Z,X+q,H-1.2,Z-14,.012,'#222')}
   if(p.type=='papanks'){const tilt=(()=>{const tt=p.tt||[0,0];const u=Math.max(0,Math.min(1,(T-tt[0])/Math.max(.01,tt[1]-tt[0])));const e=u*u*(3-2*u);return (p.tilt0||0)*(1-e)})();
    const lt=p.lt?Math.max(0,Math.min(9,Math.floor((T-p.lt[0])/(p.lt[1]-p.lt[0])*9.999))):(p.full?9:0);const RT2=m=>M.chain(M.T(X,0,Z),M.RY(ry),M.RZ(tilt),m);
-   for(const q of [-1,1])D(G.box,RT2(M.chain(M.T(q*1.05,.95,0),M.S(.12,1.9,.12))),'#6B4423');
+   for(const q of [-1,1])D(G.box,RT2(M.chain(M.T(q*1.05,0,0),M.S(.12,2.85,.12))),'#6B4423');
    const key='ks'+lt+(p.old?1:0);const C=window.__KST||(window.__KST={});
    if(!C[key]){const cv=signCanvas(1024,320,(x,w,h)=>{x.fillStyle='#B98A55';x.fillRect(0,0,w,h);for(let i=0;i<7;i++){x.fillStyle=i%2?'#A97A47':'#C29360';x.fillRect(0,i*h/7,w,h/7-3)}
      const L='KOTA SENI'.split('');const cols=['#E53935','#FB8C00','#FDD835','#43A047','#00ACC1','#1E88E5','#8E24AA','#D81B60','#F4511E'];x.font='900 190px Bangers, Impact, sans-serif';x.textBaseline='middle';x.textAlign='center';let ci=0;
@@ -251,7 +251,10 @@ function __owlSil(p,T,t){let x=p.x,z=p.z;if(p.to){const u=Math.min(1,Math.max(0,
   D(G.sphHi,R(M.chain(M.T(.05,1.86,0),M.RZ(-.18),M.S(.62,.16,.58))),BT,NC);D(G.sph,R(M.chain(M.T(.08,2.02,0),M.S(.07,.08,.07))),BT,NC);
   const bl=(Math.sin(t*2.3)>.96)?.15:1;for(const s2 of [-1,1]){D(G.sph,R(M.chain(M.T(s2*.2,1.25,.64),M.S(.15,.17*bl,.08))),'#FFFFFF',NC);D(G.sph,R(M.chain(M.T(s2*.2,1.22+(p.sad?-.04:0),.71),M.S(.07,.08*bl,.04))),'#141018',NC);
    D(G.box,R(M.chain(M.T(s2*.2,1.46,.66),M.RZ(s2*(p.sad?-.35:.15)),M.S(.16,.035,.03))),BT,NC)}
-  if(p.sad)D(G.box,R(M.chain(M.T(0,1.0,.75),M.RZ(0),M.S(.16,.03,.02))),'#2A1638',NC);else D(G.sph,R(M.chain(M.T(0,1.02,.74),M.S(.09,.05,.03))),'#2A1638',NC);
+  const md=p.mouth||(p.sad?'sedih':'senyum');
+  if(md=='kaget'){D(G.sph,R(M.chain(M.T(0,1.0,.74),M.S(.14,.17,.06))),'#2A1638',NC);D(G.sph,R(M.chain(M.T(0,.94,.77),M.S(.08,.05,.03))),'#E0607A',NC)}
+  else{const sg=md=='sedih'?-1:1;for(let k=0;k<7;k++){const u=(k-3)/3;D(G.sph,R(M.chain(M.T(u*.2,1.05+sg*(-.07*(1-u*u)),.86-Math.abs(u)*.06),M.S(.045,.04,.03))),'#2A1638',NC)}}
+  D(G.box,R(M.chain(M.T(0,.62,.9),M.RZ(-.7),M.T(-.6,-.1,0),M.S(1.2,.2,.03))),'#C62828',NC);D(G.box,R(M.chain(M.T(0,.62,.92),M.RZ(-.7),M.T(-.32,-.08,0),M.S(.64,.16,.002))),'#FFFFFF',{tex:__bbTex('WALI KOTA','#FFD23F'),em:.5,cast:false});
   for(const s2 of [-1,1])D(G.sph,R(M.chain(M.T(s2*.8,.95,.05),M.RZ(s2*(mv?.9+Math.sin(t*12)*.3:.35)),M.T(0,-.28,0),M.S(.15,.3,.15))),B,NC);
   if(p.kuas){D(G.box,R(M.chain(M.T(.86,.7,.25),M.RZ(-.5),M.S(.05,.6,.05))),'#8A5A2B',NC);D(G.box,R(M.chain(M.T(1.08,1.12,.25),M.RZ(-.5),M.S(.1,.16,.08))),'#C9CFD6',NC);D(G.sphHi,R(M.chain(M.T(1.18,1.3,.25),M.S(.09,.1,.08))),'#E53935',NC)}
   if(p.roti)D(G.sphHi,R(M.chain(M.T(-.6,1.0,.5),M.RY(.4),M.S(.3,.18,.18))),'#C98A3B',NC);
