@@ -64,6 +64,15 @@ tr:last-child td{background:#B8352E}
 .btn:focus-visible{outline:3px solid var(--red)}
 .note{font-size:12px;color:var(--soft);font-weight:600;margin-top:16px;line-height:1.5}
 @media (prefers-reduced-motion:no-preference){.eyes span{animation:blink 4s infinite}@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}}
+.seg{background:var(--paper2);border-radius:14px;padding:12px;margin-bottom:10px}
+.seg h3{margin:0 0 8px;font:400 22px/1 Bangers,Impact,sans-serif;letter-spacing:.03em;display:flex;justify-content:space-between;align-items:baseline}
+.seg h3 small{font:800 12px Inter,sans-serif;color:var(--soft)}
+details.seg summary{cursor:pointer;list-style:none}
+details.seg summary::-webkit-details-marker{display:none}
+details.seg summary h3:after{content:"lihat semua ▾";font:800 12px Inter,sans-serif;color:var(--blue)}
+details.seg[open] summary h3:after{content:"tutup ▴"}
+details.seg .chips{margin-top:8px;max-height:420px;overflow:auto}
+.chip.hit{outline:3px solid var(--yel)}
 </style>
 </head>
 <body>
@@ -101,8 +110,15 @@ tr:last-child td{background:#B8352E}
   <h2>Antre minta jabatan <small>dari komen</small></h2>
   <div class="chips" id="antre"></div>
 
+  <h2>Warga baru <small>komen sejak kota hancur</small></h2>
+  <div class="chips" id="baru"></div>
+
   <h2>Peserta lomba kursi wapres</h2>
   <div class="chips" id="lomba"></div>
+
+  <h2>Warga lama <small>sebelum kota hancur</small></h2>
+  <p class="lead" style="margin:0 0 10px;font-size:14px">Warga yang udah daftar di Kota Seni versi pertama. Dikelompokin sesuai kawasannya. Nama lo aman, nggak ikut hancur.</p>
+  <div id="lama"><p class="lead" style="font-size:14px">Lagi buka arsip warga lama…</p></div>
 
   <h2>Kasus belum selesai</h2>
   <div class="misteri"><div class="eyes" aria-hidden="true"><span></span><span></span></div><div><b>Pencuri roti &amp; colokan</b><br>KETANGKEP CCTV di HARI 7: ternyata Vilindo, Wali Kota Kota Seni. Nasibnya ditentukan komen.</div></div>
@@ -140,9 +156,10 @@ const DATA={
   {n:'CCTV + jebakan roti',k:'HARI 7 · voting seri, dua-duanya dipasang: CCTV (nafis_saja) + roti (4aroeladeliatjan), dipasang Tukang raslowpeformm666'},
   {n:'Nasib Vilindo',k:'Selanjutnya · A maafin, balik jadi Wali Kota / B hukum jaga pos jaga tiap malam',next:1}
  ],
- antre:[['fani','guru'],['basskalbar','guru'],['ZZZZZZ','pemain bola no. 10'],['datboy.han','tukang kue'],['rinz_verse','menteri keuangan'],['raslowpeformm666','tukang'],['anak.sateronomi','wapres'],['cogan.elit.leon','naga pelindung kota'],['saka_satria8','astronot'],['auzankhalifalhapis','drummer & ketua band'],['iamrafiramzi18','penasihat President (warga lama, dulu pemain terompet)']],
+ antre:[['fani','guru'],['basskalbar','guru'],['ZZZZZZ','pemain bola no. 10'],['datboy.han','tukang kue'],['rinz_verse','menteri keuangan'],['raslowpeformm666','tukang'],['anak.sateronomi','wapres'],['cogan.elit.leon','naga pelindung kota'],['saka_satria8','astronot'],['auzankhalifalhapis','drummer & ketua band'],['iamrafiramzi18','penasihat President (warga lama, dulu pemain terompet)'],['only_regha','kuli bangunan (bayar pake gorengan & kopi)'],['raksyzzz','satpam'],['itz_raja54','penjaga pos jaga'],['karinaards','guru & bangun studio'],['dakwah.edit123','pelukis'],['vito00234','mekanik'],['gabriell_imulpp','polisi'],['014fik_4','damkar'],['f1mnx.new','kapten pemadam'],['ap.kaumon','kepala sekolah'],['akuituvrn','influencer kota'],['jovan_v3','pengelola gedung & warung'],['luki.aja.tuh','wapres'],['indyyyyyss','wapres'],['wirrzzz4','wapres'],['zheriun_3','buka warung makan']],
  lomba:['alvaro.alifiandra','basskalbar','idyysse','Luki aja tuh','bayupranata411','kenz_$$','mhmdf4qih_2'],
  pendiri:[["cokiramartin", "Editor"], ["tiaraaatj", "Head Creative"], ["drunkenvr", "Gitaris & Vokalis"], ["barralaode_", "Drummer"], ["idayuputriii_", "Editor"], ["kmeonn", "Ilustrator"], ["vynicholl_", "Editor"], ["yang_terkasihi", "Gitaris"], ["irfan_hbbi_", "Filmmaker"], ["johanes.nnd", "Tarot Reader"]],
+ baru:[['sup_ikan_goreng','HARI 6 · "ganti password aja min"'],['mldysbrn_','HARI 6 · nyari namanya, sekarang udah ada'],['parut172','HARI 4'],['vanzz.kicau','HARI 4 · "pertama bosz"'],['lira_suka_macha','HARI 3 · pilih pos ronda'],['zaki_kns','HARI 3'],['rrqalkabangka2','HARI 3 · pilih pos jaga'],['namonah66','HARI 2-3 · mau jadi ketua keamanan'],['syila_sila.imup','HARI 2'],['bintang.pamungkas468','HARI 1 · usul tempat ibadah semua agama (18 like)'],['sokhehs','HARI 1 · usul rumah sakit'],['usernamwr34','HARI 1 · usul rumah tiap warga'],['anid.nidaaaw','HARI 1 · usul mall'],['axe.god.fanzz','HARI 1'],['anzell.dheo','HARI 1'],['kadek.satria71','HARI 1'],['reyhansetacus','HARI 1'],['gruphospitalanimal','HARI 1'],['anasarfa16','HARI 1'],['sexacy','HARI 1'],['argacraft33','HARI 1'],['rehan__717','Kota hancur'],['danzzkece_217','Kota hancur · usul jalanan'],['sitimasitoh91712','Kota hancur'],['bliitzs2930','Kota hancur · usul sekolah'],['gw_bilal','Kota hancur · usul supermarket'],['fayeh.ansoly','Kota hancur · usul kosan hijau'],['atangv2','Kota hancur · usul rumah piano']],
  lain:['karinaards','mldysbrn_','vanzz.kicau','4aroeladeliatjan','DakWah','si noob main FF','nafis_saja','pulz1818','日號','corzzonn','imdayp0','_its.me.jihano','dndmnk_']
 };
 const $=id=>document.getElementById(id);
@@ -152,18 +169,38 @@ $('ngecas').innerHTML=DATA.ngecas.map(([j,n])=>`<tr><td>${j}</td><td>${esc(n)}</
 $('bangun').innerHTML=DATA.bangun.map(b=>`<li class="${b.next?'next':b.lost?'lost':''}"><b>${esc(b.n)}</b><small>${esc(b.k)}</small></li>`).join('');
 $('antre').innerHTML=DATA.antre.map(([u,j])=>`<span class="chip">@${esc(u)} <i>· ${esc(j)}</i></span>`).join('');
 $('pendiri').innerHTML=DATA.pendiri.map(([u,j])=>`<span class="chip" style="border-color:#d4a72c;background:#FFF3C4">👑 @${esc(u)} <i>· ${esc(j)}</i></span>`).join('');
+$('baru').innerHTML=DATA.baru.map(([u,k])=>`<span class="chip" data-u="${esc(u.toLowerCase())}">@${esc(u)} <i>· ${esc(k)}</i></span>`).join('');
 $('lomba').innerHTML=DATA.lomba.map(u=>`<span class="chip">@${esc(u)}</span>`).join('');
 const ALL=new Map();
 const add=(u,info)=>{const k=u.toLowerCase().replace(/^@/,'');if(!ALL.has(k))ALL.set(k,{u,info:[]});ALL.get(k).info.push(info)};
 DATA.pejabat.forEach(p=>add(p.u,p.role.toLowerCase()));DATA.ngecas.forEach(([j,n])=>{if(n!=='Warga lama')add(n.replace(' (maaf)',''),'jadwal ngecas jam '+j)});
 DATA.antre.forEach(([u,j])=>add(u,'antre jadi '+j));DATA.lomba.forEach(u=>add(u,'peserta lomba kursi wapres'));DATA.pendiri.forEach(([u,j])=>add(u,'Pendiri Kota ('+j+')'));DATA.lain.forEach(u=>add(u,'warga yang komen'));
-add('nafis_saja','pengusul rumah di bukit');
+add('nafis_saja','pengusul rumah di bukit');DATA.baru.forEach(([u,k])=>add(u,'warga baru ('+k+')'));
 $('nPejabat').textContent=DATA.pejabat.filter(p=>!p.calon&&p.role!=='PRESIDENT').length;$('nBangun').textContent=DATA.bangun.filter(b=>!b.next&&!b.lost).length;$('nWarga').textContent=ALL.size;
-function cari(){const q=$('q').value.trim().toLowerCase().replace(/^@/,'');document.querySelectorAll('.row').forEach(r=>r.classList.toggle('hit',!!q&&r.dataset.u.includes(q)));
+function cari(){const q=$('q').value.trim().toLowerCase().replace(/^@/,'');document.querySelectorAll('.row,.chip[data-u]').forEach(r=>r.classList.toggle('hit',!!q&&r.dataset.u.includes(q)));
+ const um=document.querySelector('#umum');if(um&&q&&um.querySelector('.chip.hit'))um.open=true;
  if(!q){$('hasil').textContent='';return}
  const m=[...ALL.entries()].filter(([k])=>k.includes(q));
  $('hasil').className=m.length?'ok':'no';
  $('hasil').textContent=m.length?m.slice(0,3).map(([k,v])=>'@'+v.u+' tercatat: '+[...new Set(v.info)].join(', ')).join(' · '):'Belum ketemu. Komen di video terbaru biar nama lo masuk.'}
+
+const SEG=[
+ ['Musik & Suara','🎵',/gitar|guitar|drum|bass|vokal|vocal|penyanyi|terompet|produser|musik|piano|keyboard|dj/i],
+ ['Visual & Desain','🎨',/ilustr|illustr|pelukis|galeri|foto|desain|design|gambar/i],
+ ['Film & Digital','🎬',/editor|film|produksi|creative|video|animat/i],
+ ['Panggung & Cerita','🎭',/sastra|penulis|tarot|teater|aktor|penari|dance/i],
+ ['Usaha & Jasa Kota','🏪',/barista|kasir|balap|toko|jualan/i]
+];
+const NOPE=new Set(['viralindongid','immanuelragil',...DATA.pendiri.map(x=>x[0])]);
+fetch('/warga.json').then(r=>r.json()).then(d=>{
+ const g=SEG.map(()=>[]),umum=[];
+ d.warga.forEach(w=>{if(NOPE.has(w.u))return;const i=SEG.findIndex(x=>x[2].test(w.p||''));
+  if(i<0){umum.push(w);add(w.u,'warga lama (Pusat Kota)')}else{g[i].push(w);add(w.u,'warga lama, '+SEG[i][0]+' ('+w.p+')')}});
+ const chip=w=>`<span class="chip" data-u="${esc(w.u.toLowerCase())}">@${esc(w.u)}${w.p&&!/^(warga|belum pilih profesi)$/i.test(w.p)?` <i>· ${esc(w.p)}</i>`:''}</span>`;
+ let h=SEG.map((x,i)=>g[i].length?`<div class="seg"><h3>${x[1]} ${x[0]} <small>${g[i].length} warga</small></h3><div class="chips">${g[i].map(chip).join('')}</div></div>`:'').join('');
+ h+=`<details class="seg" id="umum"><summary><h3>🏛️ Pusat Kota <small>${umum.length} warga</small></h3></summary><p class="lead" style="margin:0;font-size:13px">Warga lama yang belum milih profesi. Komen profesi seni lo di video terbaru biar pindah ke kawasan yang pas.</p><div class="chips">${umum.map(chip).join('')}</div></details>`;
+ $('lama').innerHTML=h;$('nWarga').textContent=ALL.size;cari();
+}).catch(()=>{$('lama').innerHTML='<p class="lead" style="font-size:14px">Arsip warga lama lagi nggak bisa dibuka. Coba refresh.</p>'});
 $('q').addEventListener('input',cari);$('cari').addEventListener('submit',e=>{e.preventDefault();cari()});
 </script>
 </body>
