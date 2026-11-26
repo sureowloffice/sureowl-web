@@ -219,6 +219,58 @@ function __propsF(K,T,t,man,REC){const NC={cast:false};const bx=(x,y,z,sx,sy,sz,
   if(p.type=='umpan'){const e=p.eat?Math.max(.15,1-Math.max(0,(T-p.eat)/1.2)):1;D(G.cyl16||G.cyl8,R(M.chain(M.S(.32,.04,.32))),'#F4F4F4',NC);D(G.sphHi,R(M.chain(M.T(0,.05,0),M.S(.26*e,.16*e,.16*e))),'#C98A3B',NC);D(G.sphHi,R(M.chain(M.T(0,.12*e,0),M.S(.2*e,.06*e,.12*e))),'#E3AE62',NC);if(p.ting)for(let k=0;k<3;k++){const q=((t*.8+k/3)%1);D(G.sph,R(M.chain(M.T(Math.sin(k*2+t)*.1,.25+q*.5,0),M.S(.03,.03,.03))),'#FFFFFF',{em:.6,alpha:(1-q)*.5,cast:false})}}
   if(p.type=='lahan'){D(G.box,R(M.chain(M.S(3.2,.02,2.4))),'#C9A97A',NC);for(const [q,w] of [[-1.6,0],[1.6,0]])D(G.box,R(M.chain(M.T(q,0,0),M.S(.06,.5,2.4))),'#E9E2D0',NC);for(const q of [-1.2,1.2])D(G.box,R(M.chain(M.T(0,0,q),M.S(3.2,.5,.06))),'#E9E2D0',NC);
    D(G.box,R(M.chain(M.T(-1.2,0,1.2),M.S(.08,1.4,.08))),'#7A5230',NC);D(G.box,R(M.chain(M.T(-1.2,1.15,1.24),M.S(1.3,.55,.04))),'#2B1F14',NC);D(G.box,R(M.chain(M.T(-1.2,1.17,1.265),M.S(1.22,.47,.002))),'#FFFFFF',{tex:__bbTex('LAHAN KOSONG','#FFD23F'),em:.6,cast:false})}
+  if(p.type=='ruangband'){const cl=v=>v<0?0:v>1?1:v,ee=q=>q*q*(3-2*q),pr=a=>a?cl((T-a[0])/Math.max(.01,a[1]-a[0])):(p.full?1:0);
+   const WD=window.__cineTexF;const wood=WD?{tex:WD('wood')}:{};const BW=3.4,BD=2.8,BH=2.4,hx=BW/2,hz=BD/2;
+   const fp=p.full?1:pr(p.bp),wp=p.full?1:ee(pr(p.bd)),rp=p.full?1:ee(pr(p.ba));
+   // pondasi
+   if(fp>0)b(0,0,0,BW*fp+.2*fp,.08,BD*fp+.2*fp,'#9E9A92');
+   const inHit=(p.hit||[]).some(h=>T>=h[0]&&T<h[1]);const lvlNow=(()=>{let L=0;for(const w of (p.waves||[]))if(T>=w[0]&&T<w[1])L=w[2];return L})();
+   if(wp>0){const wh=BH*wp,wc='#5B4B8A',ic='#3A3550';
+    // dinding belakang (luar ungu, dalam gelap)
+    b(0,.08,-hz,BW,wh,.1,wc,wood);b(0,.08,-hz+.06,BW-.2,wh,.02,ic);
+    // dinding kiri
+    b(-hx,.08,0,.1,wh,BD,wc,wood);b(-hx+.06,.08,0,.02,wh,BD-.2,ic);
+    // dinding kanan dengan pintu (z .15..1.05)
+    b(hx,.08,-.6,.1,wh,1.6,wc,wood);b(hx,.08,1.25,.1,wh,.3,wc,wood);if(wh>1.95)b(hx,1.95+.08,.6,.1,wh-1.95,.9,wc,wood);b(hx-.06,.08,-.6,.02,wh,1.4,ic);
+    // depan kaca
+    if(wp>.99){b(0,.08,hz,BW,.12,.1,'#2B2440');b(-hx+.05,.08,hz,.1,BH,.1,'#2B2440');b(hx-.05,.08,hz,.1,BH,.1,'#2B2440');b(0,BH-.04,hz,BW,.12,.1,'#2B2440');
+     D(G.box,R(M.chain(M.T(0,.2,hz),M.S(BW-.2,BH-.25,.02))),'#BFE6FF',{alpha:.14,cast:false,em:.2})}
+    // pintu + celah bawah
+    if(wp>.99){const kr=pr(p.karet);b(hx+.01,.14,.6,.08,1.81,.86,'#8A5A2B',wood);D(G.sph,R(M.chain(M.T(hx+.07,1.0,.3),M.S(.05,.05,.05))),'#E0B84A',NC);
+     if(kr>0)b(hx+.06,.08,.6+(.43*(1-kr)),.05,.06,.86*kr,'#151515');
+     // ventilasi di dinding belakang (luar)
+     const vp=pr(p.vent);b(.9,1.85,-hz-.06,.5,.3,.02,'#222');for(let k=0;k<4;k++)b(.9,1.88+k*.07,-hz-.075,.46,.025,.02,'#AAA');if(vp>0)b(.9,1.83+.34*(1-vp),-hz-.09,.56,.34*vp,.02,'#E9E2D0')}
+   }
+   if(rp>0){const dy=1.8*(1-rp)*(1-rp);b(0,BH+.08+dy,0,BW+.4,.16,BD+.4,'#3E2F66');for(const sz of [-1,1]){b(0,BH+.08+dy,sz*(BD/2+.2),BW+.44,.18,.04,'#FFD23F');}for(const sx of [-1,1])b(sx*(BW/2+.2),BH+.08+dy,0,.04,.18,BD+.44,'#FFD23F')}
+   // isi: busa, karpet, drum
+   if(wp>.99){const bu=pr(p.busa);if(bu>0){const N1=18,N2=12;const n1=Math.ceil(bu*(N1+N2));for(let k=0;k<Math.min(n1,N1);k++){const c=k%6,r=Math.floor(k/6);const px=-1.3+c*.52,py=.5+r*.56;const pop=cl((bu*(N1+N2)-k)/1.2);D(G.box,R(M.chain(M.T(px,py,-hz+.08),M.S(.48*pop,.5*pop,.06))),'#2B2B33',NC);for(const [qx,qy] of [[-.12,.12],[.12,.12],[-.12,.36],[.12,.36]])D(G.sph,R(M.chain(M.T(px+qx*pop,py+qy*pop,-hz+.14),M.S(.07*pop,.07*pop,.05))),'#35353F',NC)}
+      for(let k=0;k<Math.max(0,n1-N1);k++){const c=k%4,r=Math.floor(k/4);const pz=-.9+c*.55,py=.5+r*.56;const pop=cl((bu*(N1+N2)-N1-k)/1.2);D(G.box,R(M.chain(M.T(-hx+.1,py,pz),M.S(.06,.5*pop,.48*pop))),'#2B2B33',NC);for(const [qz,qy] of [[-.12,.12],[.12,.12],[-.12,.36],[.12,.36]])D(G.sph,R(M.chain(M.T(-hx+.16,py+qy*pop,pz+qz*pop),M.S(.05,.07*pop,.07*pop))),'#35353F',NC)}}
+    const kp=pr(p.karpet);if(kp>0){b(-1.3+1.3*kp,.08,-.2,2.6*kp,.035,2.0,'#B23A48');if(kp>.99)b(0,.115,-.2,2.3,.005,1.7,'#C9566A')}
+    const ky=kp>.99?.035:0;const dz=-.3;
+    // stool (di belakang drum)
+    D(G.cyl16||G.cyl8,R(M.chain(M.T(0,.08+ky,dz-.7),M.S(.04,.42,.04))),'#333',NC);D(G.cyl16||G.cyl8,R(M.chain(M.T(0,.5+ky,dz-.7),M.S(.2,.06,.2))),'#222',NC);
+    // bass drum, kepala depan ngadep kamera
+    const pz=1+(inHit?.04*Math.abs(Math.sin(t*19)):0);D(G.cyl16||G.cyl8,R(M.chain(M.T(0,.42+ky,dz-.2),M.RX(Math.PI/2),M.S(.34*pz,.36,.34*pz))),'#C62828',NC);D(G.cyl16||G.cyl8,R(M.chain(M.T(0,.42+ky,dz+.17),M.RX(Math.PI/2),M.S(.3*pz,.01,.3*pz))),'#F4F1EA',{cast:false,em:.15});
+    D(G.box,R(M.chain(M.T(0,.36+ky,dz+.19),M.S(.34,.12,.004))),'#FFFFFF',{tex:__bbTex('KOTA SENI','#E53935'),em:.4,cast:false});
+    for(const [dx,dy2,dz2,r,h,c] of [[-.38,.62,-.4,.17,.13,'#F4F1EA'],[.1,.8,-.15,.13,.12,'#C62828'],[.48,.42,-.45,.19,.32,'#C62828']]){D(G.cyl16||G.cyl8,R(M.chain(M.T(dx,ky+.08,dz+dz2),M.S(.015,dy2-.08,.015))),'#888',NC);D(G.cyl16||G.cyl8,R(M.chain(M.T(dx,dy2+ky,dz+dz2),M.S(r,h,r))),c,NC);D(G.cyl16||G.cyl8,R(M.chain(M.T(dx,dy2+h+ky,dz+dz2),M.S(r*.95,.005,r*.95))),'#FFFFFF',NC)}
+    for(const [dx,dz2,hy,ph] of [[-.65,-.15,1.05,0],[.7,-.2,1.15,1.7]]){D(G.cyl16||G.cyl8,R(M.chain(M.T(dx,.08+ky,dz+dz2),M.S(.015,hy-.08,.015))),'#888',NC);D(G.cyl16||G.cyl8,R(M.chain(M.T(dx,hy+ky,dz+dz2),M.RZ(.15*Math.sin(t*30+ph)*(inHit?1:0)+.05),M.S(.27,.012,.27))),'#E0B84A',{em:.1})}
+    // jadwal di dinding kanan luar
+    if(p.jadwal!=null&&T>=p.jadwal){const a=ee(cl((T-p.jadwal)/.35));const C=window.__JDW||(window.__JDW=texFromCanvas(signCanvas(512,384,(x,w,h)=>{x.fillStyle='#2F5D46';x.fillRect(0,0,w,h);x.lineWidth=18;x.strokeStyle='#8A5A2B';x.strokeRect(0,0,w,h);x.textAlign='center';x.fillStyle='#FFD23F';x.font='900 58px Bangers, Impact';x.fillText('JADWAL LATIHAN',w/2,80);x.fillStyle='#F4F1E6';x.font='900 72px Bangers, Impact';x.fillText('16.00 - 20.00',w/2,190);x.fillStyle='#FF8A80';x.font='900 44px Bangers, Impact';x.fillText('LEWAT JAM 20.00 = SENYAP',w/2,300)})));
+      D(G.box,R(M.chain(M.T(hx+.07,1.05+(1-a)*.4,-.5),M.RY(Math.PI/2),M.S(1.0*a,.75*a,.03))),'#FFFFFF',{tex:C,em:.5,cast:false})}
+    // papan nama
+    if(p.nama!=null&&T>=p.nama||p.namaFull){const a=p.namaFull?1:ee(cl((T-p.nama)/.4));D(G.box,R(M.chain(M.T(0,BH+.32,hz+.22),M.S(2.4*a,.5*a,.06))),'#2B1F14',NC);D(G.box,R(M.chain(M.T(0,BH+.35,hz+.26),M.S(2.3*a,.44*a,.002))),'#FFFFFF',{tex:__bbTex('RUANG BAND KOTA SENI','#FFD23F'),em:.6,cast:false})}
+    // pita
+    if(p.pita){const cut=T>=p.pita;const fall=cut?cl((T-p.pita)/.5):0;for(const sx of [-1,1]){b(sx*1.1,0,hz+.6,.06,.95,.06,'#E0B84A');D(G.box,R(M.chain(M.T(sx*1.1,.85,hz+.6),M.RZ(sx*fall*1.3),M.T(-sx*.55,0,0),M.S(1.1,.08,.02))),'#E53935',NC)}if(!cut)D(G.sph,R(M.chain(M.T(0,.85,hz+.62),M.S(.16,.12,.06))),'#C62828',NC)}
+    // lampu malam
+    if(window.__K3&&window.__K3.night)D(G.sph,R(M.chain(M.T(0,BH-.2,0),M.S(.18,.08,.18))),'#FFF3C4',{em:1,cast:false});
+   }
+   // gelombang suara
+   if(lvlNow>0){const col=lvlNow>.7?'#FF3B30':lvlNow>.35?'#FFCC00':'#34C759';for(let k=0;k<3;k++){const q=((t*.8+k/3)%1);const r=1.9+q*(1.5+5*lvlNow);const n=Math.round(14+r*6);for(let j=0;j<n;j++){const an=j/n*Math.PI*2;D(G.sph,R(M.chain(M.T(Math.cos(an)*r,1.3+Math.sin(an*3+t*4)*.05,Math.sin(an)*r),M.S(.11,.11,.11))),col,{alpha:(1-q)*.9,em:1,cast:false})}}}
+   // x-ray: suara bocor kayak air
+   if(p.xray&&T>=p.xray[0]&&T<p.xray[1]){const kr=pr(p.karet),vp=pr(p.vent);for(let k=0;k<14;k++){const q=((t*.7+k/14)%1);
+     if(kr<.95){D(G.sph,R(M.chain(M.T(hx+.1+q*1.6,.05+Math.sin(q*3)*.02,.25+((k*.37)%1)*.7),M.S(.09*(1-q*.5),.04,.09*(1-q*.5)))),'#3FA7FF',{alpha:.75*(1-q)*(1-kr),em:.7,cast:false})}
+     if(vp<.95){D(G.sph,R(M.chain(M.T(.75+((k*.53)%1)*.3,1.95-q*q*1.8,-hz-.12-q*.9),M.S(.08,.08*(1-q*.4),.08))),'#3FA7FF',{alpha:.75*(1-q)*(1-vp),em:.7,cast:false})}}}
+  }
   if(p.type=='posjaga'){const cl=v=>v<0?0:v>1?1:v,ee=q=>q*q*(3-2*q),pr=a=>a?cl((T-a[0])/Math.max(.01,a[1]-a[0])):(p.full?1:0);
    const g=p.full?1:pr(p.gali),tp=ee(pr(p.tiang)),at=ee(pr(p.atap)),mu=pr(p.mural);const WD=window.__cineTexF;const wood=WD?{tex:WD('wood')}:{};
    const CN=[[-.85,.6],[.85,.6],[-.85,-.6],[.85,-.6]];const digA=p.gali&&!p.full&&T>=p.gali[0]&&T<p.gali[1];
