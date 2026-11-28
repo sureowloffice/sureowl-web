@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#F4E9D2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=Bangers&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/main/game.css?v=5">
+<link rel="stylesheet" href="/main/game.css?v=6">
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -16,8 +16,8 @@
 
 <!-- HUD -->
 <div id="hud" class="hide">
-  <div class="card" id="clock"><div id="hDay">Semi · Hari 1</div><div id="hTime">06:00 <span id="hWx">☀️</span></div><div id="hMoney">💰 500</div></div>
-  <button id="bMute">🔊</button>
+  <div class="card" id="clock"><div id="hDay">Semi · Hari 1</div><div id="hTime">06:00 <span id="hWx">☀️</span></div><div id="hMoney">💰 500</div><div id="hZona"></div></div>
+  <button id="bMenu">☰</button><button id="bMute">🔊</button>
   <button id="bEmo">😊</button><button id="bMisi">📋</button><button id="bPeta">🗺️</button><button id="bCam">🎥</button><div id="emoBar" class="hide"></div><div id="kotaOn" class="hide"></div><div id="visitBar" class="hide"><span id="vName"></span><button id="vLike">❤️ 0</button></div>
   <div id="babCard" class="hide"></div>
   <div id="zoneFade"><div id="zT"></div><div id="zS"></div><div id="zBar"><i></i></div></div>
@@ -29,10 +29,10 @@
 <div id="ctl" class="hide">
   <div id="joy"><div id="knob"></div></div>
   <div id="btns">
-    <button id="bAlat" class="sm"><span id="toolIc">⛏️</span><small id="toolNm">Cangkul</small></button>
+    <button id="bAlat" class="sm">⇆<small>Ganti alat</small></button>
     <button id="bTas" class="sm">🎒<small>Tas</small></button>
-    <button id="bAksi" class="big b2">AKSI</button>
-    <button id="bPakai" class="big">PAKAI</button>
+    <div id="aksiHint" class="hide"></div><button id="bAksi" class="big b2">AKSI</button>
+    <button id="bPakai" class="big"><span id="toolIc">⛏️</span><small id="toolNm">Cangkul</small></button>
   </div>
 </div>
 
@@ -70,7 +70,7 @@
 <script>
 // Muat mesin yang sama dengan video reel, lalu tambal (bola halus, wajah & tangan versi film).
 (async()=>{
-  const V='?v=5';
+  const V='?v=6';
   const get=u=>fetch(u+V).then(r=>{if(!r.ok)throw new Error(u);return r.text()});
   const run=src=>{const s=document.createElement('script');s.textContent=src;document.body.appendChild(s)};
   let eng=await get('/engine.js');

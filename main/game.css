@@ -117,3 +117,19 @@ html,body{margin:0;height:100%;overflow:hidden;background:#BFE3FF;font-family:In
 #zoneFade.on{opacity:1;pointer-events:auto}
 #zBar{width:160px;height:6px;border-radius:4px;background:rgba(255,246,224,.15);margin-top:14px;overflow:hidden;display:none}#zoneFade.lama #zBar{display:block}
 #zBar i{display:block;height:100%;width:0;background:#FFD23F}#zBar.go i{animation:zb 1.1s ease-out forwards}@keyframes zb{to{width:100%}}
+
+/* ---- tombol disederhanakan ---- */
+#bMute,#bMisi,#bPeta,#bCam,#kotaOn{display:none!important}
+#bMenu{position:absolute;left:10px;top:calc(10px + env(safe-area-inset-top));pointer-events:auto;width:46px;height:46px;border-radius:14px;border:3px solid var(--ink);background:var(--krem);box-shadow:0 3px 0 var(--ink);font:900 22px Inter}
+#bEmo{left:64px!important;top:calc(10px + env(safe-area-inset-top))!important;width:46px!important;height:46px!important}
+#emoBar{left:118px!important;top:calc(10px + env(safe-area-inset-top))!important}
+#visitBar{top:calc(66px + env(safe-area-inset-top))!important}
+#hZona{font:800 11px Inter;color:#5A4630;margin-top:2px}
+#babCard{top:calc(122px + env(safe-area-inset-top))!important}
+#bPakai{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}#bPakai #toolIc{font-size:30px}#bPakai small{font:800 10px Inter;margin-top:2px}
+#bAksi{font-size:26px!important}#bAksi.on{animation:aglow 1.2s infinite}@keyframes aglow{50%{box-shadow:0 4px 0 var(--ink),0 0 0 8px rgba(159,224,176,.55)}}
+#aksiHint{position:absolute;right:0;bottom:176px;background:var(--ink);color:#FFF6E0;font:800 12px Inter;padding:4px 10px;border-radius:12px;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+#ctl.kota #bPakai,#ctl.kota #bAlat{display:none}#ctl.kota #bAksi{right:0;bottom:4px;width:96px;height:96px}#ctl.kota #aksiHint{right:0;bottom:108px}#ctl.kota #bAksi{font-size:30px!important}#ctl.kota #bTas{right:108px;bottom:8px}
+.mgrid,.igrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.mgrid button,.igrid button{border:3px solid var(--ink);background:#fff;border-radius:14px;padding:10px 6px;font:800 13px Inter;box-shadow:0 3px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:3px}
+.mgrid button b,.igrid button b{font-size:24px}
