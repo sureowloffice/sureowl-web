@@ -223,7 +223,7 @@ function room(t){const R=ROOM;D(G.box,M.chain(M.T(R.x,-.6,R.z),M.S(44,.5,44)),'#
  perabot(t);
  bx(-33.5,0,.6,.3,1.25,.3,'#5B3A1E');bx(-33.5,1.25,.6,.45,.3,.45,'#FFE8A3',{em:.9,cast:false})}
 function masukRumah(){INSIDE=true;P.x=RDOOR[0];P.z=RDOOR[1]-.6;P.yaw=Math.PI;cam.tx=P.x;cam.tz=P.z+.4;sfx('buka');hud();
- if(S.tut==6)say(['Ini rumah lo. Di dalem rumah jam berhenti, jadi santai aja.','Deketin kasur terus pencet AKSI buat tidur.'])}
+ if(S.tut==6)say(['Ini rumah lo. Di dalem rumah jam berhenti, jadi santai aja.','Deketin kasur terus pencet tombol bulet buat tidur.'])}
 function keluarRumah(){INSIDE=false;P.x=DOOR[0];P.z=DOOR[1]+.9;P.yaw=0;cam.tx=P.x;cam.tz=P.z+.4;sfx('buka');hud()}
 function aksiDalam(){if(Math.hypot(P.x-BED[0],P.z-BED[1])<2.0)return rumah();
  if(near(RDOOR,1.0))return pindah(keluarRumah,'🌱','Ke kebun');
@@ -231,7 +231,7 @@ function aksiDalam(){if(Math.hypot(P.x-BED[0],P.z-BED[1])<2.0)return rumah();
  if(Math.hypot(P.x+33.5,P.z-1.7)<1.4)return bikinAvatar(()=>toast('Tampilan baru, semangat baru!'));
  if(near(TVP,1.6)){const c=cuacaOf(S.day+1),q=tgl(S.day+1);return say(['📺 Ramalan cuaca besok ('+MUSIM[q.m]+' hari '+q.d+'): '+CUACA_IC[c]+' '+CUACA_NM[c]+'.'],'TV KOTA SENI')}
  if(Math.hypot(P.x+29.6,P.z+.4)<1.4)return renovasi();
- toast('Pencet AKSI deket kasur buat tidur, deket pintu buat keluar')}
+ toast('Deketin kasur buat tidur, deketin pintu buat keluar')}
 function tileDraw(x,z,T,t){const cx=x+.5,cz=z+.5;/*tile*/
  if(T.til)bx(cx,0,cz,.96,.06,.96,T.wet?'#6B4A2E':'#9C6B42',NC);
  if(T.t=='weed'){for(let k=0;k<3;k++)D(G.sph,M.chain(M.T(cx+(k-1)*.18,.12,cz+(k%2?.12:-.1)),M.S(.14,.2,.14)),'#5FA344',NC)}
@@ -283,7 +283,7 @@ const hourNow=()=>6+S.min/60;
 let VP=null;
 M.persp=(fy,a,n,f)=>{const q=1/Math.tan(fy/2);return [q/a,0,0,0,0,q,0,0,0,0,(f+n)/(n-f),-1,0,0,2*f*n/(n-f),0]};
 let CAMM='dekat';try{CAMM=localStorage.getItem('ks_cam')||'dekat'}catch(e){}
-const CAMNM={dekat:'Dekat',lebar:'Lebar',belakang:'Belakang badan (kayak GTA)'};
+const CAMNM={dekat:'Dekat',lebar:'Lebar',belakang:'Belakang'};
 const camBelakang=()=>CAMM==='belakang'&&!INSIDE&&!SPIN&&!INTRO&&S;
 function setCam(m){CAMM=m;try{localStorage.setItem('ks_cam',m)}catch(e){}if(m!=='belakang')cam.yaw=-.18;else cam.yaw=P.yaw+Math.PI;cam.dist=m==='lebar'?(TOUCH?30:26):(TOUCH?19:17);toast('🎥 Kamera: '+CAMNM[m])}
 function project(p){const x=VP[0]*p[0]+VP[4]*p[1]+VP[8]*p[2]+VP[12],y=VP[1]*p[0]+VP[5]*p[1]+VP[9]*p[2]+VP[13],w=VP[3]*p[0]+VP[7]*p[1]+VP[11]*p[2]+VP[15];if(w<=.05)return [-9999,-9999];return [(x/w*.5+.5)*innerWidth,(1-(y/w*.5+.5))*innerHeight]}
@@ -336,13 +336,13 @@ function tags(t){tag('pres','PRESIDENT',PNPC.show&&!INSIDE&&(PNPC.x<16.4)===(zon
 
 // ---------- input ----------
 const KEY=new Set();let JOY=[0,0];
-addEventListener('keydown',e=>{const k=e.key.toLowerCase();KEY.add(k);if(UI.dlg&&(k==' '||k=='e'||k=='enter')){dlgNext();e.preventDefault();return}if(UI.busy)return;if(k==' '){usePakai();e.preventDefault()}if(k=='e')useAksi();if(k=='q')nextTool();if(k=='i'||k=='tab'){openTas();e.preventDefault()}});
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();KEY.add(k);if(UI.dlg&&(k==' '||k=='e'||k=='enter')){dlgNext();e.preventDefault();return}if(UI.busy)return;if(k==' '||k=='e'){const c=pintar();if(c)jalanin(c);e.preventDefault()}if(k=='f')rodaBuka(rodaGaya(),innerWidth-80,innerHeight-80,true);if(k=='r'){const c=pintar();if(c&&c.k==='orang')rodaBuka(rodaOrang(c.r,c.npc),innerWidth-80,innerHeight-80,true)}if(k=='escape')rodaTutup();if(k=='i'||k=='tab'){openTas();e.preventDefault()}});
 addEventListener('keyup',e=>KEY.delete(e.key.toLowerCase()));
 {const j=$('joy'),kn=$('knob');let id=null,c=null;const R=50;
  j.addEventListener('pointerdown',e=>{id=e.pointerId;const b=j.getBoundingClientRect();c=[b.left+b.width/2,b.top+b.height/2];j.setPointerCapture(id);mv(e)});
  const mv=e=>{if(e.pointerId!==id)return;let dx=e.clientX-c[0],dy=e.clientY-c[1];const l=Math.hypot(dx,dy);if(l>R){dx*=R/l;dy*=R/l}kn.style.transform=`translate(${dx}px,${dy}px)`;JOY=[dx/R,dy/R]};
  j.addEventListener('pointermove',mv);const up=e=>{if(e.pointerId!==id)return;id=null;JOY=[0,0];kn.style.transform=''};j.addEventListener('pointerup',up);j.addEventListener('pointercancel',up)}
-$('bPakai').onclick=()=>{if(UI.dlg)return dlgNext();if(!UI.busy)usePakai()};$('bAksi').onclick=()=>{if(UI.dlg)return dlgNext();if(!UI.busy)useAksi()};$('bAlat').onclick=()=>{if(!UI.busy)nextTool()};$('bTas').onclick=()=>{if(!UI.busy)openTas()};
+$('bPakai').onclick=()=>{if(UI.dlg)return dlgNext();if(!UI.busy)usePakai()};$('bAlat').onclick=()=>{if(!UI.busy)nextTool()};$('bTas').onclick=()=>{if(!UI.busy)openTas()};
 $('dlg').onclick=()=>dlgNext();
 $('bMute').onclick=()=>{audioOn();setMute(!MUTE)};
 $('vLike').onclick=()=>sukaLahan();
@@ -350,7 +350,7 @@ $('bMenu').onclick=()=>{if(S&&!UI.busy)menu()};
 $('bCam').onclick=()=>{const L=['dekat','lebar','belakang'];setCam(L[(L.indexOf(CAMM)+1)%3])};
 $('bPeta').onclick=()=>{if(S&&!UI.busy)peta()};
 $('bMisi').onclick=()=>{if(S&&!UI.busy)panelMisi()};
-$('bEmo').onclick=()=>$('emoBar').classList.toggle('hide');$('emoBar').innerHTML=['👋','❤️','👏','😂','🔥','🎵'].map(e=>`<button>${e}</button>`).join('');$('emoBar').querySelectorAll('button').forEach(b=>b.onclick=()=>kirimEmo(b.textContent));setMute(MUTE);
+$('emoBar').innerHTML=['👋','❤️','👏','😂','🔥','🎵'].map(e=>`<button>${e}</button>`).join('');$('emoBar').querySelectorAll('button').forEach(b=>b.onclick=()=>kirimEmo(b.textContent));setMute(MUTE);
 
 // ---------- UI ----------
 const UI={busy:false,dlg:null,talking:null};
@@ -370,7 +370,7 @@ function junk(tiles){let n=0;for(const T of tiles)if(T.t)n++;return n}
 function pulih(){const j=junk(S.tiles);let pl=0;for(const T of S.tiles)if(T.c)pl++;return Math.round(60*Math.max(0,1-j/Math.max(1,S.j0||j))+40*Math.min(1,pl/96))}
 function pulihBar(){const p=pulih();return `<div class="pulih"><div>🌱 Lahan Pulih <b>${p}%</b></div><div class="bar"><i style="width:${p}%"></i></div><small>Bersihin rumput, batu, tunggul (60%) + tanami petak (40%).</small></div>`}
 function hud(){const q=tgl(S.day);$('hDay').textContent=MUSIM[q.m]+' · Hari '+q.d+(isBday()?' 🎂':'');const m=S.min+360;const hh=Math.floor(m/60)%24,mm=Math.floor(m%60/10)*10;$('hTime').firstChild.nodeValue=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+' ';$('hWx').textContent=S.cuaca==='hujan'?'🌧️':hourNow()>=19||hourNow()<5?'🌙':S.cuaca==='berawan'?'⛅':'☀️';$('hMoney').textContent='💰 '+S.money;
- const tl=TOOLS[S.tool];if(S.sel){$('toolIc').textContent=CROP[S.sel].ic;$('toolNm').textContent='Benih '+CROP[S.sel].nm}else{$('toolIc').textContent=tl.ic;$('toolNm').textContent=tl.nm}}
+}
 
 // ---------- aksi ----------
 function target(){const fx=Math.sin(P.yaw),fz=Math.cos(P.yaw);return [Math.floor(P.x+fx*.85),Math.floor(P.z+fz*.85)]}
@@ -508,7 +508,7 @@ function sleep(fainted,why){UI.busy=true;sfx('tidur');const line=TUT.sleepLine()
 function faint(){if(UI.busy)return;S.E=0;sleep(true)}
 
 // ---------- tur kota hari 1 (bisa dilewati) ----------
-function kasihAlat(){say(['Bantu gue balikin lahan ini, ya. Nih gue kasih CANGKUL, PENYIRAM, SABIT, KAPAK, sama PALU. Plus sekantong benih WORTEL.','Pertama, cabut rumput liar di petak yang gue tandain. Pegang SABIT (tombol ALAT), hadap rumputnya, terus pencet PAKAI.'],null,()=>{S.tut=1;S.tool=2;S.sel=null;hud();PNPC.tx=8;PNPC.tz=2.2})}
+function kasihAlat(){say(['Bantu gue balikin lahan ini, ya. Nih gue kasih CANGKUL, PENYIRAM, SABIT, KAPAK, sama PALU. Plus sekantong benih WORTEL.','Pertama, cabut rumput liar di petak yang gue tandain. Jalan ke rumputnya terus pencet tombol bulet gede di kanan bawah. Alatnya kepilih sendiri.'],null,()=>{S.tut=1;S.tool=2;S.sel=null;hud();PNPC.tx=8;PNPC.tz=2.2})}
 function tawarTur(){panel('TUR KOTA',`<div class="say"><b>President:</b> Mau gue ajak keliling kota dulu? Makan waktu kira-kira 2 jam (jam game).</div><button class="pri" id="bTur">🚶 Ikut tur</button><button class="ghost" id="bNoTur">Lewati, langsung kerja</button>`,kasihAlat);
  $('bTur').onclick=()=>{closePanel();tur(kasihAlat)};$('bNoTur').onclick=()=>{closePanel();kasihAlat()}}
 const TOUR=[{c:[33,.8],pn:[34.3,.6],pl:[32.7,1.1],t:['Ini TOKO BENIH. Buka jam 9 pagi sampe 5 sore.','Tiap hari ke-7 tokonya libur, jadi beli stok benih dari sehari sebelumnya.']},
@@ -531,15 +531,15 @@ const TUT={s:0,
   if(s==6)return INSIDE?[BED[0],1.4,BED[1]]:[DOOR[0],2.4,DOOR[1]];return null},
  talk(){const s=S.tut;
   if(s==0)return say(['Eh, lo warga baru ya? Selamat datang di Kota Seni!','Kota ini sempet hancur. Ini lahan lo. Dulu kebun paling rame se-Kota Seni.'],null,tawarTur);
-  const L={1:'Cabut rumput liarnya dulu pakai SABIT.',2:'Cangkul 9 petak yang gue tandain. Pegang CANGKUL, hadap petaknya, PAKAI.',3:'Buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. Langsung kesebar 3×3.',4:'Siram semua petaknya pakai PENYIRAM. Tanaman cuma tumbuh kalau disiram tiap hari.',5:'Cari 3 barang liar (jamur, bunga, buah) di lahan atau di kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore. Ke kota lewat gerbang KELUAR KE KOTA di timur lahan.',6:'Udah malem. Masuk rumah, deketin kasur, terus tidur. Besok siram lagi ya!'};
+  const L={1:'Cabut rumput liarnya dulu pakai SABIT.',2:'Gemburin 9 petak yang gue tandain. Hadap petaknya, pencet tombol bulet gede.',3:'Sekarang tanam benih WORTEL. Hadap tengah petak, pencet tombol bulet gede. Langsung kesebar 3×3.',4:'Siram semua petaknya. Tanaman cuma tumbuh kalau disiram tiap hari.',5:'Cari 3 barang liar (jamur, bunga, buah) di lahan atau di kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore. Ke kota lewat gerbang KELUAR KE KOTA di timur lahan.',6:'Udah malem. Masuk rumah, deketin kasur, terus tidur. Besok siram lagi ya!'};
   if(!L[s]&&S.tut>=99)hatiNgobrol('pres',PNPC.x,PNPC.z);
   say(L[s]?[L[s]]:[...(isBday()?['Selamat ulang tahun, @'+ME.u+'! Kota Seni ikut seneng.']:[]),lineOf('pres')])},
  ev(e,n){const s=S.tut;const done=()=>{const tg=this.target();return !tg};
-  if(s==1&&e=='rumput'&&done()){S.tut=2;S.tool=0;hud();say(['Mantap! Sekarang CANGKUL 9 petak itu. Tanahnya harus digemburin dulu sebelum ditanam.'])}
-  else if(s==2&&e=='cangkul'&&done()){S.tut=3;say(['Rapi! Sekarang buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak.'])}
-  else if(s==3&&e=='tanam'){S.tut=4;S.tool=1;hud();say(['Udah ketanem. Sekarang SIRAM semua petaknya pakai PENYIRAM.'])}
+  if(s==1&&e=='rumput'&&done()){S.tut=2;S.tool=0;hud();say(['Mantap! Sekarang gemburin 9 petak itu. Tanahnya harus digemburin dulu sebelum ditanam.'])}
+  else if(s==2&&e=='cangkul'&&done()){S.tut=3;say(['Rapi! Sekarang hadap tengah petak terus tanam benih WORTEL.'])}
+  else if(s==3&&e=='tanam'){S.tut=4;S.tool=1;hud();say(['Udah ketanem. Sekarang SIRAM semua petaknya.'])}
   else if(s==4&&e=='siram'&&done()){S.tut=5;for(let x=ST.x0;x<ST.x1;x++)for(let z=ST.z0;z<ST.z1;z++){const T=ti(x,z);if(T.c)T.c.age=CROP[T.c.k].grow-1}
-   say(['Kerja bagus! Ini benih spesial dari gue: besok pagi wortelnya udah bisa dipanen!','Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Ambil pakai AKSI.','Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Mau ke kota? Lewat gerbang KELUAR KE KOTA di timur lahan. Lo bakal muncul di depan rumah lo di kompleks.'],null,()=>{PNPC.tx=PLAZA[0]-1.2;PNPC.tz=PLAZA[1]+1.6})}
+   say(['Kerja bagus! Ini benih spesial dari gue: besok pagi wortelnya udah bisa dipanen!','Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Deketin terus pencet tombol bulet.','Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Mau ke kota? Lewat gerbang KELUAR KE KOTA di timur lahan. Lo bakal muncul di depan rumah lo di kompleks.'],null,()=>{PNPC.tx=PLAZA[0]-1.2;PNPC.tz=PLAZA[1]+1.6})}
   else if(s==5&&e=='jual'){const tot=Object.values(S.bin).reduce((a,b)=>a+b,0)+S.ship.reduce((a,b)=>a+b[1],0);if(tot>=3){S.tut=6;say(['Sip! Kotak jual dibayar jam 5 sore.','Kalau udah capek atau udah malem, masuk rumah terus tidur. Hari 1 lo nggak bakal pingsan, tenang.'])}}},
  sleepLine(){if(S.tut<99&&S.day<=2)return 'Besok pagi wortel lo udah siap panen. Jangan lupa!';const L=['Tanah yang disiram tiap hari, panennya nggak bohong.','Toko benih tutup tiap hari ke-7, beli stok dulu.','Bambu nanti bisa jadi suling di Studio. Lagi gue bangun!','Kalau capek, makan roti. Jangan sampe pingsan.'];return L[S.day%L.length]},
  onSleep(){if(S.tut<99&&S.tut>=4)S.tut=99},
@@ -551,7 +551,7 @@ const TUT={s:0,
   if(S.msgAyam==='lapar')q.push(cb=>say(['Ayam lo kelaperan semalem. Beli pakan di Pak Benih atau olah gandum di kandang.'],null,cb));else if(S.msgAyam==='telur')toast('🥚 Ayam lo bertelur! Ambil di kandang');
   if(S.day>=3&&!S.studioAnn)q.push(cb=>{S.studioAnn=1;say(['Kabar gembira! STUDIO udah buka, di utara jalan sebelah toko benih.','Di sana lo pilih seni lo sendiri: Musik, Lukis, Kriya, Videografer & Fotografer, Editor, atau Ilustrator.'],null,cb)});
   const run=()=>{const f=q.shift();if(f)f(run)};run()},
-morning2(cb){say(['Pagi! Wortel lo udah siap panen. Hadap tanamannya, pencet AKSI.','Besok STUDIO buka. Di sana lo pilih seni lo sendiri!','Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru.','Batu pakai PALU, tunggul pakai KAPAK. Hasilnya bisa dijual.'],null,cb)}};
+morning2(cb){say(['Pagi! Wortel lo udah siap panen. Hadap tanamannya, pencet tombol bulet.','Besok STUDIO buka. Di sana lo pilih seni lo sendiri!','Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru.','Batu sama tunggul tinggal deketin terus pencet tombol bulet. Hasilnya bisa dijual.'],null,cb)}};
 TUT.s=0;
 
 // ---------- ekosistem: waktu nyata, misi harian, festival, proyek, pameran, pasar, renovasi ----------
@@ -770,6 +770,63 @@ async function panelTeman(){panel('TEMAN','<div class="small">Memuat…</div>');
  const bl=(S.blokir||[]).map(u=>`<div class="row"><div class="ic">🚫</div><div class="tx">@${u}</div><button data-b="${u}">Buka</button></div>`).join('');
  panel('TEMAN',`<div class="small">Hati naik tiap hari kalau saling sapa, tos, tepuk, peluk, joget, atau kasih hadiah. Kenalan → Teman (❤️3) → Sahabat (❤️6) → Sahabat Sejati (❤️10).</div>`+rows+(bl?'<b>Diabaikan</b>'+bl:''));
  $('pBody').querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{S.blokir=(S.blokir||[]).filter(x=>x!==b.dataset.b);panelTeman()})}
+// ---------- tombol pintar: alat kepilih sendiri ----------
+let GOAL=null;
+const TIX=k=>TOOLS.findIndex(t=>t.k===k);
+function pakaiAlat(k){S.sel=null;S.tool=TIX(k);usePakai()}
+function benihCocok(){const m=tgl(S.day).m;if(S.sel&&S.inv[S.sel+'_b']&&MUSIMC[S.sel].includes(m))return S.sel;let b=null,n=0;for(const k in CROP)if(S.inv[k+'_b']>n&&MUSIMC[k].includes(m)){b=k;n=S.inv[k+'_b']}return b}
+function pintar(){if(!S)return null;const h=aksiHint();
+ if(zonaNow()==='kota'&&!INSIDE){for(const r of OTH.values())if(near([r.x,r.z],1.7))return {ic:'👋',nm:'Sapa @'+r.u,k:'orang',r,npc:false};for(const w of JALAN)if(near([w.x,w.z],1.5))return {ic:'👋',nm:'Sapa @'+w.u,k:'orang',r:w,npc:true}}
+ if(h){const i=h.indexOf(' ');return {ic:h.slice(0,i),nm:h.slice(i+1),k:'aksi',run:useAksi}}
+ if(INSIDE||zonaNow()!=='rumah')return null;
+ const [x,z]=target(),T=ti(x,z);if(!T)return null;
+ if(VISIT)return T.c&&!T.wet?{ic:'💧',nm:'Bantu siram',k:'alat',run:bantuSiram}:null;
+ if(T.t==='weed')return {ic:'🌾',nm:'Babat',k:'alat',run:()=>pakaiAlat('sabit')};
+ if(T.t==='rock')return {ic:'🔨',nm:'Pecahin',k:'alat',run:()=>pakaiAlat('palu')};
+ if(T.t==='stump')return {ic:'🪓',nm:'Tebang',k:'alat',run:()=>pakaiAlat('kapak')};
+ if(T.c&&!T.wet)return {ic:'💧',nm:'Siram',k:'alat',run:()=>pakaiAlat('siram')};
+ if(T.c)return {ic:'🌿',nm:'Lagi tumbuh',k:'diam'};
+ if(T.til){const b=benihCocok();if(b)return {ic:CROP[b].ic,nm:'Tanam '+CROP[b].nm,k:'alat',run:()=>{S.sel=b;usePakai()}};if(!T.wet)return {ic:'💧',nm:'Siram',k:'alat',run:()=>pakaiAlat('siram')};return {ic:'🌱',nm:'Butuh benih',k:'diam'}}
+ return {ic:'⛏️',nm:'Gemburin',k:'alat',run:()=>pakaiAlat('cangkul')}}
+function jalanin(c,tahan){if(!c)return;if(c.k==='orang'){if(!tahan)lakukan(c.r,'sapa',c.npc);return}if(c.run)c.run()}
+// ---------- roda pilihan (tahan → geser → lepas) ----------
+const RODA={el:null,it:[],sel:-1,sticky:false};
+function rodaBuka(items,ax,ay,sticky){rodaTutup();const W=innerWidth,H=innerHeight,R=Math.min(96,W*.24);const cx=Math.max(R+40,Math.min(W-R-40,ax-90)),cy=Math.max(R+80,Math.min(H-R-80,ay-190));
+ const el=document.createElement('div');el.id='roda';el.innerHTML=`<div class="rpus" style="left:${cx}px;top:${cy}px">✕</div>`+items.map((it,i)=>{const a=-Math.PI/2+i*2*Math.PI/items.length;it.x=cx+Math.cos(a)*R;it.y=cy+Math.sin(a)*R;return `<div class="rit" data-i="${i}" style="left:${it.x}px;top:${it.y}px"><b>${it.ic}</b>${it.nm}</div>`}).join('');
+ document.body.appendChild(el);RODA.el=el;RODA.it=items;RODA.sel=-1;RODA.sticky=!!sticky;
+ el.addEventListener('pointerdown',e=>{const d=e.target.closest('.rit');if(d){const it=items[+d.dataset.i];rodaTutup();it.fn()}else if(RODA.sticky)rodaTutup()})}
+function rodaGeser(x,y){if(!RODA.el)return;let b=-1,bd=52;RODA.it.forEach((it,i)=>{const d=Math.hypot(x-it.x,y-it.y);if(d<bd){bd=d;b=i}});if(b!==RODA.sel){RODA.sel=b;RODA.el.querySelectorAll('.rit').forEach((d,i)=>d.classList.toggle('on',i===b));if(b>=0)buzz(8)}}
+function rodaLepas(){if(!RODA.el)return;if(RODA.sel>=0){const it=RODA.it[RODA.sel];rodaTutup();it.fn()}else{RODA.sticky=true;RODA.el.classList.add('sticky')}}
+function rodaTutup(){if(RODA.el)RODA.el.remove();RODA.el=null;RODA.sel=-1}
+function rodaOrang(r,npc){const isT=TEMAN[r.u]!==undefined;const L=[['pukul','👊','Pukul'],['tos','✋','Tos'],['tepuk','👏','Tepuk'],['joget_req','💃','Joget'],...(npc?[]:[['peluk_req','🤗','Peluk'],['hadiah','🎁','Hadiah'],...(isT?[]:[['teman_req','❤️','Temenan']]),['lain','⋯','Lainnya']])];
+ return L.map(([a,ic,nm])=>({ic,nm,fn:()=>a==='lain'?interaksi(r,npc):lakukan(r,a,npc)}))}
+const GAYA=[['👋','Lambai','lambai'],['😂','Ketawa','semangat'],['👏','Tepuk','tepuk'],['💃','Joget','tari'],['❤️','Sayang','dada'],['🤔','Bingung','bingung'],['🙌','Hore','angkat'],['🔥','Semangat','semangat']];
+function gaya(i){const g=GAYA[i];gesMe(g[2],g[2]==='tari'?4:2);kirimEmo(g[0])}
+function rodaGaya(){return GAYA.map((g,i)=>({ic:g[0],nm:g[1],fn:()=>gaya(i)}))}
+// tombol bulet utama: ketuk = jalanin, tahan = ulang (alat) / roda (orang)
+{const b=$('bAksi');let id=null,tm=0,rep=0,c0=null,dn=0;
+ const stop=()=>{clearTimeout(tm);clearInterval(rep);tm=rep=0};
+ b.addEventListener('pointerdown',e=>{e.preventDefault();audioOn();if(UI.dlg){dlgNext();return}if(UI.busy||!S)return;id=e.pointerId;b.setPointerCapture(id);dn=performance.now();c0=pintar();GOAL=null;
+  if(c0&&c0.k==='orang'){tm=setTimeout(()=>{tm=0;const bb=b.getBoundingClientRect();rodaBuka(rodaOrang(c0.r,c0.npc),bb.left+bb.width/2,bb.top+bb.height/2)},280);return}
+  const ul=c=>c&&(c.k==='alat'||c.ic==='🧺');jalanin(c0);if(ul(c0))tm=setTimeout(()=>{rep=setInterval(()=>{if(UI.busy)return stop();const c=pintar();if(ul(c))c.run()},430)},380)});
+ b.addEventListener('pointermove',e=>{if(e.pointerId===id)rodaGeser(e.clientX,e.clientY)});
+ const up=e=>{if(e.pointerId!==id)return;id=null;const wasT=!!tm;stop();if(c0&&c0.k==='orang'){if(RODA.el)rodaLepas();else if(wasT)lakukan(c0.r,'sapa',c0.npc)}};
+ b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up)}
+// tombol Gaya: ketuk = lambai, tahan = roda gaya
+{const b=$('bEmo');let id=null,tm=0;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();if(!S||UI.busy)return;id=e.pointerId;b.setPointerCapture(id);tm=setTimeout(()=>{tm=0;const bb=b.getBoundingClientRect();rodaBuka(rodaGaya(),bb.left+bb.width/2,bb.top+bb.height/2)},260)});
+ b.addEventListener('pointermove',e=>{if(e.pointerId===id)rodaGeser(e.clientX,e.clientY)});
+ const up=e=>{if(e.pointerId!==id)return;id=null;if(tm){clearTimeout(tm);tm=0;gaya(0)}else rodaLepas()};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up)}
+// ketuk layar buat jalan (kamera Dekat & Lebar)
+function keTanah(sx,sy){const a=project([0,0,0]),bx=project([1,0,0]),bz=project([0,0,1]);const m00=bx[0]-a[0],m10=bx[1]-a[1],m01=bz[0]-a[0],m11=bz[1]-a[1],d=m00*m11-m01*m10;if(Math.abs(d)<1e-6)return null;const u=sx-a[0],v=sy-a[1];return [(u*m11-m01*v)/d,(m00*v-m10*u)/d]}
+function ketukLayar(sx,sy){if(!S||UI.busy||camBelakang()||RODA.el)return;const g=keTanah(sx,sy);if(!g)return;const [gx,gz]=g;const dk=(p,r)=>Math.hypot(gx-p[0],gz-p[1])<(r||1);
+ if(zonaNow()==='kota'&&!INSIDE){for(const r of OTH.values())if(dk([r.x,r.z],1.1)){GOAL={x:r.x,z:r.z,r:1.4,fx:r.x,fz:r.z,then:()=>{const bb=$('bAksi').getBoundingClientRect();rodaBuka(rodaOrang(r,false),bb.left+bb.width/2,bb.top+bb.height/2,true)}};return}
+  for(const w of JALAN)if(dk([w.x,w.z],1.1)){w.wait=8;GOAL={x:w.x,z:w.z,r:1.3,fx:w.x,fz:w.z,then:()=>{const bb=$('bAksi').getBoundingClientRect();rodaBuka(rodaOrang(w,true),bb.left+bb.width/2,bb.top+bb.height/2,true)}};return}}
+ const titik=[];if(!INSIDE){titik.push(DOOR,SHOP.benih.door,SHOP.roti.door,SHOP.studio.door,[PAPAN.proyek[0],PAPAN.proyek[1]+.8],[PAPAN.pameran[0],PAPAN.pameran[1]+.8],[PAPAN.pasar[0],PAPAN.pasar[1]+.8],BOXP);for(const n of NPCS)titik.push([n.x,n.z]);if(PNPC.show)titik.push([PNPC.x,PNPC.z]);for(const h of KSLOT)titik.push([h.x,h.z+1.25])}else titik.push(BED,RDOOR,TVP);
+ for(const q of titik)if(dk(q,.9)){GOAL={x:q[0],z:q[1],r:1.05,fx:q[0],fz:q[1],then:()=>{const c=pintar();if(c&&c.k==='aksi')c.run()}};return}
+ if(zonaNow()==='rumah'&&!INSIDE){const tx=Math.floor(gx),tz=Math.floor(gz),T=ti(tx,tz);if(T&&(T.t||T.c||T.til)){const cx=tx+.5,cz=tz+.5;let ax=P.x-cx,az=P.z-cz,ad=Math.hypot(ax,az)||1;GOAL={x:cx+ax/ad*.95,z:cz+az/ad*.95,r:.3,fx:cx,fz:cz,then:()=>{const c=pintar();if(c&&(c.k==='alat'||c.k==='aksi'))c.run()}};return}}
+ GOAL={x:gx,z:gz,r:.25}}
+{let d0=null;$('gl').addEventListener('pointerdown',e=>{d0=[e.clientX,e.clientY,performance.now()]});$('gl').addEventListener('pointerup',e=>{if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])<14&&performance.now()-d0[2]<450)ketukLayar(e.clientX,e.clientY);d0=null})}
 // ---------- petunjuk tombol AKSI (biar jelas mau ngapain) ----------
 function aksiHint(){if(!S||UI.busy)return '';const nr=(p,r)=>near(p,r);
  if(INSIDE){if(Math.hypot(P.x-BED[0],P.z-BED[1])<2)return '😴 Tidur';if(nr(RDOOR,1))return '🌱 Ke lahan';if(Math.hypot(P.x+26.45,P.z+.7)<1.5)return '🖼️ Rak pajang';if(Math.hypot(P.x+33.5,P.z-1.7)<1.4)return '🪞 Ganti tampilan';if(nr(TVP,1.6))return '📺 Ramalan cuaca';if(Math.hypot(P.x+29.6,P.z+.4)<1.4)return '🏠 Renovasi';return ''}
@@ -783,20 +840,20 @@ function aksiHint(){if(!S||UI.busy)return '';const nr=(p,r)=>near(p,r);
  if(S.kandang&&nr([KANDANG[0],KANDANG[1]+1.5],1.3))return '🐔 Kandang';if(nr(BOXP,1.6))return '📦 Kotak jual';
  if(zonaNow()==='rumah'){const [x,z]=target();const T=ti(x,z);if(T&&T.c&&T.c.ripe)return '🧺 Panen'}
  for(const f of S.fg)if(!f.got&&Math.hypot(P.x-f.x,P.z-f.z)<1)return '✋ Ambil';return ''}
-let hintT=0;function hintStep(dt){hintT+=dt;if(hintT<.2)return;hintT=0;const h=aksiHint(),el=$('aksiHint');if(el.textContent!==h)el.textContent=h;el.classList.toggle('hide',!h);$('bAksi').classList.toggle('on',!!h)}
+let hintT=0;function hintStep(dt){hintT+=dt;if(hintT<.15)return;hintT=0;const c=UI.dlg?{ic:'▶',nm:'Lanjut',k:'aksi'}:pintar();const ic=c?c.ic:'✋',nm=c?c.nm:'';if($('aIc').textContent!==ic)$('aIc').textContent=ic;if($('aNm').textContent!==nm)$('aNm').textContent=nm;const on=!!c&&c.k!=='diam';$('bAksi').classList.toggle('on',on);$('bAksi').classList.toggle('mati',!c||c.k==='diam')}
 // ---------- menu (semua tombol lain ngumpul di sini) ----------
 function menu(){panel('MENU',`<div class="mgrid">
  <button data-m="misi"><b>📋</b>Misi & Cerita</button><button data-m="teman"><b>👥</b>Teman</button><button data-m="peta"><b>🗺️</b>Peta</button><button data-m="tas"><b>🎒</b>Tas</button>
- <button data-m="cam"><b>🎥</b>Kamera: ${CAMNM[CAMM].split(' ')[0]}</button><button data-m="suara"><b>${MUTE?'🔇':'🔊'}</b>Suara ${MUTE?'mati':'nyala'}</button><button data-m="lite"><b>⚡</b>Mode ringan ${LITE?'nyala':'mati'}</button><button data-m="cara"><b>❓</b>Cara main</button></div>`);
+ <button data-m="cam"><b>🎥</b>Kamera: ${CAMNM[CAMM]}</button><button data-m="suara"><b>${MUTE?'🔇':'🔊'}</b>Suara ${MUTE?'mati':'nyala'}</button><button data-m="lite"><b>⚡</b>Mode ringan ${LITE?'nyala':'mati'}</button><button data-m="cara"><b>❓</b>Cara main</button></div>`);
  $('pBody').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const m=b.dataset.m;closePanel();
   if(m==='misi')panelMisi();else if(m==='teman')panelTeman();else if(m==='peta')peta();else if(m==='tas')openTas();
   else if(m==='cam'){const L=['dekat','lebar','belakang'];setCam(L[(L.indexOf(CAMM)+1)%3]);menu()}else if(m==='suara'){audioOn();setMute(!MUTE);menu()}else if(m==='lite'){setLite(!LITE);menu()}else if(m==='cara')caraMain()})}
-function caraMain(){panel('CARA MAIN',`<div class="row"><div class="ic">🕹️</div><div class="tx">Jalan<small>geser lingkaran kiri bawah (komputer: WASD)</small></div></div>
- <div class="row"><div class="ic">🟢</div><div class="tx">AKSI<small>ngobrol, masuk, panen, ambil, interaksi. Tulisan di atas tombol = yang bakal terjadi (komputer: E)</small></div></div>
- <div class="row"><div class="ic">⛏️</div><div class="tx">PAKAI<small>pakai alat ke petak di depan (komputer: Spasi). ⇆ ganti alat (Q)</small></div></div>
- <div class="row"><div class="ic">🎒</div><div class="tx">Tas<small>barang, benih, alat, kasih hadiah ke tokoh (I)</small></div></div>
- <div class="row"><div class="ic">🏡</div><div class="tx">Lahan ⇄ Kota<small>ke kota: gerbang KELUAR KE KOTA. Balik: pintu rumah lo di kompleks</small></div></div>
- <div class="row"><div class="ic">🤝</div><div class="tx">Warga lain<small>deketin di kota, pencet AKSI: sapa, tos, peluk, joget, pukul bercanda, hadiah, ajak temenan</small></div></div>`)}
+function caraMain(){panel('CARA MAIN',`<div class="row"><div class="ic">🕹️</div><div class="tx">Jalan<small>geser lingkaran kiri bawah. Kamera Dekat & Lebar: bisa juga ketuk tanah, avatar jalan sendiri (komputer: WASD)</small></div></div>
+ <div class="row"><div class="ic">🟢</div><div class="tx">Tombol bulet gede<small>gambarnya berubah sesuai yang ada di depan lo: Babat, Pecahin, Tebang, Gemburin, Tanam, Siram, Panen, Masuk, Ngobrol, Sapa. Tahan buat ngulang terus (komputer: E / Spasi)</small></div></div>
+ <div class="row"><div class="ic">👆</div><div class="tx">Ketuk barang<small>ketuk batu, rumput, tanaman, pintu, atau orang. Avatar jalan ke sana terus langsung ngerjain</small></div></div>
+ <div class="row"><div class="ic">😊</div><div class="tx">Gaya<small>ketuk = lambai. Tahan, geser ke gaya yang lo mau, lepas (komputer: F)</small></div></div>
+ <div class="row"><div class="ic">🤝</div><div class="tx">Ke warga lain<small>deketin, ketuk tombol bulet = sapa. Tahan tombol bulet, geser ke Pukul, Tos, Peluk, Joget, Hadiah, Temenan, lepas (komputer: R)</small></div></div>
+ <div class="row"><div class="ic">🎒</div><div class="tx">Tas<small>barang, benih (pilih benih yang mau ditanam), hadiah ke tokoh (I)</small></div></div>`)}
 // ---------- peta kota ----------
 function peta(){const k=6,ox=1.5,oz=7,X=x=>((x+ox)*k).toFixed(1),Z=z=>((z+oz)*k).toFixed(1);
  const r=WALK.filter(w=>w[0]>16).map(w=>`<rect x="${X(w[0])}" y="${Z(w[2])}" width="${((w[1]-w[0])*k).toFixed(1)}" height="${((w[3]-w[2])*k).toFixed(1)}" fill="#E8D5A8"/>`).join('');
@@ -831,8 +888,10 @@ function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1
  if(S&&!UI.busy){
   // gerak
   let ix=JOY[0],iz=JOY[1];if(KEY.has('a')||KEY.has('arrowleft'))ix-=1;if(KEY.has('d')||KEY.has('arrowright'))ix+=1;if(KEY.has('w')||KEY.has('arrowup'))iz-=1;if(KEY.has('s')||KEY.has('arrowdown'))iz+=1;
-  const l=Math.hypot(ix,iz);if(l>1){ix/=l;iz/=l}
-  const cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw);const wx=ix*cy+iz*sy,wz=-ix*sy+iz*cy;
+  let l=Math.hypot(ix,iz);if(l>1){ix/=l;iz/=l}
+  const cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw);let wx=ix*cy+iz*sy,wz=-ix*sy+iz*cy;
+  if(l>.15)GOAL=null;else if(GOAL){const gx=GOAL.x-P.x,gz=GOAL.z-P.z,gd=Math.hypot(gx,gz);if(gd<GOAL.r){const g=GOAL;GOAL=null;if(g.fx!=null)P.yaw=Math.atan2(g.fx-P.x,g.fz-P.z);if(g.then)g.then()}else{wx=gx/gd;wz=gz/gd;l=1;GOAL.st=(GOAL.st||0)+dt;if(GOAL.st>.5){if(Math.hypot(P.x-GOAL.px,P.z-GOAL.pz)<.15){GOAL=null;wx=wz=0;l=0}else{GOAL.st=0;GOAL.px=P.x;GOAL.pz=P.z}}}}
+  tag('goal','⬇',GOAL?[GOAL.x,.6,GOAL.z]:null,'goal');
   const sp=(S.E<30?2.2:3.3);P.vx=wx*sp;P.vz=wz*sp;
   if(l>.15){stepT-=dt;if(stepT<=0){stepT=S.E<30?.42:.3;sfx('langkah')}P.yaw=Math.atan2(wx,wz);const nx=P.x+P.vx*dt,nz=P.z+P.vz*dt;if(free(nx,P.z))P.x=nx;if(free(P.x,nz))P.z=nz}else{P.vx=P.vz=0}
   // waktu
@@ -868,7 +927,7 @@ function start(st){S=st;setTimeout(loadTeman,2500);cam.dist=CAMM==='lebar'?(TOUC
  if(S.tut>=99)PNPC.x=PNPC.tx=PLAZA[0]-1.2,PNPC.z=PNPC.tz=PLAZA[1]+1.6;
  $('gate').classList.add('hide');hud();
  const go=()=>{$('hud').classList.remove('hide');$('ctl').classList.remove('hide');hud();
-  const greet=()=>{if(S.tut===0)setTimeout(()=>say(['Halo! Gue President Kota Seni. Samperin gue di depan rumah lo, terus pencet AKSI.']),400)};
+  const greet=()=>{if(S.tut===0)setTimeout(()=>say(['Halo! Gue President Kota Seni. Samperin gue di depan rumah lo, terus pencet tombol bulet gede di kanan bawah.']),400)};
   if(!S.look)return bikinAvatar(go);
   if(S.tut>=99&&S.day>=3&&!S.studioAnn&&S.bday)setTimeout(()=>{S.studioAnn=1;say(['Kabar gembira! STUDIO udah buka, di utara jalan sebelah toko benih.','Di sana lo pilih seni lo sendiri: Musik, Lukis, Kriya, Videografer & Fotografer, Editor, atau Ilustrator.'])},600);
   if(!S.bday)return pickBday(()=>{if(isBday()&&S.bdGot!==S.day)bdayGift(greet);else greet()});

@@ -89,7 +89,6 @@ html,body{margin:0;height:100%;overflow:hidden;background:#BFE3FF;font-family:In
 #panel.ava #pHead{margin-bottom:4px}#panel.ava #pHead b{font-size:22px}
 .avr{display:flex;align-items:center;gap:8px;margin:2px 0}.avr>b{flex:0 0 58px;font:800 12px/1.15 Inter}.avr .sws{margin:0;flex:1;min-width:0}
 #panel.ava .sws{gap:5px;overflow:visible;flex-wrap:wrap}#panel.ava .sw{width:30px;height:30px;border-width:2px}#panel.ava .sws.txt .sw{width:auto;height:28px;padding:0 9px;font-size:11px}#panel.ava .pri{margin-top:8px}
-#bEmo{position:absolute;left:10px;top:calc(60px + env(safe-area-inset-top));pointer-events:auto;width:42px;height:42px;border-radius:50%;border:3px solid var(--ink);background:var(--krem);box-shadow:0 3px 0 var(--ink);font-size:20px}
 #emoBar{position:absolute;left:58px;top:calc(60px + env(safe-area-inset-top));pointer-events:auto;display:flex;gap:4px;background:var(--krem);border:3px solid var(--ink);border-radius:24px;padding:3px 6px;box-shadow:0 3px 0 var(--ink)}
 #emoBar.hide{display:none}#emoBar button{border:none;background:none;font-size:24px;width:36px;height:36px}
 #kotaOn{position:absolute;left:10px;top:calc(162px + env(safe-area-inset-top));max-width:60vw;background:rgba(255,246,224,.95);border:2px solid var(--ink);border-radius:14px;padding:3px 10px;font:800 11px Inter}
@@ -121,15 +120,22 @@ html,body{margin:0;height:100%;overflow:hidden;background:#BFE3FF;font-family:In
 /* ---- tombol disederhanakan ---- */
 #bMute,#bMisi,#bPeta,#bCam,#kotaOn{display:none!important}
 #bMenu{position:absolute;left:10px;top:calc(10px + env(safe-area-inset-top));pointer-events:auto;width:46px;height:46px;border-radius:14px;border:3px solid var(--ink);background:var(--krem);box-shadow:0 3px 0 var(--ink);font:900 22px Inter}
-#bEmo{left:64px!important;top:calc(10px + env(safe-area-inset-top))!important;width:46px!important;height:46px!important}
 #emoBar{left:118px!important;top:calc(10px + env(safe-area-inset-top))!important}
 #visitBar{top:calc(66px + env(safe-area-inset-top))!important}
 #hZona{font:800 11px Inter;color:#5A4630;margin-top:2px}
 #babCard{top:calc(122px + env(safe-area-inset-top))!important}
-#bPakai{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}#bPakai #toolIc{font-size:30px}#bPakai small{font:800 10px Inter;margin-top:2px}
-#bAksi{font-size:26px!important}#bAksi.on{animation:aglow 1.2s infinite}@keyframes aglow{50%{box-shadow:0 4px 0 var(--ink),0 0 0 8px rgba(159,224,176,.55)}}
-#aksiHint{position:absolute;right:0;bottom:176px;background:var(--ink);color:#FFF6E0;font:800 12px Inter;padding:4px 10px;border-radius:12px;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-#ctl.kota #bPakai,#ctl.kota #bAlat{display:none}#ctl.kota #bAksi{right:0;bottom:4px;width:96px;height:96px}#ctl.kota #aksiHint{right:0;bottom:108px}#ctl.kota #bAksi{font-size:30px!important}#ctl.kota #bTas{right:108px;bottom:8px}
+#ctl #bAksi{right:0;bottom:0;width:104px;height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;font:800 11px Inter!important;letter-spacing:0;padding:0 6px;touch-action:none;user-select:none;-webkit-user-select:none}
+#aIc{font-size:38px}#aNm{font:800 11px Inter;margin-top:3px;max-width:94px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bAksi.on{animation:aglow 1.4s infinite}#bAksi.mati{opacity:.75}@keyframes aglow{50%{box-shadow:0 4px 0 var(--ink),0 0 0 8px rgba(159,224,176,.55)}}
+#ctl #bEmo{position:absolute;right:112px;bottom:6px;left:auto;top:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+#ctl #bTas{right:20px;bottom:116px}
+#btns .hide{display:none!important}
 .mgrid,.igrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
 .mgrid button,.igrid button{border:3px solid var(--ink);background:#fff;border-radius:14px;padding:10px 6px;font:800 13px Inter;box-shadow:0 3px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:3px}
 .mgrid button b,.igrid button b{font-size:24px}
+#roda{position:fixed;inset:0;z-index:20;background:rgba(20,12,4,.25);touch-action:none}
+#roda .rit,#roda .rpus{position:absolute;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;border:3px solid var(--ink);background:var(--krem);box-shadow:0 3px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 10px Inter;color:var(--ink);transition:transform .08s}
+#roda .rit b{font-size:24px;line-height:1.1}
+#roda .rit.on{background:var(--emas);transform:translate(-50%,-50%) scale(1.22)}
+#roda .rpus{width:40px;height:40px;font-size:16px;background:#fff;opacity:.8}
+.tag.goal{background:none;border:0;font-size:20px;box-shadow:none;animation:gbob .6s infinite alternate}@keyframes gbob{to{margin-top:-6px}}

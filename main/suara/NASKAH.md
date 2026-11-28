@@ -9,7 +9,7 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | Kode | Kalimat |
 |---|---|
 | p18afe20 | Bantu gue balikin lahan ini, ya. Nih gue kasih CANGKUL, PENYIRAM, SABIT, KAPAK, sama PALU. Plus sekantong benih WORTEL. |
-| p1qvghxw | Pertama, cabut rumput liar di petak yang gue tandain. Pegang SABIT (tombol ALAT), hadap rumputnya, terus pencet PAKAI. |
+| p1bryr04 | Pertama, cabut rumput liar di petak yang gue tandain. Jalan ke rumputnya terus pencet tombol bulet gede di kanan bawah. Alatnya kepilih sendiri. |
 | p1y5xpbp | Ini TOKO BENIH. Buka jam 9 pagi sampe 5 sore. |
 | p1s9tu0y | Tiap hari ke-7 tokonya libur, jadi beli stok benih dari sehari sebelumnya. |
 | pb8awu9 | Ini TOKO ROTI punya Bu Roti. Roti bikin tenaga lo balik. |
@@ -21,16 +21,16 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | ps6vf3k | Eh, lo warga baru ya? Selamat datang di Kota Seni! |
 | pfn5npk | Kota ini sempet hancur. Ini lahan lo. Dulu kebun paling rame se-Kota Seni. |
 | pg8qhl2 | Cabut rumput liarnya dulu pakai SABIT. |
-| p1esg135 | Cangkul 9 petak yang gue tandain. Pegang CANGKUL, hadap petaknya, PAKAI. |
-| p128rfse | Buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. Langsung kesebar 3×3. |
-| p1cekebk | Siram semua petaknya pakai PENYIRAM. Tanaman cuma tumbuh kalau disiram tiap hari. |
+| p1uyu2sf | Gemburin 9 petak yang gue tandain. Hadap petaknya, pencet tombol bulet gede. |
+| plqymx9 | Sekarang tanam benih WORTEL. Hadap tengah petak, pencet tombol bulet gede. Langsung kesebar 3×3. |
+| p197p5jb | Siram semua petaknya. Tanaman cuma tumbuh kalau disiram tiap hari. |
 | p1w9lft6 | Cari 3 barang liar (jamur, bunga, buah) di lahan atau di kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore. Ke kota lewat gerbang KELUAR KE KOTA di timur lahan. |
 | ptyfev4 | Udah malem. Masuk rumah, deketin kasur, terus tidur. Besok siram lagi ya! |
-| p175d72g | Mantap! Sekarang CANGKUL 9 petak itu. Tanahnya harus digemburin dulu sebelum ditanam. |
-| pl2pxfc | Rapi! Sekarang buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. |
-| pwdtkmv | Udah ketanem. Sekarang SIRAM semua petaknya pakai PENYIRAM. |
+| p1ufdgnw | Mantap! Sekarang gemburin 9 petak itu. Tanahnya harus digemburin dulu sebelum ditanam. |
+| p16hon2l | Rapi! Sekarang hadap tengah petak terus tanam benih WORTEL. |
+| p16zi67k | Udah ketanem. Sekarang SIRAM semua petaknya. |
 | p9qf74y | Kerja bagus! Ini benih spesial dari gue: besok pagi wortelnya udah bisa dipanen! |
-| pa0n3vy | Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Ambil pakai AKSI. |
+| pybh9gq | Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Deketin terus pencet tombol bulet. |
 | p94s5wj | Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Mau ke kota? Lewat gerbang KELUAR KE KOTA di timur lahan. Lo bakal muncul di depan rumah lo di kompleks. |
 | p16d6bw4 | Sip! Kotak jual dibayar jam 5 sore. |
 | p1uxd3wh | Kalau udah capek atau udah malem, masuk rumah terus tidur. Hari 1 lo nggak bakal pingsan, tenang. |
@@ -47,10 +47,10 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | p1dkvg8m | 🥚 Ayam lo bertelur! Ambil di kandang |
 | p17n78ju | Kabar gembira! STUDIO udah buka, di utara jalan sebelah toko benih. |
 | p1ox1bqf | Di sana lo pilih seni lo sendiri: Musik, Lukis, Kriya, Videografer & Fotografer, Editor, atau Ilustrator. |
-| p189mzn3 | Pagi! Wortel lo udah siap panen. Hadap tanamannya, pencet AKSI. |
+| puqyn7m | Pagi! Wortel lo udah siap panen. Hadap tanamannya, pencet tombol bulet. |
 | p1lf80fg | Besok STUDIO buka. Di sana lo pilih seni lo sendiri! |
 | p1ei1wcb | Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru. |
-| p1tlipca | Batu pakai PALU, tunggul pakai KAPAK. Hasilnya bisa dijual. |
+| pgk6zo3 | Batu sama tunggul tinggal deketin terus pencet tombol bulet. Hasilnya bisa dijual. |
 | p4a6l7u | Semangat! Lahan ini makin cakep tiap hari. |
 | pxr7u29 | Batu pakai PALU, tunggul pakai KAPAK. Makin bersih, makin luas kebun lo. |
 | pfumkd | Liat "Lahan Pulih" di TAS. Itu nilai lahan lo di mata gue. |
@@ -59,5 +59,5 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | povj1v6 | Studio buat bikin suling lagi gue bangun. Tunggu ya! |
 | p18jr4q8 | Jangan begadang. Jam 2 pagi lo bakal ketiduran di luar. |
 | p1tzoxvt | Ini rumah lo. Di dalem rumah jam berhenti, jadi santai aja. |
-| p1olq9t5 | Deketin kasur terus pencet AKSI buat tidur. |
-| pixsd04 | Halo! Gue President Kota Seni. Samperin gue di depan rumah lo, terus pencet AKSI. |
+| p15tqtt0 | Deketin kasur terus pencet tombol bulet buat tidur. |
+| ps4ra01 | Halo! Gue President Kota Seni. Samperin gue di depan rumah lo, terus pencet tombol bulet gede di kanan bawah. |
