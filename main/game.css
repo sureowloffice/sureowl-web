@@ -109,3 +109,4 @@ html,body{margin:0;height:100%;overflow:hidden;background:#BFE3FF;font-family:In
 #babCard{position:absolute;right:10px;top:calc(104px + env(safe-area-inset-top));max-width:58vw;background:rgba(255,246,224,.96);border:2px solid var(--ink);border-radius:12px;padding:5px 9px;font:700 11px/1.3 Inter;text-align:right;box-shadow:0 2px 0 var(--ink)}
 #babCard small{font-weight:600;color:#5A4630}
 .tag.jalan{background:#F1F1F1;font-size:10px;opacity:.9}
+#bPeta{position:absolute;left:58px;top:calc(110px + env(safe-area-inset-top));pointer-events:auto;width:42px;height:42px;border-radius:50%;border:3px solid var(--ink);background:var(--krem);box-shadow:0 3px 0 var(--ink);font-size:19px}

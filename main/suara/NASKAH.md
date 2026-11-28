@@ -16,8 +16,8 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | pjk2qpw | Gandum lo jual ke Bu Roti aja, harganya lebih bagus dari kotak jual. |
 | p11h1e09 | Ini ALUN-ALUN. Tiap Sabtu malam nanti ada festival di sini. |
 | p1u21t54 | Yang di kursi emas itu Wapres. Kerjaannya jagain kursi. Serius. |
-| p1wlrunz | Rumah-rumah ini punya warga asli Kota Seni. Namanya ganti tiap hari, mampir aja kapan-kapan. |
-| p9cegnc | Udah, balik ke lahan yuk. Kerjaan nunggu! |
+| p1vrgug5 | Ini gerbang KOMPLEKS WARGA. Tiap blok isinya warga sesuai seninya. |
+| plhyu31 | Ketuk rumah warga buat main ke lahan mereka. Udah, balik ke lahan yuk! |
 | ps6vf3k | Eh, lo warga baru ya? Selamat datang di Kota Seni! |
 | pfn5npk | Kota ini sempet hancur. Ini lahan lo. Dulu kebun paling rame se-Kota Seni. |
 | pg8qhl2 | Cabut rumput liarnya dulu pakai SABIT. |
@@ -41,6 +41,10 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | p8i29s4 | Kalau capek, makan roti. Jangan sampe pingsan. |
 | pzavy86 | Waduh. Udah 7 hari lo nggak berkarya, alat seni lo hilang. |
 | p1p05hk1 | Sekarang lo warga biasa lagi. Ke Studio, bawa bahan tugasnya, nanti dikasih alat baru. |
+| p1tt4mf4 | Musim Dingin: cuma bambu yang tumbuh. Saatnya fokus berkarya di Studio! |
+| pgoacff | 🌧️ Hujan! Semua tanaman lo kesiram alam hari ini |
+| p1g90ppx | Ayam lo kelaperan semalem. Beli pakan di Pak Benih atau olah gandum di kandang. |
+| p1dkvg8m | 🥚 Ayam lo bertelur! Ambil di kandang |
 | p17n78ju | Kabar gembira! STUDIO udah buka, di utara jalan sebelah toko benih. |
 | p1ox1bqf | Di sana lo pilih seni lo sendiri: Musik, Lukis, Kriya, Videografer & Fotografer, Editor, atau Ilustrator. |
 | p189mzn3 | Pagi! Wortel lo udah siap panen. Hadap tanamannya, pencet AKSI. |
