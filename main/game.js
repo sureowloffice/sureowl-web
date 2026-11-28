@@ -179,7 +179,7 @@ function pagarKota(){for(const [x0,z0,x1,z1] of PAGAR){const L=Math.hypot(x1-x0,
   D(G.box,M.chain(M.T(cx,0,cz),M.RY(a),M.S(.5,.62,L+.3)),'#4E8F3A',{});D(G.box,M.chain(M.T(cx,.62,cz),M.RY(a),M.S(.56,.1,L+.36)),'#5FA344',NC)}
  for(const [x,z,tx,c] of ARAH){bx(x,0,z,.1,1.4,.1,'#5B3A1E');D(G.box,M.chain(M.T(x,1.25,z+.06),M.S(1.3,.34,.04)),'#FFFFFF',{tex:sign(tx,c),em:.4,cast:false})}
  for(const s2 of [-1,1])bx(24+s2*1.25,0,7.7,.2,2.4,.2,'#8E5A3B');bx(24,2.4,7.7,2.9,.18,.22,'#8E5A3B');D(G.box,M.chain(M.T(24,2.05,7.76),M.S(2.3,.42,.04)),'#FFFFFF',{tex:sign('KOMPLEKS WARGA','#D7DDF5'),em:.4,cast:false})}
-function papan(t){pagarKota();for(const [x,z,nm,c] of Object.values(PAPAN)){for(const s of [-1,1])bx(x+s*.62,0,z,.1,1.5,.1,'#5B3A1E');bx(x,.75,z,1.5,.75,.08,'#7A4B22');
+function papan(t){pagarKota();gerbangDraw();for(const [x,z,nm,c] of Object.values(PAPAN)){for(const s of [-1,1])bx(x+s*.62,0,z,.1,1.5,.1,'#5B3A1E');bx(x,.75,z,1.5,.75,.08,'#7A4B22');
   D(G.box,M.chain(M.T(x,1.12,z+.05),M.S(1.36,.4,.02)),'#FFFFFF',{tex:sign(nm,c),em:.4,cast:false});bx(x,.8,z+.05,1.3,.28,.02,'#FFF6E0',{em:.25,cast:false})}
  if(PRO.done){const g=PANGGUNG;bx(g.x,0,g.z,g.w,.5,g.d,'#8E5A3B');bx(g.x,.5,g.z,g.w-.1,.05,g.d-.1,'#C08A52');for(const s of [-1,1])bx(g.x+s*(g.w/2-.1),0,g.z-g.d/2+.1,.12,2.4,.12,'#5B3A1E');
   bx(g.x,2.3,g.z-g.d/2+.1,g.w,.12,.12,'#5B3A1E');D(G.box,M.chain(M.T(g.x,2.05,g.z-g.d/2+.12),M.S(2.6,.4,.03)),'#FFFFFF',{tex:sign('PANGGUNG KOTA','#FFD23F'),em:.5,cast:false})}
@@ -281,7 +281,12 @@ const hourNow=()=>6+S.min/60;
 
 // ---------- render ----------
 let VP=null;
-function project(p){const x=VP[0]*p[0]+VP[4]*p[1]+VP[8]*p[2]+VP[12],y=VP[1]*p[0]+VP[5]*p[1]+VP[9]*p[2]+VP[13],w=VP[3]*p[0]+VP[7]*p[1]+VP[11]*p[2]+VP[15];return [(x/w*.5+.5)*innerWidth,(1-(y/w*.5+.5))*innerHeight]}
+M.persp=(fy,a,n,f)=>{const q=1/Math.tan(fy/2);return [q/a,0,0,0,0,q,0,0,0,0,(f+n)/(n-f),-1,0,0,2*f*n/(n-f),0]};
+let CAMM='dekat';try{CAMM=localStorage.getItem('ks_cam')||'dekat'}catch(e){}
+const CAMNM={dekat:'Dekat',lebar:'Lebar',belakang:'Belakang badan (kayak GTA)'};
+const camBelakang=()=>CAMM==='belakang'&&!INSIDE&&!SPIN&&!INTRO&&S;
+function setCam(m){CAMM=m;try{localStorage.setItem('ks_cam',m)}catch(e){}if(m!=='belakang')cam.yaw=-.18;else cam.yaw=P.yaw+Math.PI;cam.dist=m==='lebar'?(TOUCH?30:26):(TOUCH?19:17);toast('🎥 Kamera: '+CAMNM[m])}
+function project(p){const x=VP[0]*p[0]+VP[4]*p[1]+VP[8]*p[2]+VP[12],y=VP[1]*p[0]+VP[5]*p[1]+VP[9]*p[2]+VP[13],w=VP[3]*p[0]+VP[7]*p[1]+VP[11]*p[2]+VP[15];if(w<=.05)return [-9999,-9999];return [(x/w*.5+.5)*innerWidth,(1-(y/w*.5+.5))*innerHeight]}
 function render(t){
  DL=[];
  if(INSIDE)room(t);else{
@@ -310,7 +315,8 @@ function render(t){
  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
  gl.disable(gl.DEPTH_TEST);gl.useProgram(P_SKY.p);gl.uniform3fv(P_SKY.u.uTop,L.top);gl.uniform3fv(P_SKY.u.uHor,L.hor);bindGeo(skyQ);gl.drawArrays(gl.TRIANGLES,0,6);gl.enable(gl.DEPTH_TEST);
  const asp=W/H;const cp=[cam.tx+Math.sin(cam.yaw)*Math.cos(cam.pitch)*cam.dist,cam.ty+Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*Math.cos(cam.pitch)*cam.dist];
- const tg3=[cam.tx,cam.ty,cam.tz];const far=add(tg3,scl(norm(sub(cp,tg3)),80));const V=M.look(far,tg3,[0,1,0]);const hh=HALF(cam.dist)*(asp<1?1:.8);VP=M.mul(M.ortho(-hh*asp,hh*asp,-hh,hh,1,220),V);
+ if(camBelakang()){const ex=P.x+Math.sin(cam.yaw)*5,ez=P.z+Math.cos(cam.yaw)*5;cp[0]=ex;cp[1]=2.9;cp[2]=ez;VP=M.mul(M.persp(1.05,asp,.1,260),M.look(cp,[P.x-Math.sin(cam.yaw)*1.5,1.0,P.z-Math.cos(cam.yaw)*1.5],[0,1,0]))}
+ else{const tg3=[cam.tx,cam.ty,cam.tz];const far=add(tg3,scl(norm(sub(cp,tg3)),80));const V=M.look(far,tg3,[0,1,0]);const hh=HALF(cam.dist)*(asp<1?1:.8);VP=M.mul(M.ortho(-hh*asp,hh*asp,-hh,hh,1,220),V)}
  const u=P_MAIN.u;gl.useProgram(P_MAIN.p);gl.uniformMatrix4fv(u.uVP,false,VP);gl.uniformMatrix4fv(u.uLVP,false,LVP);gl.uniform3fv(u.uSun,sun);gl.uniform3fv(u.uSunC,L.sunC);
  gl.uniform3fv(u.uSky,L.sky);gl.uniform3fv(u.uGnd,L.gnd);gl.uniform3fv(u.uFog,L.fog);gl.uniform1f(u.uFogN,140);gl.uniform1f(u.uFogF,300);gl.uniform3fv(u.uCam,cp);gl.uniform1f(u.uShRes,SHS);
  gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,shTex);gl.uniform1i(u.uSh,0);gl.uniform1i(u.uTex,1);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
@@ -340,6 +346,7 @@ $('bPakai').onclick=()=>{if(UI.dlg)return dlgNext();if(!UI.busy)usePakai()};$('b
 $('dlg').onclick=()=>dlgNext();
 $('bMute').onclick=()=>{audioOn();setMute(!MUTE)};
 $('vLike').onclick=()=>sukaLahan();
+$('bCam').onclick=()=>{const L=['dekat','lebar','belakang'];setCam(L[(L.indexOf(CAMM)+1)%3])};
 $('bPeta').onclick=()=>{if(S&&!UI.busy)peta()};
 $('bMisi').onclick=()=>{if(S&&!UI.busy)panelMisi()};
 $('bEmo').onclick=()=>$('emoBar').classList.toggle('hide');$('emoBar').innerHTML=['👋','❤️','👏','😂','🔥','🎵'].map(e=>`<button>${e}</button>`).join('');$('emoBar').querySelectorAll('button').forEach(b=>b.onclick=()=>kirimEmo(b.textContent));setMute(MUTE);
@@ -700,6 +707,14 @@ function bantuSiram(){const [x,z]=target();const i=x*FD+z,T=x>=0&&x<FW&&z>=0&&z<
  if(!T||!T.til||T.wet||!T.c||T.c.ripe)return toast('Petak ini nggak perlu disiram');const tg=tglNyata();if(!S.bantu||S.bantu.tgl!==tg)S.bantu={tgl:tg,n:0};
  if(S.bantu.n>=20)return toast('Udah bantu 20 petak hari ini. Makasih!');T.wet=1;S.bantu.n++;S.money+=2;hud();burst(x+.5,.15,z+.5,['#5DADE2','#9FD8FF'],10,1,2,.05);floatTxt('💧 +💰2',x+.5,1,z+.5);misiEv('bantu');
  VISIT.q=(VISIT.q||[]).concat(i);clearTimeout(VISIT.tm);const V=VISIT;VISIT.tm=setTimeout(()=>{if(ME.tok&&V.q.length)api('mainBantu',{u:ME.u,tok:ME.tok,t:V.u,idx:V.q});V.q=[]},1500)}
+// ---------- area rumah (pribadi) vs kota (online) ----------
+let ZONA=null;const zonaNow=()=>INSIDE||P.x<16.4?'rumah':'kota';
+function zonaStep(){const z=zonaNow();if(z===ZONA)return;const awal=ZONA===null;ZONA=z;if(awal)return;
+ const el=$('zoneFade');if(z==='kota'){netT=99;$('zT').textContent='🌐 Keluar ke Kota';$('zS').textContent='Online · ketemu warga lain di sini'}
+ else{$('zT').textContent=VISIT?'🏡 Masuk Area Rumah @'+VISIT.u:'🏡 Masuk Area Rumah';$('zS').textContent=VISIT?'Lahan teman · cuma bisa lihat & bantu siram':'Pribadi · cuma lo di sini'}
+ sfx('buka');el.classList.remove('on');void el.offsetWidth;el.classList.add('on')}
+function gerbangDraw(){const x=16.6;for(const z of [3.85,6.65])bx(x,0,z,.28,2.6,.28,'#8E5A3B');bx(x,2.6,5.25,.3,.2,3.1,'#8E5A3B');
+ D(G.box,M.chain(M.T(x,2.25,5.25),M.S(.04,.4,2.3)),'#FFFFFF',{tex:sign('RUMAH  |  KOTA','#E9C46A'),em:.4,cast:false});D(G.box,M.chain(M.T(x+.05,2.25,5.25),M.RY(Math.PI/2),M.S(2.3,.4,.04)),'#FFFFFF',{tex:sign('🏡 RUMAH | KOTA 🌐','#E9C46A'),em:.4,cast:false})}
 // ---------- peta kota ----------
 function peta(){const k=6,ox=1.5,oz=7,X=x=>((x+ox)*k).toFixed(1),Z=z=>((z+oz)*k).toFixed(1);
  const r=WALK.map(w=>`<rect x="${X(w[0])}" y="${Z(w[2])}" width="${((w[1]-w[0])*k).toFixed(1)}" height="${((w[3]-w[2])*k).toFixed(1)}" fill="#E8D5A8"/>`).join('');
@@ -724,7 +739,7 @@ function dropOth(k){OTH.delete(k);tag('o:'+k,'',null);tag('oe:'+k,'',null)}
 function netStep(dt){if(inKota()&&!document.hidden){netT+=dt;if(netT>3.5){netT=0;netTick()}}else{netT=3.4;if(OTH.size)for(const k of [...OTH.keys()])dropOth(k)}
  for(const r of OTH.values()){const dx=r.tx-r.x,dz=r.tz-r.z,d=Math.hypot(dx,dz);if(d>6){r.x=r.tx;r.z=r.tz}else if(d>.05){const st=Math.min(d,3.4*dt);r.x+=dx/d*st;r.z+=dz/d*st;r.yaw=Math.atan2(dx,dz);r.mv=true}else{r.mv=false;r.yaw=r.ty}}
  const el=$('kotaOn');const fs=festNow()?'🎉 Festival lagi jalan di alun-alun!':festToday()?'🎉 Festival malam ini 19.00 WIB':'';
- if(inKota()||fs){el.classList.remove('hide');el.textContent=[inKota()?(OTH.size?'👥 '+OTH.size+' warga lain di kota':'👥 Belum ada warga lain di kota'):'',fs].filter(Boolean).join(' · ')}else el.classList.add('hide')}
+ el.classList.remove('hide');el.textContent=[zonaNow()==='kota'?'🌐 Kota · '+(OTH.size?OTH.size+' warga lain online':'belum ada warga lain online'):VISIT&&!INSIDE?'🏡 Area Rumah @'+VISIT.u:'🏡 Area Rumah (pribadi)',fs].filter(Boolean).join(' · ')}
 function kirimEmo(e){MY.e=e;MY.eAt=Date.now();if(inKota())misiEv('emote');sfx('pop');netT=99;$('emoBar').classList.add('hide')}
 // ---------- loop ----------
 let misiT=0,kolT=0;let perfN=0,perfT=0,perfDone=false;
@@ -751,7 +766,8 @@ function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1
  if(S&&!perfDone&&!UI.busy){perfN++;perfT+=dt;if(perfT>5){perfDone=true;if(!LITE&&perfT/perfN>1/30){setLite(true);toast('HP lo agak berat, mode ringan dinyalain biar lancar')}}}
  if(S&&SPIN)P.yaw+=dt*1.1;
  fxStep(dt);if(SHAKE>.01){cam.tx+=(Math.random()-.5)*SHAKE;cam.tz+=(Math.random()-.5)*SHAKE;SHAKE*=.82}
- if(S){netStep(dt);cekFestival();cekVisit();babStep(dt);jalanStep(dt);misiT+=dt;if(misiT>30){misiT=0;cekMisi()}kolT+=dt;if(kolT>120){kolT=0;koleksi()}}
+ if(S){zonaStep();netStep(dt);cekFestival();cekVisit();babStep(dt);jalanStep(dt);misiT+=dt;if(misiT>30){misiT=0;cekMisi()}kolT+=dt;if(kolT>120){kolT=0;koleksi()}}
+ if(camBelakang()&&Math.hypot(P.vx,P.vz)>.1){let d=(P.yaw+Math.PI)-cam.yaw;d=Math.atan2(Math.sin(d),Math.cos(d));cam.yaw+=d*(1-Math.exp(-dt*2.6))}
  if(S){const k=1-Math.exp(-dt*(INTRO?(INTRO.k||1.2):6));const fx=INTRO?INTRO.x:P.x,fz=INTRO?INTRO.z:P.z+.4;cam.tx+=(fx-cam.tx)*k;cam.tz+=(fz-cam.tz)*k;render(t)}
  music(t);
  requestAnimationFrame(step)}
@@ -765,7 +781,7 @@ function free(x,z){if(INSIDE){const R=ROOM;if(x<R.x-R.w/2+.3||x>R.x+R.w/2-.3||z<
 
 // ---------- masuk ----------
 async function api(a,body){const r=await fetch('/api/akun?a='+a,body?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}:{});return r.json().catch(()=>({}))}
-function start(st){S=st;S.perabot=S.perabot||[];if(!S.cuaca)S.cuaca=cuacaOf(S.day);setTimeout(cekJuara,5000);loadKompleks();cekMisi();setTimeout(koleksi,3000);S.proses=S.proses||[];S.tlv=S.tlv||{};S.foto=S.foto||{};S.pajang=S.pajang||[];audioOn();pakaiLook();if(!S.fg||!S.fg.length)spawnForage();
+function start(st){S=st;cam.dist=CAMM==='lebar'?(TOUCH?30:26):(TOUCH?19:17);S.perabot=S.perabot||[];if(!S.cuaca)S.cuaca=cuacaOf(S.day);setTimeout(cekJuara,5000);loadKompleks();cekMisi();setTimeout(koleksi,3000);S.proses=S.proses||[];S.tlv=S.tlv||{};S.foto=S.foto||{};S.pajang=S.pajang||[];audioOn();pakaiLook();if(!S.fg||!S.fg.length)spawnForage();
  if(!S.j0)S.j0=junk(newState(ME.u,false).tiles);
  if(S.tut>=99)PNPC.x=PNPC.tx=PLAZA[0]-1.2,PNPC.z=PNPC.tz=PLAZA[1]+1.6;
  $('gate').classList.add('hide');hud();
