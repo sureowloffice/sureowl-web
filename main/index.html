@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#F4E9D2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=Bangers&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/main/game.css?v=1">
+<link rel="stylesheet" href="/main/game.css?v=3">
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -17,6 +17,8 @@
 <!-- HUD -->
 <div id="hud" class="hide">
   <div class="card" id="clock"><div id="hDay">Semi · Hari 1</div><div id="hTime">06:00 <span id="hWx">☀️</span></div><div id="hMoney">💰 500</div></div>
+  <button id="bMute">🔊</button>
+  <button id="bEmo">😊</button><button id="bMisi">📋</button><div id="emoBar" class="hide"></div><div id="kotaOn" class="hide"></div>
   <div id="toast"></div>
   <div id="arrow" class="hide">▼</div>
 </div>
@@ -59,12 +61,14 @@
     <div class="foot">Belum jadi warga? Follow <b>@viralindongid</b> + komen <b>PINDAH</b> di postingan mana aja.</div>
   </div>
 </div>
+<!-- pembuka kilas balik -->
+<div id="intro" class="hide"><div id="iImg"></div><div id="iTxt"></div><button id="iSkip">Lewati ›</button><div id="iTap">ketuk buat lanjut</div></div>
 <div id="load">Menyiapkan lahan…</div>
 
 <script>
 // Muat mesin yang sama dengan video reel, lalu tambal (bola halus, wajah & tangan versi film).
 (async()=>{
-  const V='?v=1';
+  const V='?v=3';
   const get=u=>fetch(u+V).then(r=>{if(!r.ok)throw new Error(u);return r.text()});
   const run=src=>{const s=document.createElement('script');s.textContent=src;document.body.appendChild(s)};
   let eng=await get('/engine.js');

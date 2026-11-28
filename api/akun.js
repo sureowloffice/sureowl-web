@@ -28,6 +28,7 @@ async function redis(cmds) {
 
 let wargaCache = { at: 0, set: null };
 let onlineCache = { at: 0, body: null };
+let mainOnCache = { at: 0, list: [] };
 async function warga(host) {
   if (wargaCache.set && Date.now() - wargaCache.at < 60000) return wargaCache.set;
   const r = await fetch('https://' + host + '/warga.json?nc=' + Date.now());
@@ -191,6 +192,81 @@ module.exports = async (req, res) => {
     // ===== Game Lahanku (/main): cek Buku Warga, kode 4 angka, simpan progres =====
     {
       const q0 = new URL(req.url, 'http://x').searchParams;const ga = q0.get('a') || '';
+      const tglJkt = (d = 0) => new Date(Date.now() + 7 * 3600e3 - d * 864e5).toISOString().slice(0, 10);
+      const EXP = String(86400 * 60);
+      // ----- kota bareng: posisi warga yang lagi di kota Lahanku -----
+      const mainTok = u => crypto.createHmac('sha256', String(TOKEN)).update('mainpos:' + u).digest('hex').slice(0, 32);
+      const mainOn = async () => { if (Date.now() - mainOnCache.at < 2500) return mainOnCache.list;
+        const now = Date.now(); const [us] = await redis([['ZRANGEBYSCORE', 'mainon', String(now - 15000), '+inf']]); let list = [];
+        if (us && us.length) { const [vals] = await redis([['MGET', ...us.slice(-40).map(u => 'mainpos:' + u)]]);
+          list = (vals || []).map((v, i) => { try { return v ? Object.assign({ u: us.slice(-40)[i] }, JSON.parse(v)) : null } catch (e) { return null } }).filter(Boolean) }
+        mainOnCache = { at: Date.now(), list }; return list };
+      if (ga === 'mainOn') return send(res, 200, { ok: true, on: await mainOn() });
+      if (ga === 'mainPos') { let bd = req.body; if (typeof bd === 'string') { try { bd = JSON.parse(bd) } catch (e) { bd = {} } } bd = bd || {};
+        const pu = String(bd.u || '').toLowerCase().slice(0, 40), p = bd.p || {};
+        if (!pu || bd.tok !== mainTok(pu)) return send(res, 200, { ok: false });
+        const num = (v, a, b) => Math.max(a, Math.min(b, +v || 0));
+        const EMO = ['👋', '❤️', '👏', '😂', '🔥', '🎵'], SENI = ['musik', 'lukis', 'kriya', 'foto', 'editor', 'ilustrator'], hexok = c => /^#[0-9a-f]{6}$/i.test(c || '');
+        const q = { x: +num(p.x, 16.5, 47).toFixed(2), z: +num(p.z, -6.5, 14.5).toFixed(2), y: +num(p.y, -7, 7).toFixed(2),
+          lk: /^\d:\d:\d$/.test(p.lk || '') ? p.lk : '1:0:0', col: hexok(p.col) ? p.col : '#3F7CC4', tas: hexok(p.tas) ? p.tas : '#C0392B', aks: Math.max(0, Math.min(4, p.aks | 0)), seni: SENI.includes(p.seni) ? p.seni : '' };
+        if (EMO.includes(p.e) && +p.ea >= 0 && +p.ea < 6) { q.e = p.e; q.et = Date.now() - Math.round(+p.ea * 1000) }
+        const cmd = [['SET', 'mainpos:' + pu, JSON.stringify(q), 'EX', '20'], ['ZADD', 'mainon', String(Date.now()), pu]];
+        if (Math.random() < .05) cmd.push(['ZREMRANGEBYSCORE', 'mainon', '-inf', String(Date.now() - 60000)]);
+        await redis(cmd); return send(res, 200, { ok: true, on: await mainOn(), now: Date.now() }) }
+      // ----- ekosistem: pameran karya mingguan, proyek kota, pasar antarwarga -----
+      const KARYA_OK = ['suling', 'gitar', 'drum', 'lukisan', 'lukisanbesar', 'gerabah', 'patung', 'fotokota', 'videopendek', 'videojadi', 'trailer', 'ilustrasi', 'poster', 'komik'];
+      const JUAL_OK = KARYA_OK.concat(['wortel', 'tomat', 'gandum', 'bambu', 'kapas', 'pewarna', 'jamur', 'bunga', 'buah', 'kayu', 'batu', 'tanahliat', 'momen', 'roti']);
+      const PROYEK = { nama: 'Panggung Kota', butuh: { kayu: 500, batu: 300 } };
+      const minggu = () => { const d = new Date(Date.now() + 7 * 3600e3); const i = (d.getUTCDay() + 6) % 7; return new Date(d.getTime() - i * 864e5).toISOString().slice(0, 10) };
+      const body0 = () => { let b = req.body; if (typeof b === 'string') { try { b = JSON.parse(b) } catch (e) { b = {} } } return b || {} };
+      const auth = b => { const u = String(b.u || '').toLowerCase().slice(0, 40); return u && b.tok === mainTok(u) ? u : null };
+      const lookOk = l => { l = l || {}; const hx = c => /^#[0-9a-f]{6}$/i.test(c || ''); return { lk: /^\d:\d:\d$/.test(l.lk || '') ? l.lk : '1:0:0', col: hx(l.col) ? l.col : '#3F7CC4', tas: hx(l.tas) ? l.tas : '#C0392B', aks: Math.max(0, Math.min(4, l.aks | 0)) } };
+      const W30 = String(86400 * 30);
+      if (ga === 'mainPameran' && req.method === 'GET') { const wk = minggu(); const [h] = await redis([['HGETALL', 'pameran:' + wk]]); const ent = [];
+        for (let i = 0; i < (h || []).length; i += 2) { try { ent.push(Object.assign({ u: h[i] }, JSON.parse(h[i + 1]))) } catch (e) {} }
+        const lk = ent.length ? await redis(ent.map(e => ['SCARD', 'pamlike:' + wk + ':' + e.u])) : [];
+        ent.forEach((e, i) => e.likes = +lk[i] || 0); ent.sort((a, b) => b.likes - a.likes || a.ts - b.ts);
+        res.setHeader('Cache-Control', 'public, max-age=10'); return send(res, 200, { ok: true, minggu: wk, karya: ent }) }
+      if (ga === 'mainPameran') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        if (!KARYA_OK.includes(b.k)) return send(res, 200, { ok: false, msg: 'Itu bukan karya.' }); const wk = minggu();
+        await redis([['HSET', 'pameran:' + wk, u, JSON.stringify(Object.assign({ k: b.k, ts: Date.now() }, lookOk(b.look)))], ['EXPIRE', 'pameran:' + wk, W30]]); return send(res, 200, { ok: true }) }
+      if (ga === 'mainLike') { const b = body0(), u = auth(b), t = String(b.t || '').toLowerCase().slice(0, 40); if (!u || !t || t === u) return send(res, 200, { ok: false }); const wk = minggu();
+        const [ad] = await redis([['SADD', 'pamlike:' + wk + ':' + t, u], ['EXPIRE', 'pamlike:' + wk + ':' + t, W30]]); return send(res, 200, { ok: true, baru: +ad === 1 }) }
+      if (ga === 'mainProyek' && req.method === 'GET') { const [k, bt, top] = await redis([['GET', 'proyek:panggung:kayu'], ['GET', 'proyek:panggung:batu'], ['ZREVRANGE', 'proyek:panggung:by', '0', '4', 'WITHSCORES']]);
+        const t5 = []; for (let i = 0; i < (top || []).length; i += 2) t5.push({ u: top[i], n: +top[i + 1] });
+        res.setHeader('Cache-Control', 'public, max-age=10'); return send(res, 200, { ok: true, nama: PROYEK.nama, butuh: PROYEK.butuh, ada: { kayu: +k || 0, batu: +bt || 0 }, top: t5 }) }
+      if (ga === 'mainSetor') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        const k = b.k, n = Math.max(1, Math.min(200, b.n | 0)); if (!['kayu', 'batu'].includes(k)) return send(res, 200, { ok: false });
+        const [tot] = await redis([['INCRBY', 'proyek:panggung:' + k, String(n)], ['ZINCRBY', 'proyek:panggung:by', String(n), u]]); return send(res, 200, { ok: true, total: +tot }) }
+      if (ga === 'mainPasar' && req.method === 'GET') { const [h] = await redis([['HGETALL', 'pasar']]); const L = [];
+        for (let i = 0; i < (h || []).length; i += 2) { try { L.push(Object.assign({ id: h[i] }, JSON.parse(h[i + 1]))) } catch (e) {} }
+        L.sort((a, b) => b.ts - a.ts); return send(res, 200, { ok: true, jual: L.slice(0, 60) }) }
+      if (ga === 'mainJual') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        const k = b.k, n = Math.max(1, Math.min(99, b.n | 0)), h = Math.max(1, Math.min(99999, b.h | 0)); if (!JUAL_OK.includes(k)) return send(res, 200, { ok: false, msg: 'Barang ini nggak bisa dijual di pasar.' });
+        const [cnt] = await redis([['SCARD', 'pasarby:' + u]]); if (+cnt >= 5) return send(res, 200, { ok: false, msg: 'Maksimal 5 lapak. Batalin salah satu dulu.' });
+        const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        await redis([['HSET', 'pasar', id, JSON.stringify({ u, k, n, h, ts: Date.now() })], ['SADD', 'pasarby:' + u, id]]); return send(res, 200, { ok: true, id }) }
+      if (ga === 'mainBeli' || ga === 'mainBatal') { const b = body0(), u = auth(b), id = String(b.id || '').slice(0, 20); if (!u || !id) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        const [v] = await redis([['HGET', 'pasar', id]]); let o = null; try { o = v ? JSON.parse(v) : null } catch (e) {} if (!o) return send(res, 200, { ok: false, msg: 'Barangnya udah laku.' });
+        if (ga === 'mainBeli' && o.u === u) return send(res, 200, { ok: false, msg: 'Itu lapak lo sendiri.' }); if (ga === 'mainBatal' && o.u !== u) return send(res, 200, { ok: false });
+        const [del] = await redis([['HDEL', 'pasar', id]]); if (+del !== 1) return send(res, 200, { ok: false, msg: 'Barangnya udah laku.' });
+        const c = [['SREM', 'pasarby:' + o.u, id]]; if (ga === 'mainBeli') c.push(['INCRBY', 'pasarduit:' + o.u, String(o.h)], ['LPUSH', 'pasarlog:' + o.u, '@' + u + ' beli ' + o.n + ' ' + o.k + ' (💰' + o.h + ')'], ['LTRIM', 'pasarlog:' + o.u, '0', '19']);
+        await redis(c); return send(res, 200, { ok: true, k: o.k, n: o.n, h: o.h }) }
+      if (ga === 'mainKoleksi') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false });
+        const [uang, log] = await redis([['GETDEL', 'pasarduit:' + u], ['LRANGE', 'pasarlog:' + u, '0', '9'], ['DEL', 'pasarlog:' + u]]); return send(res, 200, { ok: true, uang: +uang || 0, log: log || [] }) }
+      if (ga === 'mainStat') { // statistik warga aktif Lahanku (angka gabungan saja, tanpa nama)
+        const hari = [];for (let d = 13; d >= 0; d--) hari.push(tglJkt(d));
+        const cmd = [];for (const h of hari) cmd.push(['SCARD', 'main:aktif:' + h], ['SCARD', 'main:baru:' + h]);
+        const r1 = await redis(cmd);
+        const cmd2 = [];for (let i = 0; i < hari.length; i++) { const h = hari[i];
+          cmd2.push(i >= 1 ? ['SINTER', 'main:baru:' + hari[i - 1], 'main:aktif:' + h] : ['SCARD', 'x'], i >= 7 ? ['SINTER', 'main:baru:' + hari[i - 7], 'main:aktif:' + h] : ['SCARD', 'x']) }
+        const r2 = await redis(cmd2);
+        const rows = hari.map((h, i) => { const baru = +r1[i * 2 + 1] || 0; const b1 = i >= 1 ? (+r1[(i - 1) * 2 + 1] || 0) : 0, b7 = i >= 7 ? (+r1[(i - 7) * 2 + 1] || 0) : 0;
+          const n1 = Array.isArray(r2[i * 2]) ? r2[i * 2].length : 0, n7 = Array.isArray(r2[i * 2 + 1]) ? r2[i * 2 + 1].length : 0;
+          return { tgl: h, aktif: +r1[i * 2] || 0, baru, d1: b1 ? Math.round(n1 / b1 * 100) : null, d7: b7 ? Math.round(n7 / b7 * 100) : null } });
+        const [total] = await redis([['SCARD', 'mainwarga']]);
+        res.setHeader('Cache-Control', 'public, max-age=60');
+        return send(res, 200, { ok: true, total: +total || 0, hari: rows }) }
       if (ga === 'mainCek' || ga === 'mainMasuk' || ga === 'main') {
         const host = req.headers['x-forwarded-host'] || req.headers.host || 'kotaseni.vercel.app';
         let bd = req.body; if (typeof bd === 'string') { try { bd = JSON.parse(bd) } catch (e) { bd = {} } } bd = bd || {};
@@ -207,14 +283,21 @@ module.exports = async (req, res) => {
         if (+fails >= 8) return send(res, 200, { ok: false, msg: 'Kebanyakan salah kode. Coba lagi 1 jam lagi, atau DM @viralindongid.' });
         if (ga === 'mainMasuk') {
           if (!cur) { if (!bd.baru) return send(res, 200, { ok: false, msg: 'Kode belum dibuat.' }); const b = await inBuku(); if (!b.ok) return send(res, 200, { ok: false, msg: 'Nama belum ada di Buku Warga.' });
-            await redis([['HSET', 'mainpin', gu, hp(pin)], ['SADD', 'mainwarga', gu]]); return send(res, 200, { ok: true, s: null }) }
+            const tokBaru = mainTok(gu); await redis([['HSET', 'mainpin', gu, hp(pin)], ['SADD', 'mainwarga', gu], ['SADD', 'main:baru:' + tglJkt(), gu], ['EXPIRE', 'main:baru:' + tglJkt(), EXP], ['SADD', 'main:aktif:' + tglJkt(), gu], ['EXPIRE', 'main:aktif:' + tglJkt(), EXP]]); return send(res, 200, { ok: true, s: null, tok: tokBaru }) }
           if (cur !== hp(pin)) { await redis([['INCR', 'mainfail:' + gu], ['EXPIRE', 'mainfail:' + gu, '3600']]); return send(res, 200, { ok: false, msg: 'Kode salah. Lupa? DM @viralindongid.' }) }
-          const [st] = await redis([['GET', 'main:' + gu]]); let s0 = null; try { s0 = st ? JSON.parse(st) : null } catch (e) { s0 = null }
-          return send(res, 200, { ok: true, s: s0 }) }
+          const [st] = await redis([['GET', 'main:' + gu], ['SADD', 'main:aktif:' + tglJkt(), gu], ['EXPIRE', 'main:aktif:' + tglJkt(), EXP]]); let s0 = null; try { s0 = st ? JSON.parse(st) : null } catch (e) { s0 = null }
+          return send(res, 200, { ok: true, s: s0, tok: mainTok(gu) }) }
         if (ga === 'main' && req.method === 'POST') {
           if (!cur || cur !== hp(pin)) return send(res, 200, { ok: false, msg: 'Kode salah.' });
-          const js = JSON.stringify(bd.s || null); if (js.length > 120000) return send(res, 200, { ok: false, msg: 'Simpanan terlalu besar.' });
-          await redis([['SET', 'main:' + gu, js], ['ZADD', 'mainhari', String((bd.s && bd.s.day) || 0), gu]]); return send(res, 200, { ok: true }) }
+          const s = bd.s; const js = JSON.stringify(s || null); if (js.length > 120000) return send(res, 200, { ok: false, msg: 'Simpanan terlalu besar.' });
+          // cek wajar: hari tidak mundur, uang masuk akal, lahan 16×12
+          const day = s && +s.day, money = s && +s.money;
+          if (!s || !Number.isInteger(day) || day < 1 || day > 5000 || !Number.isFinite(money) || money < 0 || !Array.isArray(s.tiles) || s.tiles.length !== 192)
+            return send(res, 200, { ok: false, msg: 'Simpanan nggak valid.' });
+          if (money > 1000 + day * 8000) return send(res, 200, { ok: false, msg: 'Uangnya nggak masuk akal, simpanan ditolak.' });
+          const [old] = await redis([['GET', 'main:' + gu]]); let o = null; try { o = old ? JSON.parse(old) : null } catch (e) { o = null }
+          if (o && +o.day > day) return send(res, 200, { ok: false, old: true, msg: 'Ada simpanan yang lebih baru (Hari ' + o.day + '). Muat ulang buat lanjut dari sana.' });
+          await redis([['SET', 'main:' + gu, js], ['ZADD', 'mainhari', String((bd.s && bd.s.day) || 0), gu], ['SADD', 'main:aktif:' + tglJkt(), gu], ['EXPIRE', 'main:aktif:' + tglJkt(), EXP]]); return send(res, 200, { ok: true }) }
         return send(res, 400, { ok: false });
       }
     }
