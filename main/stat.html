@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statistik Lahanku</title><meta name="robots" content="noindex">
+<style>
+body{margin:0;font:15px/1.45 Inter,system-ui,sans-serif;background:#FFF6E0;color:#2B1D0E;padding:20px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:#6B5A44;font-size:13px;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.c{background:#fff;border:2px solid #2B1D0E;border-radius:12px;padding:10px 12px}.c b{display:block;font-size:26px}.c span{font-size:12px;color:#6B5A44}
+.bar{height:12px;border:2px solid #2B1D0E;border-radius:8px;background:#EDE3CF;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:#4CAF50}
+table{width:100%;border-collapse:collapse;background:#fff;border:2px solid #2B1D0E;border-radius:12px;overflow:hidden}
+th,td{padding:7px 8px;border-bottom:1px solid #EDE3CF;text-align:right;font-size:13px}th:first-child,td:first-child{text-align:left}th{background:#F4E9D2}
+small{color:#6B5A44}
+</style></head><body>
+<h1>Statistik Lahanku</h1><div class="sub">Warga aktif = main atau tersimpan di hari itu (WIB). Angka gabungan, tanpa nama.</div>
+<div class="cards" id="cards">Memuat…</div>
+<table><thead><tr><th>Tanggal</th><th>Aktif</th><th>Baru</th><th>Balik besok (D1)</th><th>Balik 7 hari (D7)</th></tr></thead><tbody id="rows"></tbody></table>
+<p><small>D1 = dari warga baru kemarin, berapa persen main lagi hari ini (target 40%). D7 = dari warga baru 7 hari lalu, berapa persen main hari ini (target 15%). Jualan koin premium dibuka setelah 1.000 warga aktif.</small></p>
+<script>
+fetch('/api/akun?a=mainStat').then(r=>r.json()).then(d=>{const H=d.hari||[];const t=H[H.length-1]||{aktif:0,baru:0};
+ const max7=Math.max(0,...H.slice(-7).map(h=>h.aktif));const pct=Math.min(100,Math.round(max7/1000*100));
+ document.getElementById('cards').innerHTML=`<div class="c"><b>${d.total}</b><span>warga punya kode</span></div><div class="c"><b>${t.aktif}</b><span>aktif hari ini</span></div><div class="c"><b>${t.baru}</b><span>warga baru hari ini</span></div><div class="c"><b>${max7}</b><span>aktif tertinggi 7 hari · menuju 1.000</span><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+ document.getElementById('rows').innerHTML=H.slice().reverse().map(h=>`<tr><td>${h.tgl}</td><td>${h.aktif}</td><td>${h.baru}</td><td>${h.d1==null?'–':h.d1+'%'}</td><td>${h.d7==null?'–':h.d7+'%'}</td></tr>`).join('')
+}).catch(()=>{document.getElementById('cards').textContent='Gagal memuat statistik.'});
+</script></body></html>
