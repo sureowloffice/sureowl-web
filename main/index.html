@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#F4E9D2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=Bangers&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/main/game.css?v=4">
+<link rel="stylesheet" href="/main/game.css?v=5">
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -20,7 +20,7 @@
   <button id="bMute">🔊</button>
   <button id="bEmo">😊</button><button id="bMisi">📋</button><button id="bPeta">🗺️</button><button id="bCam">🎥</button><div id="emoBar" class="hide"></div><div id="kotaOn" class="hide"></div><div id="visitBar" class="hide"><span id="vName"></span><button id="vLike">❤️ 0</button></div>
   <div id="babCard" class="hide"></div>
-  <div id="zoneFade"><div id="zT"></div><div id="zS"></div></div>
+  <div id="zoneFade"><div id="zT"></div><div id="zS"></div><div id="zBar"><i></i></div></div>
   <div id="toast"></div>
   <div id="arrow" class="hide">▼</div>
 </div>
@@ -70,7 +70,7 @@
 <script>
 // Muat mesin yang sama dengan video reel, lalu tambal (bola halus, wajah & tangan versi film).
 (async()=>{
-  const V='?v=4';
+  const V='?v=5';
   const get=u=>fetch(u+V).then(r=>{if(!r.ok)throw new Error(u);return r.text()});
   const run=src=>{const s=document.createElement('script');s.textContent=src;document.body.appendChild(s)};
   let eng=await get('/engine.js');
