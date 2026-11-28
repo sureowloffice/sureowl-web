@@ -41,13 +41,13 @@ const SHOP={studio:{x:27.6,z:-3,w:4.4,d:4,door:[27.6,-0.8],nm:'STUDIO',c:'#EDE4F
 const PLAZA=[37,8];
 const PAPAN={proyek:[34.2,3.6,'PROYEK KOTA','#E9C46A'],pameran:[37,3.6,'PAMERAN','#F4A6C8'],pasar:[39.8,3.6,'PASAR WARGA','#A8DADC']};const PANGGUNG={x:44.2,z:9.2,w:3.6,d:2.6};
 // area yang bisa dilewati: lahan, halaman, jalan, alun-alun, toko, studio, kompleks (di luar ini dibatasi pagar tanaman)
-const WALK=[[.25,15.75,.25,11.75],[2.6,5.4,-.7,.4],[.4,13.6,-2.0,-.55],[15.5,17.6,4.2,6.3],[17,32.2,3.3,7.2],[31.5,34,3.3,7.2],[33.4,40.6,4.8,11.2],[29.6,44.6,.2,4.9],[26.6,28.6,-1.0,3.4],[22.8,25.2,7,36.6],[40.4,46.6,5.8,11.2]];
+const WALK=[[.25,15.75,.25,11.75],[2.6,5.4,-.7,.4],[.4,13.6,-2.0,-.55],[17.3,32.2,3.3,7.2],[31.5,34,3.3,7.2],[33.4,40.6,4.8,11.2],[29.6,44.6,.2,4.9],[26.6,28.6,-1.0,3.4],[22.8,25.2,7,36.6],[40.4,46.6,5.8,11.2]];
 for(let i=0;i<7;i++){const z=15.6+i*3.3;WALK.push([25,39.6,z-1.0,z+.8])}
 const inWalk=(x,z)=>WALK.some(r=>x>=r[0]&&x<=r[1]&&z>=r[2]&&z<=r[3]);
-const PAGAR=[[17,3.1,26.5,3.1],[28.7,3.1,29.5,3.1],[26.45,-.9,26.45,3.1],[28.75,-.9,28.75,3.1],[29.5,.1,29.5,3.1],[17,7.4,22.6,7.4],[25.4,7.4,33.3,7.4],[33.3,7.4,33.3,11.4],[33.3,11.4,46.8,11.4],[46.8,5.6,46.8,11.4],[40.7,5.35,46.8,5.35],[44.7,.1,44.7,5.35],[35.5,.05,38.5,.05],[43.5,.05,44.7,.05],[29.5,.05,30.5,.05],
+const PAGAR=[[17.1,3.1,17.1,7.4],[17,3.1,26.5,3.1],[28.7,3.1,29.5,3.1],[26.45,-.9,26.45,3.1],[28.75,-.9,28.75,3.1],[29.5,.1,29.5,3.1],[17,7.4,22.6,7.4],[25.4,7.4,33.3,7.4],[33.3,7.4,33.3,11.4],[33.3,11.4,46.8,11.4],[46.8,5.6,46.8,11.4],[40.7,5.35,46.8,5.35],[44.7,.1,44.7,5.35],[35.5,.05,38.5,.05],[43.5,.05,44.7,.05],[29.5,.05,30.5,.05],
  [22.65,7.4,22.65,36.8],[22.65,36.8,40,36.8],[40,12.9,40,36.8],[25.4,12.9,40,12.9],[25.35,7.4,25.35,12.9]];
 for(let i=0;i<7;i++){const z=15.6+i*3.3;PAGAR.push([25.35,i?z-2.5:12.9,25.35,z-1.05]);if(i==6)PAGAR.push([25.35,z+.85,25.35,36.8])}
-const ARAH=[[17.6,2.75,'KOTA →','#FFF6E0'],[26,2.75,'↑ STUDIO','#EDE4F7'],[32.6,7.75,'ALUN-ALUN','#FFE8A3'],[22.2,6.9,'↓ KOMPLEKS','#D7DDF5']];
+const ARAH=[[26,2.75,'↑ STUDIO','#EDE4F7'],[32.6,7.75,'ALUN-ALUN','#FFE8A3'],[22.2,6.9,'↓ KOMPLEKS','#D7DDF5']];
 const BOUND={x0:-3,x1:47,z0:-6.5,z1:37};
 const STARTER={x0:9,z0:3,x1:12,z1:6};// 3×3 petak tutorial (x 9..11, z 3..5)
 
@@ -136,7 +136,7 @@ const KZ=i=>15.6+i*3.3;const KSLOT=[];BLOK.forEach((b,i)=>{for(let j=0;j<5;j++)K
 let KOMP={},KOMPN={},WARGA=[];
 fetch('/warga.json').then(r=>r.json()).then(d=>{WARGA=(d.warga||[]).map(w=>String(w.u).toLowerCase())}).catch(()=>{});
 async function loadKompleks(){try{const j=await api('mainKompleks');if(j.ok){KOMPN=j.n||{};const R=seedRand('komp'+tglNyata());KOMP={};for(const [k] of BLOK){let L=(j.blok&&j.blok[k]||[]).slice();
-   for(let i=L.length-1;i>0;i--){const q=Math.floor(R()*(i+1));[L[i],L[q]]=[L[q],L[i]]}if(ME&&L.includes(ME.u)){L=L.filter(u=>u!==ME.u);L.unshift(ME.u)}KOMP[k]=L.slice(0,5)}}}catch(e){}}
+   for(let i=L.length-1;i>0;i--){const q=Math.floor(R()*(i+1));[L[i],L[q]]=[L[q],L[i]]}KOMP[k]=L.slice(0,5)}}}catch(e){}placeMe()}
 const houseOf=h=>(KOMP[h.b]||[])[h.j]||'';
 const hcol=u=>{const C=['#F2D7B6','#CFE8D5','#F7D1D1','#D7DDF5','#F5E6A8','#E3D0F0'],Rf=['#B5523B','#3E6FB0','#5E8C3A','#8E44AD','#C0392B','#D4881E'];let h=0;for(const c of u)h=(h*31+c.charCodeAt(0))>>>0;return [C[h%C.length],Rf[(h>>>3)%Rf.length]]};
 let cam={yaw:-.18,pitch:.88,dist:TOUCH?19:17,tx:9,ty:.6,tz:2};
@@ -179,7 +179,7 @@ function pagarKota(){for(const [x0,z0,x1,z1] of PAGAR){const L=Math.hypot(x1-x0,
   D(G.box,M.chain(M.T(cx,0,cz),M.RY(a),M.S(.5,.62,L+.3)),'#4E8F3A',{});D(G.box,M.chain(M.T(cx,.62,cz),M.RY(a),M.S(.56,.1,L+.36)),'#5FA344',NC)}
  for(const [x,z,tx,c] of ARAH){bx(x,0,z,.1,1.4,.1,'#5B3A1E');D(G.box,M.chain(M.T(x,1.25,z+.06),M.S(1.3,.34,.04)),'#FFFFFF',{tex:sign(tx,c),em:.4,cast:false})}
  for(const s2 of [-1,1])bx(24+s2*1.25,0,7.7,.2,2.4,.2,'#8E5A3B');bx(24,2.4,7.7,2.9,.18,.22,'#8E5A3B');D(G.box,M.chain(M.T(24,2.05,7.76),M.S(2.3,.42,.04)),'#FFFFFF',{tex:sign('KOMPLEKS WARGA','#D7DDF5'),em:.4,cast:false})}
-function papan(t){pagarKota();gerbangDraw();for(const [x,z,nm,c] of Object.values(PAPAN)){for(const s of [-1,1])bx(x+s*.62,0,z,.1,1.5,.1,'#5B3A1E');bx(x,.75,z,1.5,.75,.08,'#7A4B22');
+function papan(t){pagarKota();for(const [x,z,nm,c] of Object.values(PAPAN)){for(const s of [-1,1])bx(x+s*.62,0,z,.1,1.5,.1,'#5B3A1E');bx(x,.75,z,1.5,.75,.08,'#7A4B22');
   D(G.box,M.chain(M.T(x,1.12,z+.05),M.S(1.36,.4,.02)),'#FFFFFF',{tex:sign(nm,c),em:.4,cast:false});bx(x,.8,z+.05,1.3,.28,.02,'#FFF6E0',{em:.25,cast:false})}
  if(PRO.done){const g=PANGGUNG;bx(g.x,0,g.z,g.w,.5,g.d,'#8E5A3B');bx(g.x,.5,g.z,g.w-.1,.05,g.d-.1,'#C08A52');for(const s of [-1,1])bx(g.x+s*(g.w/2-.1),0,g.z-g.d/2+.1,.12,2.4,.12,'#5B3A1E');
   bx(g.x,2.3,g.z-g.d/2+.1,g.w,.12,.12,'#5B3A1E');D(G.box,M.chain(M.T(g.x,2.05,g.z-g.d/2+.12),M.S(2.6,.4,.03)),'#FFFFFF',{tex:sign('PANGGUNG KOTA','#FFD23F'),em:.5,cast:false})}
@@ -250,7 +250,7 @@ function tileDraw(x,z,T,t){const cx=x+.5,cz=z+.5;/*tile*/
    if(st>=2&&c.k=='pewarna')for(let k=0;k<4;k++)D(G.sph,M.chain(M.T(cx+Math.cos(k*1.6+.4)*.15,.4+(k%2)*.06,cz+Math.sin(k*1.6+.4)*.15),M.S(.08,.05,.08)),st==3?'#D63384':'#F3A6C8',{em:.15,cast:false});
    if(st==3&&c.k=='tomat')for(let k=0;k<4;k++)D(G.sphHi,M.chain(M.T(cx+Math.cos(k*1.6)*.18,.3+(k%2)*.12,cz+Math.sin(k*1.6)*.18),M.S(.08,.08,.08)),'#E53935',{})}
   if(c.ripe)D(G.sph,M.chain(M.T(cx,1.0+Math.sin(t*4)*.05,cz),M.S(.07,.07,.07)),'#FFD23F',{em:1,cast:false})}}
-function forage(t){for(const f of S.fg){if(f.got)continue;const it=ITEM[f.k];const y=.15+Math.sin(t*3+f.x)*.03;
+function forage(t,VZ){for(const f of S.fg){if(f.got||(f.x<16.4)!==(VZ==='rumah'))continue;const it=ITEM[f.k];const y=.15+Math.sin(t*3+f.x)*.03;
  if(f.k=='jamur'){D(G.cyl8,M.chain(M.T(f.x,0,f.z),M.S(.05,.15,.05)),'#F4EFE6',{});D(G.sphHi,M.chain(M.T(f.x,.17,f.z),M.S(.14,.08,.14)),'#C0392B',{})}
  else if(f.k=='bunga'){D(G.box,M.chain(M.T(f.x,0,f.z),M.S(.02,.2,.02)),'#3E8E41',NC);D(G.sphHi,M.chain(M.T(f.x,.22,f.z),M.S(.09,.05,.09)),'#FFC93C',NC)}
  else{D(G.sph,M.chain(M.T(f.x,.12,f.z),M.S(.22,.16,.22)),'#3E8E41',{});for(let k=0;k<3;k++)D(G.sphHi,M.chain(M.T(f.x+Math.cos(k*2)*.12,.22,f.z+Math.sin(k*2)*.12),M.S(.05,.05,.05)),'#5B5BD6',NC)}
@@ -289,22 +289,22 @@ function setCam(m){CAMM=m;try{localStorage.setItem('ks_cam',m)}catch(e){}if(m!==
 function project(p){const x=VP[0]*p[0]+VP[4]*p[1]+VP[8]*p[2]+VP[12],y=VP[1]*p[0]+VP[5]*p[1]+VP[9]*p[2]+VP[13],w=VP[3]*p[0]+VP[7]*p[1]+VP[11]*p[2]+VP[15];if(w<=.05)return [-9999,-9999];return [(x/w*.5+.5)*innerWidth,(1-(y/w*.5+.5))*innerHeight]}
 function render(t){
  DL=[];
+ const VZ=INTRO?(INTRO.x>16.4?'kota':'rumah'):zonaNow();
  if(INSIDE)room(t);else{
  D(G.box,M.chain(M.T(22,-.5,14),M.S(80,.5,66)),'#6FB556',{cast:false});
- bx(FW/2,0,FD/2,FW+.2,.02,FD+.2,'#B79A6E',NC);// tanah lahan
- path();fence();house();building(SHOP.studio,t);if(S.day<3){const sd=SHOP.studio;bx(sd.door[0]-.7,0,sd.z+sd.d/2+.6,.08,1.0,.08,'#5B3A1E');bx(sd.door[0]+.7,0,sd.z+sd.d/2+.6,.08,1.0,.08,'#5B3A1E');D(G.box,M.chain(M.T(sd.door[0],1.0,sd.z+sd.d/2+.6),M.S(1.7,.42,.05)),'#FFFFFF',{tex:sign('BUKA HARI 3','#E9C46A'),em:.4,cast:false})}building(SHOP.benih,t);building(SHOP.roti,t);trees();plaza(t);wargaHouses();wapresChair();papan(t);
- {const TT=VISIT?VISIT.tiles:S.tiles;for(let x=0;x<FW;x++)for(let z=0;z<FD;z++)tileDraw(x,z,TT[x*FD+z]||{},t)}
- forage(t);fxDraw();if(S.kandang&&!VISIT)kandangDraw(t);
+ if(VZ==='rumah'){bx(FW/2,0,FD/2,FW+.2,.02,FD+.2,'#B79A6E',NC);bx(5.5,0,.5,7,.03,1.2,'#D4B483',NC);fence();house();gerbangDraw();trees();for(const [x,z] of [[19,1],[19.5,5.2],[19,9.5],[21.5,3],[21.5,7.5]])D(G.sphHi,M.chain(M.T(x,1.6,z),M.S(1.3,1.2,1.3)),'#4CAF50',{})}else{path();building(SHOP.studio,t);if(S.day<3){const sd=SHOP.studio;bx(sd.door[0]-.7,0,sd.z+sd.d/2+.6,.08,1.0,.08,'#5B3A1E');bx(sd.door[0]+.7,0,sd.z+sd.d/2+.6,.08,1.0,.08,'#5B3A1E');D(G.box,M.chain(M.T(sd.door[0],1.0,sd.z+sd.d/2+.6),M.S(1.7,.42,.05)),'#FFFFFF',{tex:sign('BUKA HARI 3','#E9C46A'),em:.4,cast:false})}building(SHOP.benih,t);building(SHOP.roti,t);trees();plaza(t);wargaHouses();wapresChair();papan(t);}
+ if(VZ==='rumah'){const TT=VISIT?VISIT.tiles:S.tiles;for(let x=0;x<FW;x++)for(let z=0;z<FD;z++)tileDraw(x,z,TT[x*FD+z]||{},t)}
+ forage(t,VZ);fxDraw();if(VZ==='rumah'&&S.kandang&&!VISIT)kandangDraw(t);
  if(S.cuaca==='hujan')for(let i=0;i<80;i++){const x=cam.tx+((i*7.13)%26)-13,z=cam.tz+((i*3.71)%22)-11,y=6-((t*9+i*1.37)%6.5);D(G.box,M.chain(M.T(x,y,z),M.S(.025,.4,.025)),'#9FD8FF',{em:.4,alpha:.55,cast:false})}}
  // petak sasaran
  if(!UI.busy&&!INSIDE&&!(VISIT&&P.x<16.4)){const tg=target();if(tg&&ti(tg[0],tg[1]))D(G.box,M.chain(M.T(tg[0]+.5,.07,tg[1]+.5),M.S(1.0,.02,1.0)),'#FFFFFF',{em:1,alpha:.35,cast:false})}
  // pemain
  const tl=TOOLS[S.tool];const hold=SPIN?null:S.sel?'benih':tl.hold;const swing=t<P.actT;
  person(PR,P.x,P.z,P.yaw,t,Math.hypot(P.vx,P.vz)>.05,{hold,ges:swing?'palu':'diam',ex:S.E<30?'lemas':S.E<60?'netral':'senyum',bend:S.E<30?.25:0,sweat:S.E<60&&S.E>=30});
- if(!INSIDE){if(PNPC.show)person(PRES,PNPC.x,PNPC.z,PNPC.yaw,t,Math.hypot(PNPC.tx-PNPC.x,PNPC.tz-PNPC.z)>.05,{ges:UI.talking=='pres'?'tunjuk':'diam',ex:'senyum'});
- for(const n of NPCS)person(n,n.x,n.z,n.yaw,t,false,{ex:'senyum',ges:n.ges});
+ if(!INSIDE){if(PNPC.show&&(PNPC.x<16.4)===(VZ==='rumah'))person(PRES,PNPC.x,PNPC.z,PNPC.yaw,t,Math.hypot(PNPC.tx-PNPC.x,PNPC.tz-PNPC.z)>.05,{ges:UI.talking=='pres'?'tunjuk':'diam',ex:'senyum'});
+ if(VZ==='kota'){for(const n of NPCS)person(n,n.x,n.z,n.yaw,t,false,{ex:'senyum',ges:n.ges});
  for(const r of OTH.values())person(r,r.x,r.z,r.yaw,t,r.mv,{ex:'senyum'});
- for(const w of (LITE?JALAN.slice(0,3):JALAN))if(Math.abs(w.x-cam.tx)<16&&Math.abs(w.z-cam.tz)<16)person(w,w.x,w.z,w.yaw,t,w.mv,{ex:'senyum'})}
+ for(const w of (LITE?JALAN.slice(0,3):JALAN))if(Math.abs(w.x-cam.tx)<16&&Math.abs(w.z-cam.tz)<16)person(w,w.x,w.z,w.yaw,t,w.mv,{ex:'senyum'})}}
  // ---- GL ----
  const hr=INSIDE?12.5:hourNow();const L=light(hr);if(!INSIDE&&S.cuaca&&S.cuaca!=='cerah'){const f=S.cuaca==='hujan'?.68:.86;for(const k of ['top','hor','sunC','sky','gnd'])L[k]=L[k].map(v=>v*f)}
  const sunA=clamp((hr-6)/13);const sun=norm([-.6+sunA*1.2,.95,.7]);
@@ -326,13 +326,13 @@ function render(t){
  tags(t)}
 // label HTML
 const TG=new Map();function tag(k,txt,p,cls){let el=TG.get(k);if(!el){el=document.createElement('div');el.className='tag '+(cls||'');$('tags').appendChild(el);TG.set(k,el)}if(!p){el.style.display='none';return}const s=project(p);el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px';if(el.textContent!==txt)el.textContent=txt}
-function tags(t){tag('pres','PRESIDENT',PNPC.show&&!INSIDE?[PNPC.x,1.55,PNPC.z]:null,'pres');for(const n of NPCS)tag(n.u,n.nm,Math.hypot(n.x-P.x,n.z-P.z)<9?[n.x,1.5,n.z]:null);
+function tags(t){tag('pres','PRESIDENT',PNPC.show&&!INSIDE&&(PNPC.x<16.4)===(zonaNow()==='rumah')?[PNPC.x,1.55,PNPC.z]:null,'pres');for(const n of NPCS)tag(n.u,n.nm,Math.hypot(n.x-P.x,n.z-P.z)<9?[n.x,1.5,n.z]:null);
  tag('me','@'+(ME.u==='tamu'?'tamu':ME.u)+(S.seni?' '+SENI[S.seni].ic:''),[P.x,1.55,P.z]);
  tag('emo-me',MY.e||'',MY.e&&Date.now()-MY.eAt<5000&&!INSIDE?[P.x,2.35,P.z]:null,'emo');
  JALAN.forEach((w,i)=>tag('j'+i,'@'+w.u,!INSIDE&&Math.hypot(w.x-P.x,w.z-P.z)<7?[w.x,1.55,w.z]:null,'jalan'));
  for(const r of OTH.values()){tag('o:'+r.u,'@'+r.u+(r.seni&&SENI[r.seni]?' '+SENI[r.seni].ic:''),[r.x,1.55,r.z],'oth');tag('oe:'+r.u,r.e||'',r.e&&Date.now()-SKEW-(r.et||0)<5000?[r.x,2.35,r.z]:null,'emo')}
  KSLOT.forEach((h,i)=>{const u=houseOf(h);tag('h'+i,u?'🏠 @'+u:'🏠 rumah kosong',Math.hypot(h.x-P.x,h.z-P.z)<6&&!INSIDE?[h.x,2.5,h.z]:null,'home')});
- const ar=$('arrow');const tp=TUT.target();if(tp&&!UI.busy){const s=project([tp[0],tp[1]||1.4,tp[2]]);ar.classList.remove('hide');ar.style.left=Math.max(20,Math.min(innerWidth-20,s[0]))+'px';ar.style.top=Math.max(110,Math.min(innerHeight-230,s[1]))+'px'}else ar.classList.add('hide')}
+ const ar=$('arrow');let tp=TUT.target();if(tp&&!INSIDE){const ik=zonaNow()==='kota';if((tp[0]>16.4)!==ik){if(ik){const h=myHouse();tp=[h.x,2.2,h.z+1]}else tp=[15.8,1.8,5.25]}}if(tp&&!UI.busy){const s=project([tp[0],tp[1]||1.4,tp[2]]);ar.classList.remove('hide');ar.style.left=Math.max(20,Math.min(innerWidth-20,s[0]))+'px';ar.style.top=Math.max(110,Math.min(innerHeight-230,s[1]))+'px'}else ar.classList.add('hide')}
 
 // ---------- input ----------
 const KEY=new Set();let JOY=[0,0];
@@ -439,7 +439,7 @@ function pilihSeni(){const lost=S.lost;
  panel('PILIH SENI LO',`<div class="say"><b>Kak Studio:</b> ${lost?'Alat seni lo hilang karena 7 hari nggak berkarya. Bawa bahan tugasnya, gue kasih alat baru. Boleh ganti jalur.':'Di Kota Seni, tiap warga pegang alat seni pilihannya sendiri. Lo mau jadi apa?'}</div>`+rows);
  $('pBody').querySelectorAll('[data-j]').forEach(bt=>bt.onclick=()=>{const k=bt.dataset.j,J=SENI[k];
   panel('YAKIN?',`<div class="say">Jadi <b>${J.ic} ${J.nm}</b>? Lo dapet <b>${J.alat}</b>. Jalur kedua bisa dibuka nanti.</div><button class="pri" id="bYa">Ya, gue ${J.nm}!</button><button class="ghost" id="bNo">Balik</button>`);
-  $('bNo').onclick=pilihSeni;$('bYa').onclick=()=>{if(lost){if(!hasB(J.tugas))return pilihSeni();takeB(J.tugas)}S.seni=k;S.lost=null;S.alat={lv:1,n:0,last:S.day};closePanel();sfx('koin');save();
+  $('bNo').onclick=pilihSeni;$('bYa').onclick=()=>{if(lost){if(!hasB(J.tugas))return pilihSeni();takeB(J.tugas)}S.seni=k;S.lost=null;S.alat={lv:1,n:0,last:S.day};placeMe();closePanel();sfx('koin');save();
    say(['Selamat! Lo sekarang warga '+J.nm+' Kota Seni. Ini '+J.alat+' lo.','Inget aturan kota: kalau 7 hari (hari game) nggak berkarya, alatnya hilang dan lo jadi warga biasa lagi.','Bikin karya di sini. Karyanya jadi besok pagi.'],'KAK STUDIO')}})}
 function panelStudio(){const J=SENI[S.seni],A=S.alat,idle=S.day-A.last,cost=(A.lv>1?8:15)-(hatiOf('kakstudio')>=5?3:0);
  const rows=J.resep.map((r,i)=>`<div class="row"><div class="ic">${r.ic}</div><div class="tx">${r.nm} <small>· jual 💰${r.sell}</small><small>${bTxt(r.bahan)} · tenaga ${cost}</small></div><button data-r="${i}" ${hasB(r.bahan)?'':'disabled'}>Bikin</button></div>`).join('');
@@ -494,7 +494,7 @@ function spawnForage(){const R=seedRand(ME.u+'fg'+S.day);const spots=[[19.7,3.6]
 function growNight(){for(const T of S.tiles){if(T.c&&T.wet&&!T.c.ripe){T.c.age++;if(T.c.age>=CROP[T.c.k].grow)T.c.ripe=1}T.wet=0}}
 function sleep(fainted,why){UI.busy=true;sfx('tidur');const line=TUT.sleepLine();const paid=payBin();if(paid)setTimeout(()=>{sfx('koin');coinFly(paid)},700);const ship=S.ship.slice();const earned=S.paidToday;
  growNight();const jadi=(S.proses||[]).slice();for(const k of jadi)addInv(k,1);S.proses=[];const prevDay=S.day;S.day++;S.msgSeni=null;
- if(S.seni&&S.alat){const idle=S.day-S.alat.last;if(idle>=7){S.lost=S.seni;S.seni=null;S.alat=null;S.msgSeni='hilang'}else if(idle>=3)S.msgSeni='debu'}
+ if(S.seni&&S.alat){const idle=S.day-S.alat.last;if(idle>=7){S.lost=S.seni;S.seni=null;S.alat=null;S.msgSeni='hilang';placeMe()}else if(idle>=3)S.msgSeni='debu'}
  {const m0=tgl(prevDay).m,m1=tgl(S.day).m;S.msgMusim=null;if(m0!==m1){let mati=0;for(const T of S.tiles)if(T.c&&!MUSIMC[T.c.k].includes(m1)){T.c=null;mati++}S.msgMusim=[m1,mati]}}
  S.cuaca=cuacaOf(S.day);if(S.cuaca==='hujan')for(const T of S.tiles)if(T.til)T.wet=1;
  S.msgAyam=null;if(S.kandang&&S.ayam){let mk=0;for(let i=0;i<S.ayam;i++)if((S.pakan||0)>0){S.pakan--;S.telurSiap=(S.telurSiap||0)+1;mk++}S.msgAyam=mk<S.ayam?'lapar':mk?'telur':null}S.min=fainted?360:0;S.E=fainted?60:EMAX();S.ship=[];S.paidToday=0;spawnForage();
@@ -514,7 +514,7 @@ const TOUR=[{c:[33,.8],pn:[34.3,.6],pl:[32.7,1.1],t:['Ini TOKO BENIH. Buka jam 9
  {c:[41,.8],pn:[42.3,.6],pl:[40.7,1.1],t:['Ini TOKO ROTI punya Bu Roti. Roti bikin tenaga lo balik.','Gandum lo jual ke Bu Roti aja, harganya lebih bagus dari kotak jual.']},
  {c:[37,7.4],pn:[35.2,6.6],pl:[35.6,5.4],t:['Ini ALUN-ALUN. Tiap Sabtu malam nanti ada festival di sini.','Yang di kursi emas itu Wapres. Kerjaannya jagain kursi. Serius.']},
  {c:[24,9.5],pn:[24.6,8.4],pl:[23.6,8.9],t:['Ini gerbang KOMPLEKS WARGA. Tiap blok isinya warga sesuai seninya.','Ketuk rumah warga buat main ke lahan mereka. Udah, balik ke lahan yuk!']}];
-function tur(done){UI.busy=true;let i=0;const go=()=>{if(i>=TOUR.length){INTRO=null;S.min+=120;PNPC.x=PNPC.tx=7;PNPC.z=PNPC.tz=-.2;P.x=7;P.z=.9;P.yaw=Math.PI;hud();UI.busy=false;return done()}
+function tur(done){UI.busy=true;TOURING=true;let i=0;const go=()=>{if(i>=TOUR.length){INTRO=null;S.min+=120;PNPC.x=PNPC.tx=7;PNPC.z=PNPC.tz=-.2;P.x=7;P.z=.9;P.yaw=Math.PI;hud();UI.busy=false;setTimeout(()=>{TOURING=false;ZONA=zonaNow()},100);return done()}
   UI.busy=true;const s=TOUR[i++];INTRO={x:s.c[0],z:s.c[1],k:3};PNPC.x=PNPC.tx=s.pn[0];PNPC.z=PNPC.tz=s.pn[1];P.x=s.pl[0];P.z=s.pl[1];P.yaw=Math.atan2(s.pn[0]-s.pl[0],s.pn[1]-s.pl[1]);
   setTimeout(()=>say(s.t,null,go),900)};go()}
 // ---------- tutorial hari 1 (dipandu President) ----------
@@ -530,7 +530,7 @@ const TUT={s:0,
   if(s==6)return INSIDE?[BED[0],1.4,BED[1]]:[DOOR[0],2.4,DOOR[1]];return null},
  talk(){const s=S.tut;
   if(s==0)return say(['Eh, lo warga baru ya? Selamat datang di Kota Seni!','Kota ini sempet hancur. Ini lahan lo. Dulu kebun paling rame se-Kota Seni.'],null,tawarTur);
-  const L={1:'Cabut rumput liarnya dulu pakai SABIT.',2:'Cangkul 9 petak yang gue tandain. Pegang CANGKUL, hadap petaknya, PAKAI.',3:'Buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. Langsung kesebar 3×3.',4:'Siram semua petaknya pakai PENYIRAM. Tanaman cuma tumbuh kalau disiram tiap hari.',5:'Toko benih & toko roti ada di sebelah kanan (timur). Cari 3 barang liar di sekitar kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore.',6:'Udah malem. Masuk rumah, deketin kasur, terus tidur. Besok siram lagi ya!'};
+  const L={1:'Cabut rumput liarnya dulu pakai SABIT.',2:'Cangkul 9 petak yang gue tandain. Pegang CANGKUL, hadap petaknya, PAKAI.',3:'Buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. Langsung kesebar 3×3.',4:'Siram semua petaknya pakai PENYIRAM. Tanaman cuma tumbuh kalau disiram tiap hari.',5:'Cari 3 barang liar (jamur, bunga, buah) di lahan atau di kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore. Ke kota lewat gerbang timur lahan.',6:'Udah malem. Masuk rumah, deketin kasur, terus tidur. Besok siram lagi ya!'};
   if(!L[s]&&S.tut>=99)hatiNgobrol('pres',PNPC.x,PNPC.z);
   say(L[s]?[L[s]]:[...(isBday()?['Selamat ulang tahun, @'+ME.u+'! Kota Seni ikut seneng.']:[]),lineOf('pres')])},
  ev(e,n){const s=S.tut;const done=()=>{const tg=this.target();return !tg};
@@ -538,7 +538,7 @@ const TUT={s:0,
   else if(s==2&&e=='cangkul'&&done()){S.tut=3;say(['Rapi! Sekarang buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak.'])}
   else if(s==3&&e=='tanam'){S.tut=4;S.tool=1;hud();say(['Udah ketanem. Sekarang SIRAM semua petaknya pakai PENYIRAM.'])}
   else if(s==4&&e=='siram'&&done()){S.tut=5;for(let x=ST.x0;x<ST.x1;x++)for(let z=ST.z0;z<ST.z1;z++){const T=ti(x,z);if(T.c)T.c.age=CROP[T.c.k].grow-1}
-   say(['Kerja bagus! Ini benih spesial dari gue: besok pagi wortelnya udah bisa dipanen!','Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Ambil pakai AKSI.','Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Toko benih & toko roti ada di timur, ikutin jalan setapak.'],null,()=>{PNPC.tx=PLAZA[0]-1.2;PNPC.tz=PLAZA[1]+1.6})}
+   say(['Kerja bagus! Ini benih spesial dari gue: besok pagi wortelnya udah bisa dipanen!','Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Ambil pakai AKSI.','Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Mau ke kota? Lewat gerbang timur lahan, lo bakal muncul di depan rumah lo di kompleks.'],null,()=>{PNPC.tx=PLAZA[0]-1.2;PNPC.tz=PLAZA[1]+1.6})}
   else if(s==5&&e=='jual'){const tot=Object.values(S.bin).reduce((a,b)=>a+b,0)+S.ship.reduce((a,b)=>a+b[1],0);if(tot>=3){S.tut=6;say(['Sip! Kotak jual dibayar jam 5 sore.','Kalau udah capek atau udah malem, masuk rumah terus tidur. Hari 1 lo nggak bakal pingsan, tenang.'])}}},
  sleepLine(){if(S.tut<99&&S.day<=2)return 'Besok pagi wortel lo udah siap panen. Jangan lupa!';const L=['Tanah yang disiram tiap hari, panennya nggak bohong.','Toko benih tutup tiap hari ke-7, beli stok dulu.','Bambu nanti bisa jadi suling di Studio. Lagi gue bangun!','Kalau capek, makan roti. Jangan sampe pingsan.'];return L[S.day%L.length]},
  onSleep(){if(S.tut<99&&S.tut>=4)S.tut=99},
@@ -661,16 +661,16 @@ function jalanStep(dt){siapJalan();for(const w of JALAN){if(w.wait>0){w.wait-=dt
 // ---------- main ke lahan warga lain (lihat saja) ----------
 let VISIT=null;
 function ketuk(h){const u=houseOf(h),B=BLOK.find(b=>b[0]===h.b);if(!u)return toast('Rumah kosong di '+B[1]+'. Nunggu warga baru.');
- if(u===ME.u)return toast('Ini alamat lo di '+B[1]+'. Lahan lo ada di barat kota.');
+ if(u===ME.u)return pulang();
  panel('RUMAH @'+u,`<div class="small">${B[1]} · ${KOMPN[h.b]||0} warga di blok ini</div><button class="pri" id="bVisit">🌱 Main ke lahannya</button><button class="ghost" id="bNoV">Nanti aja</button>`);
  $('bNoV').onclick=closePanel;$('bVisit').onclick=async()=>{$('bVisit').disabled=true;const j=await api('mainLihat&u='+encodeURIComponent(u));
   if(!j.ok||!Array.isArray(j.tiles)){closePanel();return toast('Lahannya belum bisa dilihat. Coba lagi nanti.')}
-  closePanel();VISIT={u,tiles:j.tiles,seni:j.seni,likes:j.likes||0,rumah:j.rumah||1,pulih:j.pulih};P.x=15.2;P.z=5.25;P.yaw=-Math.PI/2;cam.tx=P.x;cam.tz=P.z;misiEv('visit');sfx('buka');
+  closePanel();VISIT={u,h,tiles:j.tiles,seni:j.seni,likes:j.likes||0,rumah:j.rumah||1,pulih:j.pulih};P.x=15.2;P.z=5.25;P.yaw=-Math.PI/2;cam.tx=P.x;cam.tz=P.z;misiEv('visit');sfx('buka');
   $('visitBar').classList.remove('hide');$('vName').textContent='👀 Lahan @'+u+(j.seni&&SENI[j.seni]?' '+SENI[j.seni].ic:'');$('vLike').textContent='❤️ '+VISIT.likes;
   say(['Lo lagi main ke lahan @'+u+'. Lihat-lihat aja ya, nggak bisa diubah.','Kalau suka, pencet ❤️ di atas. Keluar lewat gerbang timur buat balik ke kota.'],null)}}
 async function sukaLahan(){if(!VISIT)return;if(!ME.tok)return toast('Masuk pakai username IG buat kasih ❤️');const r=await api('mainSukaLahan',{u:ME.u,tok:ME.tok,t:VISIT.u});
  if(r.ok&&r.baru){VISIT.likes++;$('vLike').textContent='❤️ '+VISIT.likes;sfx('pop');burst(P.x,1.4,P.z,['#FF5FA2','#FFD23F'],12,1.2,2.4,.06);toast('❤️ terkirim ke @'+VISIT.u)}else toast('Udah lo ❤️ sebelumnya')}
-function cekVisit(){if(VISIT&&P.x>16.6){VISIT=null;$('visitBar').classList.add('hide');toast('Balik ke kota')}}
+function cekVisit(){}
 // ---------- Fase 2: cuaca, kandang & ayam, hati tokoh kota, juara pameran, bantu siram ----------
 function cuacaOf(d){if(d<=1)return 'cerah';const R=seedRand(ME.u+'cuaca'+d);const r=R(),m=tgl(d).m;const ph=m==3?.15:m==1?.3:.25;return r<ph?'hujan':r<ph+.2?'berawan':'cerah'}
 const CUACA_IC={cerah:'☀️',berawan:'⛅',hujan:'🌧️'},CUACA_NM={cerah:'Cerah',berawan:'Berawan',hujan:'Hujan (tanaman kesiram otomatis)'};
@@ -709,21 +709,28 @@ function bantuSiram(){const [x,z]=target();const i=x*FD+z,T=x>=0&&x<FW&&z>=0&&z<
  VISIT.q=(VISIT.q||[]).concat(i);clearTimeout(VISIT.tm);const V=VISIT;VISIT.tm=setTimeout(()=>{if(ME.tok&&V.q.length)api('mainBantu',{u:ME.u,tok:ME.tok,t:V.u,idx:V.q});V.q=[]},1500)}
 // ---------- area rumah (pribadi) vs kota (online) ----------
 let ZONA=null;const zonaNow=()=>INSIDE||P.x<16.4?'rumah':'kota';
-function zonaStep(){const z=zonaNow();if(z===ZONA)return;const awal=ZONA===null;ZONA=z;if(awal)return;
+function zonaStep(){const z=zonaNow();if(z===ZONA)return;const awal=ZONA===null;ZONA=z;if(awal||TOURING)return;
  const el=$('zoneFade');if(z==='kota'){netT=99;$('zT').textContent='🌐 Keluar ke Kota';$('zS').textContent='Online · ketemu warga lain di sini'}
  else{$('zT').textContent=VISIT?'🏡 Masuk Area Rumah @'+VISIT.u:'🏡 Masuk Area Rumah';$('zS').textContent=VISIT?'Lahan teman · cuma bisa lihat & bantu siram':'Pribadi · cuma lo di sini'}
  sfx('buka');el.classList.remove('on');void el.offsetWidth;el.classList.add('on')}
 function gerbangDraw(){const x=16.6;for(const z of [3.85,6.65])bx(x,0,z,.28,2.6,.28,'#8E5A3B');bx(x,2.6,5.25,.3,.2,3.1,'#8E5A3B');
- D(G.box,M.chain(M.T(x,2.25,5.25),M.S(.04,.4,2.3)),'#FFFFFF',{tex:sign('RUMAH  |  KOTA','#E9C46A'),em:.4,cast:false});D(G.box,M.chain(M.T(x+.05,2.25,5.25),M.RY(Math.PI/2),M.S(2.3,.4,.04)),'#FFFFFF',{tex:sign('🏡 RUMAH | KOTA 🌐','#E9C46A'),em:.4,cast:false})}
+ D(G.box,M.chain(M.T(x,2.25,5.25),M.S(.04,.4,2.3)),'#FFFFFF',{tex:sign('KE KOTA 🌐','#E9C46A'),em:.4,cast:false});D(G.box,M.chain(M.T(x+.05,2.25,5.25),M.RY(Math.PI/2),M.S(2.3,.4,.04)),'#FFFFFF',{tex:sign('KE KOTA 🌐','#E9C46A'),em:.4,cast:false});bx(17.6,0,5.25,2.2,.03,2.0,'#D4B483',NC)}
+// rumah lo di kompleks = pintu ke lahan lo
+function placeMe(){if(!ME||!ME.u)return;const b=S&&S.seni?S.seni:'baru';for(const [k] of BLOK)KOMP[k]=(KOMP[k]||[]).filter(u=>u!==ME.u);KOMP[b]=[ME.u,...KOMP[b]].slice(0,5)}
+const myHouse=()=>KSLOT.find(h=>houseOf(h)===ME.u)||KSLOT[0];
+let TOURING=false;
+function pulang(){if(UI.busy)return;VISIT=null;$('visitBar').classList.add('hide');INSIDE=false;P.x=15.0;P.z=5.25;P.yaw=-Math.PI/2;cam.tx=P.x;cam.tz=P.z;cam.yaw=CAMM==='belakang'?Math.PI/2:-.18}
+function keKota(){const h=VISIT&&VISIT.h?VISIT.h:myHouse();if(VISIT){VISIT=null;$('visitBar').classList.add('hide')}P.x=h.x;P.z=h.z+1.55;P.yaw=0;cam.tx=P.x;cam.tz=P.z;if(CAMM==='belakang')cam.yaw=Math.PI}
+function portalStep(){if(UI.busy||INSIDE||TOURING||INTRO)return;if(zonaNow()==='rumah'&&P.x>15.55&&P.z>4.1&&P.z<6.4)keKota()}
 // ---------- peta kota ----------
 function peta(){const k=6,ox=1.5,oz=7,X=x=>((x+ox)*k).toFixed(1),Z=z=>((z+oz)*k).toFixed(1);
- const r=WALK.map(w=>`<rect x="${X(w[0])}" y="${Z(w[2])}" width="${((w[1]-w[0])*k).toFixed(1)}" height="${((w[3]-w[2])*k).toFixed(1)}" fill="#E8D5A8"/>`).join('');
- const bd=[[HOUSE,'#E9D3B0'],[SHOP.studio,'#C9B6E8'],[SHOP.benih,'#9BC59D'],[SHOP.roti,'#F2A49A']].map(([b,c])=>`<rect x="${X(b.x-b.w/2)}" y="${Z(b.z-b.d/2)}" width="${b.w*k}" height="${b.d*k}" fill="${c}" stroke="#2B1D0E"/>`).join('');
- const lb=[[8,6,'LAHAN LO'],[4,-3.4,'RUMAH'],[27.6,-3,'STUDIO'],[33,-3,'BENIH'],[41,-3,'ROTI'],[37,8.6,'ALUN-ALUN'],[43.6,8.6,'PANGGUNG'],[32,13.9,'KOMPLEKS WARGA']].map(([x,z,t])=>`<text x="${X(x)}" y="${Z(z)}" text-anchor="middle" font-size="9" font-weight="800" fill="#2B1D0E">${t}</text>`).join('')+
+ const r=WALK.filter(w=>w[0]>16).map(w=>`<rect x="${X(w[0])}" y="${Z(w[2])}" width="${((w[1]-w[0])*k).toFixed(1)}" height="${((w[3]-w[2])*k).toFixed(1)}" fill="#E8D5A8"/>`).join('');
+ const bd=[[SHOP.studio,'#C9B6E8'],[SHOP.benih,'#9BC59D'],[SHOP.roti,'#F2A49A']].map(([b,c])=>`<rect x="${X(b.x-b.w/2)}" y="${Z(b.z-b.d/2)}" width="${b.w*k}" height="${b.d*k}" fill="${c}" stroke="#2B1D0E"/>`).join('');
+ const lb=[[27.6,-3,'STUDIO'],[33,-3,'BENIH'],[41,-3,'ROTI'],[37,8.6,'ALUN-ALUN'],[43.6,8.6,'PANGGUNG'],[32,13.9,'KOMPLEKS WARGA']].map(([x,z,t])=>`<text x="${X(x)}" y="${Z(z)}" text-anchor="middle" font-size="9" font-weight="800" fill="#2B1D0E">${t}</text>`).join('')+
   BLOK.map((b,i)=>`<text x="${X(26)}" y="${Z(15.6+i*3.3)+3}" font-size="6.5" fill="#5A4630">${b[1].replace('BLOK ','')}</text>`).join('');
- const me=INSIDE?[DOOR[0],DOOR[1]]:[P.x,P.z];const ot=[...OTH.values()].map(o=>`<circle cx="${X(o.x)}" cy="${Z(o.z)}" r="3" fill="#5DADE2"/>`).join('');
- panel('PETA KOTA',`<svg viewBox="0 0 ${49*k} ${45*k}" style="width:100%;background:#9BD17A;border:2px solid #2B1D0E;border-radius:10px">${r}${bd}<circle cx="${X(37)}" cy="${Z(8)}" r="7" fill="#9FD8FF" stroke="#2B1D0E"/>${lb}${ot}<circle cx="${X(me[0])}" cy="${Z(me[1])}" r="5" fill="#E53935" stroke="#fff" stroke-width="2"/></svg>
-  <div class="small">🔴 lo · 🔵 warga lain online. Jalan cuma bisa lewat jalan setapak; pagar tanaman = batas.</div>`)}
+ const mh=myHouse();const me=zonaNow()==='rumah'?[mh.x,mh.z]:[P.x,P.z];const mhs=`<rect x="${X(mh.x-1)}" y="${Z(mh.z-.8)}" width="${2*k}" height="${1.6*k}" fill="#FFD23F" stroke="#2B1D0E"/>`;const ot=[...OTH.values()].map(o=>`<circle cx="${X(o.x)}" cy="${Z(o.z)}" r="3" fill="#5DADE2"/>`).join('');
+ panel('PETA KOTA',`<svg viewBox="0 0 ${49*k} ${45*k}" style="width:100%;background:#9BD17A;border:2px solid #2B1D0E;border-radius:10px">${r}${bd}${mhs}<circle cx="${X(37)}" cy="${Z(8)}" r="7" fill="#9FD8FF" stroke="#2B1D0E"/>${lb}${ot}<circle cx="${X(me[0])}" cy="${Z(me[1])}" r="5" fill="#E53935" stroke="#fff" stroke-width="2"/></svg>
+  <div class="small">${zonaNow()==='rumah'?'Lo lagi di Area Rumah (pribadi). Keluar lewat gerbang timur lahan, lo muncul di depan rumah lo. ':''}🟨 rumah lo (pintu ke lahan lo) · 🔴 lo · 🔵 warga lain online.</div>`)}
 // ---------- kota bareng: warga lain yang lagi di kota ----------
 const OTH=new Map();let netT=3.4,netBusy=false,SKEW=0;const MY={e:null,eAt:0};const EMO=['👋','❤️','👏','😂','🔥','🎵'];
 const inKota=()=>S&&!INSIDE&&P.x>16.4;
@@ -766,7 +773,7 @@ function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1
  if(S&&!perfDone&&!UI.busy){perfN++;perfT+=dt;if(perfT>5){perfDone=true;if(!LITE&&perfT/perfN>1/30){setLite(true);toast('HP lo agak berat, mode ringan dinyalain biar lancar')}}}
  if(S&&SPIN)P.yaw+=dt*1.1;
  fxStep(dt);if(SHAKE>.01){cam.tx+=(Math.random()-.5)*SHAKE;cam.tz+=(Math.random()-.5)*SHAKE;SHAKE*=.82}
- if(S){zonaStep();netStep(dt);cekFestival();cekVisit();babStep(dt);jalanStep(dt);misiT+=dt;if(misiT>30){misiT=0;cekMisi()}kolT+=dt;if(kolT>120){kolT=0;koleksi()}}
+ if(S){portalStep();zonaStep();netStep(dt);cekFestival();cekVisit();babStep(dt);jalanStep(dt);misiT+=dt;if(misiT>30){misiT=0;cekMisi()}kolT+=dt;if(kolT>120){kolT=0;koleksi()}}
  if(camBelakang()&&Math.hypot(P.vx,P.vz)>.1){let d=(P.yaw+Math.PI)-cam.yaw;d=Math.atan2(Math.sin(d),Math.cos(d));cam.yaw+=d*(1-Math.exp(-dt*2.6))}
  if(S){const k=1-Math.exp(-dt*(INTRO?(INTRO.k||1.2):6));const fx=INTRO?INTRO.x:P.x,fz=INTRO?INTRO.z:P.z+.4;cam.tx+=(fx-cam.tx)*k;cam.tz+=(fz-cam.tz)*k;render(t)}
  music(t);

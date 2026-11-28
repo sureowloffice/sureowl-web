@@ -24,14 +24,14 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | p1esg135 | Cangkul 9 petak yang gue tandain. Pegang CANGKUL, hadap petaknya, PAKAI. |
 | p128rfse | Buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. Langsung kesebar 3×3. |
 | p1cekebk | Siram semua petaknya pakai PENYIRAM. Tanaman cuma tumbuh kalau disiram tiap hari. |
-| p1qu0ro5 | Toko benih & toko roti ada di sebelah kanan (timur). Cari 3 barang liar di sekitar kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore. |
+| p1ms6qbg | Cari 3 barang liar (jamur, bunga, buah) di lahan atau di kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore. Ke kota lewat gerbang timur lahan. |
 | ptyfev4 | Udah malem. Masuk rumah, deketin kasur, terus tidur. Besok siram lagi ya! |
 | p175d72g | Mantap! Sekarang CANGKUL 9 petak itu. Tanahnya harus digemburin dulu sebelum ditanam. |
 | pl2pxfc | Rapi! Sekarang buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. |
 | pwdtkmv | Udah ketanem. Sekarang SIRAM semua petaknya pakai PENYIRAM. |
 | p9qf74y | Kerja bagus! Ini benih spesial dari gue: besok pagi wortelnya udah bisa dipanen! |
 | pa0n3vy | Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Ambil pakai AKSI. |
-| pznd8wr | Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Toko benih & toko roti ada di timur, ikutin jalan setapak. |
+| pgfkvlj | Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Mau ke kota? Lewat gerbang timur lahan, lo bakal muncul di depan rumah lo di kompleks. |
 | p16d6bw4 | Sip! Kotak jual dibayar jam 5 sore. |
 | p1uxd3wh | Kalau udah capek atau udah malem, masuk rumah terus tidur. Hari 1 lo nggak bakal pingsan, tenang. |
 | pweh3w3 | Besok pagi wortel lo udah siap panen. Jangan lupa! |
