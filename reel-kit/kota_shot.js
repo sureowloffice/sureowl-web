@@ -641,6 +641,68 @@ SHOTS['distrik-musik']={f:u=>({yaw:.45+L(-.1,.1,u),pitch:.5,dist:L(32,24,E(u)),t
  const P14=[RB[0]+.2,RB[1]+3.4];
  T0('h14b-cta',(u,ts)=>({yaw:L(-.12,0,u),pitch:.04,dist:L(2.5,1.45,sm(u)),tx:P14[0],ty:1.02,tz:P14[1]}),Object.assign({},RT,{props:[PKS,TIA,RBP({busa:[0,.01],karpet:[0,.01],karet:[0,.01],vent:[0,.01],jadwal:-1})],ppl:[NB(201,P14[0]-1.2,P14[1]-1.3,.3,null,{ges:'lambai',hop:1}),NB(202,P14[0]+1.2,P14[1]-1.3,-.3,null,{ges:'tepuk',hop:1}),NB(204,P14[0]-.4,P14[1]-1.9,0,null,{ges:'palu',hop:1}),NB(207,P14[0]+.5,P14[1]-1.9,0,null,{ges:'tepuk',hop:1,helm:1,hy:1.0}),{owl:1,vil:1,x:P14[0]+1.4,z:P14[1]-.6,yaw:-.3,sc:.4,mouth:'senyum'}]}),HP('h14b-cta',[[0,P14[0],P14[1],0,0]],{ex:[[0,'senyum'],[4,'serius'],[9,'semangat']],ges:[[0,'tunjuk'],[4,'pinggang'],[9,'angkat']]}),{jam:17.6});
  }
+ {// ===== DI KOTA SENI #1: ALAT SENI HILANG =====
+ const KP=path.join(__dirname,'data/ks1_kf.json');const KK=fs.existsSync(KP)?JSON.parse(fs.readFileSync(KP,'utf8')):{};const kk=(n,d)=>KK[n]!=null?KK[n]:d;
+ const sm=q=>{q=Math.max(0,Math.min(1,q));return q*q*(3-2*q)};
+ const RT={build:{x:-79,z:-47,b0:6,b1:6,dur:1},roti:1,plak:'Usulan ★vanzz★'};const GX=-86.6,GZ=-42.6;
+ const PKS={type:'papanks',x:-83.3,z:-41.4,ry:0,full:1};const TIA={type:'tiang',x:-80.8,z:-41.6,ry:0,lamp:1,st:'ilang'};const PG={type:'posjaga',x:GX,z:GZ,ry:0,kent:1,full:1};
+ const RBD={type:'ruangband',x:-80.6,z:-38.4,ry:0,full:1,namaFull:1};
+ const PX0=-87,PZ0=-32;
+ const TAMAN=[{type:'blok',x:PX0,z:PZ0,w:15,h:.03,d:13,c:'#86C96E'},{type:'blok',x:PX0,z:PZ0+1.2,w:2.2,h:.035,d:13,c:'#E9D8B4'},
+  {type:'pohon',x:PX0-6,z:PZ0-5,c:'#4CAF50'},{type:'pohon',x:PX0+6,z:PZ0-5,c:'#66BB6A'},{type:'pohon',x:PX0-6.2,z:PZ0+4.5,c:'#43A047'},{type:'pohon',x:PX0+5.5,z:PZ0+3.4,c:'#7CB342'},{type:'pohon',x:PX0-2.5,z:PZ0-5.6,c:'#FF8FB1'},{type:'pohon',x:PX0+2.8,z:PZ0-5.4,c:'#FFB74D'},
+  {type:'bunga',x:PX0-3.5,z:PZ0-2.2,n:16},{type:'bunga',x:PX0+3.6,z:PZ0-2,n:16},{type:'bunga',x:PX0-4,z:PZ0+2.6,n:12},{type:'bunga',x:PX0+4.2,z:PZ0+2.2,n:12},
+  {type:'bangku',x:PX0,z:PZ0-1.35,ry:0}];
+ const CITY=[PKS,TIA,PG,RBD].concat(TAMAN);
+ const OFF=PR('x',[[0,-95,-60,0,0]]);
+ const GES={mic:'mic',gitar:'gitar',biola:'biola',stik:'drum',kamera:'kamera',kuas:'kasih',selendang:'tari'};
+ const W=(i,x,z,yaw,hold,bb,o)=>Object.assign({i,x,z,yaw,hold,ges:GES[hold]||'diam',ex:'senyum',bb,bbs:.42,bby:1.45},o||{});
+ const CROWD=[W(220,PX0-3.2,PZ0-1.2,.6,'mic','RARA · PENYANYI',{gc:null}),W(221,PX0+3.0,PZ0-1.0,-.6,'kamera','DIMAS · VIDEOGRAFER'),W(222,PX0-4.4,PZ0+.8,1.0,'biola','SARI · VIOLINIS'),
+  W(223,PX0+4.3,PZ0+.6,-1.0,'stik','ARYA · DRUMMER',{hop:1}),W(224,PX0-2.2,PZ0-3.4,.3,'kuas','NINA · PELUKIS'),W(225,PX0+2.1,PZ0-3.3,-.3,'selendang','LALA · PENARI',{hop:1}),
+  W(226,PX0-5.4,PZ0-2.6,.8,'gitar','JOJO · GITARIS',{gc:'#2E7DD1'}),W(227,PX0+5.2,PZ0-2.4,-.8,'mic','TIARA · PENYANYI'),W(228,PX0-1.2,PZ0-4.6,.1,'kamera','BAYU · FOTOGRAFER'),W(229,PX0+1.0,PZ0-4.7,-.1,'stik','DONI · DRUMMER',{hop:1})];
+ const BIMA=o=>Object.assign({i:210,x:PX0,z:PZ0-.75,yaw:0,col:'#3F7CC4',hold:'gitar',ges:'gitar',ex:'senyum',bb:'BIMA · GITARIS',bbs:.5,bby:1.5},o||{});
+ const flick=(a,b,n,t0,t1)=>{const r=[];for(let k=0;k<=n;k++)r.push([t0+(t1-t0)*k/n,k%2?a:b]);return r};
+ const SORE={jam:16.9};
+ // 1 HOOK: taman penuh warna, semua pegang alat, gitar Bima kedip-kedip
+ T0('s1-hook',u=>({yaw:L(.12,.04,u),pitch:L(.14,.11,u),dist:L(4.6,3.2,sm(u)),tx:PX0,ty:L(1.05,.95,u),tz:PZ0-.6}),Object.assign({},RT,{props:CITY,ppl:CROWD.concat([BIMA({ges:'diam',ex:'sedih',ha:flick(.3,.9,46,0,7),bbs:.45}),W(260,PX0-.95,PZ0+.25,.35,'mic',null),W(261,PX0+.95,PZ0+.3,-.35,'kamera',null),W(262,PX0-2.2,PZ0-1.4,.4,'biola',null),W(263,PX0+2.2,PZ0-1.3,-.4,'stik',null,{hop:1})])}),OFF,SORE);
+ // 2 warga baru datang, milih seni, alat muncul
+ const p1=kk('pop1',4.6),p2=kk('pop2',5.1);
+ T0('s2-datang',u=>({yaw:L(-.25,-.1,u),pitch:.12,dist:L(5.0,3.4,sm(u)),tx:PX0-2.4,ty:1.0,tz:L(PZ0-.5,PZ0+1.4,sm(u))}),Object.assign({},RT,{props:CITY,ppl:CROWD.slice(2).concat([
+   Object.assign(W(240,PX0-3.3,PZ0-3.5,0,'mic',null),{to:[PX0-3.0,PZ0+1.6],tw:0,dw:3.6,ha:[[0,0],[p1,0],[p1+.2,1]],spk:[p1],gk:[[0,'diam'],[p1,'mic']],ek:[[0,'bingung'],[p1,'semangat']],bbk:[[0,'WARGA BARU'],[p1,'RARA · PENYANYI','#FFE27A']],col:'#E91E63'}),
+   Object.assign(W(241,PX0-1.9,PZ0-4.0,0,'kamera',null),{to:[PX0-1.8,PZ0+1.3],tw:.3,dw:3.8,ha:[[0,0],[p2,0],[p2+.2,1]],spk:[p2],gk:[[0,'diam'],[p2,'kamera']],ek:[[0,'bingung'],[p2,'semangat']],bbk:[[0,'WARGA BARU'],[p2,'DIMAS · VIDEOGRAFER','#FFE27A']],col:'#00ACC1'})])}),OFF,SORE);
+ // 3 semua berkarya (wide)
+ T0('s3-lepas',u=>({yaw:L(.5,.75,u),pitch:L(.35,.42,u),dist:L(11,13,u),tx:PX0,ty:.8,tz:PZ0-1.5}),Object.assign({},RT,{props:CITY,ppl:CROWD.concat([BIMA()])}),OFF,SORE);
+ // 4 Bima main gitar tiap sore, penonton 3
+ const VIEW=[W(230,PX0-1.0,PZ0+1.6,Math.PI+.25,null,null,{ges:'diam',ex:'netral'}),W(231,PX0+.1,PZ0+2.0,Math.PI,null,null,{ges:'diam',ex:'netral'}),W(232,PX0+1.1,PZ0+1.5,Math.PI-.3,null,null,{ges:'diam',ex:'netral',ms:.72,col:'#F2B705'})];
+ T0('s4-taman',u=>({yaw:L(-.35,.25,u),pitch:.24,dist:L(4.6,3.4,sm(u)),tx:PX0,ty:1.0,tz:PZ0-.4}),Object.assign({},RT,{props:CITY,ppl:VIEW.concat([BIMA()])}),OFF,{jam:17.3});
+ // kamar
+ const KX=-60,KZ=-60;
+ const KAMAR=[{type:'kamar',x:KX,z:KZ,w:5,d:5,dinding:'#E8DCC6'},{type:'kasur',x:KX+1.2,z:KZ-1.3,ry:0,c:'#7E57C2'},
+  {type:'blok',x:KX+2.5,z:KZ-1.59,w:.1,h:3,d:1.82,c:'#E2D3BA'},{type:'blok',x:KX+2.5,z:KZ+1.59,w:.1,h:3,d:1.82,c:'#E2D3BA'},{type:'blok',x:KX+2.5,y:2.3,z:KZ,w:.1,h:.7,d:1.4,c:'#E2D3BA'}];
+ const GP=o=>Object.assign({type:'gitarprop',x:KX-.4,z:KZ-2.3,ry:0,lean:.2},o||{});
+ const PINTU=o=>Object.assign({type:'pintu',x:KX+2.5,z:KZ,ry:Math.PI/2},o||{});
+ // 5 capek: gitar disandarin di pojok
+ T0('s5-capek',u=>({yaw:L(.55,.35,u),pitch:.14,dist:L(4.2,3.4,sm(u)),tx:KX-.2,ty:1.0,tz:KZ-1.5}),{props:KAMAR.concat([GP(),PINTU()]),ppl:[BIMA({x:KX+.4,z:KZ-.8,yaw:-.6,hold:null,ges:'diam',ex:'lemas',bbs:.42})]},OFF,{jam:18});
+ // 6 senar putus, gitar hilang jadi debu
+ const u0=kk('putus0',.3),u1=kk('putus1',2.4),h0=kk('hil0',3.2),h1=kk('hil1',5.3);
+ T0('s6-pudar',u=>({yaw:L(.12,-.05,u),pitch:.12,dist:L(2.3,1.9,u),tx:KX-.4,ty:.85,tz:KZ-2.3}),{props:KAMAR.concat([GP({hs:[[0,6],[u0,6],[u1,0]],ha:[[0,1],[h0,1],[h0+.6,.6],[h1,0]],flick:1,dust:[h0,h1]}),PINTU()])},OFF,{jam:18.4});
+ // 7 Bima jadi warga biasa, jalan di taman, semua masih berkarya
+ const bs=kk('biasa',.6);
+ T0('s7-biasa',u=>({yaw:L(-.15,.25,u),pitch:.1,dist:L(3.2,3.6,u),tx:L(PX0+2.2,PX0-.8,u),ty:1.0,tz:PZ0+1.4}),Object.assign({},RT,{props:CITY,ppl:CROWD.concat([BIMA({x:PX0+2.6,z:PZ0+1.4,to:[PX0-1.2,PZ0+1.4],tw:0,dw:7,yaw:-1.5708,hold:null,ges:'diam',ex:'sedih',col:'#9AA0A6',bbk:[[0,'BIMA · GITARIS'],[bs,'BIMA · WARGA BIASA','#C9CDD2']]})])}),OFF,SORE);
+ // 8 ketok pintu: Ade
+ const kn=kk('knock',.4),bk=kk('buka',.75);
+ T0('s8-ketok',u=>{const e=sm((u-.25)/.6);return {yaw:L(-1.15,-1.45,e),pitch:.1,dist:L(4.0,2.4,e),tx:KX+L(1.6,2.6,e),ty:L(1.0,.8,e),tz:KZ}},{props:KAMAR.concat([PINTU({open:[bk,bk+.9]})]),ppl:[BIMA({x:KX+.9,z:KZ+1.2,yaw:1.2,hold:null,ges:'diam',ex:'kaget',bb:null}),
+   W(211,KX+3.25,KZ+.05,-1.5708,'gitar','ADE · GITARIS',{ms:.72,col:'#F2B705',gc:'#C9A27A',hs:5,ges:'diam',ex:'sedih',bby:1.15,bbs:.4,ek:[[0,'netral'],[kk('kak',1.5)+5,'senyum']]})]},OFF,{jam:17.8});
+ // 9 kilas balik: salah satu penonton = Ade di balik pohon
+ const ad=kk('ade',1.9);
+ T0('s9-kilas',u=>{const e=sm((u-.25)/.55);return {yaw:L(-.1,.25,e),pitch:.1,dist:L(4.4,2.8,e),tx:L(PX0,PX0+4.3,e),ty:L(1.0,.75,e),tz:L(PZ0-.2,PZ0+2.3,e)}},Object.assign({},RT,{props:CITY,ppl:VIEW.slice(0,2).concat([BIMA(),W(211,PX0+4.3,PZ0+2.3,-2.0,null,null,{ms:.72,col:'#F2B705',ges:'diam',ex:'senyum'})])}),OFF,{jam:17.3});
+ // 10 gitar balik
+ const bl=kk('balik',1.3);
+ T0('s10-balik',u=>({yaw:L(-.35,-.15,u),pitch:.12,dist:L(2.6,2.0,u),tx:KX+.9,ty:1.0,tz:KZ+.3}),{props:KAMAR.concat([PINTU({open:[-2,-1]})]),ppl:[BIMA({x:KX+.9,z:KZ+.3,yaw:0,ges:'gitar',hs:6,gck:[[0,'#C9A27A'],[bl,'#E07A2E']],spk:[bl],ek:[[0,'haru'],[bl,'senyum']],bbk:[[0,'BIMA · WARGA BIASA','#C9CDD2'],[bl,'BIMA · GITARIS','#FFE27A']]}),
+   W(211,KX+1.8,KZ+.9,-.7,null,null,{ms:.72,col:'#F2B705',ges:'tepuk',ex:'senyum'})]},OFF,{jam:17.8});
+ // 11 penutup: Bima & Ade main bareng, penonton rame bawa alat
+ const MANY=[];for(let k=0;k<12;k++){const an=-1.1+k*.2,rr=2.8+(k%3)*.7;const H=['mic','kamera','biola','kuas','selendang','stik',null,'gitar'][k%8];MANY.push(W(250+k,PX0+Math.sin(an)*rr,PZ0+.4+Math.cos(an)*rr,an+Math.PI,H,null,{ges:H?'tepuk':'tepuk',ex:'senyum',hop:k%2}))}
+ T0('s11-cta',u=>({yaw:L(.05,.25,u),pitch:L(.12,.3,sm(u)),dist:L(3.6,8.5,sm(u)),tx:PX0,ty:L(1.0,1.6,u),tz:PZ0}),Object.assign({},RT,{props:CITY,ppl:MANY.concat([BIMA({x:PX0-.45}),W(211,PX0+.55,PZ0-.65,-.15,'gitar','ADE · GITARIS',{ms:.72,col:'#F2B705',gc:'#C9A27A',hs:5,ges:'gitar',bby:1.15,bbs:.4})])}),OFF,{jam:17.6});
+ }
   T0('s2-jejak',u=>({yaw:.2,pitch:L(.55,.42,u),dist:L(3.4,4.6,E(u)),tx:-75,ty:0,tz:L(-70.5,-71.5,u)}),{night:1,props:[{type:'tepung',x:-75,z:-70,ry:.3,n:12}],ppl:[{owl:1,x:-76.5,z:-75.6,to:[-77.4,-77.8],tw:1.0,dw:1.6,yaw:-2.8,sc:.38}]},null,{jam:22});
   T0('t-bungkuk',u=>({yaw:1.9,pitch:.08,dist:4.2,tx:-83.8,ty:.5,tz:-41.4}),K3(60,{ppl:[0,1,2,3].map(k=>({i:120+k,x:-85.2+k*.8,z:-41.4,yaw:.3,bend:.3,ges:'pinggang',ex:'sakit'}))}));
   T0('t-saklar',u=>({yaw:1.25,pitch:.04,dist:L(2.2,1.8,u),tx:-69.95,ty:.72,tz:-62.25}),{props:[{type:'saklar',x:-70,z:-62.6}]},PR('x',[[0,-69.95,-61.95,HS,0]],{ges:[[0,'pencet']],ex:[[0,'bingung']]}));

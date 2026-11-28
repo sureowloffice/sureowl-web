@@ -1,0 +1,10 @@
+// ===== DI KOTA SENI #1 helpers =====
+function hookKS(t,t1){if(t>t1)return;const o=Math.min(1,(t1-t)/.25);x.save();x.globalAlpha=o;x.translate(W/2,330);x.rotate(-.025);
+ out('DI KOTA SENI,',0,-125,92,'#fff');out('KALAU KAMU BERHENTI BERKARYA…',0,-20,66,'#fff');out('ALAT SENIMU HILANG',0,95,112,Y);x.restore()}
+function eye3(t,t0,t1,n){if(t<t0||t>t1)return;const s=back((t-t0)/.3);x.save();x.translate(W-210,560);x.scale(s,s);rr(-150,-80,300,160,80,'rgba(17,17,17,.88)');x.font='72px "Noto Color Emoji"';x.textAlign='center';x.textBaseline='middle';x.fillText('👁',-60,6);out(String(n),60,8,110,Y);x.restore()}
+function kalender(t,t0,t1,lab,sub,col){if(t<t0||t>t1)return;const s=back((t-t0)/.3);x.save();x.translate(W/2,430);x.rotate(-.03);x.scale(s,s);rr(-250,-170,500,340,30,'#fff');rr(-250,-170,500,110,30,col||R);x.fillStyle=col||R;x.fillRect(-250,-90,500,30);
+ for(const q of [-140,140]){rr(q-16,-195,32,70,14,'#555')}out(lab,0,-112,64,'#fff');x.font='900 64px Inter';x.fillStyle='#111';x.textAlign='center';x.textBaseline='middle';x.fillText(sub,0,60);x.restore()}
+function sepia(t,t0,t1){if(t<t0||t>t1)return;const o=Math.min(1,(t-t0)/.25,(t1-t)/.25);x.save();x.globalAlpha=.42*o;x.globalCompositeOperation='color';x.fillStyle='#8A6A3A';x.fillRect(0,0,W,H);x.restore();
+ x.save();x.globalAlpha=.5*o;const g=x.createRadialGradient(W/2,H/2,H*.25,W/2,H/2,H*.7);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(40,25,5,.9)');x.fillStyle=g;x.fillRect(0,0,W,H);x.restore()}
+function ctaKS(t){const EV=window.P.EV;const L=[['💬 KOMEN SENI LO APA',EV.tulis-.1,Y,'#111'],['📤 KIRIM KE TEMEN YANG SUKA SENI',EV.kirim,'#1E88E5','#fff'],['➕ FOLLOW = JADI WARGA',EV.follow,'#18C77A','#fff']];
+ L.forEach(([l,ti,c,fg],i)=>{if(t<ti)return;const k=back((t-ti)/.25);x.save();x.translate(W/2,1500+i*125);x.scale(k,k);x.font='900 54px Inter, "Noto Color Emoji"';const w=Math.min(W-60,x.measureText(l).width+90);rr(-w/2+8,-44,w,104,26,'#111');rr(-w/2,-52,w,104,26,c);x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';x.fillText(l,0,2);x.restore()})}
