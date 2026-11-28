@@ -213,7 +213,14 @@ module.exports = async (req, res) => {
           return send(res, 200, { ok: true, s: s0 }) }
         if (ga === 'main' && req.method === 'POST') {
           if (!cur || cur !== hp(pin)) return send(res, 200, { ok: false, msg: 'Kode salah.' });
-          const js = JSON.stringify(bd.s || null); if (js.length > 120000) return send(res, 200, { ok: false, msg: 'Simpanan terlalu besar.' });
+          const s = bd.s; const js = JSON.stringify(s || null); if (js.length > 120000) return send(res, 200, { ok: false, msg: 'Simpanan terlalu besar.' });
+          // cek wajar: hari tidak mundur, uang masuk akal, lahan 16×12
+          const day = s && +s.day, money = s && +s.money;
+          if (!s || !Number.isInteger(day) || day < 1 || day > 5000 || !Number.isFinite(money) || money < 0 || !Array.isArray(s.tiles) || s.tiles.length !== 192)
+            return send(res, 200, { ok: false, msg: 'Simpanan nggak valid.' });
+          if (money > 1000 + day * 8000) return send(res, 200, { ok: false, msg: 'Uangnya nggak masuk akal, simpanan ditolak.' });
+          const [old] = await redis([['GET', 'main:' + gu]]); let o = null; try { o = old ? JSON.parse(old) : null } catch (e) { o = null }
+          if (o && +o.day > day) return send(res, 200, { ok: false, old: true, msg: 'Ada simpanan yang lebih baru (Hari ' + o.day + '). Muat ulang buat lanjut dari sana.' });
           await redis([['SET', 'main:' + gu, js], ['ZADD', 'mainhari', String((bd.s && bd.s.day) || 0), gu]]); return send(res, 200, { ok: true }) }
         return send(res, 400, { ok: false });
       }

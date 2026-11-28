@@ -31,17 +31,74 @@ function newState(u,lama){const R=seedRand(u||'tamu');const T=[];
  for(let x=0;x<FW;x++)for(let z=0;z<FD;z++){const inS=x>=STARTER.x0&&x<STARTER.x1&&z>=STARTER.z0&&z<STARTER.z1;let t='';const r=R();
   if(inS)t=(x+z)%3==0?'weed':'';else if(r<.12)t='weed';else if(r<.19)t='rock';else if(r<.23)t='stump';
   T.push({t,hp:t=='rock'?2:t=='stump'?3:0,til:0,wet:0,c:null})}
- return {v:1,day:1,min:0,money:lama?800:500,E:100,tiles:T,inv:{wortel_b:1,...(lama?{bambu_b:1}:{})},bin:{},paidToday:0,ship:[],tut:0,fg:[],tool:0,sel:null,lama:!!lama,pk:null}}
+ return {v:2,j0:T.filter(q=>q.t).length,bday:null,intro:0,day:1,min:0,money:lama?800:500,E:100,tiles:T,inv:{wortel_b:1,...(lama?{bambu_b:1}:{})},bin:{},paidToday:0,ship:[],tut:0,fg:[],tool:0,sel:null,lama:!!lama,pk:null}}
 const ti=(x,z)=>(x>=0&&x<FW&&z>=0&&z<FD)?S.tiles[x*FD+z]:null;
-function saveLocal(){try{localStorage.setItem('ks_main_'+ME.u,JSON.stringify(S))}catch(e){}}
-async function saveServer(){if(ME.guest)return;try{await fetch('/api/akun?a=main',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({u:ME.u,pin:ME.pin,s:S})})}catch(e){}}
+function saveLocal(){if(!S)return;S.ts=Date.now();try{localStorage.setItem('ks_main_'+ME.u,JSON.stringify(S))}catch(e){}}
+let srvT=0,srvBusy=false;
+async function saveServer(){if(ME.guest||ME.stale||!S||srvBusy)return;srvBusy=true;srvT=0;
+ try{const r=await fetch('/api/akun?a=main',{method:'POST',keepalive:true,headers:{'content-type':'application/json'},body:JSON.stringify({u:ME.u,pin:ME.pin,s:S})});const j=await r.json().catch(()=>({}));
+  if(j&&j.ok===false&&j.msg){toast(j.msg);if(j.old)ME.stale=true}}catch(e){}srvBusy=false}
 function save(){saveLocal();saveServer()}
 
+// ---------- suara: musik latar + efek (dibuat langsung, tanpa file) ----------
+let AC=null,MG=null,MUS=null,SFXG=null,NOISE=null;let MUTE=false;try{MUTE=localStorage.getItem('ks_mute')==='1'}catch(e){}
+function audioOn(){try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();MG=AC.createGain();MG.gain.value=MUTE?0:1;MG.connect(AC.destination);
+  MUS=AC.createGain();MUS.gain.value=.16;MUS.connect(MG);SFXG=AC.createGain();SFXG.gain.value=.55;SFXG.connect(MG);
+  NOISE=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+ if(AC.state==='suspended')AC.resume()}catch(e){}}
+addEventListener('pointerdown',()=>{if(S)audioOn()});addEventListener('keydown',()=>{if(S)audioOn()});
+function setMute(m){MUTE=m;try{localStorage.setItem('ks_mute',m?'1':'0')}catch(e){}if(MG)MG.gain.value=m?0:1;const b=$('bMute');if(b)b.textContent=m?'🔇':'🔊'}
+function tone(type,f,t0,dur,g,dest,f2){const o=AC.createOscillator(),a=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t0+dur);
+ a.gain.setValueAtTime(0,t0);a.gain.linearRampToValueAtTime(g,t0+Math.min(.02,dur*.2));a.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(a);a.connect(dest||SFXG);o.start(t0);o.stop(t0+dur+.05)}
+function noise(t0,dur,g,ft,ff,q){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),a=AC.createGain();s.buffer=NOISE;f.type=ft;f.frequency.value=ff;f.Q.value=q||1;
+ a.gain.setValueAtTime(0,t0);a.gain.linearRampToValueAtTime(g,t0+Math.min(.04,dur*.3));a.gain.exponentialRampToValueAtTime(.0001,t0+dur);s.connect(f);f.connect(a);a.connect(SFXG);s.start(t0);s.stop(t0+dur+.05)}
+function sfx(k){if(!AC||MUTE||AC.state!=='running')return;const t=AC.currentTime;
+ if(k=='cangkul'){noise(t,.14,.9,'lowpass',450);tone('sine',110,t,.14,.5,null,55)}
+ else if(k=='siram'){noise(t,.45,.35,'bandpass',2600,.8);noise(t+.05,.35,.2,'bandpass',4200,1.2)}
+ else if(k=='sabit'){noise(t,.09,.5,'highpass',3200);noise(t+.05,.07,.3,'highpass',4500)}
+ else if(k=='kapak'||k=='palu'){tone('square',k=='palu'?190:140,t,.08,.25);noise(t,.12,.7,'lowpass',900)}
+ else if(k=='tanam'){for(let i=0;i<3;i++)noise(t+i*.06,.05,.4,'lowpass',700)}
+ else if(k=='pop'){tone('sine',520,t,.13,.5,null,1150)}
+ else if(k=='koin'){tone('square',988,t,.08,.18);tone('square',1319,t+.08,.22,.18)}
+ else if(k=='langkah'){noise(t,.035,.12,'lowpass',650)}
+ else if(k=='buka'){tone('sine',700,t,.06,.12)}
+ else if(k=='ketuk'){tone('sine',260,t,.06,.4);tone('sine',260,t+.16,.06,.4)}
+ else if(k=='tidur'){[784,659,523].forEach((f,i)=>tone('triangle',f,t+i*.22,.5,.2))}}
+// musik latar: pagi ceria, siang santai, malam tenang
+const PENT=[0,2,4,7,9];const MOT={pagi:[[0,2,4,-1,3,2,-1,1],[2,-1,4,5,4,-1,2,-1]],siang:[[2,-1,1,0,-1,1,2,-1],[4,-1,3,-1,2,1,-1,-1]],malam:[[4,-1,-1,3,-1,-1,2,-1],[1,-1,-1,0,-1,-1,-1,-1]]};
+const ROOT={pagi:[65.41,55,87.31,98],siang:[65.41,87.31,55,98],malam:[55,87.31,65.41,98]};
+let mNext=0,mStep=0;
+function music(){if(!AC||MUTE||!S||AC.state!=='running')return;const h=hourNow();const per=h>=6&&h<11?'pagi':h>=11&&h<18.5?'siang':'malam';
+ const bpm=per=='pagi'?104:per=='siang'?92:70;const e8=60/bpm/2;const now=AC.currentTime;if(mNext<now-.5)mNext=now+.05;
+ while(mNext<now+.3){const bar=Math.floor(mStep/8),pos=mStep%8;const R=seedRand(per+S.day+':'+(bar%4)+':'+pos);
+  let deg=MOT[per][bar%2][pos];if(deg>=0&&R()<.2)deg=Math.max(0,deg+(R()<.5?-1:1));if(per=='malam'&&R()<.3)deg=-1;
+  if(deg>=0){const semi=PENT[deg%5]+12*Math.floor(deg/5);tone(per=='malam'?'sine':'triangle',523.25*Math.pow(2,semi/12),mNext,e8*(per=='malam'?2.6:1.6),per=='malam'?.35:.3,MUS)}
+  const rt=ROOT[per][bar%4];if(pos==0||pos==4)tone('sine',rt*(pos==4?1.5:1),mNext,e8*3.5,.55,MUS);
+  if(per=='malam'&&pos==0)for(const r of [2,rt==55?2.378:2.52,3])tone('triangle',rt*r,mNext,e8*7.5,.08,MUS);
+  mNext+=e8;mStep++}}
 // ---------- pemain & tokoh ----------
 const P={x:8.5,z:1.0,yaw:0,vx:0,vz:0,act:0,actT:0,faint:0};
 const PR={u:'me',col:'#3F7CC4',ph:.3};
 const PRES={u:'immanuelragil',own:1,ph:1.1};const PNPC={x:7,z:-0.2,yaw:0,tx:7,tz:-0.2,show:true};
-const NPCS=[{u:'tukangroti',nm:'Bu Roti',col:'#F4A261',x:43.4,z:.5,yaw:-.4},{u:'jagabenih',nm:'Pak Benih',col:'#2E7D32',x:35.4,z:.5,yaw:-.4}];
+const NPCS=[{u:'tukangroti',nm:'Bu Roti',col:'#F4A261',x:43.4,z:.5,yaw:-.4},{u:'jagabenih',nm:'Pak Benih',col:'#2E7D32',x:35.4,z:.5,yaw:-.4},
+ {u:'alvaro.alifiandra',nm:'WAPRES @alvaro.alifiandra',col:'#6A4C93',x:38.15,z:10.25,yaw:Math.PI,ges:'pinggang'}];
+const CHAIR=[37,10.55];
+// obrolan berganti tiap hari
+const LINES={
+ tukangroti:['Roti anget! Makan 1 roti bikin tenaga lo balik.','Gandum lo jual aja ke kotak, nanti gue olah jadi roti.','Kalau badan udah keringetan, itu tanda lo harus istirahat.','Dulu sebelum kota hancur, antrean roti gue sampe alun-alun.','Toko gue buka jam 8 pagi sampe 8 malem. Jangan telat!','Wapres tiap hari duduk di kursinya. Katanya lagi "mikirin kota".'],
+ jagabenih:['Benih lengkap di sini. Inget, toko tutup tiap hari ke-7 ya.','Wortel paling cepet, 3 hari. Cocok buat yang baru mulai.','Tomat agak lama, tapi abis panen berbuah lagi tiap 3 hari.','Bambu itu bahan seni. Nanti bisa jadi suling di Studio.','Tanaman nggak tumbuh kalau lupa disiram. Satu hari aja kelewat, mundur sehari.','1 kantong benih = 9 petak. Cangkul 3×3 dulu biar pas.'],
+ 'alvaro.alifiandra':['Ini kursi wapres. Jangan didudukin ya.','Gue lagi rapat sama diri sendiri. Penting.','President sibuk ngurus kota, gue sibuk jagain kursi.','Kalau lahan lo udah rapi, nanti gue mampir. Mungkin.','Kota ini bakal rame lagi. Gue yakin. Lumayan yakin.','Lo udah nyiram belum? Gue nanya doang.'],
+ pres:['Semangat! Lahan ini makin cakep tiap hari.','Batu pakai PALU, tunggul pakai KAPAK. Makin bersih, makin luas kebun lo.','Liat "Lahan Pulih" di TAS. Itu nilai lahan lo di mata gue.','Kotak jual dibayar jam 5 sore. Lewat itu, dibayar besok.','Rumah-rumah di jalan itu punya warga asli Kota Seni. Mampir aja.','Studio buat bikin suling lagi gue bangun. Tunggu ya!','Jangan begadang. Jam 2 pagi lo bakal ketiduran di luar.']};
+const lineOf=(k,salt)=>{const L=LINES[k];return L[((S?S.day:1)+(salt||0))%L.length]};
+const MUSIM=['Semi','Panas','Gugur','Dingin'];
+const tgl=d=>({m:Math.floor((d-1)/30)%4,d:(d-1)%30+1});
+// rumah warga asli di jalan kota (nama berganti tiap hari)
+const HSLOT=[[17.5,1.9,1],[22,1.9,1],[25.5,1.9,1],[18,8.7,-1],[21.5,8.7,-1],[25,8.7,-1],[28.5,8.7,-1],[38.5,12.6,-1],[41.5,12.6,-1]];
+let WARGA=[],HOUSES=HSLOT.map(()=>'');
+fetch('/warga.json').then(r=>r.json()).then(d=>{WARGA=(d.warga||[]).map(w=>String(w.u).toLowerCase());pickHouses()}).catch(()=>{});
+function pickHouses(){const skip=new Set(['immanuelragil','alvaro.alifiandra',ME.u]);const L=WARGA.filter(u=>!skip.has(u));if(!L.length)return;const R=seedRand('rumah'+(S?S.day:1));const got=new Set();
+ HOUSES=HSLOT.map(()=>{for(let k=0;k<20;k++){const u=L[Math.floor(R()*L.length)];if(!got.has(u)){got.add(u);return u}}return ''})}
+const hcol=u=>{const C=['#F2D7B6','#CFE8D5','#F7D1D1','#D7DDF5','#F5E6A8','#E3D0F0'],Rf=['#B5523B','#3E6FB0','#5E8C3A','#8E44AD','#C0392B','#D4881E'];let h=0;for(const c of u)h=(h*31+c.charCodeAt(0))>>>0;return [C[h%C.length],Rf[(h>>>3)%Rf.length]]};
 let cam={yaw:-.18,pitch:.88,dist:TOUCH?19:17,tx:9,ty:.6,tz:2};
 
 // ---------- tekstur papan ----------
@@ -66,6 +123,12 @@ const TREES=[[-2,-5,'#4CAF50'],[14,-5,'#66BB6A'],[20,-4,'#43A047'],[26,-5,'#7CB3
 function trees(){for(const [x,z,c] of TREES){D(G.cyl16,M.chain(M.T(x,0,z),M.S(.18,1.4,.18)),'#7A5230',{});D(G.sphHi,M.chain(M.T(x,1.9,z),M.S(1.0,.85,1.0)),c,{});D(G.sphHi,M.chain(M.T(x+.4,1.55,z+.2),M.S(.65,.55,.65)),c,{})}}
 function plaza(t){const [x,z]=PLAZA;D(G.cyl16,M.chain(M.T(x,0,z),M.S(1.3,.35,1.3)),'#B8C2CC',{});D(G.cyl16,M.chain(M.T(x,.35,z),M.S(1.05,.05,1.05)),'#6FB7FF',{em:.3});D(G.cyl16,M.chain(M.T(x,.35,z),M.S(.15,.7,.15)),'#B8C2CC',{});
  for(const s of [-1,1]){bx(x+s*2.6,.38,z-1.6,1.5,.08,.45,'#A0662E');for(const q of [-.6,.6])bx(x+s*2.6+q,0,z-1.6,.08,.38,.4,'#5B3A1E')}}
+function wargaHouses(){HSLOT.forEach(([x,z,f],i)=>{const u=HOUSES[i]||'';const [c,r]=u?hcol(u):['#E6DCCB','#9A8F80'];
+ bx(x,0,z,2.2,1.5,1.8,c);roofAt(x,z,2.2,1.8,1.62,r);bx(x,0,z+f*.92,.62,1.1,.06,'#7A4B22');bx(x+.62,.7,z+f*.92,.42,.38,.05,'#BFE6FF',{em:.4});
+ bx(x-.95,0,z+f*1.25,.08,.7,.08,'#5B3A1E');bx(x-.95,.7,z+f*1.25,.3,.2,.22,u?'#E53935':'#9AA0A6')})}
+function wapresChair(){const [x,z]=CHAIR;const g='#C9A227';bx(x,0,z,.9,.42,.8,'#7A4B22');bx(x,.42,z,.92,.12,.82,'#C0392B');bx(x,.42,z+.36,.92,1.0,.1,g);bx(x,1.42,z+.36,.6,.12,.12,g);
+ for(const s of [-1,1])bx(x+s*.44,.42,z,.08,.32,.8,g);
+ D(G.box,M.chain(M.T(x,.15,z-.42),M.S(.8,.2,.02)),'#FFFFFF',{tex:sign('KURSI WAPRES','#FFD23F'),em:.5,cast:false})}
 function tileDraw(x,z,T,t){const cx=x+.5,cz=z+.5;
  if(T.til)bx(cx,0,cz,.96,.06,.96,T.wet?'#6B4A2E':'#9C6B42',NC);
  if(T.t=='weed'){for(let k=0;k<3;k++)D(G.sph,M.chain(M.T(cx+(k-1)*.18,.12,cz+(k%2?.12:-.1)),M.S(.14,.2,.14)),'#5FA344',NC)}
@@ -106,7 +169,7 @@ function render(t){
  DL=[];
  D(G.box,M.chain(M.T(22,-.5,4),M.S(80,.5,40)),'#6FB556',{cast:false});
  bx(FW/2,0,FD/2,FW+.2,.02,FD+.2,'#B79A6E',NC);// tanah lahan
- path();fence();house();building(SHOP.benih,t);building(SHOP.roti,t);trees();plaza(t);
+ path();fence();house();building(SHOP.benih,t);building(SHOP.roti,t);trees();plaza(t);wargaHouses();wapresChair();
  for(let x=0;x<FW;x++)for(let z=0;z<FD;z++)tileDraw(x,z,S.tiles[x*FD+z],t);
  forage(t);
  // petak sasaran
@@ -115,7 +178,7 @@ function render(t){
  const tl=TOOLS[S.tool];const hold=S.sel?'benih':tl.hold;const swing=t<P.actT;
  person(PR,P.x,P.z,P.yaw,t,Math.hypot(P.vx,P.vz)>.05,{hold,ges:swing?'palu':'diam',ex:S.E<30?'lemas':S.E<60?'netral':'senyum',bend:S.E<30?.25:0,sweat:S.E<60&&S.E>=30});
  if(PNPC.show)person(PRES,PNPC.x,PNPC.z,PNPC.yaw,t,Math.hypot(PNPC.tx-PNPC.x,PNPC.tz-PNPC.z)>.05,{ges:UI.talking=='pres'?'tunjuk':'diam',ex:'senyum'});
- for(const n of NPCS)person(n,n.x,n.z,n.yaw,t,false,{ex:'senyum'});
+ for(const n of NPCS)person(n,n.x,n.z,n.yaw,t,false,{ex:'senyum',ges:n.ges});
  // ---- GL ----
  const hr=hourNow();const L=light(hr);
  const sunA=clamp((hr-6)/13);const sun=norm([-.6+sunA*1.2,.95,.7]);
@@ -138,6 +201,7 @@ function render(t){
 const TG=new Map();function tag(k,txt,p,cls){let el=TG.get(k);if(!el){el=document.createElement('div');el.className='tag '+(cls||'');$('tags').appendChild(el);TG.set(k,el)}if(!p){el.style.display='none';return}const s=project(p);el.style.display='';el.style.left=s[0]+'px';el.style.top=s[1]+'px';if(el.textContent!==txt)el.textContent=txt}
 function tags(t){tag('pres','PRESIDENT',PNPC.show?[PNPC.x,1.55,PNPC.z]:null,'pres');for(const n of NPCS)tag(n.u,n.nm,Math.hypot(n.x-P.x,n.z-P.z)<9?[n.x,1.5,n.z]:null);
  tag('me','@'+(ME.u==='tamu'?'tamu':ME.u),[P.x,1.55,P.z]);
+ HSLOT.forEach(([x,z],i)=>tag('h'+i,HOUSES[i]?'🏠 @'+HOUSES[i]:'🏠 rumah kosong',Math.hypot(x-P.x,z-P.z)<7?[x,2.55,z]:null,'home'));
  const ar=$('arrow');const tp=TUT.target();if(tp&&!UI.busy){const s=project([tp[0],tp[1]||1.4,tp[2]]);ar.classList.remove('hide');ar.style.left=Math.max(20,Math.min(innerWidth-20,s[0]))+'px';ar.style.top=Math.max(110,Math.min(innerHeight-230,s[1]))+'px'}else ar.classList.add('hide')}
 
 // ---------- input ----------
@@ -150,15 +214,20 @@ addEventListener('keyup',e=>KEY.delete(e.key.toLowerCase()));
  j.addEventListener('pointermove',mv);const up=e=>{if(e.pointerId!==id)return;id=null;JOY=[0,0];kn.style.transform=''};j.addEventListener('pointerup',up);j.addEventListener('pointercancel',up)}
 $('bPakai').onclick=()=>{if(UI.dlg)return dlgNext();if(!UI.busy)usePakai()};$('bAksi').onclick=()=>{if(UI.dlg)return dlgNext();if(!UI.busy)useAksi()};$('bAlat').onclick=()=>{if(!UI.busy)nextTool()};$('bTas').onclick=()=>{if(!UI.busy)openTas()};
 $('dlg').onclick=()=>dlgNext();
+$('bMute').onclick=()=>{audioOn();setMute(!MUTE)};setMute(MUTE);
 
 // ---------- UI ----------
 const UI={busy:false,dlg:null,talking:null};
 let toastT=0;function toast(s){const el=$('toast');el.textContent=s;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2200)}
-function say(lines,who,done){UI.dlg={lines:lines.slice(),done,who:who||'PRESIDENT'};UI.busy=true;UI.talking=who?null:'pres';$('dName').textContent=UI.dlg.who;$('dlg').classList.remove('hide');$('dText').textContent=UI.dlg.lines.shift()}
-function dlgNext(){if(!UI.dlg)return;if(UI.dlg.lines.length){$('dText').textContent=UI.dlg.lines.shift();return}const d=UI.dlg.done;UI.dlg=null;UI.busy=false;UI.talking=null;$('dlg').classList.add('hide');if(d)d()}
+function say(lines,who,done){sfx('buka');UI.dlg={lines:lines.slice(),done,who:who||'PRESIDENT'};UI.busy=true;UI.talking=who?null:'pres';$('dName').textContent=UI.dlg.who;$('dlg').classList.remove('hide');$('dText').textContent=UI.dlg.lines.shift()}
+function dlgNext(){if(!UI.dlg)return;if(UI.dlg.lines.length){sfx('buka');$('dText').textContent=UI.dlg.lines.shift();return}const d=UI.dlg.done;UI.dlg=null;UI.busy=false;UI.talking=null;$('dlg').classList.add('hide');if(d)d()}
 function panel(title,html,onX){$('pTitle').textContent=title;$('pBody').innerHTML=html;$('panel').classList.remove('hide');UI.busy=true;$('pX').onclick=()=>{closePanel();if(onX)onX()}}
 function closePanel(){$('panel').classList.add('hide');UI.busy=false}
-function hud(){$('hDay').textContent='Semi · Hari '+S.day;const m=S.min+360;const hh=Math.floor(m/60)%24,mm=Math.floor(m%60/10)*10;$('hTime').firstChild.nodeValue=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+' ';$('hWx').textContent=hourNow()>=19||hourNow()<5?'🌙':'☀️';$('hMoney').textContent='💰 '+S.money;
+function isBday(){if(!S||!S.bday)return false;const q=tgl(S.day);return q.m===S.bday.m&&q.d===S.bday.d}
+function junk(tiles){let n=0;for(const T of tiles)if(T.t)n++;return n}
+function pulih(){const j=junk(S.tiles);let pl=0;for(const T of S.tiles)if(T.c)pl++;return Math.round(60*Math.max(0,1-j/Math.max(1,S.j0||j))+40*Math.min(1,pl/96))}
+function pulihBar(){const p=pulih();return `<div class="pulih"><div>🌱 Lahan Pulih <b>${p}%</b></div><div class="bar"><i style="width:${p}%"></i></div><small>Bersihin rumput, batu, tunggul (60%) + tanami petak (40%).</small></div>`}
+function hud(){const q=tgl(S.day);$('hDay').textContent=MUSIM[q.m]+' · Hari '+q.d+(isBday()?' 🎂':'');const m=S.min+360;const hh=Math.floor(m/60)%24,mm=Math.floor(m%60/10)*10;$('hTime').firstChild.nodeValue=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+' ';$('hWx').textContent=hourNow()>=19||hourNow()<5?'🌙':'☀️';$('hMoney').textContent='💰 '+S.money;
  const tl=TOOLS[S.tool];if(S.sel){$('toolIc').textContent=CROP[S.sel].ic;$('toolNm').textContent='Benih '+CROP[S.sel].nm}else{$('toolIc').textContent=tl.ic;$('toolNm').textContent=tl.nm}}
 
 // ---------- aksi ----------
@@ -168,8 +237,8 @@ function tire(n){S.E-=n;if(S.day===1&&S.E<5)S.E=5;if(S.E<=0)faint()}
 function usePakai(){const [x,z]=target();const T=ti(x,z);P.actT=performance.now()/1000+.35;
  if(S.sel){const k=S.sel;if(!S.inv[k+'_b']){S.sel=null;hud();return toast('Benih habis')}
   let n=0;for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++){const Q=ti(x+dx,z+dz);if(Q&&Q.til&&!Q.c&&!Q.t){Q.c={k,age:0,ripe:0};n++}}
-  if(!n)return toast('Cangkul tanahnya dulu ya');S.inv[k+'_b']--;if(!S.inv[k+'_b']){delete S.inv[k+'_b'];S.sel=null}hud();toast('Tanam '+CROP[k].nm+' di '+n+' petak');TUT.ev('tanam');return}
- const tl=TOOLS[S.tool];if(!T){tire(tl.cost*.5);return}
+  if(!n)return toast('Cangkul tanahnya dulu ya');S.inv[k+'_b']--;if(!S.inv[k+'_b']){delete S.inv[k+'_b'];S.sel=null}hud();sfx('tanam');toast('Tanam '+CROP[k].nm+' di '+n+' petak');TUT.ev('tanam');return}
+ const tl=TOOLS[S.tool];sfx(tl.k);if(!T){tire(tl.cost*.5);return}
  if(tl.k=='cangkul'){if(T.t)return toast(T.t=='weed'?'Pakai sabit buat rumput':T.t=='rock'?'Pakai palu buat batu':'Pakai kapak buat tunggul');if(T.c)return;if(!T.til){T.til=1;tire(tl.cost);TUT.ev('cangkul')}}
  else if(tl.k=='siram'){if(T.til&&!T.wet){T.wet=1;TUT.ev('siram')}tire(tl.cost)}
  else if(tl.k=='sabit'){if(T.t=='weed'){T.t='';TUT.ev('rumput')}else if(T.c&&!T.c.ripe){}tire(tl.cost)}
@@ -183,19 +252,20 @@ function useAksi(){
  if(near(DOOR,1.3))return rumah();
  if(near(SHOP.benih.door,1.4))return tokoBenih();
  if(near(SHOP.roti.door,1.4))return tokoRoti();
- for(const n of NPCS)if(near([n.x,n.z],1.5))return say([n.u=='tukangroti'?'Roti anget! Makan 1 roti bikin tenaga lo balik. Gandum lo boleh dijual ke kotak, nanti gue olah.':'Benih lengkap di sini. Inget, toko tutup tiap hari ke-7 ya.'],n.nm);
+ for(const n of NPCS)if(near([n.x,n.z],1.5)){const bd=isBday()?['Eh, hari ini ulang tahun lo kan? Selamat ya!']:[];return say([...bd,lineOf(n.u,n.u.length)],n.u=='alvaro.alifiandra'?'WAPRES':n.nm.toUpperCase())}
+ for(let i=0;i<HSLOT.length;i++){const [hx,hz,f]=HSLOT[i];if(near([hx,hz+f*1.2],1.2)){sfx('ketuk');return toast(HOUSES[i]?'Tok tok… Rumah @'+HOUSES[i]+'. Lagi nggak ada di rumah.':'Rumah kosong. Nunggu warga baru pindah.')}}
  if(near(BOXP,1.6))return kotakJual();
- const [x,z]=target();const T=ti(x,z);if(T&&T.c&&T.c.ripe){const C=CROP[T.c.k];addInv(T.c.k,1);toast('+1 '+C.ic+' '+C.nm);if(C.re){T.c.ripe=0;T.c.age=C.grow-C.re}else T.c=null;TUT.ev('panen');return}
- for(const f of S.fg)if(!f.got&&Math.hypot(P.x-f.x,P.z-f.z)<1.0){f.got=1;addInv(f.k,1);toast('+1 '+ITEM[f.k].ic+' '+ITEM[f.k].nm);TUT.ev('ambil');return}
+ const [x,z]=target();const T=ti(x,z);if(T&&T.c&&T.c.ripe){const C=CROP[T.c.k];addInv(T.c.k,1);sfx('pop');toast('+1 '+C.ic+' '+C.nm);if(C.re){T.c.ripe=0;T.c.age=C.grow-C.re}else T.c=null;TUT.ev('panen');return}
+ for(const f of S.fg)if(!f.got&&Math.hypot(P.x-f.x,P.z-f.z)<1.0){f.got=1;addInv(f.k,1);sfx('pop');toast('+1 '+ITEM[f.k].ic+' '+ITEM[f.k].nm);TUT.ev('ambil');return}
  toast('Nggak ada apa-apa di sini')}
 function isOpen(b){const h=hourNow();if(b===SHOP.benih&&S.day%7===0)return false;return h>=b.open[0]&&h<b.open[1]}
 function tokoBenih(){const b=SHOP.benih;if(!isOpen(b))return say([S.day%7===0?'Hari ini toko benih libur. Balik besok ya.':'Toko benih buka jam 09.00 sampai 17.00.'],'PAK BENIH');
  const rows=Object.entries(CROP).map(([k,c])=>`<div class="row"><div class="ic">${c.ic}</div><div class="tx">Benih ${c.nm}<small>tumbuh ${c.grow} hari · jual ${c.sell}/buah${c.re?' · berbuah lagi tiap '+c.re+' hari':''}</small></div><button data-k="${k}" ${S.money<c.seed?'disabled':''}>💰${c.seed}</button></div>`).join('');
  panel('TOKO BENIH',`<div class="small">1 kantong = 9 petak (3×3). Uang: 💰${S.money}</div>`+rows);
- $('pBody').querySelectorAll('button[data-k]').forEach(bt=>bt.onclick=()=>{const k=bt.dataset.k;const c=CROP[k];if(S.money<c.seed)return;S.money-=c.seed;addInv(k+'_b',1);hud();toast('Beli benih '+c.nm);tokoBenih()})}
+ $('pBody').querySelectorAll('button[data-k]').forEach(bt=>bt.onclick=()=>{const k=bt.dataset.k;const c=CROP[k];if(S.money<c.seed)return;S.money-=c.seed;addInv(k+'_b',1);hud();sfx('koin');toast('Beli benih '+c.nm);tokoBenih()})}
 function tokoRoti(){const b=SHOP.roti;if(!isOpen(b))return say(['Toko roti buka jam 08.00 sampai 20.00.'],'BU ROTI');
  panel('TOKO ROTI',`<div class="row"><div class="ic">🥐</div><div class="tx">Roti anget<small>Makan dari Tas: tenaga +25</small></div><button id="bRoti" ${S.money<20?'disabled':''}>💰20</button></div>`);
- $('bRoti').onclick=()=>{if(S.money<20)return;S.money-=20;addInv('roti',1);hud();toast('+1 🥐 Roti');tokoRoti()}}
+ $('bRoti').onclick=()=>{if(S.money<20)return;S.money-=20;addInv('roti',1);hud();sfx('koin');toast('+1 🥐 Roti');tokoRoti()}}
 function kotakJual(){const ks=Object.keys(S.inv).filter(k=>!k.endsWith('_b')&&S.inv[k]>0&&ITEM[k]);
  if(!ks.length)return toast('Tas lo belum ada barang buat dijual');
  const rows=ks.map(k=>`<div class="row"><div class="ic">${ITEM[k].ic}</div><div class="tx">${ITEM[k].nm} ×${S.inv[k]}<small>${ITEM[k].sell} / buah</small></div><button data-k="${k}">Masukin</button></div>`).join('');
@@ -208,22 +278,23 @@ function payBin(){const v=binValue();if(!v)return 0;const L=Object.entries(S.bin
 function openTas(){const tools=TOOLS.map((tl,i)=>`<div class="row ${!S.sel&&S.tool==i?'sel':''}"><div class="ic">${tl.ic}</div><div class="tx">${tl.nm}</div><button data-t="${i}">Pakai</button></div>`).join('');
  const seeds=Object.keys(CROP).filter(k=>S.inv[k+'_b']).map(k=>`<div class="row ${S.sel==k?'sel':''}"><div class="ic">${CROP[k].ic}</div><div class="tx">Benih ${CROP[k].nm} ×${S.inv[k+'_b']}<small>tanam 3×3 di tanah yang udah dicangkul</small></div><button data-s="${k}">Pegang</button></div>`).join('');
  const items=Object.keys(S.inv).filter(k=>!k.endsWith('_b')&&S.inv[k]>0).map(k=>`<div class="row"><div class="ic">${ITEM[k].ic}</div><div class="tx">${ITEM[k].nm} ×${S.inv[k]}</div>${k=='roti'?'<button data-e="roti">Makan</button>':''}</div>`).join('');
- panel('TAS','<b>Alat</b>'+tools+(seeds?'<b>Benih</b>'+seeds:'')+(items?'<b>Barang</b>'+items:''));
+ panel('TAS',pulihBar()+'<b>Alat</b>'+tools+(seeds?'<b>Benih</b>'+seeds:'')+(items?'<b>Barang</b>'+items:''));
  const P2=$('pBody');P2.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{S.tool=+b.dataset.t;S.sel=null;hud();closePanel()});P2.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{S.sel=b.dataset.s;hud();closePanel()});
  P2.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{S.inv.roti--;if(!S.inv.roti)delete S.inv.roti;S.E=Math.min(100,S.E+25);toast('Nyam! Tenaga balik');closePanel()})}
 function rumah(){panel('RUMAH',`<div class="small">Tidur = ganti hari & simpan otomatis.</div><button class="pri" id="bTidur">😴 Tidur</button><button class="ghost" id="bBatal">Belum, keluar lagi</button>`);$('bTidur').onclick=()=>{closePanel();sleep(false)};$('bBatal').onclick=closePanel}
 
 // ---------- hari ----------
-function spawnForage(){const R=seedRand(ME.u+'fg'+S.day);const spots=[[20,2],[23,8],[27,1.5],[30,10],[44,6],[46,1],[19,11],[25,12.5],[40,11],[-1.8,7],[-1.8,10],[14,-4.5],[31,6],[43,9]];S.fg=[];
+function spawnForage(){const R=seedRand(ME.u+'fg'+S.day);const spots=[[19.7,3.4],[23,7.1],[27.3,1.5],[30,10],[44,6],[46,1],[19,11],[25,12.5],[40,10.3],[-1.8,7],[-1.8,10],[14,-4.5],[31,6],[43,9]];S.fg=[];
  const ks=['jamur','bunga','buah'];for(let i=0;i<6;i++){const s=spots[Math.floor(R()*spots.length)];if(S.fg.some(f=>f.x==s[0]&&f.z==s[1]))continue;S.fg.push({k:ks[Math.floor(R()*3)],x:s[0]+R()*.6,z:s[1]+R()*.6,got:0})}}
 function growNight(){for(const T of S.tiles){if(T.c&&T.wet&&!T.c.ripe){T.c.age++;if(T.c.age>=CROP[T.c.k].grow)T.c.ripe=1}T.wet=0}}
-function sleep(fainted){UI.busy=true;const line=TUT.sleepLine();const late=binValue();const paid=payBin();const ship=S.ship.slice();const earned=S.paidToday;
- growNight();const prevDay=S.day;S.day++;S.min=fainted?360:0;S.E=fainted?60:100;S.ship=[];S.paidToday=0;spawnForage();
+function sleep(fainted,why){UI.busy=true;sfx('tidur');const line=TUT.sleepLine();const paid=payBin();if(paid)setTimeout(()=>sfx('koin'),700);const ship=S.ship.slice();const earned=S.paidToday;
+ growNight();const prevDay=S.day;S.day++;S.min=fainted?360:0;S.E=fainted?60:100;S.ship=[];S.paidToday=0;spawnForage();pickHouses();
  P.x=DOOR[0];P.z=DOOR[1]+.9;P.yaw=0;TUT.onSleep();save();
  const cnt={};for(const [k,n] of ship)cnt[k]=(cnt[k]||0)+n;
  const rows=Object.entries(cnt).map(([k,n])=>`<div class="sumL">${ITEM[k].ic} ${ITEM[k].nm} ×${n} = ${ITEM[k].sell*n}</div>`).join('')||'<div class="sumL">Belum ada barang yang dijual.</div>';
- panel('HASIL HARI '+prevDay,(fainted?'<div class="say">Lo pingsan kecapekan! Warga bawa lo pulang. Jangan dipaksa ya.</div>':'')+rows+`<div class="sumT">+💰${earned}</div><div class="say"><b>President:</b> ${line}</div><button class="pri" id="bPagi">☀️ Pagi! Hari ${S.day}</button>`);
- $('bPagi').onclick=()=>{closePanel();hud();if(TUT.s>=0)TUT.morning()}}
+ const q=tgl(S.day);
+ panel('HASIL HARI '+prevDay,(fainted?'<div class="say">Lo pingsan kecapekan! Warga bawa lo pulang. Jangan dipaksa ya.</div>':why=='late'?'<div class="say">Lo ketiduran jam 2 pagi. President nganter lo pulang. Besok jangan begadang ya.</div>':'')+rows+`<div class="sumT">+💰${earned}</div>${pulihBar()}<div class="say"><b>President:</b> ${line}</div><button class="pri" id="bPagi">☀️ Pagi! ${MUSIM[q.m]} · Hari ${q.d}</button>`);
+ $('bPagi').onclick=()=>{closePanel();hud();TUT.morning()}}
 function faint(){if(UI.busy)return;S.E=0;sleep(true)}
 
 // ---------- tutorial hari 1 (dipandu President) ----------
@@ -240,7 +311,7 @@ const TUT={s:0,
  talk(){const s=S.tut;
   if(s==0)return say(['Eh, lo warga baru ya? Selamat datang di Kota Seni!','Kota ini sempet hancur. Ini lahan lo. Dulu kebun paling rame se-Kota Seni.','Bantu gue balikin, ya. Nih gue kasih CANGKUL, PENYIRAM, SABIT, KAPAK, sama PALU. Plus sekantong benih WORTEL.','Pertama, cabut rumput liar di petak yang gue tandain. Pegang SABIT (tombol ALAT), hadap rumputnya, terus pencet PAKAI.'],null,()=>{S.tut=1;S.tool=2;S.sel=null;hud();PNPC.tx=8;PNPC.tz=2.2});
   const L={1:'Cabut rumput liarnya dulu pakai SABIT.',2:'Cangkul 9 petak yang gue tandain. Pegang CANGKUL, hadap petaknya, PAKAI.',3:'Buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. Langsung kesebar 3×3.',4:'Siram semua petaknya pakai PENYIRAM. Tanaman cuma tumbuh kalau disiram tiap hari.',5:'Toko benih & toko roti ada di sebelah kanan (timur). Cari 3 barang liar di sekitar kota, terus masukin ke KOTAK JUAL sebelum jam 5 sore.',6:'Udah malem. Masuk rumah, tidur. Besok siram lagi ya!'};
-  say([L[s]||'Semangat! Lahan ini makin cakep tiap hari.'])},
+  say(L[s]?[L[s]]:[...(isBday()?['Selamat ulang tahun, @'+ME.u+'! Kota Seni ikut seneng.']:[]),lineOf('pres')])},
  ev(e,n){const s=S.tut;const done=()=>{const tg=this.target();return !tg};
   if(s==1&&e=='rumput'&&done()){S.tut=2;S.tool=0;hud();say(['Mantap! Sekarang CANGKUL 9 petak itu. Tanahnya harus digemburin dulu sebelum ditanam.'])}
   else if(s==2&&e=='cangkul'&&done()){S.tut=3;say(['Rapi! Sekarang buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak.'])}
@@ -249,11 +320,12 @@ const TUT={s:0,
   else if(s==5&&e=='jual'){const tot=Object.values(S.bin).reduce((a,b)=>a+b,0)+S.ship.reduce((a,b)=>a+b[1],0);if(tot>=3){S.tut=6;say(['Sip! Kotak jual dibayar jam 5 sore.','Kalau udah capek atau udah malem, masuk rumah terus tidur. Hari 1 lo nggak bakal pingsan, tenang.'])}}},
  sleepLine(){if(S.tut<99&&S.day<=2)return 'Besok siram lagi ya. Tiga hari lagi panen pertama lo.';const L=['Tanah yang disiram tiap hari, panennya nggak bohong.','Toko benih tutup tiap hari ke-7, beli stok dulu.','Bambu nanti bisa jadi suling di Studio. Lagi gue bangun!','Kalau capek, makan roti. Jangan sampe pingsan.'];return L[S.day%L.length]},
  onSleep(){if(S.tut<99&&S.tut>=4)S.tut=99},
- morning(){if(S.day==2)say(['Pagi! Siram wortel lo lagi ya. Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru.','Batu pakai PALU, tunggul pakai KAPAK. Hasilnya bisa dijual.'])}};
+ morning(){const m2=()=>{if(S.day==2)TUT.morning2()};if(isBday()&&S.bdGot!==S.day)return bdayGift(m2);m2()},
+ morning2(){say(['Pagi! Siram wortel lo lagi ya. Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru.','Batu pakai PALU, tunggul pakai KAPAK. Hasilnya bisa dijual.'])}};
 TUT.s=0;
 
 // ---------- loop ----------
-let last=performance.now();let saveT=0;let pay5=false;
+let last=performance.now();let saveT=0;let pay5=false;let stepT=0;
 function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000;
  if(S&&!UI.busy){
   // gerak
@@ -261,19 +333,21 @@ function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1
   const l=Math.hypot(ix,iz);if(l>1){ix/=l;iz/=l}
   const cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw);const wx=ix*cy+iz*sy,wz=-ix*sy+iz*cy;
   const sp=(S.E<30?2.2:3.3);P.vx=wx*sp;P.vz=wz*sp;
-  if(l>.15){P.yaw=Math.atan2(wx,wz);const nx=P.x+P.vx*dt,nz=P.z+P.vz*dt;if(free(nx,P.z))P.x=nx;if(free(P.x,nz))P.z=nz}else{P.vx=P.vz=0}
+  if(l>.15){stepT-=dt;if(stepT<=0){stepT=S.E<30?.42:.3;sfx('langkah')}P.yaw=Math.atan2(wx,wz);const nx=P.x+P.vx*dt,nz=P.z+P.vz*dt;if(free(nx,P.z))P.x=nx;if(free(P.x,nz))P.z=nz}else{P.vx=P.vz=0}
   // waktu
-  S.min+=dt/.75;if(!pay5&&hourNow()>=17){pay5=true;const v=payBin();if(v)toast('Kotak jual dibayar: +💰'+v);hud()}
+  S.min+=dt/.75;if(!pay5&&hourNow()>=17){pay5=true;const v=payBin();if(v){toast('Kotak jual dibayar: +💰'+v);sfx('koin')}hud()}
   if(hourNow()<17)pay5=false;
-  if(S.min>=20*60){toast('Jam 2 pagi! Lo ketiduran di luar…');faint()}
+  if(S.min>=20*60){if(S.day===1){toast('Udah jam 2 pagi. President nganter lo pulang.');sleep(false,'late')}else{toast('Jam 2 pagi! Lo ketiduran di luar…');faint()}}
   saveT+=dt;if(saveT>20){saveT=0;saveLocal()}
+  srvT+=dt;if(srvT>60)saveServer();
   // President jalan pelan ke tujuan
   const dx=PNPC.tx-PNPC.x,dz=PNPC.tz-PNPC.z,dd=Math.hypot(dx,dz);if(dd>.05){const s2=Math.min(dd,1.8*dt);PNPC.x+=dx/dd*s2;PNPC.z+=dz/dd*s2;PNPC.yaw=Math.atan2(dx,dz)}else PNPC.yaw=Math.atan2(P.x-PNPC.x,P.z-PNPC.z);
   if(Math.floor(t*4)%4==0)hud();
  }
- if(S){const k=1-Math.exp(-dt*6);cam.tx+=(P.x-cam.tx)*k;cam.tz+=(P.z+.4-cam.tz)*k;render(t)}
+ if(S){const k=1-Math.exp(-dt*(INTRO?1.2:6));const fx=INTRO?INTRO.x:P.x,fz=INTRO?INTRO.z:P.z+.4;cam.tx+=(fx-cam.tx)*k;cam.tz+=(fz-cam.tz)*k;render(t)}
+ music(t);
  requestAnimationFrame(step)}
-const SOLID=[[HOUSE.x,HOUSE.z,HOUSE.w,HOUSE.d],[SHOP.benih.x,SHOP.benih.z,5,4],[SHOP.roti.x,SHOP.roti.z,5,4],[BOXP[0],BOXP[1],1.1,.8],[PLAZA[0],PLAZA[1],2.4,2.4]];
+const SOLID=[[HOUSE.x,HOUSE.z,HOUSE.w,HOUSE.d],[SHOP.benih.x,SHOP.benih.z,5,4],[SHOP.roti.x,SHOP.roti.z,5,4],[BOXP[0],BOXP[1],1.1,.8],[PLAZA[0],PLAZA[1],2.4,2.4],[CHAIR[0],CHAIR[1],.9,.8],...HSLOT.map(([x,z])=>[x,z,2.2,1.8])];
 function free(x,z){if(x<BOUND.x0||x>BOUND.x1||z<BOUND.z0||z>BOUND.z1)return false;for(const [cx,cz,w,d] of SOLID)if(Math.abs(x-cx)<w/2+.25&&Math.abs(z-cz)<d/2+.25)return false;
  const T=ti(Math.floor(x),Math.floor(z));if(T&&(T.t=='rock'||T.t=='stump'))return false;
  // pagar lahan (ada celah di sisi timur z 4..6.5 & utara x 3..9)
@@ -282,13 +356,41 @@ function free(x,z){if(x<BOUND.x0||x>BOUND.x1||z<BOUND.z0||z>BOUND.z1)return fals
 
 // ---------- masuk ----------
 async function api(a,body){const r=await fetch('/api/akun?a='+a,body?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}:{});return r.json().catch(()=>({}))}
-function start(st){S=st;if(!S.fg||!S.fg.length)spawnForage();
+function start(st){S=st;audioOn();if(!S.fg||!S.fg.length)spawnForage();
+ if(!S.j0)S.j0=junk(newState(ME.u,false).tiles);pickHouses();
  if(S.tut>=99)PNPC.x=PNPC.tx=PLAZA[0]-1.2,PNPC.z=PNPC.tz=PLAZA[1]+1.6;
- $('gate').classList.add('hide');$('hud').classList.remove('hide');$('ctl').classList.remove('hide');hud();
- if(S.tut===0)setTimeout(()=>say(['Halo! Gue President Kota Seni. Samperin gue di depan rumah lo, terus pencet AKSI.']),600)}
+ $('gate').classList.add('hide');hud();
+ const go=()=>{$('hud').classList.remove('hide');$('ctl').classList.remove('hide');hud();
+  const greet=()=>{if(S.tut===0)setTimeout(()=>say(['Halo! Gue President Kota Seni. Samperin gue di depan rumah lo, terus pencet AKSI.']),400)};
+  if(!S.bday)return pickBday(()=>{if(isBday()&&S.bdGot!==S.day)bdayGift(greet);else greet()});
+  greet()};
+ if(S.tut===0&&!S.intro)intro(go);else go()}
+// ---------- pembuka (kilas balik, bisa dilewati) ----------
+let INTRO=null;
+function intro(done){UI.busy=true;S.intro=1;const el=$('intro'),tx=$('iTxt'),im=$('iImg');el.classList.remove('hide');
+ const SL=[{c:[PLAZA[0],8],sep:1,t:'Dulu, Kota Seni kota paling rame. Musik di mana-mana, kebun di mana-mana.'},
+  {img:1,t:'Sampai suatu hari… kota ini hancur.'},
+  {c:[8,6],sep:1,t:'Warga pergi. Lahan-lahan jadi rusak. Batu, tunggul, rumput liar di mana-mana.'},
+  {c:[8,2],sep:0,t:'Sekarang lo datang. Ini lahan lo.'}];
+ let i=-1,tm=0;const next=()=>{clearTimeout(tm);i++;if(i>=SL.length)return end();const s=SL[i];INTRO=s.c?{x:s.c[0],z:s.c[1]}:INTRO;
+  glc.style.filter=s.sep?'sepia(.85) brightness(.9)':'';im.classList.toggle('on',!!s.img);tx.classList.remove('on');void tx.offsetWidth;tx.textContent=s.t;tx.classList.add('on');tm=setTimeout(next,4600)};
+ const end=()=>{clearTimeout(tm);INTRO=null;glc.style.filter='';el.classList.add('hide');UI.busy=false;save();done()};
+ el.onclick=e=>{if(e.target.id==='iSkip')return end();next()};next()}
+function bdayGift(cb){S.bdGot=S.day;S.money+=200;addInv('roti',2);hud();sfx('koin');
+ say(['Selamat ulang tahun, @'+ME.u+'! 🎂','Ini hadiah dari Kota Seni: 💰200 sama 2 roti. Jangan dihabisin sekaligus ya.'],null,cb)}
+// ---------- pilih ulang tahun ----------
+function pickBday(done){let m=0,d=0;const draw=()=>{panel('ULANG TAHUN LO',`<div class="say"><b>President:</b> Satu lagi. Kapan ulang tahun lo? Biar warga kota bisa ngerayain.</div>
+  <div class="mus">${MUSIM.map((n,k)=>`<button data-m="${k}" class="${k==m?'on':''}">${n}</button>`).join('')}</div>
+  <div class="cal">${Array.from({length:30},(_,k)=>`<button data-d="${k+1}" class="${k+1==d?'on':''}">${k+1}</button>`).join('')}</div>
+  <button class="pri" id="bBd" ${d?'':'disabled'}>${d?'Simpan: '+MUSIM[m]+' hari '+d:'Pilih tanggal dulu'}</button><div class="small" style="text-align:center">1 tahun di kota = 4 musim × 30 hari.</div>`,()=>done());
+  $('pX').classList.add('hide');
+  $('pBody').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{m=+b.dataset.m;draw()});$('pBody').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{d=+b.dataset.d;draw()});
+  $('bBd').onclick=()=>{if(!d)return;S.bday={m,d};$('pX').classList.remove('hide');closePanel();save();toast('🎂 Ulang tahun: '+MUSIM[m]+' hari '+d);done()}};draw()}
 function gateMsg(s){$('gMsg').innerHTML='<b>President:</b> '+s}
 let GU=null,GNEW=false;
-$('gCek').onclick=async()=>{const u=$('gUser').value.trim().replace(/^@/,'').toLowerCase();if(!u)return;gateMsg('Bentar, gue cek di Buku Warga…');
+$('gCek').onclick=async()=>{const u=$('gUser').value.trim().replace(/^@/,'').toLowerCase();if(!u)return;
+ if(!/^[a-z0-9._]{1,30}$/.test(u))return gateMsg('Itu kayaknya nama tampilan, bukan username. Username IG cuma huruf, angka, titik, sama garis bawah (contoh: <b>budi.santoso_</b>).');
+ gateMsg('Bentar, gue cek di Buku Warga…');
  const r=await api('mainCek&u='+encodeURIComponent(u));
  if(!r.ok){gateMsg(r.msg||'Nama lo belum ada di Buku Warga. Follow @viralindongid + komen <b>PINDAH</b> di postingan mana aja, nanti gue catat.');return}
  GU=u;GNEW=!r.pin;$('gStep1').classList.add('hide');$('gStep2').classList.remove('hide');
@@ -301,10 +403,11 @@ $('gMasuk').onclick=async()=>{const p=$('gPin').value.trim();if(!/^\d{4}$/.test(
  gateMsg('Bentar…');const r=await api('mainMasuk',{u:GU,pin:p,baru:GNEW});
  if(!r.ok)return gateMsg(r.msg||'Kode salah. Lupa? DM @viralindongid.');
  ME={u:GU,guest:false,pin:p};let st=r.s;let loc=null;try{loc=JSON.parse(localStorage.getItem('ks_main_'+GU)||'null')}catch(e){}
- if(!st&&loc)st=loc;if(!st)st=newState(GU,GU_LAMA);start(st)};
+ let push=false;if(loc&&(!st||((loc.ts||0)>(st.ts||0)&&(loc.day||0)>=(st.day||0)))){push=true;st=loc}
+ if(!st)st=newState(GU,GU_LAMA);start(st);if(push)saveServer()};
 $('gTamu').onclick=()=>{ME={u:'tamu',guest:true,pin:null};let loc=null;try{loc=JSON.parse(localStorage.getItem('ks_main_tamu')||'null')}catch(e){}start(loc||newState('tamu',false));toast('Mode lihat-lihat: progres cuma kesimpen di HP ini')};
 $('gUser').addEventListener('keydown',e=>{if(e.key=='Enter')$('gCek').click()});$('gPin').addEventListener('keydown',e=>{if(e.key=='Enter'&&(!GNEW))$('gMasuk').click()});
-addEventListener('visibilitychange',()=>{if(document.hidden&&S)save()});
+addEventListener('visibilitychange',()=>{if(document.hidden&&S)save()});addEventListener('pagehide',()=>{if(S)save()});
 $('load').classList.add('hide');
 // pratinjau cepat: ?tamu=1
 if(new URLSearchParams(location.search).get('tamu'))$('gTamu').click();
