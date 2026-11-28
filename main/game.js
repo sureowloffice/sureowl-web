@@ -131,7 +131,10 @@ function house(){const h=HOUSE;bx(h.x,0,h.z,h.w,2.2,h.d,'#E9D3B0');roofAt(h.x,h.
  bx(h.x-1.6,2.6,h.z-.6,.5,1.0,.5,'#8C6A5A');// cerobong
  // kotak jual
  bx(BOXP[0],0,BOXP[1],1.1,.7,.8,'#A0662E');bx(BOXP[0],.7,BOXP[1],1.2,.1,.9,'#7A4B22');D(G.box,M.chain(M.T(BOXP[0],.35,BOXP[1]+.42),M.S(.9,.3,.02)),'#FFFFFF',{tex:sign('KOTAK JUAL','#FFD23F'),em:.5,cast:false})}
-function fence(){const c='#C99A64';for(let x=-.5;x<=FW+.5;x+=1){bx(x,0,-.3-.05,.12,.7,.12,c);bx(x,0,FD+.3,.12,.7,.12,c)}bx(FW/2,.45,-.35,FW+1,.08,.06,c);bx(FW/2,.45,FD+.3,FW+1,.08,.06,c);
+function fence(){const c='#C99A64';for(let x=-.5;x<=FW+.5;x+=1){if(x<2||x>6)bx(x,0,-.3-.05,.12,.7,.12,c);bx(x,0,FD+.3,.12,.7,.12,c)}bx(.5,.45,-.35,2,.08,.06,c);bx(11.25,.45,-.35,10.5,.08,.06,c);bx(FW/2,.45,FD+.3,FW+1,.08,.06,c);
+ // gerbang ke rumah
+ for(const x of [2.5,5.5])bx(x,0,-.35,.18,1.9,.18,'#8E5A3B');bx(4,1.9,-.35,3.4,.16,.2,'#8E5A3B');D(G.box,M.chain(M.T(4,1.62,-.3),M.S(1.9,.42,.04)),'#FFFFFF',{tex:sign('LAHANKU','#E9C46A'),em:.4,cast:false});
+ bx(4,0,-.55,1.5,.032,1.1,'#D4B483',NC);
  for(let z=-.3;z<=FD+.3;z+=1){bx(-.5,0,z,.12,.7,.12,c);if(z<4||z>6.5)bx(FW+.5,0,z,.12,.7,.12,c)}}
 function path(){bx(24,0,5.25,16,.03,2.2,'#D4B483',NC);bx(37,0,1.6,14,.03,2.4,'#D4B483',NC);bx(PLAZA[0],0,PLAZA[1],7,.035,6,'#CDBB98',NC);bx(5.5,0,.5,7,.03,1.2,'#D4B483',NC);bx(27.6,0,1.6,1.4,.03,5,'#D4B483',NC)}
 const TREES=[[-2,-5,'#4CAF50'],[14,-5,'#66BB6A'],[20,-4,'#43A047'],[24.2,-5.4,'#7CB342'],[46,-4,'#4CAF50'],[22,11,'#66BB6A'],[29,12,'#FF8FB1'],[45,12,'#FFB74D'],[-2,13,'#43A047'],[18,13.5,'#4CAF50'],[34,12.5,'#7CB342']];
