@@ -245,7 +245,7 @@ function render(t){
  // petak sasaran
  if(!UI.busy&&!INSIDE){const tg=target();if(tg&&ti(tg[0],tg[1]))D(G.box,M.chain(M.T(tg[0]+.5,.07,tg[1]+.5),M.S(1.0,.02,1.0)),'#FFFFFF',{em:1,alpha:.35,cast:false})}
  // pemain
- const tl=TOOLS[S.tool];const hold=S.sel?'benih':tl.hold;const swing=t<P.actT;
+ const tl=TOOLS[S.tool];const hold=SPIN?null:S.sel?'benih':tl.hold;const swing=t<P.actT;
  person(PR,P.x,P.z,P.yaw,t,Math.hypot(P.vx,P.vz)>.05,{hold,ges:swing?'palu':'diam',ex:S.E<30?'lemas':S.E<60?'netral':'senyum',bend:S.E<30?.25:0,sweat:S.E<60&&S.E>=30});
  if(!INSIDE){if(PNPC.show)person(PRES,PNPC.x,PNPC.z,PNPC.yaw,t,Math.hypot(PNPC.tx-PNPC.x,PNPC.tz-PNPC.z)>.05,{ges:UI.talking=='pres'?'tunjuk':'diam',ex:'senyum'});
  for(const n of NPCS)person(n,n.x,n.z,n.yaw,t,false,{ex:'senyum',ges:n.ges});
@@ -627,8 +627,8 @@ const KULIT=['#F5D3B0','#E8B68A','#C98F62','#A06A43','#6E4630'],RAMBUT=['Pendek'
 const AKS=['Tanpa','Topi depan','Topi belakang','Bunga','Bando'];
 const BAJU=['#3F7CC4','#E53935','#2E7D32','#F4A261','#8E44AD','#F2C94C','#1ABC9C','#2B2B2B'],TASW=['#C0392B','#E67E22','#27AE60','#2980B9','#8E5A3B','#2B2B2B'];
 function pakaiLook(){if(S&&S.look){PR.lk=S.look.lk;PR.col=S.look.col;PR.tas=S.look.tas;PR.aks=S.look.aks|0}else{PR.tas=TASW[0];PR.aks=0}}
-let SPIN=false;
-function bikinAvatar(done){SPIN=true;const old=cam.dist;cam.dist=TOUCH?7:7;P.yaw=cam.yaw;INTRO={x:P.x,z:P.z+(TOUCH?1.6:1.0),k:5};
+let SPIN=false;const AVA_TY=()=>innerHeight>innerWidth?-.75:.1;
+function bikinAvatar(done){SPIN=true;const old={dist:cam.dist,pitch:cam.pitch,ty:cam.ty};cam.dist=5.2;cam.pitch=.38;cam.ty=AVA_TY();P.yaw=cam.yaw;INTRO={x:P.x,z:P.z,k:5};$('tags').classList.add('hide');$('hud').classList.add('hide');
  const cur=(S.look&&S.look.lk||'1:0:0').split(':').map(Number);let v={k:cur[0],r:cur[1],w:cur[2],b:BAJU.indexOf(S.look&&S.look.col),t:TASW.indexOf(S.look&&S.look.tas),a:(S.look&&S.look.aks)|0};if(v.b<0)v.b=0;if(v.t<0)v.t=0;
  const apply=()=>{PR.lk=v.k+':'+v.r+':'+v.w;PR.col=BAJU[v.b];PR.tas=TASW[v.t];PR.aks=v.a};
  const sw=(key,list,isCol)=>list.map((c,i)=>`<button class="sw ${v[key]==i?'on':''}" data-${key}="${i}" ${isCol?`style="background:${c}"`:''}>${isCol?'':c}</button>`).join('');
@@ -636,7 +636,7 @@ function bikinAvatar(done){SPIN=true;const old=cam.dist;cam.dist=TOUCH?7:7;P.yaw
   <div class="avr"><b>Baju</b><div class="sws">${sw('b',BAJU,1)}</div></div><div class="avr"><b>Tas</b><div class="sws">${sw('t',TASW,1)}</div></div><div class="avr"><b>Hiasan kepala</b><div class="sws txt">${sw('a',AKS,0)}</div></div><button class="pri" id="bAva">✔ Selesai, ini gue!</button>`);
   $('pX').classList.add('hide');$('panel').classList.add('ava');
   for(const key of ['k','r','w','b','t','a']){const bs=$('pBody').querySelectorAll('[data-'+key+']');bs.forEach(bt=>bt.onclick=()=>{v[key]=+bt.dataset[key];sfx('buka');bs.forEach(x=>x.classList.toggle('on',x===bt));apply()})}
-  $('bAva').onclick=()=>{SPIN=false;P.yaw=cam.yaw;S.look={lk:PR.lk,col:PR.col,tas:PR.tas,aks:PR.aks};$('pX').classList.remove('hide');$('panel').classList.remove('ava');closePanel();cam.dist=old;INTRO=null;save();toast('Avatar lo udah jadi!');done()}};
+  $('bAva').onclick=()=>{SPIN=false;P.yaw=cam.yaw;S.look={lk:PR.lk,col:PR.col,tas:PR.tas,aks:PR.aks};$('pX').classList.remove('hide');$('panel').classList.remove('ava');closePanel();Object.assign(cam,old);$('tags').classList.remove('hide');$('hud').classList.remove('hide');INTRO=null;save();toast('Avatar lo udah jadi!');done()}};
  draw()}
 // ---------- pilih ulang tahun ----------
 function pickBday(done){let m=0,d=0;const draw=()=>{panel('ULANG TAHUN LO',`<div class="say"><b>President:</b> Satu lagi. Kapan ulang tahun lo? Biar warga kota bisa ngerayain.</div>
