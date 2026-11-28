@@ -78,6 +78,11 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
   if(s>0&&r.__hold==='ktw'){const P=Wm(M.chain(hd,M.T(0,-.25,.05)));D(G.box,M.chain(M.T(P[12],P[13],P[14]),M.RY((window.__CAMO||{}).yaw||0),M.S(.32,.21,.0005)),'#FFFFFF',{tex:__bbTex('KTW WARGA LAMA','#E9DFC8'),em:.6,cast:false})}
   {const HA=r.__ha==null?1:r.__ha;if(HA>.01){const NO=HA<.99?{alpha:HA,cast:false}:NC;const hs=r.__hs==null?6:r.__hs;
    if(r.__hold==='stik'){D(G.box,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(0,-.05,0),M.S(.025,.42,.025))),'#E8C27A',NO);D(G.sph,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(0,.37,0),M.S(.035,.035,.035))),'#F2D49A',NO)}
+   if(s>0&&r.__hold==='siram'){D(G.box,Wm(M.chain(hd,M.T(0,-.2,.08),M.S(.2,.2,.14))),'#3DA35D',NO);D(G.box,Wm(M.chain(hd,M.T(0,-.06,.08),M.S(.04,.1,.04))),'#2E7D4A',NO);D(G.box,Wm(M.chain(hd,M.T(0,-.14,.18),M.RX(.9),M.S(.035,.22,.035))),'#2E7D4A',NO)}
+   if(s>0&&r.__hold==='sabit'){D(G.box,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(0,-.05,0),M.S(.035,.32,.035))),'#8A5A2B',NO);D(G.box,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(0,.27,0),M.RZ(1.2),M.T(.12,0,0),M.S(.26,.04,.012))),'#C9CFD6',NO)}
+   if(s>0&&r.__hold==='kapak'){D(G.box,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(0,-.05,0),M.S(.04,.5,.04))),'#8A5A2B',NO);D(G.box,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(.06,.4,0),M.S(.16,.12,.03))),'#9AA3AD',NO)}
+   if(s>0&&r.__hold==='palu2'){D(G.box,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(0,-.05,0),M.S(.04,.45,.04))),'#8A5A2B',NO);D(G.box,Wm(M.chain(hd,M.T(0,-.02,.03),M.RX(-1.3),M.T(0,.38,0),M.S(.2,.1,.1))),'#5B5F66',NO)}
+   if(s>0&&r.__hold==='benih'){D(G.sphHi,Wm(M.chain(hd,M.T(0,-.12,.06),M.S(.11,.13,.09))),'#E9D8B4',NO);D(G.box,Wm(M.chain(hd,M.T(0,-.02,.06),M.S(.06,.04,.06))),'#C9A27A',NO)}
    if(s>0&&r.__hold==='mic'){D(G.box,Wm(M.chain(hd,M.T(0,-.06,.05),M.RX(-.6),M.T(0,-.05,0),M.S(.04,.2,.04))),'#222',NO);D(G.sphHi,Wm(M.chain(hd,M.T(0,-.06,.05),M.RX(-.6),M.T(0,.2,0),M.S(.07,.07,.07))),'#B8BCC4',NO)}
    if(s>0&&r.__hold==='biola'){D(G.box,Wm(M.chain(hd,M.T(0,-.03,.05),M.RZ(1.2),M.T(0,-.3,0),M.S(.015,.62,.015))),'#D8C7A0',NO)}
    if(s<0&&r.__hold==='gitar')D(G.sph,Wm(M.chain(hd,M.S(.08,.08,.08))),L.skin,NC);
@@ -90,7 +95,7 @@ function __arms(r,L,Wm,t,sw){const H=window.__HERO,me=H&&r.u&&r.u.toLowerCase()=
    if(s>0&&r.__hold==='biola'){D(G.sphHi,Wm(M.chain(M.T(-.22,.98,.2),M.RZ(-.9),M.RX(.3),M.S(.08,.15,.035))),'#9C4A1A',NO);D(G.box,Wm(M.chain(M.T(-.22,.98,.2),M.RZ(-.9),M.RX(.3),M.T(0,.1,.02),M.S(.03,.24,.02))),'#2A1A10',NO)}
    if(s>0&&r.__hold==='selendang'){for(const q of [-1,1])D(G.box,Wm(M.chain(M.T(q*.16,.25,.2),M.RZ(q*.08+Math.sin(t*3+q)*.08),M.S(.12,.68,.02))),q>0?'#FF5FA2':'#FFC93C',NO);D(G.sphHi,Wm(M.chain(M.T(0,.9,.05),M.S(.3,.06,.24))),'#FF5FA2',NO)}
   }}
-  if(bb.hm&&r.__hold!=='stik'){D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.14,0),M.S(.028,.17,.028))),'#8A5A2B',NC);D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.3,0),M.S(.1,.045,.045))),'#5B5F66',NC)}
+  if(bb.hm&&r.__hold!=='stik'&&!r.__nohm){D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.14,0),M.S(.028,.17,.028))),'#8A5A2B',NC);D(G.sph,Wm(M.chain(hd,M.RX(-1.35),M.T(0,-.3,0),M.S(.1,.045,.045))),'#5B5F66',NC)}
   if(bb.pt)D(G.sph,Wm(M.chain(hd,M.T(0,-.09,.0),M.S(.025,.07,.025))),L.skin,NC)}}
 
 // kru bangunan: warga + President kerja (palu, angkut, atap), tumpukan bahan, debu tiap pukulan

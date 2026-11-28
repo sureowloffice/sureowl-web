@@ -188,6 +188,36 @@ async function profil(u) {
 module.exports = async (req, res) => {
   if (!URL_ || !TOKEN) return send(res, 503, { error: 'Akun kota belum aktif.' });
   try {
+    // ===== Game Lahanku (/main): cek Buku Warga, kode 4 angka, simpan progres =====
+    {
+      const q0 = new URL(req.url, 'http://x').searchParams;const ga = q0.get('a') || '';
+      if (ga === 'mainCek' || ga === 'mainMasuk' || ga === 'main') {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || 'kotaseni.vercel.app';
+        let bd = req.body; if (typeof bd === 'string') { try { bd = JSON.parse(bd) } catch (e) { bd = {} } } bd = bd || {};
+        const gu = String(q0.get('u') || bd.u || '').trim().replace(/^@/, '').toLowerCase().slice(0, 40);
+        if (!gu) return send(res, 400, { ok: false, msg: 'Username kosong.' });
+        const hp = p => crypto.createHash('sha256').update('kotaseni-main:' + gu + ':' + p).digest('hex');
+        const inBuku = async () => { const set = await warga(host); if (set.has(gu)) return { ok: true, lama: true };
+          try { const r = await fetch('https://' + host + '/main/warga-baru.json?nc=' + Date.now()); const d = await r.json(); if ((d.baru || []).some(n => String(n).toLowerCase() === gu)) return { ok: true, lama: false } } catch (e) {}
+          const [ex] = await redis([['HEXISTS', 'mainpin', gu]]); if (ex) return { ok: true, lama: false }; return { ok: false } };
+        if (ga === 'mainCek') { const b = await inBuku(); if (!b.ok) return send(res, 200, { ok: false });
+          const [pin] = await redis([['HGET', 'mainpin', gu]]); return send(res, 200, { ok: true, lama: b.lama, pin: !!pin }) }
+        const pin = String(bd.pin || ''); if (!/^\d{4}$/.test(pin)) return send(res, 200, { ok: false, msg: 'Kodenya harus 4 angka.' });
+        const [cur, fails] = await redis([['HGET', 'mainpin', gu], ['GET', 'mainfail:' + gu]]);
+        if (+fails >= 8) return send(res, 200, { ok: false, msg: 'Kebanyakan salah kode. Coba lagi 1 jam lagi, atau DM @viralindongid.' });
+        if (ga === 'mainMasuk') {
+          if (!cur) { if (!bd.baru) return send(res, 200, { ok: false, msg: 'Kode belum dibuat.' }); const b = await inBuku(); if (!b.ok) return send(res, 200, { ok: false, msg: 'Nama belum ada di Buku Warga.' });
+            await redis([['HSET', 'mainpin', gu, hp(pin)], ['SADD', 'mainwarga', gu]]); return send(res, 200, { ok: true, s: null }) }
+          if (cur !== hp(pin)) { await redis([['INCR', 'mainfail:' + gu], ['EXPIRE', 'mainfail:' + gu, '3600']]); return send(res, 200, { ok: false, msg: 'Kode salah. Lupa? DM @viralindongid.' }) }
+          const [st] = await redis([['GET', 'main:' + gu]]); let s0 = null; try { s0 = st ? JSON.parse(st) : null } catch (e) { s0 = null }
+          return send(res, 200, { ok: true, s: s0 }) }
+        if (ga === 'main' && req.method === 'POST') {
+          if (!cur || cur !== hp(pin)) return send(res, 200, { ok: false, msg: 'Kode salah.' });
+          const js = JSON.stringify(bd.s || null); if (js.length > 120000) return send(res, 200, { ok: false, msg: 'Simpanan terlalu besar.' });
+          await redis([['SET', 'main:' + gu, js], ['ZADD', 'mainhari', String((bd.s && bd.s.day) || 0), gu]]); return send(res, 200, { ok: true }) }
+        return send(res, 400, { ok: false });
+      }
+    }
     if (req.method === 'GET') {
       const q = new URL(req.url, 'http://x').searchParams;
       if (q.get('a') === 'top') {

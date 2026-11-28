@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Kota Seni · Lahanku</title>
+<meta name="description" content="Pulihkan lahanmu di Kota Seni: cangkul, tanam, siram, panen, dan bikin karya seni.">
+<meta name="theme-color" content="#F4E9D2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=Bangers&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/main/game.css?v=1">
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="tags"></div>
+
+<!-- HUD -->
+<div id="hud" class="hide">
+  <div class="card" id="clock"><div id="hDay">Semi · Hari 1</div><div id="hTime">06:00 <span id="hWx">☀️</span></div><div id="hMoney">💰 500</div></div>
+  <div id="toast"></div>
+  <div id="arrow" class="hide">▼</div>
+</div>
+
+<!-- kontrol -->
+<div id="ctl" class="hide">
+  <div id="joy"><div id="knob"></div></div>
+  <div id="btns">
+    <button id="bAlat" class="sm"><span id="toolIc">⛏️</span><small id="toolNm">Cangkul</small></button>
+    <button id="bTas" class="sm">🎒<small>Tas</small></button>
+    <button id="bAksi" class="big b2">AKSI</button>
+    <button id="bPakai" class="big">PAKAI</button>
+  </div>
+</div>
+
+<!-- dialog krem -->
+<div id="dlg" class="hide"><div id="dName">PRESIDENT</div><div id="dText"></div><div id="dNext">▼</div></div>
+
+<!-- panel umum (toko, tas, tidur, hasil hari) -->
+<div id="panel" class="hide"><div id="pBox"><div id="pHead"><b id="pTitle"></b><button id="pX">✕</button></div><div id="pBody"></div></div></div>
+
+<!-- masuk -->
+<div id="gate">
+  <div id="gBox">
+    <div class="logo">KOTA SENI</div>
+    <div class="sub">Lahanku</div>
+    <div id="gMsg" class="say"><b>President:</b> Lo udah jadi warga? Tulis username IG lo, gue cek di Buku Warga.</div>
+    <div id="gStep1">
+      <div class="inp"><span>@</span><input id="gUser" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="username Instagram"></div>
+      <button id="gCek" class="pri">Cek namaku</button>
+      <button id="gTamu" class="ghost">Lihat-lihat dulu (main tanpa simpan)</button>
+    </div>
+    <div id="gStep2" class="hide">
+      <div id="gPinMsg" class="small"></div>
+      <input id="gPin" class="pin" inputmode="numeric" maxlength="4" placeholder="••••">
+      <input id="gPin2" class="pin hide" inputmode="numeric" maxlength="4" placeholder="ulang ••••">
+      <button id="gMasuk" class="pri">Masuk</button>
+      <button id="gBalik" class="ghost">Ganti username</button>
+    </div>
+    <div class="foot">Belum jadi warga? Follow <b>@viralindongid</b> + komen <b>PINDAH</b> di postingan mana aja.</div>
+  </div>
+</div>
+<div id="load">Menyiapkan lahan…</div>
+
+<script>
+// Muat mesin yang sama dengan video reel, lalu tambal (bola halus, wajah & tangan versi film).
+(async()=>{
+  const V='?v=1';
+  const get=u=>fetch(u+V).then(r=>{if(!r.ok)throw new Error(u);return r.text()});
+  const run=src=>{const s=document.createElement('script');s.textContent=src;document.body.appendChild(s)};
+  let eng=await get('/engine.js');
+  const F0="function plane(w,h){";
+  eng=eng.replace(F0,"function sphereS(la,lo){const g=new Geo();const P=(i,j)=>{const th=i/la*Math.PI,ph=j/lo*Math.PI*2;return [Math.sin(th)*Math.cos(ph),Math.cos(th),Math.sin(th)*Math.sin(ph)]};const V=(...ps)=>{for(const p of ps)g.v.push(p[0],p[1],p[2],p[0],p[1],p[2],0,0)};for(let i=0;i<la;i++)for(let j=0;j<lo;j++){const a=P(i,j),b=P(i+1,j),c=P(i+1,j+1),d=P(i,j+1);if(i==0)V(a,b,c);else if(i==la-1)V(a,b,d);else{V(a,b,c);V(a,c,d)}}return g}\nfunction cylS(s){const g=new Geo();const V=(p,n)=>g.v.push(p[0],p[1],p[2],n[0],n[1],n[2],0,0);for(let i=0;i<s;i++){const a0=i/s*Math.PI*2,a1=(i+1)/s*Math.PI*2,c0=Math.cos(a0),s0=Math.sin(a0),c1=Math.cos(a1),s1=Math.sin(a1);const b0=[c0,0,s0],b1=[c1,0,s1],t0=[c0,1,s0],t1=[c1,1,s1],n0=[c0,0,s0],n1=[c1,0,s1];V(b0,n0);V(b1,n1);V(t1,n1);V(b0,n0);V(t1,n1);V(t0,n0);for(const [y,ny] of [[0,-1],[1,1]]){V([0,y,0],[0,ny,0]);V([c0,y,s0],[0,ny,0]);V([c1,y,s1],[0,ny,0])}}return g}\n"+F0)
+   .replace("sph:upload(sphere(1,6,10)),sphHi:upload(sphere(1,12,20))","sph:upload(sphereS(12,18)),sphHi:upload(sphereS(20,30))")
+   .replace("cyl8:upload(cyl(1,1,1,8)),cyl16:upload(cyl(1,1,1,16))","cyl8:upload(cylS(14)),cyl16:upload(cylS(22))")
+   .replace("x.fillStyle='#2B2450';x.fillRect(0,0,w,h);x.fillStyle='#302957'","x.fillStyle='#A9D68F';x.fillRect(0,0,w,h);x.fillStyle='#B2DB98'")
+   .replace("x.fillStyle='#2E2754';x.fillRect(w/2+2,4","x.fillStyle='#AED994';x.fillRect(w/2+2,4");
+  run(eng);
+  let av=await get('/avatar.js');
+  const A1="if(role==='pres'){Object.assign(L,{shirt:'#1E2A44',arm:'#1E2A44',pants:'#1E2A44',shoe:'#111111',hair:'pendek',hc:'#1F1F1F'})}",A2="if(L.role==='pres'){for(const sx of [-1,1])D(G.box";
+  const B1='function body3D(r,Wm,t,near,mv){',B2='function acc3D(r,Wm,t,near,L){';
+  const AD='function __adult(W0){if(!window.__CINE)return W0;const HB=M.chain(M.T(0,1.3,0),M.S(.86,.86,.86),M.T(0,-1.0,0)),BB=M.S(1,1.3,1);return m=>W0(M.mul(m[13]>=1.0?HB:BB,m))}\n';
+  const F1="else for(const sx of [-1,1]){D(G.sph,Wm(M.chain(M.T(sx*.19,1.34,.36),M.S(.15,.18,.11))),CREAM",F2="if(near){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH";
+  const F3="else D(G.sphHi,Wm(M.chain(M.T(0,1.52,-.06),M.S(.53,.36,.47))),L.hc,NC);",F4="if(near){for(const sx of [-1,1]){const ar=M.chain(M.T(sx*.36,.88,0)";
+  av=av.replace(B1,AD+'function body3D(r,Wm0,t,near,mv){const Wm=__adult(Wm0);').replace(B2,'function acc3D(r,Wm0,t,near,L){const Wm=__adult(Wm0);')
+   .replace(F1,"else if(window.__CINE)__face(r,L,Wm,t,near);"+F1).replace(F2,"if(near&&!window.__CINE){for(const sx of [-1,1])D(G.sph,Wm(M.chain(M.T(sx*.32,1.18,.33),M.S(.07,.04,.03))),BLUSH")
+   .replace(F3,"else if(window.__CINE&&L.role==='pres')__hairP(Wm,L.hc);"+F3).replace(F4,"if(near&&window.__CINE)__arms(r,L,Wm,t,sw);else "+F4)
+   .replace(A1,"if(role==='pres'){Object.assign(L,window.__PRES)}").replace(A2,"if(L.role==='pres'&&L.glass){for(const sx of [-1,1])D(G.box");
+  av+='\n'+await get('/main/face.js');
+  window.__CINE={fov:.87};window.__PRES={shirt:'#1E2A44',arm:'#1E2A44',pants:'#1E2A44',shoe:'#111111',hair:'pendek',hc:'#1F1F1F',pin:1,acc:'hp',glass:0};
+  run(av);
+  run(await get('/main/game.js'));
+})().catch(e=>{document.getElementById('load').textContent='Gagal memuat: '+e.message+'. Coba muat ulang.'});
+</script>
+</body>
+</html>
