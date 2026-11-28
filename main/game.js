@@ -163,6 +163,7 @@ function room(t){const R=ROOM;D(G.box,M.chain(M.T(R.x,-.6,R.z),M.S(44,.5,44)),'#
  bx(-26.6,0,1.6,.8,1.2,.5,'#8E5A3B');D(G.sph,M.chain(M.T(-26.6,1.45,1.6),M.S(.32,.3,.32)),'#5E8C3A');
  bx(-26.45,0,-.7,.5,1.5,1.6,'#7A4B22');for(const y of [.45,.95])bx(-26.6,y,-.7,.4,.04,1.5,'#A0703F');
  (S.pajang||[]).forEach((k,i)=>{const y=[1.0,.5,1.0][i],z=[-1.2,-.7,-.2][i];D(G.box,M.chain(M.T(-26.75,y+.22,z),M.S(.04,.34,.34)),'#FFFFFF',{tex:sign(ITEM[k].ic,'#FFF6E0'),em:.3,cast:false})});
+ bx(-33.97,.5,1.7,.06,1.45,.8,'#7A4B22');bx(-33.93,.6,1.7,.03,1.25,.62,'#CFE9F5',{em:.45,cast:false});
  bx(-33.5,0,.6,.3,1.25,.3,'#5B3A1E');bx(-33.5,1.25,.6,.45,.3,.45,'#FFE8A3',{em:.9,cast:false})}
 function masukRumah(){INSIDE=true;P.x=RDOOR[0];P.z=RDOOR[1]-.6;P.yaw=Math.PI;cam.tx=P.x;cam.tz=P.z+.4;sfx('buka');hud();
  if(S.tut==6)say(['Ini rumah lo. Di dalem rumah jam berhenti, jadi santai aja.','Deketin kasur terus pencet AKSI buat tidur.'])}
@@ -170,6 +171,7 @@ function keluarRumah(){INSIDE=false;P.x=DOOR[0];P.z=DOOR[1]+.9;P.yaw=0;cam.tx=P.
 function aksiDalam(){if(Math.hypot(P.x-BED[0],P.z-BED[1])<2.0)return rumah();
  if(near(RDOOR,1.2))return keluarRumah();
  if(Math.hypot(P.x+26.45,P.z+.7)<1.5)return pajang();
+ if(Math.hypot(P.x+33.5,P.z-1.7)<1.4)return bikinAvatar(()=>toast('Tampilan baru, semangat baru!'));
  if(near(TVP,1.6))return toast('📺 Ramalan cuaca belum siaran. Nanti nyala pas update Cuaca.');
  if(Math.hypot(P.x+29.6,P.z+.4)<1.4)return toast(isBday()?'🎂 Ada kue ulang tahun di meja!':'Meja makan. Roti dimakan dari TAS ya.');
  toast('Pencet AKSI deket kasur buat tidur, deket pintu buat keluar')}
@@ -194,9 +196,14 @@ function forage(t){for(const f of S.fg){if(f.got)continue;const it=ITEM[f.k];con
  else{D(G.sph,M.chain(M.T(f.x,.12,f.z),M.S(.22,.16,.22)),'#3E8E41',{});for(let k=0;k<3;k++)D(G.sphHi,M.chain(M.T(f.x+Math.cos(k*2)*.12,.22,f.z+Math.sin(k*2)*.12),M.S(.05,.05,.05)),'#5B5BD6',NC)}
  D(G.cyl16,M.chain(M.T(f.x,.01,f.z),M.S(.3,.01,.3)),'#FFFFFF',{em:1,alpha:.35+.2*Math.sin(t*4),cast:false})}}
 function shade(h,f){const c=hex(h);return '#'+c.map(v=>Math.round(Math.max(0,Math.min(1,v*f))*255).toString(16).padStart(2,'0')).join('')}
+// hiasan kepala pilihan warga: 0 tanpa, 1 topi depan, 2 topi belakang, 3 bunga, 4 bando (warna ikut tas)
+function aksesori(r,Wm){const a=r.aks|0,c=r.tas||'#C0392B',dk=shade(c,.75),NC={cast:false};if(!a)return;
+ if(a==1||a==2){const f=a==1?1:-1;D(G.sphHi,Wm(M.chain(M.T(0,1.7,0),M.S(.52,.27,.5))),c);D(G.box,Wm(M.chain(M.T(0,1.66,f*.5),M.RX(f*-.12),M.S(.4,.035,.3))),dk,NC);D(G.sph,Wm(M.chain(M.T(0,1.96,0),M.S(.06,.04,.06))),dk,NC)}
+ else if(a==3){D(G.sph,Wm(M.chain(M.T(.3,1.8,.16),M.S(.09,.09,.09))),'#FFD23F',{em:.5,cast:false});for(let i=0;i<5;i++){const g=i/5*Math.PI*2;D(G.sph,Wm(M.chain(M.T(.3+Math.cos(g)*.11,1.8+Math.sin(g)*.11,.16),M.S(.075,.075,.05))),c,{em:.3,cast:false})}}
+ else if(a==4){for(let i=0;i<=10;i++){const g=-1.25+i*.25;D(G.sph,Wm(M.chain(M.T(Math.sin(g)*.49,1.38+Math.cos(g)*.48,.04),M.S(.055,.055,.07))),c,NC)}D(G.sph,Wm(M.chain(M.T(.2,1.82,.1),M.S(.1,.07,.06))),dk,NC)}}
 function person(r,x,z,yaw,t,mv,o){o=o||{};r.__hold=o.hold||null;r.__ges=o.ges||'diam';r.__ex=o.ex||null;r.__nohm=1;r.__ha=1;r.__hs=6;r.__gc=null;
  const bend=o.bend||0;const bob=mv?Math.abs(Math.sin(t*10+(r.ph||0)))*.06:0;const B=M.chain(M.T(x,bob,z),M.RY(yaw),M.RX(bend),M.S(.6,.6,.6));const Wm=m=>M.mul(B,m);
- const L=AVA.body3D(r,Wm,t,true,mv);AVA.acc3D(r,Wm,t,true,L);
+ const L=AVA.body3D(r,Wm,t,true,mv);if(r.aks===undefined)AVA.acc3D(r,Wm,t,true,L);else aksesori(r,Wm);
  if(r.tas){const c=r.tas,dk=shade(c,.72);D(G.box,Wm(M.chain(M.T(0,.7,-.34),M.S(.44,.5,.2))),c);D(G.box,Wm(M.chain(M.T(0,.94,-.34),M.S(.47,.09,.23))),dk,{cast:false});
   D(G.box,Wm(M.chain(M.T(0,.56,-.46),M.S(.3,.2,.05))),dk,{cast:false});D(G.box,Wm(M.chain(M.T(0,.64,-.49),M.S(.05,.05,.02))),'#E0B341',{em:.3,cast:false});
   for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.15,.78,.2),M.RX(-.25),M.S(.06,.34,.04))),dk,{cast:false})}
@@ -453,11 +460,11 @@ const OTH=new Map();let netT=3.4,netBusy=false,SKEW=0;const MY={e:null,eAt:0};co
 const inKota=()=>S&&!INSIDE&&P.x>16.4;
 async function netTick(){if(netBusy)return;netBusy=true;try{let j;
  if(!ME.guest&&ME.tok){const ea=MY.e?(Date.now()-MY.eAt)/1000:99;
-  j=await (await fetch('/api/akun?a=mainPos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({u:ME.u,tok:ME.tok,p:{x:P.x,z:P.z,y:P.yaw,lk:PR.lk,col:PR.col,tas:PR.tas,seni:S.seni||'',e:ea<5?MY.e:null,ea}})})).json();
+  j=await (await fetch('/api/akun?a=mainPos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({u:ME.u,tok:ME.tok,p:{x:P.x,z:P.z,y:P.yaw,lk:PR.lk,col:PR.col,tas:PR.tas,aks:PR.aks|0,seni:S.seni||'',e:ea<5?MY.e:null,ea}})})).json();
   if(j.now)SKEW=Date.now()-j.now}
  else j=await (await fetch('/api/akun?a=mainOn')).json();
  const seen=new Set();for(const o of (j.on||[])){if(o.u===ME.u)continue;seen.add(o.u);let r=OTH.get(o.u);
-  if(!r){r={u:o.u,x:o.x,z:o.z,yaw:o.y,ph:Math.random()*6};OTH.set(o.u,r)}Object.assign(r,{tx:o.x,tz:o.z,ty:o.y,lk:o.lk,col:o.col,tas:o.tas,seni:o.seni,e:o.e,et:o.et})}
+  if(!r){r={u:o.u,x:o.x,z:o.z,yaw:o.y,ph:Math.random()*6};OTH.set(o.u,r)}Object.assign(r,{tx:o.x,tz:o.z,ty:o.y,lk:o.lk,col:o.col,tas:o.tas,aks:o.aks|0,seni:o.seni,e:o.e,et:o.et})}
  for(const k of [...OTH.keys()])if(!seen.has(k))dropOth(k)}catch(e){}netBusy=false}
 function dropOth(k){OTH.delete(k);tag('o:'+k,'',null);tag('oe:'+k,'',null)}
 function netStep(dt){if(inKota()&&!document.hidden){netT+=dt;if(netT>3.5){netT=0;netTick()}}else{netT=3.4;if(OTH.size)for(const k of [...OTH.keys()])dropOth(k)}
@@ -525,18 +532,19 @@ function bdayGift(cb){S.bdGot=S.day;S.money+=200;addInv('roti',2);hud();sfx('koi
  say(['Selamat ulang tahun, @'+ME.u+'! 🎂','Ini hadiah dari Kota Seni: 💰200 sama 2 roti. Jangan dihabisin sekaligus ya.'],null,cb)}
 // ---------- buat avatar (awal game) ----------
 const KULIT=['#F5D3B0','#E8B68A','#C98F62','#A06A43','#6E4630'],RAMBUT=['Pendek','Keriting','Gondrong','Diikat','Cepak','Poni'],WRAMBUT=['#1A1A1A','#3A2414','#6B4423','#A06A2C','#7A2E1E'];
+const AKS=['Tanpa','Topi depan','Topi belakang','Bunga','Bando'];
 const BAJU=['#3F7CC4','#E53935','#2E7D32','#F4A261','#8E44AD','#F2C94C','#1ABC9C','#2B2B2B'],TASW=['#C0392B','#E67E22','#27AE60','#2980B9','#8E5A3B','#2B2B2B'];
-function pakaiLook(){if(S&&S.look){PR.lk=S.look.lk;PR.col=S.look.col;PR.tas=S.look.tas}else{PR.tas=TASW[0]}}
+function pakaiLook(){if(S&&S.look){PR.lk=S.look.lk;PR.col=S.look.col;PR.tas=S.look.tas;PR.aks=S.look.aks|0}else{PR.tas=TASW[0];PR.aks=0}}
 let SPIN=false;
 function bikinAvatar(done){SPIN=true;const old=cam.dist;cam.dist=TOUCH?7:7;P.yaw=cam.yaw;INTRO={x:P.x,z:P.z+(TOUCH?1.6:1.0),k:5};
- const cur=(S.look&&S.look.lk||'1:0:0').split(':').map(Number);let v={k:cur[0],r:cur[1],w:cur[2],b:BAJU.indexOf(S.look&&S.look.col),t:TASW.indexOf(S.look&&S.look.tas)};if(v.b<0)v.b=0;if(v.t<0)v.t=0;
- const apply=()=>{PR.lk=v.k+':'+v.r+':'+v.w;PR.col=BAJU[v.b];PR.tas=TASW[v.t]};
+ const cur=(S.look&&S.look.lk||'1:0:0').split(':').map(Number);let v={k:cur[0],r:cur[1],w:cur[2],b:BAJU.indexOf(S.look&&S.look.col),t:TASW.indexOf(S.look&&S.look.tas),a:(S.look&&S.look.aks)|0};if(v.b<0)v.b=0;if(v.t<0)v.t=0;
+ const apply=()=>{PR.lk=v.k+':'+v.r+':'+v.w;PR.col=BAJU[v.b];PR.tas=TASW[v.t];PR.aks=v.a};
  const sw=(key,list,isCol)=>list.map((c,i)=>`<button class="sw ${v[key]==i?'on':''}" data-${key}="${i}" ${isCol?`style="background:${c}"`:''}>${isCol?'':c}</button>`).join('');
  const draw=()=>{apply();panel('BUAT AVATAR LO',`<div class="avr"><b>Kulit</b><div class="sws">${sw('k',KULIT,1)}</div></div><div class="avr"><b>Rambut</b><div class="sws txt">${sw('r',RAMBUT,0)}</div></div><div class="avr"><b>Warna rambut</b><div class="sws">${sw('w',WRAMBUT,1)}</div></div>
-  <div class="avr"><b>Baju</b><div class="sws">${sw('b',BAJU,1)}</div></div><div class="avr"><b>Tas</b><div class="sws">${sw('t',TASW,1)}</div></div><button class="pri" id="bAva">✔ Selesai, ini gue!</button>`);
+  <div class="avr"><b>Baju</b><div class="sws">${sw('b',BAJU,1)}</div></div><div class="avr"><b>Tas</b><div class="sws">${sw('t',TASW,1)}</div></div><div class="avr"><b>Hiasan kepala</b><div class="sws txt">${sw('a',AKS,0)}</div></div><button class="pri" id="bAva">✔ Selesai, ini gue!</button>`);
   $('pX').classList.add('hide');$('panel').classList.add('ava');
-  for(const key of ['k','r','w','b','t']){const bs=$('pBody').querySelectorAll('[data-'+key+']');bs.forEach(bt=>bt.onclick=()=>{v[key]=+bt.dataset[key];sfx('buka');bs.forEach(x=>x.classList.toggle('on',x===bt));apply()})}
-  $('bAva').onclick=()=>{SPIN=false;P.yaw=cam.yaw;S.look={lk:PR.lk,col:PR.col,tas:PR.tas};$('pX').classList.remove('hide');$('panel').classList.remove('ava');closePanel();cam.dist=old;INTRO=null;save();toast('Avatar lo udah jadi!');done()}};
+  for(const key of ['k','r','w','b','t','a']){const bs=$('pBody').querySelectorAll('[data-'+key+']');bs.forEach(bt=>bt.onclick=()=>{v[key]=+bt.dataset[key];sfx('buka');bs.forEach(x=>x.classList.toggle('on',x===bt));apply()})}
+  $('bAva').onclick=()=>{SPIN=false;P.yaw=cam.yaw;S.look={lk:PR.lk,col:PR.col,tas:PR.tas,aks:PR.aks};$('pX').classList.remove('hide');$('panel').classList.remove('ava');closePanel();cam.dist=old;INTRO=null;save();toast('Avatar lo udah jadi!');done()}};
  draw()}
 // ---------- pilih ulang tahun ----------
 function pickBday(done){let m=0,d=0;const draw=()=>{panel('ULANG TAHUN LO',`<div class="say"><b>President:</b> Satu lagi. Kapan ulang tahun lo? Biar warga kota bisa ngerayain.</div>

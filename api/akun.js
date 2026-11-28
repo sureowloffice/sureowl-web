@@ -208,7 +208,7 @@ module.exports = async (req, res) => {
         const num = (v, a, b) => Math.max(a, Math.min(b, +v || 0));
         const EMO = ['👋', '❤️', '👏', '😂', '🔥', '🎵'], SENI = ['musik', 'lukis', 'kriya', 'foto', 'editor', 'ilustrator'], hexok = c => /^#[0-9a-f]{6}$/i.test(c || '');
         const q = { x: +num(p.x, 16.5, 47).toFixed(2), z: +num(p.z, -6.5, 14.5).toFixed(2), y: +num(p.y, -7, 7).toFixed(2),
-          lk: /^\d:\d:\d$/.test(p.lk || '') ? p.lk : '1:0:0', col: hexok(p.col) ? p.col : '#3F7CC4', tas: hexok(p.tas) ? p.tas : '#C0392B', seni: SENI.includes(p.seni) ? p.seni : '' };
+          lk: /^\d:\d:\d$/.test(p.lk || '') ? p.lk : '1:0:0', col: hexok(p.col) ? p.col : '#3F7CC4', tas: hexok(p.tas) ? p.tas : '#C0392B', aks: Math.max(0, Math.min(4, p.aks | 0)), seni: SENI.includes(p.seni) ? p.seni : '' };
         if (EMO.includes(p.e) && +p.ea >= 0 && +p.ea < 6) { q.e = p.e; q.et = Date.now() - Math.round(+p.ea * 1000) }
         const cmd = [['SET', 'mainpos:' + pu, JSON.stringify(q), 'EX', '20'], ['ZADD', 'mainon', String(Date.now()), pu]];
         if (Math.random() < .05) cmd.push(['ZREMRANGEBYSCORE', 'mainon', '-inf', String(Date.now() - 60000)]);
