@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galeri Karya Warga · Kota Seni</title>
+<style>
+body{margin:0;font:15px/1.45 Inter,system-ui,sans-serif;background:#FFF6E0;color:#2B1D0E;padding:20px;max-width:720px;margin:auto}
+h1{font-size:24px;margin:0 0 2px}.sub{color:#6B5A44;font-size:13px;margin-bottom:16px}
+.k{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid #2B1D0E;border-radius:14px;padding:10px 12px;margin:8px 0}
+.k .ic{font-size:30px;width:44px;text-align:center}.k .tx{flex:1}.k b{display:block}.k small{color:#6B5A44}.k .lk{font-weight:800}
+.box{background:#fff;border:2px solid #2B1D0E;border-radius:14px;padding:12px;margin:16px 0}
+.bar{height:12px;border:2px solid #2B1D0E;border-radius:8px;background:#EDE3CF;overflow:hidden;margin:4px 0 8px}.bar i{display:block;height:100%;background:#4CAF50}
+a{color:#6A4C93;font-weight:800}
+</style></head><body>
+<h1>Galeri Karya Warga</h1>
+<div class="sub">Pameran minggu ini di Kota Seni. 3 karya dengan ❤️ terbanyak diangkat jadi reel <a href="https://instagram.com/viralindongid">@viralindongid</a>. Festival tiap Sabtu 19.00 WIB. <a href="/main/">Main Lahanku</a></div>
+<div id="list">Memuat…</div>
+<div class="box" id="proyek"></div>
+<script>
+const N={suling:['🪈','Suling'],gitar:['🎸','Gitar'],drum:['🥁','Drum'],lukisan:['🖼️','Lukisan'],lukisanbesar:['🏞️','Lukisan Besar'],gerabah:['🏺','Gerabah'],patung:['🗿','Patung Kecil'],fotokota:['🌆','Foto Kota'],videopendek:['📹','Video Pendek'],videojadi:['🎞️','Video Jadi'],trailer:['🎬','Trailer Festival'],ilustrasi:['📝','Ilustrasi'],poster:['📜','Poster'],komik:['📚','Komik Kota']};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+fetch('/api/akun?a=mainPameran').then(r=>r.json()).then(d=>{const L=d.karya||[];document.getElementById('list').innerHTML=L.length?L.map((e,i)=>{const n=N[e.k]||['🎨',e.k];return `<div class="k"><div class="ic">${n[0]}</div><div class="tx"><b>${i<3?['🥇','🥈','🥉'][i]+' ':''}${esc(n[1])}</b><small>@${esc(e.u)}</small></div><div class="lk">❤️ ${+e.likes||0}</div></div>`}).join(''):'<div class="sub">Belum ada karya minggu ini (minggu mulai '+esc(d.minggu||'')+').</div>'}).catch(()=>{document.getElementById('list').textContent='Gagal memuat.'});
+fetch('/api/akun?a=mainProyek').then(r=>r.json()).then(p=>{const b=(a,c)=>`<div class="bar"><i style="width:${Math.min(100,Math.round(a/c*100))}%"></i></div>`;
+ document.getElementById('proyek').innerHTML=`<b>Proyek Kota: ${esc(p.nama||'Panggung Kota')}</b><div>🪵 Kayu ${p.ada.kayu}/${p.butuh.kayu}</div>${b(p.ada.kayu,p.butuh.kayu)}<div>🪨 Batu ${p.ada.batu}/${p.butuh.batu}</div>${b(p.ada.batu,p.butuh.batu)}<small>Penyumbang terbesar: ${(p.top||[]).map(t=>'@'+esc(t.u)+' ('+t.n+')').join(', ')||'belum ada'}</small>`}).catch(()=>{});
+</script></body></html>

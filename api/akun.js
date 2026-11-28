@@ -213,6 +213,47 @@ module.exports = async (req, res) => {
         const cmd = [['SET', 'mainpos:' + pu, JSON.stringify(q), 'EX', '20'], ['ZADD', 'mainon', String(Date.now()), pu]];
         if (Math.random() < .05) cmd.push(['ZREMRANGEBYSCORE', 'mainon', '-inf', String(Date.now() - 60000)]);
         await redis(cmd); return send(res, 200, { ok: true, on: await mainOn(), now: Date.now() }) }
+      // ----- ekosistem: pameran karya mingguan, proyek kota, pasar antarwarga -----
+      const KARYA_OK = ['suling', 'gitar', 'drum', 'lukisan', 'lukisanbesar', 'gerabah', 'patung', 'fotokota', 'videopendek', 'videojadi', 'trailer', 'ilustrasi', 'poster', 'komik'];
+      const JUAL_OK = KARYA_OK.concat(['wortel', 'tomat', 'gandum', 'bambu', 'kapas', 'pewarna', 'jamur', 'bunga', 'buah', 'kayu', 'batu', 'tanahliat', 'momen', 'roti']);
+      const PROYEK = { nama: 'Panggung Kota', butuh: { kayu: 500, batu: 300 } };
+      const minggu = () => { const d = new Date(Date.now() + 7 * 3600e3); const i = (d.getUTCDay() + 6) % 7; return new Date(d.getTime() - i * 864e5).toISOString().slice(0, 10) };
+      const body0 = () => { let b = req.body; if (typeof b === 'string') { try { b = JSON.parse(b) } catch (e) { b = {} } } return b || {} };
+      const auth = b => { const u = String(b.u || '').toLowerCase().slice(0, 40); return u && b.tok === mainTok(u) ? u : null };
+      const lookOk = l => { l = l || {}; const hx = c => /^#[0-9a-f]{6}$/i.test(c || ''); return { lk: /^\d:\d:\d$/.test(l.lk || '') ? l.lk : '1:0:0', col: hx(l.col) ? l.col : '#3F7CC4', tas: hx(l.tas) ? l.tas : '#C0392B', aks: Math.max(0, Math.min(4, l.aks | 0)) } };
+      const W30 = String(86400 * 30);
+      if (ga === 'mainPameran' && req.method === 'GET') { const wk = minggu(); const [h] = await redis([['HGETALL', 'pameran:' + wk]]); const ent = [];
+        for (let i = 0; i < (h || []).length; i += 2) { try { ent.push(Object.assign({ u: h[i] }, JSON.parse(h[i + 1]))) } catch (e) {} }
+        const lk = ent.length ? await redis(ent.map(e => ['SCARD', 'pamlike:' + wk + ':' + e.u])) : [];
+        ent.forEach((e, i) => e.likes = +lk[i] || 0); ent.sort((a, b) => b.likes - a.likes || a.ts - b.ts);
+        res.setHeader('Cache-Control', 'public, max-age=10'); return send(res, 200, { ok: true, minggu: wk, karya: ent }) }
+      if (ga === 'mainPameran') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        if (!KARYA_OK.includes(b.k)) return send(res, 200, { ok: false, msg: 'Itu bukan karya.' }); const wk = minggu();
+        await redis([['HSET', 'pameran:' + wk, u, JSON.stringify(Object.assign({ k: b.k, ts: Date.now() }, lookOk(b.look)))], ['EXPIRE', 'pameran:' + wk, W30]]); return send(res, 200, { ok: true }) }
+      if (ga === 'mainLike') { const b = body0(), u = auth(b), t = String(b.t || '').toLowerCase().slice(0, 40); if (!u || !t || t === u) return send(res, 200, { ok: false }); const wk = minggu();
+        const [ad] = await redis([['SADD', 'pamlike:' + wk + ':' + t, u], ['EXPIRE', 'pamlike:' + wk + ':' + t, W30]]); return send(res, 200, { ok: true, baru: +ad === 1 }) }
+      if (ga === 'mainProyek' && req.method === 'GET') { const [k, bt, top] = await redis([['GET', 'proyek:panggung:kayu'], ['GET', 'proyek:panggung:batu'], ['ZREVRANGE', 'proyek:panggung:by', '0', '4', 'WITHSCORES']]);
+        const t5 = []; for (let i = 0; i < (top || []).length; i += 2) t5.push({ u: top[i], n: +top[i + 1] });
+        res.setHeader('Cache-Control', 'public, max-age=10'); return send(res, 200, { ok: true, nama: PROYEK.nama, butuh: PROYEK.butuh, ada: { kayu: +k || 0, batu: +bt || 0 }, top: t5 }) }
+      if (ga === 'mainSetor') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        const k = b.k, n = Math.max(1, Math.min(200, b.n | 0)); if (!['kayu', 'batu'].includes(k)) return send(res, 200, { ok: false });
+        const [tot] = await redis([['INCRBY', 'proyek:panggung:' + k, String(n)], ['ZINCRBY', 'proyek:panggung:by', String(n), u]]); return send(res, 200, { ok: true, total: +tot }) }
+      if (ga === 'mainPasar' && req.method === 'GET') { const [h] = await redis([['HGETALL', 'pasar']]); const L = [];
+        for (let i = 0; i < (h || []).length; i += 2) { try { L.push(Object.assign({ id: h[i] }, JSON.parse(h[i + 1]))) } catch (e) {} }
+        L.sort((a, b) => b.ts - a.ts); return send(res, 200, { ok: true, jual: L.slice(0, 60) }) }
+      if (ga === 'mainJual') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        const k = b.k, n = Math.max(1, Math.min(99, b.n | 0)), h = Math.max(1, Math.min(99999, b.h | 0)); if (!JUAL_OK.includes(k)) return send(res, 200, { ok: false, msg: 'Barang ini nggak bisa dijual di pasar.' });
+        const [cnt] = await redis([['SCARD', 'pasarby:' + u]]); if (+cnt >= 5) return send(res, 200, { ok: false, msg: 'Maksimal 5 lapak. Batalin salah satu dulu.' });
+        const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        await redis([['HSET', 'pasar', id, JSON.stringify({ u, k, n, h, ts: Date.now() })], ['SADD', 'pasarby:' + u, id]]); return send(res, 200, { ok: true, id }) }
+      if (ga === 'mainBeli' || ga === 'mainBatal') { const b = body0(), u = auth(b), id = String(b.id || '').slice(0, 20); if (!u || !id) return send(res, 200, { ok: false, msg: 'Masuk pakai akun dulu.' });
+        const [v] = await redis([['HGET', 'pasar', id]]); let o = null; try { o = v ? JSON.parse(v) : null } catch (e) {} if (!o) return send(res, 200, { ok: false, msg: 'Barangnya udah laku.' });
+        if (ga === 'mainBeli' && o.u === u) return send(res, 200, { ok: false, msg: 'Itu lapak lo sendiri.' }); if (ga === 'mainBatal' && o.u !== u) return send(res, 200, { ok: false });
+        const [del] = await redis([['HDEL', 'pasar', id]]); if (+del !== 1) return send(res, 200, { ok: false, msg: 'Barangnya udah laku.' });
+        const c = [['SREM', 'pasarby:' + o.u, id]]; if (ga === 'mainBeli') c.push(['INCRBY', 'pasarduit:' + o.u, String(o.h)], ['LPUSH', 'pasarlog:' + o.u, '@' + u + ' beli ' + o.n + ' ' + o.k + ' (💰' + o.h + ')'], ['LTRIM', 'pasarlog:' + o.u, '0', '19']);
+        await redis(c); return send(res, 200, { ok: true, k: o.k, n: o.n, h: o.h }) }
+      if (ga === 'mainKoleksi') { const b = body0(), u = auth(b); if (!u) return send(res, 200, { ok: false });
+        const [uang, log] = await redis([['GETDEL', 'pasarduit:' + u], ['LRANGE', 'pasarlog:' + u, '0', '9'], ['DEL', 'pasarlog:' + u]]); return send(res, 200, { ok: true, uang: +uang || 0, log: log || [] }) }
       if (ga === 'mainStat') { // statistik warga aktif Lahanku (angka gabungan saja, tanpa nama)
         const hari = [];for (let d = 13; d >= 0; d--) hari.push(tglJkt(d));
         const cmd = [];for (const h of hari) cmd.push(['SCARD', 'main:aktif:' + h], ['SCARD', 'main:baru:' + h]);
