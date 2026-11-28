@@ -28,6 +28,7 @@ async function redis(cmds) {
 
 let wargaCache = { at: 0, set: null };
 let onlineCache = { at: 0, body: null };
+let mainOnCache = { at: 0, list: [] };
 async function warga(host) {
   if (wargaCache.set && Date.now() - wargaCache.at < 60000) return wargaCache.set;
   const r = await fetch('https://' + host + '/warga.json?nc=' + Date.now());
@@ -193,6 +194,25 @@ module.exports = async (req, res) => {
       const q0 = new URL(req.url, 'http://x').searchParams;const ga = q0.get('a') || '';
       const tglJkt = (d = 0) => new Date(Date.now() + 7 * 3600e3 - d * 864e5).toISOString().slice(0, 10);
       const EXP = String(86400 * 60);
+      // ----- kota bareng: posisi warga yang lagi di kota Lahanku -----
+      const mainTok = u => crypto.createHmac('sha256', String(TOKEN)).update('mainpos:' + u).digest('hex').slice(0, 32);
+      const mainOn = async () => { if (Date.now() - mainOnCache.at < 2500) return mainOnCache.list;
+        const now = Date.now(); const [us] = await redis([['ZRANGEBYSCORE', 'mainon', String(now - 15000), '+inf']]); let list = [];
+        if (us && us.length) { const [vals] = await redis([['MGET', ...us.slice(-40).map(u => 'mainpos:' + u)]]);
+          list = (vals || []).map((v, i) => { try { return v ? Object.assign({ u: us.slice(-40)[i] }, JSON.parse(v)) : null } catch (e) { return null } }).filter(Boolean) }
+        mainOnCache = { at: Date.now(), list }; return list };
+      if (ga === 'mainOn') return send(res, 200, { ok: true, on: await mainOn() });
+      if (ga === 'mainPos') { let bd = req.body; if (typeof bd === 'string') { try { bd = JSON.parse(bd) } catch (e) { bd = {} } } bd = bd || {};
+        const pu = String(bd.u || '').toLowerCase().slice(0, 40), p = bd.p || {};
+        if (!pu || bd.tok !== mainTok(pu)) return send(res, 200, { ok: false });
+        const num = (v, a, b) => Math.max(a, Math.min(b, +v || 0));
+        const EMO = ['👋', '❤️', '👏', '😂', '🔥', '🎵'], SENI = ['musik', 'lukis', 'kriya', 'foto', 'editor', 'ilustrator'], hexok = c => /^#[0-9a-f]{6}$/i.test(c || '');
+        const q = { x: +num(p.x, 16.5, 47).toFixed(2), z: +num(p.z, -6.5, 14.5).toFixed(2), y: +num(p.y, -7, 7).toFixed(2),
+          lk: /^\d:\d:\d$/.test(p.lk || '') ? p.lk : '1:0:0', col: hexok(p.col) ? p.col : '#3F7CC4', tas: hexok(p.tas) ? p.tas : '#C0392B', seni: SENI.includes(p.seni) ? p.seni : '' };
+        if (EMO.includes(p.e) && +p.ea >= 0 && +p.ea < 6) { q.e = p.e; q.et = Date.now() - Math.round(+p.ea * 1000) }
+        const cmd = [['SET', 'mainpos:' + pu, JSON.stringify(q), 'EX', '20'], ['ZADD', 'mainon', String(Date.now()), pu]];
+        if (Math.random() < .05) cmd.push(['ZREMRANGEBYSCORE', 'mainon', '-inf', String(Date.now() - 60000)]);
+        await redis(cmd); return send(res, 200, { ok: true, on: await mainOn(), now: Date.now() }) }
       if (ga === 'mainStat') { // statistik warga aktif Lahanku (angka gabungan saja, tanpa nama)
         const hari = [];for (let d = 13; d >= 0; d--) hari.push(tglJkt(d));
         const cmd = [];for (const h of hari) cmd.push(['SCARD', 'main:aktif:' + h], ['SCARD', 'main:baru:' + h]);
@@ -222,10 +242,10 @@ module.exports = async (req, res) => {
         if (+fails >= 8) return send(res, 200, { ok: false, msg: 'Kebanyakan salah kode. Coba lagi 1 jam lagi, atau DM @viralindongid.' });
         if (ga === 'mainMasuk') {
           if (!cur) { if (!bd.baru) return send(res, 200, { ok: false, msg: 'Kode belum dibuat.' }); const b = await inBuku(); if (!b.ok) return send(res, 200, { ok: false, msg: 'Nama belum ada di Buku Warga.' });
-            await redis([['HSET', 'mainpin', gu, hp(pin)], ['SADD', 'mainwarga', gu], ['SADD', 'main:baru:' + tglJkt(), gu], ['EXPIRE', 'main:baru:' + tglJkt(), EXP], ['SADD', 'main:aktif:' + tglJkt(), gu], ['EXPIRE', 'main:aktif:' + tglJkt(), EXP]]); return send(res, 200, { ok: true, s: null }) }
+            const tokBaru = mainTok(gu); await redis([['HSET', 'mainpin', gu, hp(pin)], ['SADD', 'mainwarga', gu], ['SADD', 'main:baru:' + tglJkt(), gu], ['EXPIRE', 'main:baru:' + tglJkt(), EXP], ['SADD', 'main:aktif:' + tglJkt(), gu], ['EXPIRE', 'main:aktif:' + tglJkt(), EXP]]); return send(res, 200, { ok: true, s: null, tok: tokBaru }) }
           if (cur !== hp(pin)) { await redis([['INCR', 'mainfail:' + gu], ['EXPIRE', 'mainfail:' + gu, '3600']]); return send(res, 200, { ok: false, msg: 'Kode salah. Lupa? DM @viralindongid.' }) }
           const [st] = await redis([['GET', 'main:' + gu], ['SADD', 'main:aktif:' + tglJkt(), gu], ['EXPIRE', 'main:aktif:' + tglJkt(), EXP]]); let s0 = null; try { s0 = st ? JSON.parse(st) : null } catch (e) { s0 = null }
-          return send(res, 200, { ok: true, s: s0 }) }
+          return send(res, 200, { ok: true, s: s0, tok: mainTok(gu) }) }
         if (ga === 'main' && req.method === 'POST') {
           if (!cur || cur !== hp(pin)) return send(res, 200, { ok: false, msg: 'Kode salah.' });
           const s = bd.s; const js = JSON.stringify(s || null); if (js.length > 120000) return send(res, 200, { ok: false, msg: 'Simpanan terlalu besar.' });

@@ -39,6 +39,10 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | p1wj12ub | Toko benih tutup tiap hari ke-7, beli stok dulu. |
 | p1fqlu4i | Bambu nanti bisa jadi suling di Studio. Lagi gue bangun! |
 | p8i29s4 | Kalau capek, makan roti. Jangan sampe pingsan. |
+| pzavy86 | Waduh. Udah 7 hari lo nggak berkarya, alat seni lo hilang. |
+| p1p05hk1 | Sekarang lo warga biasa lagi. Ke Studio, bawa bahan tugasnya, nanti dikasih alat baru. |
+| p17n78ju | Kabar gembira! STUDIO udah buka, di utara jalan sebelah toko benih. |
+| p1ox1bqf | Di sana lo pilih seni lo sendiri: Musik, Lukis, Kriya, Videografer & Fotografer, Editor, atau Ilustrator. |
 | p1qcr8o0 | Pagi! Siram wortel lo lagi ya. Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru. |
 | p1tlipca | Batu pakai PALU, tunggul pakai KAPAK. Hasilnya bisa dijual. |
 | p4a6l7u | Semangat! Lahan ini makin cakep tiap hari. |
