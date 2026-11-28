@@ -29,12 +29,12 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | p175d72g | Mantap! Sekarang CANGKUL 9 petak itu. Tanahnya harus digemburin dulu sebelum ditanam. |
 | pl2pxfc | Rapi! Sekarang buka TAS, pegang benih WORTEL, terus PAKAI di tengah petak. |
 | pwdtkmv | Udah ketanem. Sekarang SIRAM semua petaknya pakai PENYIRAM. |
-| py0byd7 | Kerja bagus! Wortel panen 3 hari lagi kalau disiram tiap hari. |
+| p9qf74y | Kerja bagus! Ini benih spesial dari gue: besok pagi wortelnya udah bisa dipanen! |
 | pa0n3vy | Sekarang cari duit dulu: ada jamur, bunga, sama buah liar di sekitar kota. Ambil pakai AKSI. |
 | pznd8wr | Masukin 3 barang ke KOTAK JUAL sebelum jam 5 sore. Toko benih & toko roti ada di timur, ikutin jalan setapak. |
 | p16d6bw4 | Sip! Kotak jual dibayar jam 5 sore. |
 | p1uxd3wh | Kalau udah capek atau udah malem, masuk rumah terus tidur. Hari 1 lo nggak bakal pingsan, tenang. |
-| paeydl | Besok siram lagi ya. Tiga hari lagi panen pertama lo. |
+| pweh3w3 | Besok pagi wortel lo udah siap panen. Jangan lupa! |
 | pxp9cba | Tanah yang disiram tiap hari, panennya nggak bohong. |
 | p1wj12ub | Toko benih tutup tiap hari ke-7, beli stok dulu. |
 | p1fqlu4i | Bambu nanti bisa jadi suling di Studio. Lagi gue bangun! |
@@ -43,7 +43,9 @@ Kalau kalimat di game diubah, kodenya ikut berubah: jalankan ulang daftar ini.
 | p1p05hk1 | Sekarang lo warga biasa lagi. Ke Studio, bawa bahan tugasnya, nanti dikasih alat baru. |
 | p17n78ju | Kabar gembira! STUDIO udah buka, di utara jalan sebelah toko benih. |
 | p1ox1bqf | Di sana lo pilih seni lo sendiri: Musik, Lukis, Kriya, Videografer & Fotografer, Editor, atau Ilustrator. |
-| p1qcr8o0 | Pagi! Siram wortel lo lagi ya. Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru. |
+| p189mzn3 | Pagi! Wortel lo udah siap panen. Hadap tanamannya, pencet AKSI. |
+| p1lf80fg | Besok STUDIO buka. Di sana lo pilih seni lo sendiri! |
+| p1ei1wcb | Rumput, batu, sama tunggul juga bisa dibersihin buat lahan baru. |
 | p1tlipca | Batu pakai PALU, tunggul pakai KAPAK. Hasilnya bisa dijual. |
 | p4a6l7u | Semangat! Lahan ini makin cakep tiap hari. |
 | pxr7u29 | Batu pakai PALU, tunggul pakai KAPAK. Makin bersih, makin luas kebun lo. |
