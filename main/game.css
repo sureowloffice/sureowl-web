@@ -79,3 +79,13 @@ html,body{margin:0;height:100%;overflow:hidden;background:#BFE3FF;font-family:In
 #iSkip{position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top));border:2px solid #FFF6E0;background:rgba(0,0,0,.35);color:#FFF6E0;border-radius:20px;font:800 13px Inter;padding:7px 14px}
 #iTap{position:absolute;bottom:calc(24px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:rgba(255,246,224,.7);font:700 12px Inter}
 #gl{transition:filter 1s}
+.sws{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.sw{width:38px;height:38px;border-radius:50%;border:3px solid var(--ink);box-shadow:0 2px 0 var(--ink)}
+.sw.on{outline:3px solid var(--emas);outline-offset:2px}
+.sws.txt .sw{width:auto;height:34px;border-radius:17px;padding:0 12px;background:#fff;font:800 12px Inter}
+.sws.txt .sw.on{background:var(--emas);outline:none}
+#panel.ava{background:none;align-items:flex-end;padding:0 8px calc(8px + env(safe-area-inset-bottom))}
+#panel.ava #pBox{max-height:none;overflow:visible;width:100%;max-width:520px;padding:10px 12px}
+#panel.ava #pHead{margin-bottom:4px}#panel.ava #pHead b{font-size:22px}
+.avr{display:flex;align-items:center;gap:8px;margin:2px 0}.avr>b{flex:0 0 58px;font:800 12px/1.15 Inter}.avr .sws{margin:0;flex:1;min-width:0}
+#panel.ava .sws{gap:5px;overflow:visible;flex-wrap:wrap}#panel.ava .sw{width:30px;height:30px;border-width:2px}#panel.ava .sws.txt .sw{width:auto;height:28px;padding:0 9px;font-size:11px}#panel.ava .pri{margin-top:8px}

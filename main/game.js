@@ -174,9 +174,13 @@ function forage(t){for(const f of S.fg){if(f.got)continue;const it=ITEM[f.k];con
  else if(f.k=='bunga'){D(G.box,M.chain(M.T(f.x,0,f.z),M.S(.02,.2,.02)),'#3E8E41',NC);D(G.sphHi,M.chain(M.T(f.x,.22,f.z),M.S(.09,.05,.09)),'#FFC93C',NC)}
  else{D(G.sph,M.chain(M.T(f.x,.12,f.z),M.S(.22,.16,.22)),'#3E8E41',{});for(let k=0;k<3;k++)D(G.sphHi,M.chain(M.T(f.x+Math.cos(k*2)*.12,.22,f.z+Math.sin(k*2)*.12),M.S(.05,.05,.05)),'#5B5BD6',NC)}
  D(G.cyl16,M.chain(M.T(f.x,.01,f.z),M.S(.3,.01,.3)),'#FFFFFF',{em:1,alpha:.35+.2*Math.sin(t*4),cast:false})}}
+function shade(h,f){const c=hex(h);return '#'+c.map(v=>Math.round(Math.max(0,Math.min(1,v*f))*255).toString(16).padStart(2,'0')).join('')}
 function person(r,x,z,yaw,t,mv,o){o=o||{};r.__hold=o.hold||null;r.__ges=o.ges||'diam';r.__ex=o.ex||null;r.__nohm=1;r.__ha=1;r.__hs=6;r.__gc=null;
  const bend=o.bend||0;const bob=mv?Math.abs(Math.sin(t*10+(r.ph||0)))*.06:0;const B=M.chain(M.T(x,bob,z),M.RY(yaw),M.RX(bend),M.S(.6,.6,.6));const Wm=m=>M.mul(B,m);
  const L=AVA.body3D(r,Wm,t,true,mv);AVA.acc3D(r,Wm,t,true,L);
+ if(r.tas){const c=r.tas,dk=shade(c,.72);D(G.box,Wm(M.chain(M.T(0,.7,-.34),M.S(.44,.5,.2))),c);D(G.box,Wm(M.chain(M.T(0,.94,-.34),M.S(.47,.09,.23))),dk,{cast:false});
+  D(G.box,Wm(M.chain(M.T(0,.56,-.46),M.S(.3,.2,.05))),dk,{cast:false});D(G.box,Wm(M.chain(M.T(0,.64,-.49),M.S(.05,.05,.02))),'#E0B341',{em:.3,cast:false});
+  for(const sx of [-1,1])D(G.box,Wm(M.chain(M.T(sx*.15,.78,.2),M.RX(-.25),M.S(.06,.34,.04))),dk,{cast:false})}
  if(o.sweat)for(let k=0;k<2;k++){const q=(t*1.3+k*.5)%1;D(G.sph,M.chain(M.T(x+(k?.25:-.2),1.25-q*.4,z+.1),M.S(.04,.06,.04)),'#8FD3FF',{em:.6,alpha:1-q,cast:false})}}
 
 // ---------- cahaya ----------
@@ -392,6 +396,7 @@ function step(now){const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1
   const dx=PNPC.tx-PNPC.x,dz=PNPC.tz-PNPC.z,dd=Math.hypot(dx,dz);if(dd>.05){const s2=Math.min(dd,1.8*dt);PNPC.x+=dx/dd*s2;PNPC.z+=dz/dd*s2;PNPC.yaw=Math.atan2(dx,dz)}else PNPC.yaw=Math.atan2(P.x-PNPC.x,P.z-PNPC.z);
   if(Math.floor(t*4)%4==0)hud();
  }
+ if(S&&SPIN)P.yaw+=dt*1.1;
  if(S){const k=1-Math.exp(-dt*(INTRO?(INTRO.k||1.2):6));const fx=INTRO?INTRO.x:P.x,fz=INTRO?INTRO.z:P.z+.4;cam.tx+=(fx-cam.tx)*k;cam.tz+=(fz-cam.tz)*k;render(t)}
  music(t);
  requestAnimationFrame(step)}
@@ -405,12 +410,13 @@ function free(x,z){if(INSIDE){const R=ROOM;if(x<R.x-R.w/2+.3||x>R.x+R.w/2-.3||z<
 
 // ---------- masuk ----------
 async function api(a,body){const r=await fetch('/api/akun?a='+a,body?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}:{});return r.json().catch(()=>({}))}
-function start(st){S=st;audioOn();if(!S.fg||!S.fg.length)spawnForage();
+function start(st){S=st;audioOn();pakaiLook();if(!S.fg||!S.fg.length)spawnForage();
  if(!S.j0)S.j0=junk(newState(ME.u,false).tiles);pickHouses();
  if(S.tut>=99)PNPC.x=PNPC.tx=PLAZA[0]-1.2,PNPC.z=PNPC.tz=PLAZA[1]+1.6;
  $('gate').classList.add('hide');hud();
  const go=()=>{$('hud').classList.remove('hide');$('ctl').classList.remove('hide');hud();
   const greet=()=>{if(S.tut===0)setTimeout(()=>say(['Halo! Gue President Kota Seni. Samperin gue di depan rumah lo, terus pencet AKSI.']),400)};
+  if(!S.look)return bikinAvatar(go);
   if(!S.bday)return pickBday(()=>{if(isBday()&&S.bdGot!==S.day)bdayGift(greet);else greet()});
   greet()};
  if(S.tut===0&&!S.intro)intro(go);else go()}
@@ -427,6 +433,21 @@ function intro(done){UI.busy=true;S.intro=1;const el=$('intro'),tx=$('iTxt'),im=
  el.onclick=e=>{if(e.target.id==='iSkip')return end();next()};next()}
 function bdayGift(cb){S.bdGot=S.day;S.money+=200;addInv('roti',2);hud();sfx('koin');
  say(['Selamat ulang tahun, @'+ME.u+'! 🎂','Ini hadiah dari Kota Seni: 💰200 sama 2 roti. Jangan dihabisin sekaligus ya.'],null,cb)}
+// ---------- buat avatar (awal game) ----------
+const KULIT=['#F5D3B0','#E8B68A','#C98F62','#A06A43','#6E4630'],RAMBUT=['Pendek','Keriting','Gondrong','Diikat','Cepak','Poni'],WRAMBUT=['#1A1A1A','#3A2414','#6B4423','#A06A2C','#7A2E1E'];
+const BAJU=['#3F7CC4','#E53935','#2E7D32','#F4A261','#8E44AD','#F2C94C','#1ABC9C','#2B2B2B'],TASW=['#C0392B','#E67E22','#27AE60','#2980B9','#8E5A3B','#2B2B2B'];
+function pakaiLook(){if(S&&S.look){PR.lk=S.look.lk;PR.col=S.look.col;PR.tas=S.look.tas}else{PR.tas=TASW[0]}}
+let SPIN=false;
+function bikinAvatar(done){SPIN=true;const old=cam.dist;cam.dist=TOUCH?7:7;P.yaw=cam.yaw;INTRO={x:P.x,z:P.z+(TOUCH?1.6:1.0),k:5};
+ const cur=(S.look&&S.look.lk||'1:0:0').split(':').map(Number);let v={k:cur[0],r:cur[1],w:cur[2],b:BAJU.indexOf(S.look&&S.look.col),t:TASW.indexOf(S.look&&S.look.tas)};if(v.b<0)v.b=0;if(v.t<0)v.t=0;
+ const apply=()=>{PR.lk=v.k+':'+v.r+':'+v.w;PR.col=BAJU[v.b];PR.tas=TASW[v.t]};
+ const sw=(key,list,isCol)=>list.map((c,i)=>`<button class="sw ${v[key]==i?'on':''}" data-${key}="${i}" ${isCol?`style="background:${c}"`:''}>${isCol?'':c}</button>`).join('');
+ const draw=()=>{apply();panel('BUAT AVATAR LO',`<div class="avr"><b>Kulit</b><div class="sws">${sw('k',KULIT,1)}</div></div><div class="avr"><b>Rambut</b><div class="sws txt">${sw('r',RAMBUT,0)}</div></div><div class="avr"><b>Warna rambut</b><div class="sws">${sw('w',WRAMBUT,1)}</div></div>
+  <div class="avr"><b>Baju</b><div class="sws">${sw('b',BAJU,1)}</div></div><div class="avr"><b>Tas</b><div class="sws">${sw('t',TASW,1)}</div></div><button class="pri" id="bAva">✔ Selesai, ini gue!</button>`);
+  $('pX').classList.add('hide');$('panel').classList.add('ava');
+  for(const key of ['k','r','w','b','t']){const bs=$('pBody').querySelectorAll('[data-'+key+']');bs.forEach(bt=>bt.onclick=()=>{v[key]=+bt.dataset[key];sfx('buka');bs.forEach(x=>x.classList.toggle('on',x===bt));apply()})}
+  $('bAva').onclick=()=>{SPIN=false;P.yaw=cam.yaw;S.look={lk:PR.lk,col:PR.col,tas:PR.tas};$('pX').classList.remove('hide');$('panel').classList.remove('ava');closePanel();cam.dist=old;INTRO=null;save();toast('Avatar lo udah jadi!');done()}};
+ draw()}
 // ---------- pilih ulang tahun ----------
 function pickBday(done){let m=0,d=0;const draw=()=>{panel('ULANG TAHUN LO',`<div class="say"><b>President:</b> Satu lagi. Kapan ulang tahun lo? Biar warga kota bisa ngerayain.</div>
   <div class="mus">${MUSIM.map((n,k)=>`<button data-m="${k}" class="${k==m?'on':''}">${n}</button>`).join('')}</div>
