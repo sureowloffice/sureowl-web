@@ -210,9 +210,32 @@ module.exports = async (req, res) => {
         const q = { x: +num(p.x, 16.5, 47).toFixed(2), z: +num(p.z, -6.5, 14.5).toFixed(2), y: +num(p.y, -7, 7).toFixed(2),
           lk: /^\d:\d:\d$/.test(p.lk || '') ? p.lk : '1:0:0', col: hexok(p.col) ? p.col : '#3F7CC4', tas: hexok(p.tas) ? p.tas : '#C0392B', aks: Math.max(0, Math.min(4, p.aks | 0)), seni: SENI.includes(p.seni) ? p.seni : '' };
         if (EMO.includes(p.e) && +p.ea >= 0 && +p.ea < 6) { q.e = p.e; q.et = Date.now() - Math.round(+p.ea * 1000) }
+        const GES = ['lambai', 'angkat', 'kasih', 'tari', 'dorong', 'tepuk', 'semangat', 'bingung', 'dada'];
+        if (GES.includes(p.g) && +p.ga >= 0 && +p.ga < 7) { q.g = p.g; q.gt = Date.now() - Math.round(+p.ga * 1000) }
         const cmd = [['SET', 'mainpos:' + pu, JSON.stringify(q), 'EX', '20'], ['ZADD', 'mainon', String(Date.now()), pu]];
         if (Math.random() < .05) cmd.push(['ZREMRANGEBYSCORE', 'mainon', '-inf', String(Date.now() - 60000)]);
-        await redis(cmd); return send(res, 200, { ok: true, on: await mainOn(), now: Date.now() }) }
+        cmd.push(['LRANGE', 'aksi:' + pu, '0', '19'], ['DEL', 'aksi:' + pu]);
+        const rr = await redis(cmd); const ak = (rr[rr.length - 2] || []).map(x => { try { return JSON.parse(x) } catch (e) { return null } }).filter(Boolean);
+        return send(res, 200, { ok: true, on: await mainOn(), now: Date.now(), aksi: ak }) }
+      // ----- interaksi antar warga: aksi, ajakan (terima/tolak), pertemanan + hati -----
+      if (ga === 'mainAksi') { let b = req.body; if (typeof b === 'string') { try { b = JSON.parse(b) } catch (e) { b = {} } } b = b || {};
+        const u = String(b.u || '').toLowerCase().slice(0, 40), t = String(b.t || '').toLowerCase().slice(0, 40), a = String(b.a || '');
+        if (!u || b.tok !== mainTok(u) || !t || t === u) return send(res, 200, { ok: false });
+        const OK = ['sapa', 'tos', 'tepuk', 'pukul', 'hadiah', 'peluk_req', 'peluk_ok', 'joget_req', 'joget_ok', 'teman_req', 'teman_ok', 'tolak'];
+        if (!OK.includes(a)) return send(res, 200, { ok: false });
+        const ev = { from: u, a, ts: Date.now() }; if (a === 'tolak') ev.apa = String(b.apa || '').slice(0, 10);
+        if (a === 'hadiah') { const IT = ['wortel', 'tomat', 'gandum', 'bambu', 'kapas', 'pewarna', 'stroberi', 'jagung', 'labu', 'jamur', 'bunga', 'buah', 'kayu', 'batu', 'tanahliat', 'momen', 'roti', 'telur', 'suling', 'gitar', 'drum', 'lukisan', 'lukisanbesar', 'gerabah', 'patung', 'fotokota', 'videopendek', 'videojadi', 'trailer', 'ilustrasi', 'poster', 'komik'];
+          if (!IT.includes(b.item)) return send(res, 200, { ok: false }); ev.item = b.item; ev.n = Math.max(1, Math.min(20, b.n | 0)) }
+        const pair = [u, t].sort().join('|'); const cmd = [['RPUSH', 'aksi:' + t, JSON.stringify(ev)], ['LTRIM', 'aksi:' + t, '-30', '-1'], ['EXPIRE', 'aksi:' + t, '120']];
+        if (a === 'teman_ok') cmd.push(['SADD', 'teman:' + u, t], ['SADD', 'teman:' + t, u], ['HSETNX', 'hatip', pair, '1']);
+        await redis(cmd); let hati = null;
+        if (['sapa', 'tos', 'tepuk', 'hadiah', 'peluk_ok', 'joget_ok'].includes(a)) { const [fr] = await redis([['SISMEMBER', 'teman:' + u, t]]);
+          if (+fr) { const d = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10); const [nx] = await redis([['SET', 'hd:' + pair + ':' + d + ':' + a, '1', 'NX', 'EX', '172800']]);
+            const [h0] = await redis([['HGET', 'hatip', pair]]); hati = +h0 || 0; if (nx && hati < 10) { const [h1] = await redis([['HINCRBY', 'hatip', pair, '1']]); hati = +h1 } } }
+        return send(res, 200, { ok: true, hati }) }
+      if (ga === 'mainTeman') { const u = String(q0.get('u') || '').toLowerCase().slice(0, 40); if (!u) return send(res, 200, { ok: false });
+        const [L] = await redis([['SMEMBERS', 'teman:' + u]]); const T = (L || []).slice(0, 100); const H = T.length ? (await redis([['HMGET', 'hatip', ...T.map(x => [u, x].sort().join('|'))]]))[0] : [];
+        return send(res, 200, { ok: true, teman: T.map((x, i) => ({ u: x, hati: +(H || [])[i] || 0 })).sort((a, b) => b.hati - a.hati) }) }
       // ----- ekosistem: pameran karya mingguan, proyek kota, pasar antarwarga -----
       const KARYA_OK = ['suling', 'gitar', 'drum', 'lukisan', 'lukisanbesar', 'gerabah', 'patung', 'fotokota', 'videopendek', 'videojadi', 'trailer', 'ilustrasi', 'poster', 'komik'];
       const JUAL_OK = KARYA_OK.concat(['wortel', 'tomat', 'gandum', 'bambu', 'kapas', 'pewarna', 'jamur', 'bunga', 'buah', 'kayu', 'batu', 'tanahliat', 'momen', 'roti', 'telur', 'stroberi', 'jagung', 'labu']);
